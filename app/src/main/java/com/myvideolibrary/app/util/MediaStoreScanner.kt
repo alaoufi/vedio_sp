@@ -1,7 +1,7 @@
 package com.myvideolibrary.app.util
 
+import android.content.ContentUris
 import android.content.Context
-import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -69,9 +69,9 @@ class MediaStoreScanner @Inject constructor(
 
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idCol)
-                val uri: Uri = MediaStore.Video.Media.getContentUri(
-                    MediaStore.VOLUME_EXTERNAL, id
-                ).let { if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) it else Uri.withAppendedPath(collection, id.toString()) }
+                // ContentUris.withAppendedId works on every supported API level,
+                // unlike the two-argument getContentUri(volume, id) added in Q.
+                val uri = ContentUris.withAppendedId(collection, id)
 
                 result.add(
                     ScannedVideo(

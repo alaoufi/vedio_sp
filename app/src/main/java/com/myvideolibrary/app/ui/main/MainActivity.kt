@@ -1,0 +1,281 @@
+package com.myvideolibrary.app.ui.main
+
+import android.content.Intent
+import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.EditText
+import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.paging.LoadState
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.chip.Chip
+import com.myvideolibrary.app.R
+import com.myvideolibrary.app.data.local.entity.VideoEntity
+import com.myvideolibrary.app.data.model.LibraryViewMode
+import com.myvideolibrary.app.data.model.SortOrder
+import com.myvideolibrary.app.databinding.ActivityMainBinding
+import com.myvideolibrary.app.ui.importer.ImportActivity
+import com.myvideolibrary.app.ui.player.PlayerActivity
+import com.myvideolibrary.app.util.Formatters
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+
+@AndroidEntryPoint
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
+    private val viewModel: LibraryViewModel by viewModels()
+
+    private lateinit var adapter: VideoPagingAdapter
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
+
+        setupRecycler()
+        setupSearch()
+        setupFab()
+        observeState()
+        observeVideos()
+    }
+
+    private fun setupRecycler() {
+        adapter = VideoPagingAdapter(
+            viewMode = LibraryViewMode.GRID,
+            onClick = ::onVideoClick,
+            onLongClick = { viewModel.enterSelection(it.id) },
+            onFavorite = { viewModel.toggleFavorite(it) }
+        )
+        binding.recyclerView.adapter = adapter
+
+        binding.swipeRefresh.setOnRefreshListener {
+            adapter.refresh()
+            binding.swipeRefresh.isRefreshing = false
+        }
+
+        adapter.addLoadStateListener { loadStates ->
+            val refresh = loadStates.refresh
+            binding.progressBar.isVisible = refresh is LoadState.Loading && adapter.itemCount == 0
+            val empty = refresh is LoadState.NotLoading && adapter.itemCount == 0
+            binding.emptyState.isVisible = empty
+        }
+    }
+
+    private fun applyLayoutManager(mode: LibraryViewMode) {
+        binding.recyclerView.layoutManager = when (mode) {
+            LibraryViewMode.GRID -> GridLayoutManager(this, gridSpanCount())
+            LibraryViewMode.LIST -> LinearLayoutManager(this)
+        }
+        adapter.setViewMode(mode)
+    }
+
+    private fun gridSpanCount(): Int {
+        val widthDp = resources.configuration.screenWidthDp
+        return (widthDp / 180).coerceAtLeast(2)
+    }
+
+    private fun setupSearch() {
+        binding.searchInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+            override fun onTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                viewModel.setSearch(s?.toString().orEmpty())
+            }
+        })
+    }
+
+    private fun setupFab() {
+        binding.fabImport.setOnClickListener {
+            startActivity(Intent(this, ImportActivity::class.java))
+        }
+    }
+
+    private fun observeState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collectLatest { state ->
+                    applyLayoutManager(state.viewMode)
+                    adapter.setSelection(state.selectionMode, state.selectedIds)
+                    renderStats(state)
+                    renderFolderChips(state)
+                    renderSelectionBar(state)
+                    invalidateOptionsMenu()
+                }
+            }
+        }
+    }
+
+    private fun observeVideos() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.videos.collectLatest { adapter.submitData(it) }
+            }
+        }
+    }
+
+    private fun renderStats(state: LibraryUiState) {
+        binding.statsText.text = getString(
+            R.string.library_stats,
+            state.videoCount,
+            Formatters.fileSize(state.totalSize)
+        )
+    }
+
+    private fun renderFolderChips(state: LibraryUiState) {
+        val group = binding.folderChips
+        // Rebuild only when the folder set changes to avoid flicker.
+        if (group.tag == state.folders.map { it.id }) return
+        group.tag = state.folders.map { it.id }
+        group.removeAllViews()
+
+        val allChip = Chip(this).apply {
+            text = getString(R.string.filter_all)
+            isCheckable = true
+            isChecked = state.folderId == null
+            setOnClickListener { viewModel.setFolderFilter(null) }
+        }
+        group.addView(allChip)
+
+        state.folders.forEach { folder ->
+            val chip = Chip(this).apply {
+                text = folder.name
+                isCheckable = true
+                isChecked = state.folderId == folder.id
+                setOnClickListener { viewModel.setFolderFilter(folder.id) }
+            }
+            group.addView(chip)
+        }
+    }
+
+    private fun renderSelectionBar(state: LibraryUiState) {
+        binding.selectionBar.isVisible = state.selectionMode
+        if (state.selectionMode) {
+            binding.selectionCount.text = getString(
+                R.string.selected_count, state.selectedIds.size
+            )
+            binding.selectionDelete.setOnClickListener { confirmDeleteSelected() }
+            binding.selectionFavorite.setOnClickListener { viewModel.favoriteSelected(true) }
+            binding.selectionMove.setOnClickListener { promptMoveSelected(state) }
+            binding.selectionClose.setOnClickListener { viewModel.clearSelection() }
+        }
+    }
+
+    private fun onVideoClick(video: VideoEntity) {
+        val state = viewModel.uiState.value
+        if (state.selectionMode) {
+            viewModel.toggleSelected(video.id)
+        } else {
+            startActivity(PlayerActivity.intent(this, video.id))
+        }
+    }
+
+    private fun confirmDeleteSelected() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.delete_videos_title)
+            .setMessage(R.string.delete_videos_message)
+            .setPositiveButton(R.string.delete_files) { _, _ -> viewModel.deleteSelected(true) }
+            .setNeutralButton(R.string.remove_only) { _, _ -> viewModel.deleteSelected(false) }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun promptMoveSelected(state: LibraryUiState) {
+        val names = listOf(getString(R.string.no_folder)) + state.folders.map { it.name }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.move_to_folder)
+            .setItems(names.toTypedArray()) { _, which ->
+                val folderId = if (which == 0) null else state.folders[which - 1].id
+                viewModel.moveSelectedToFolder(folderId)
+            }
+            .show()
+    }
+
+    // ---- Options menu ----
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        val favoritesOnly = viewModel.uiState.value.favoritesOnly
+        menu.findItem(R.id.action_favorites)?.setIcon(
+            if (favoritesOnly) R.drawable.ic_favorite else R.drawable.ic_favorite_border
+        )
+        return super.onPrepareOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_toggle_view -> { viewModel.toggleViewMode(); true }
+            R.id.action_sort -> { showSortDialog(); true }
+            R.id.action_favorites -> {
+                viewModel.setFavoritesOnly(!viewModel.uiState.value.favoritesOnly)
+                true
+            }
+            R.id.action_new_folder -> { promptNewFolder(); true }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun showSortDialog() {
+        val labels = arrayOf(
+            getString(R.string.sort_date_new),
+            getString(R.string.sort_date_old),
+            getString(R.string.sort_name_az),
+            getString(R.string.sort_name_za),
+            getString(R.string.sort_duration_long),
+            getString(R.string.sort_duration_short),
+            getString(R.string.sort_size_large),
+            getString(R.string.sort_size_small)
+        )
+        val orders = arrayOf(
+            SortOrder.DATE_ADDED_DESC, SortOrder.DATE_ADDED_ASC,
+            SortOrder.NAME_ASC, SortOrder.NAME_DESC,
+            SortOrder.DURATION_DESC, SortOrder.DURATION_ASC,
+            SortOrder.SIZE_DESC, SortOrder.SIZE_ASC
+        )
+        val current = orders.indexOf(viewModel.uiState.value.sortOrder).coerceAtLeast(0)
+        AlertDialog.Builder(this)
+            .setTitle(R.string.sort_by)
+            .setSingleChoiceItems(labels, current) { dialog, which ->
+                viewModel.setSortOrder(orders[which])
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun promptNewFolder() {
+        val input = EditText(this).apply { hint = getString(R.string.folder_name_hint) }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.new_folder)
+            .setView(input)
+            .setPositiveButton(R.string.create) { _, _ ->
+                val name = input.text.toString().trim()
+                if (name.isNotEmpty()) viewModel.createFolder(name)
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    override fun onBackPressed() {
+        if (viewModel.uiState.value.selectionMode) {
+            viewModel.clearSelection()
+        } else {
+            @Suppress("DEPRECATION")
+            super.onBackPressed()
+        }
+    }
+}

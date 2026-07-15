@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">مكتبة الفيديو</string>
+
+    <!-- Library -->
+    <string name="library_stats">%1$d فيديو · %2$s</string>
+    <string name="filter_all">الكل</string>
+    <string name="search_hint">ابحث عن فيديو</string>
+    <string name="empty_library_title">مكتبتك فارغة</string>
+    <string name="empty_library_message">اضغط زر + لاستيراد الفيديوهات من جهازك.</string>
+
+    <!-- Selection -->
+    <string name="selected_count">%1$d محدد</string>
+    <string name="delete_videos_title">حذف الفيديوهات</string>
+    <string name="delete_videos_message">إزالة من المكتبة فقط، أم حذف الملفات المملوكة للتطبيق أيضًا؟</string>
+    <string name="delete_files">حذف الملفات</string>
+    <string name="remove_only">إزالة فقط</string>
+    <string name="move_to_folder">نقل إلى مجلد</string>
+    <string name="no_folder">بدون مجلد</string>
+
+    <!-- Sort -->
+    <string name="sort_by">ترتيب حسب</string>
+    <string name="sort_date_new">تاريخ الإضافة (الأحدث)</string>
+    <string name="sort_date_old">تاريخ الإضافة (الأقدم)</string>
+    <string name="sort_name_az">الاسم (أ–ي)</string>
+    <string name="sort_name_za">الاسم (ي–أ)</string>
+    <string name="sort_duration_long">المدة (الأطول)</string>
+    <string name="sort_duration_short">المدة (الأقصر)</string>
+    <string name="sort_size_large">الحجم (الأكبر)</string>
+    <string name="sort_size_small">الحجم (الأصغر)</string>
+
+    <!-- Folders -->
+    <string name="new_folder">مجلد جديد</string>
+    <string name="folder_name_hint">اسم المجلد</string>
+    <string name="create">إنشاء</string>
+    <string name="cancel">إلغاء</string>
+
+    <!-- Menu -->
+    <string name="action_toggle_view">تبديل العرض</string>
+    <string name="action_sort">ترتيب</string>
+    <string name="action_favorites">المفضلة</string>
+    <string name="action_new_folder">مجلد جديد</string>
+
+    <!-- Import -->
+    <string name="import_title">استيراد الفيديوهات</string>
+    <string name="import_select_all">تحديد الكل</string>
+    <string name="import_selected_count">استيراد (%1$d)</string>
+    <string name="import_item_meta">%1$s · %2$s</string>
+    <string name="import_done">تم استيراد %1$d فيديو</string>
+    <string name="import_empty">لا توجد فيديوهات جديدة على هذا الجهاز</string>
+    <string name="permission_denied_media">إذن الوسائط مطلوب لاستيراد الفيديوهات.</string>
+
+    <!-- Player -->
+    <string name="speed_format">%.2f×</string>
+    <string name="playback_error">تعذّر تشغيل هذا الفيديو</string>
+    <string name="brightness_label">السطوع %1$d%%</string>
+    <string name="volume_label">الصوت %1$d%%</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_thumbnail">مصغّرة الفيديو</string>
+    <string name="cd_favorite">مفضلة</string>
+    <string name="cd_back">رجوع</string>
+    <string name="cd_lock">قفل عناصر التحكم</string>
+    <string name="cd_rotate">تدوير</string>
+    <string name="cd_pip">صورة داخل صورة</string>
+    <string name="cd_background">التشغيل في الخلفية</string>
+    <string name="cd_import">استيراد الفيديوهات</string>
+</resources>

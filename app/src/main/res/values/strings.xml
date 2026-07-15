@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">My Video Library</string>
+
+    <!-- Library -->
+    <string name="library_stats">%1$d videos · %2$s</string>
+    <string name="filter_all">All</string>
+    <string name="search_hint">Search videos</string>
+    <string name="empty_library_title">Your library is empty</string>
+    <string name="empty_library_message">Tap the + button to import videos from your device.</string>
+
+    <!-- Selection -->
+    <string name="selected_count">%1$d selected</string>
+    <string name="delete_videos_title">Delete videos</string>
+    <string name="delete_videos_message">Remove from library only, or also delete the files owned by the app?</string>
+    <string name="delete_files">Delete files</string>
+    <string name="remove_only">Remove only</string>
+    <string name="move_to_folder">Move to folder</string>
+    <string name="no_folder">No folder</string>
+
+    <!-- Sort -->
+    <string name="sort_by">Sort by</string>
+    <string name="sort_date_new">Date added (newest)</string>
+    <string name="sort_date_old">Date added (oldest)</string>
+    <string name="sort_name_az">Name (A–Z)</string>
+    <string name="sort_name_za">Name (Z–A)</string>
+    <string name="sort_duration_long">Duration (longest)</string>
+    <string name="sort_duration_short">Duration (shortest)</string>
+    <string name="sort_size_large">Size (largest)</string>
+    <string name="sort_size_small">Size (smallest)</string>
+
+    <!-- Folders -->
+    <string name="new_folder">New folder</string>
+    <string name="folder_name_hint">Folder name</string>
+    <string name="create">Create</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Menu -->
+    <string name="action_toggle_view">Toggle view</string>
+    <string name="action_sort">Sort</string>
+    <string name="action_favorites">Favorites</string>
+    <string name="action_new_folder">New folder</string>
+
+    <!-- Import -->
+    <string name="import_title">Import videos</string>
+    <string name="import_select_all">Select all</string>
+    <string name="import_selected_count">Import (%1$d)</string>
+    <string name="import_item_meta">%1$s · %2$s</string>
+    <string name="import_done">Imported %1$d videos</string>
+    <string name="import_empty">No new videos found on this device</string>
+    <string name="permission_denied_media">Media permission is required to import videos.</string>
+
+    <!-- Player -->
+    <string name="speed_format">%.2f×</string>
+    <string name="playback_error">Unable to play this video</string>
+    <string name="brightness_label">Brightness %1$d%%</string>
+    <string name="volume_label">Volume %1$d%%</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_thumbnail">Video thumbnail</string>
+    <string name="cd_favorite">Favorite</string>
+    <string name="cd_back">Back</string>
+    <string name="cd_lock">Lock controls</string>
+    <string name="cd_rotate">Rotate</string>
+    <string name="cd_pip">Picture in picture</string>
+    <string name="cd_background">Background playback</string>
+    <string name="cd_import">Import videos</string>
+</resources>
