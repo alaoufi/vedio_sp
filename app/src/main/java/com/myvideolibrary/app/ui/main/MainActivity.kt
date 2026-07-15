@@ -26,6 +26,7 @@ import com.myvideolibrary.app.databinding.ActivityMainBinding
 import com.myvideolibrary.app.ui.downloads.DownloadsActivity
 import com.myvideolibrary.app.ui.importer.ImportActivity
 import com.myvideolibrary.app.ui.player.PlayerActivity
+import com.myvideolibrary.app.ui.provider.AddDownloadActivity
 import com.myvideolibrary.app.util.Formatters
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -229,6 +230,10 @@ class MainActivity : AppCompatActivity() {
             R.id.action_new_folder -> { promptNewFolder(); true }
             R.id.action_downloads -> {
                 startActivity(Intent(this, DownloadsActivity::class.java))
+                true
+            }
+            R.id.action_add_download -> {
+                startActivity(AddDownloadActivity.intent(this))
                 true
             }
             else -> super.onOptionsItemSelected(item)

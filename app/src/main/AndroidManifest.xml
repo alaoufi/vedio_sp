@@ -50,6 +50,18 @@
             android:exported="false"
             android:parentActivityName=".ui.main.MainActivity" />
 
+        <!-- Add a download from a pasted or shared TikTok/YouTube link. -->
+        <activity
+            android:name=".ui.provider.AddDownloadActivity"
+            android:exported="true"
+            android:parentActivityName=".ui.main.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
+
         <!-- Download management. -->
         <activity
             android:name=".ui.downloads.DownloadsActivity"

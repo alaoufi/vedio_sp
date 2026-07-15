@@ -76,6 +76,23 @@
     <string name="download_complete">Download complete</string>
     <string name="download_failed">Download failed</string>
 
+    <!-- Add download (providers) -->
+    <string name="add_download_title">Download from link</string>
+    <string name="add_download_hint">Paste a TikTok or YouTube link. Extraction depends on the platform and may occasionally fail.</string>
+    <string name="paste_url_hint">Video URL</string>
+    <string name="paste">Paste</string>
+    <string name="fetch_info">Fetch info</string>
+    <string name="download">Download</string>
+    <string name="download_started">Download added to the queue</string>
+    <string name="action_add_download">Download from link</string>
+    <string name="error_invalid_link">This link is not valid.</string>
+    <string name="error_private">This video is private.</string>
+    <string name="error_not_found">Video not found or deleted.</string>
+    <string name="error_unsupported">This link is not supported.</string>
+    <string name="error_network">Network error. Check your connection.</string>
+    <string name="error_extraction">Could not extract the video. The source may have changed.</string>
+    <string name="error_unknown">Something went wrong.</string>
+
     <!-- Content descriptions -->
     <string name="cd_thumbnail">Video thumbnail</string>
     <string name="cd_favorite">Favorite</string>

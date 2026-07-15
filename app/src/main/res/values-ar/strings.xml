@@ -76,6 +76,23 @@
     <string name="download_complete">اكتمل التحميل</string>
     <string name="download_failed">فشل التحميل</string>
 
+    <!-- Add download (providers) -->
+    <string name="add_download_title">تحميل من رابط</string>
+    <string name="add_download_hint">الصق رابط تيك توك أو يوتيوب. الاستخراج يعتمد على المنصّة وقد يفشل أحيانًا.</string>
+    <string name="paste_url_hint">رابط الفيديو</string>
+    <string name="paste">لصق</string>
+    <string name="fetch_info">جلب المعلومات</string>
+    <string name="download">تحميل</string>
+    <string name="download_started">أُضيف التحميل إلى الطابور</string>
+    <string name="action_add_download">تحميل من رابط</string>
+    <string name="error_invalid_link">هذا الرابط غير صالح.</string>
+    <string name="error_private">هذا الفيديو خاص.</string>
+    <string name="error_not_found">الفيديو غير موجود أو محذوف.</string>
+    <string name="error_unsupported">هذا الرابط غير مدعوم.</string>
+    <string name="error_network">خطأ في الشبكة. تحقّق من اتصالك.</string>
+    <string name="error_extraction">تعذّر استخراج الفيديو. قد يكون المصدر تغيّر.</string>
+    <string name="error_unknown">حدث خطأ ما.</string>
+
     <!-- Content descriptions -->
     <string name="cd_thumbnail">مصغّرة الفيديو</string>
     <string name="cd_favorite">مفضلة</string>
