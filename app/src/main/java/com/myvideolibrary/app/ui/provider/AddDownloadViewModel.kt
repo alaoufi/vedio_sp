@@ -71,6 +71,7 @@ class AddDownloadViewModel @Inject constructor(
                 source = resolved.source.id,
                 sourceUrl = resolved.sourceUrl,
                 directUrl = resolved.directUrl,
+                audioUrl = resolved.audioUrl,
                 thumbnailUrl = resolved.thumbnailUrl
             )
             _state.value = _state.value.copy(enqueued = true)

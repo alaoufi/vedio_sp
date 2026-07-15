@@ -117,7 +117,30 @@ class TikTokProvider @Inject constructor(
     // ---- Extraction (watermark-free) ----
 
     private fun extractNoWatermark(html: String): Extracted? =
-        fromUniversalData(html) ?: fromSigiState(html)
+        fromUniversalData(html) ?: fromSigiState(html) ?: fromNextData(html)
+
+    /** Older layout: <script id="__NEXT_DATA__">. */
+    private fun fromNextData(html: String): Extracted? {
+        val json = extractScriptJson(html, "__NEXT_DATA__") ?: return null
+        val root = runCatching { gson.fromJson(json, JsonObject::class.java) }.getOrNull() ?: return null
+
+        val item = root.obj("props")
+            ?.obj("pageProps")
+            ?.obj("itemInfo")
+            ?.obj("itemStruct")
+            ?: return null
+
+        val video = item.obj("video") ?: return null
+        val url = playAddrOf(video) ?: return null
+
+        return Extracted(
+            url = url,
+            title = item.str("desc"),
+            author = item.obj("author")?.str("nickname"),
+            cover = video.str("cover") ?: video.str("originCover"),
+            durationMs = (video.num("duration") ?: 0) * 1000
+        )
+    }
 
     /** Modern format: __UNIVERSAL_DATA_FOR_REHYDRATION__. */
     private fun fromUniversalData(html: String): Extracted? {

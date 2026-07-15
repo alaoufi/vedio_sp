@@ -41,6 +41,7 @@ class DownloadManager @Inject constructor(
         source: String,
         sourceUrl: String,
         directUrl: String,
+        audioUrl: String? = null,
         thumbnailUrl: String? = null
     ): Long {
         val dest = storageManager.newVideoFile("mp4").absolutePath
@@ -50,6 +51,7 @@ class DownloadManager @Inject constructor(
                 source = source,
                 sourceUrl = sourceUrl,
                 downloadUrl = directUrl,
+                audioUrl = audioUrl,
                 thumbnailUrl = thumbnailUrl,
                 destPath = dest,
                 status = DownloadStatus.WAITING.id,

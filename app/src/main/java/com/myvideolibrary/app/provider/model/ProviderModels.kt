@@ -11,6 +11,11 @@ data class ResolvedVideo(
     val sourceUrl: String,
     val title: String,
     val directUrl: String,
+    /**
+     * When set, [directUrl] is a video-only stream and this is the matching
+     * audio-only stream; the download manager muxes the two into one file.
+     */
+    val audioUrl: String? = null,
     val thumbnailUrl: String? = null,
     val author: String? = null,
     val durationMs: Long = 0,

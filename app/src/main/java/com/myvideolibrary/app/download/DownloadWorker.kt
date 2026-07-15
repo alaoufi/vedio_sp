@@ -58,9 +58,23 @@ class DownloadWorker @AssistedInject constructor(
         val destFile = File(download.destPath ?: storageManager.newVideoFile("mp4").absolutePath)
         return try {
             downloadRepository.setStatus(downloadId, DownloadStatus.DOWNLOADING)
-            val ok = downloadFile(url, destFile, downloadId, download.title, notificationId)
-            if (!ok) {
-                // Interrupted (paused/stopped): keep the partial file for resume.
+
+            val audioUrl = download.audioUrl
+            val finished = if (audioUrl.isNullOrBlank()) {
+                downloadFile(url, destFile, downloadId, download.title, notificationId)
+            } else {
+                downloadAndMux(
+                    videoUrl = url,
+                    audioUrl = audioUrl,
+                    destFile = destFile,
+                    downloadId = downloadId,
+                    title = download.title,
+                    notificationId = notificationId
+                )
+            }
+
+            if (!finished) {
+                // Interrupted (paused/stopped): keep partial data for resume.
                 downloadRepository.setStatus(downloadId, DownloadStatus.PAUSED)
                 return Result.success()
             }
@@ -165,6 +179,40 @@ class DownloadWorker @AssistedInject constructor(
             )
             true
         }
+    }
+
+    /**
+     * Downloads a video-only and an audio-only stream, then muxes them into
+     * [destFile]. Temp files are recreated per run (no cross-retry resume) to keep
+     * the merge deterministic. Returns false if stopped/paused mid-way.
+     */
+    private suspend fun downloadAndMux(
+        videoUrl: String,
+        audioUrl: String,
+        destFile: File,
+        downloadId: Long,
+        title: String,
+        notificationId: Int
+    ): Boolean = withContext(Dispatchers.IO) {
+        val videoTmp = File(destFile.parentFile, destFile.name + ".video.part")
+        val audioTmp = File(destFile.parentFile, destFile.name + ".audio.part")
+        videoTmp.takeIf(File::exists)?.delete()
+        audioTmp.takeIf(File::exists)?.delete()
+
+        if (!downloadFile(videoUrl, videoTmp, downloadId, title, notificationId)) {
+            return@withContext false
+        }
+        if (!downloadFile(audioUrl, audioTmp, downloadId, title, notificationId)) {
+            return@withContext false
+        }
+
+        // Merge phase: show an indeterminate notification while muxing.
+        setForeground(notifier.foregroundInfo(notificationId, title, 100, true, 0))
+        val merged = VideoMuxer.mux(videoTmp, audioTmp, destFile)
+        videoTmp.delete()
+        audioTmp.delete()
+        if (!merged) throw IllegalStateException("Failed to merge video and audio")
+        true
     }
 
     private suspend fun finalize(downloadId: Long, title: String, destFile: File) {

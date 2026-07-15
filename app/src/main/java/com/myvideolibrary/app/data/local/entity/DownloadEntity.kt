@@ -35,6 +35,13 @@ data class DownloadEntity(
     @ColumnInfo(name = "download_url")
     val downloadUrl: String? = null,
 
+    /**
+     * Optional audio-only stream URL. When present, [downloadUrl] is video-only
+     * and the two are muxed together on completion.
+     */
+    @ColumnInfo(name = "audio_url")
+    val audioUrl: String? = null,
+
     @ColumnInfo(name = "thumbnail_url")
     val thumbnailUrl: String? = null,
 

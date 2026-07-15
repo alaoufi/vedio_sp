@@ -9,6 +9,7 @@ import com.myvideolibrary.app.provider.model.ResolvedVideo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
+import org.schabi.newpipe.extractor.MediaFormat
 import org.schabi.newpipe.extractor.NewPipe
 import org.schabi.newpipe.extractor.ServiceList
 import org.schabi.newpipe.extractor.exceptions.ContentNotAvailableException
@@ -46,26 +47,56 @@ class YouTubeProvider @Inject constructor(
         try {
             val info = StreamInfo.getInfo(ServiceList.YouTube, url)
 
-            // Prefer a muxed (video+audio) stream so the result is a single
-            // playable file with no post-processing.
-            val stream = info.videoStreams
+            // Best single-file (muxed) stream — always playable, but YouTube caps
+            // these around 720p.
+            val bestMuxed = info.videoStreams
                 .filter { !it.isVideoOnly && !it.content.isNullOrBlank() }
-                .maxByOrNull { it.getResolution().filter(Char::isDigit).toIntOrNull() ?: 0 }
-                ?: throw ProviderException(
+                .maxByOrNull { resolutionValue(it.getResolution()) }
+
+            // Best MP4/H.264 video-only stream (higher resolutions live here) plus
+            // best M4A/AAC audio — both MP4-container so they mux without re-encoding.
+            val bestVideoOnly = info.videoOnlyStreams
+                .filter { !it.content.isNullOrBlank() && it.format == MediaFormat.MPEG_4 }
+                .maxByOrNull { resolutionValue(it.getResolution()) }
+            val bestAudio = info.audioStreams
+                .filter { !it.content.isNullOrBlank() && it.format == MediaFormat.M4A }
+                .maxByOrNull { it.averageBitrate }
+
+            val muxedRes = bestMuxed?.let { resolutionValue(it.getResolution()) } ?: 0
+            val hiRes = bestVideoOnly?.let { resolutionValue(it.getResolution()) } ?: 0
+
+            val resolved = when {
+                // Higher quality available by merging a video-only + audio stream.
+                bestVideoOnly != null && bestAudio != null && hiRes > muxedRes ->
+                    ResolvedVideo(
+                        source = VideoSource.YOUTUBE,
+                        sourceUrl = url,
+                        title = info.name ?: "YouTube video",
+                        directUrl = bestVideoOnly.content,
+                        audioUrl = bestAudio.content,
+                        thumbnailUrl = info.thumbnails.lastOrNull()?.url,
+                        author = info.uploaderName,
+                        durationMs = info.duration * 1000,
+                        quality = bestVideoOnly.getResolution()
+                    )
+                // Otherwise the single-file muxed stream.
+                bestMuxed != null ->
+                    ResolvedVideo(
+                        source = VideoSource.YOUTUBE,
+                        sourceUrl = url,
+                        title = info.name ?: "YouTube video",
+                        directUrl = bestMuxed.content,
+                        thumbnailUrl = info.thumbnails.lastOrNull()?.url,
+                        author = info.uploaderName,
+                        durationMs = info.duration * 1000,
+                        quality = bestMuxed.getResolution()
+                    )
+                else -> throw ProviderException(
                     ProviderErrorType.EXTRACTION_FAILED,
                     "No downloadable stream found"
                 )
-
-            ResolvedVideo(
-                source = VideoSource.YOUTUBE,
-                sourceUrl = url,
-                title = info.name ?: "YouTube video",
-                directUrl = stream.content,
-                thumbnailUrl = info.thumbnails.lastOrNull()?.url,
-                author = info.uploaderName,
-                durationMs = info.duration * 1000,
-                quality = stream.getResolution()
-            )
+            }
+            resolved
         } catch (e: ContentNotAvailableException) {
             throw ProviderException(ProviderErrorType.NOT_FOUND, "Video is unavailable", e)
         } catch (e: ExtractionException) {
@@ -79,6 +110,10 @@ class YouTubeProvider @Inject constructor(
     }
 
     override suspend fun search(query: String): List<ProviderSearchItem> = emptyList()
+
+    /** Extracts the numeric height from a resolution label like "1080p60" → 1080. */
+    private fun resolutionValue(resolution: String?): Int =
+        resolution?.takeWhile(Char::isDigit)?.toIntOrNull() ?: 0
 
     private fun ensureInitialised() {
         synchronized(lock) {

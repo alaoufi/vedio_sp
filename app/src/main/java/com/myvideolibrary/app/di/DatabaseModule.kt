@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.myvideolibrary.app.data.local.AppDatabase
 import com.myvideolibrary.app.data.local.DatabaseKeyManager
+import com.myvideolibrary.app.data.local.MIGRATION_1_2
 import com.myvideolibrary.app.data.local.dao.DownloadDao
 import com.myvideolibrary.app.data.local.dao.FolderDao
 import com.myvideolibrary.app.data.local.dao.SettingsDao
@@ -45,6 +46,7 @@ object DatabaseModule {
             AppDatabase.DATABASE_NAME
         )
             .openHelperFactory(factory)
+            .addMigrations(MIGRATION_1_2)
             .fallbackToDestructiveMigrationOnDowngrade()
             .build()
     }

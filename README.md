@@ -28,8 +28,11 @@ Implemented and wired end‑to‑end:
   progress/speed notifications, retry with backoff, queue with pause/resume/cancel;
   finished files auto‑added to the library.
 - **Provider system** — `VideoProvider` interface + registry (Hilt multibinding).
-  **YouTubeProvider** (NewPipeExtractor) and **TikTokProvider** (oEmbed metadata +
-  page extraction) are isolated modules; paste or share a link to download.
+  **YouTubeProvider** (NewPipeExtractor) picks the best single-file stream, or a
+  high-res video-only + audio pair that the download manager **merges on-device via
+  `MediaMuxer`** (no re-encode). **TikTokProvider** returns the **watermark-free**
+  `playAddr` using three extraction strategies (universal-data / SIGI / next-data).
+  Paste or share a link to download.
 - **Security** — PIN + biometric app‑lock gate, re‑lock on background, `FLAG_SECURE`
   to block screenshots and hide content from the recent‑apps preview.
 - **Settings** — theme (light/dark/system), Wi‑Fi‑only + max concurrent downloads,
