@@ -109,7 +109,33 @@ class YouTubeProvider @Inject constructor(
         }
     }
 
-    override suspend fun search(query: String): List<ProviderSearchItem> = emptyList()
+    override suspend fun search(query: String): List<ProviderSearchItem> =
+        withContext(Dispatchers.IO) {
+            ensureInitialised()
+            try {
+                val extractor = ServiceList.YouTube.getSearchExtractor(
+                    query, emptyList(), ""
+                )
+                extractor.fetchPage()
+                extractor.initialPage.items
+                    .filterIsInstance<org.schabi.newpipe.extractor.stream.StreamInfoItem>()
+                    .map { item ->
+                        ProviderSearchItem(
+                            source = VideoSource.YOUTUBE,
+                            url = item.url,
+                            title = item.name ?: "",
+                            thumbnailUrl = item.thumbnails.lastOrNull()?.url,
+                            author = item.uploaderName,
+                            durationMs = (item.duration.takeIf { it > 0 } ?: 0) * 1000
+                        )
+                    }
+            } catch (e: Exception) {
+                throw ProviderException(
+                    ProviderErrorType.EXTRACTION_FAILED,
+                    "YouTube search failed", e
+                )
+            }
+        }
 
     /** Extracts the numeric height from a resolution label like "1080p60" → 1080. */
     private fun resolutionValue(resolution: String?): Int =

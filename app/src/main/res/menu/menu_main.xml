@@ -21,6 +21,12 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/action_search_online"
+        android:icon="@drawable/ic_search"
+        android:title="@string/search_title"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/action_add_download"
         android:icon="@drawable/ic_link"
         android:title="@string/action_add_download"

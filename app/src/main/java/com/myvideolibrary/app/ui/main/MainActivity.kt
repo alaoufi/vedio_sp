@@ -22,6 +22,7 @@ import com.myvideolibrary.app.R
 import com.myvideolibrary.app.data.local.entity.VideoEntity
 import com.myvideolibrary.app.data.model.LibraryViewMode
 import com.myvideolibrary.app.data.model.SortOrder
+import com.myvideolibrary.app.data.model.SourceFilter
 import com.myvideolibrary.app.databinding.ActivityMainBinding
 import com.myvideolibrary.app.security.SecurityManager
 import com.myvideolibrary.app.security.applyScreenshotPolicy
@@ -53,6 +54,7 @@ class MainActivity : AppCompatActivity() {
 
         setupRecycler()
         setupSearch()
+        setupSourceChips()
         setupFab()
         observeState()
         observeVideos()
@@ -103,6 +105,35 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    private val sourceChipModels = listOf(
+        SourceFilter.ALL to R.string.filter_all,
+        SourceFilter.TIKTOK to R.string.source_tiktok,
+        SourceFilter.YOUTUBE to R.string.source_youtube,
+        SourceFilter.OTHER to R.string.source_other
+    )
+
+    private fun setupSourceChips() {
+        binding.sourceChips.removeAllViews()
+        sourceChipModels.forEach { (filter, labelRes) ->
+            val chip = com.google.android.material.chip.Chip(this).apply {
+                text = getString(labelRes)
+                isCheckable = true
+                isChecked = filter == SourceFilter.ALL
+                tag = filter
+                setOnClickListener { viewModel.setSourceFilter(filter) }
+            }
+            binding.sourceChips.addView(chip)
+        }
+    }
+
+    private fun renderSourceChips(state: LibraryUiState) {
+        for (i in 0 until binding.sourceChips.childCount) {
+            val chip = binding.sourceChips.getChildAt(i)
+                    as? com.google.android.material.chip.Chip ?: continue
+            chip.isChecked = chip.tag == state.sourceFilter
+        }
+    }
+
     private fun setupFab() {
         binding.fabImport.setOnClickListener {
             startActivity(Intent(this, ImportActivity::class.java))
@@ -116,6 +147,7 @@ class MainActivity : AppCompatActivity() {
                     applyLayoutManager(state.viewMode)
                     adapter.setSelection(state.selectionMode, state.selectedIds)
                     renderStats(state)
+                    renderSourceChips(state)
                     renderFolderChips(state)
                     renderSelectionBar(state)
                     invalidateOptionsMenu()
@@ -239,6 +271,10 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.action_add_download -> {
                 startActivity(AddDownloadActivity.intent(this))
+                true
+            }
+            R.id.action_search_online -> {
+                startActivity(Intent(this, com.myvideolibrary.app.ui.search.SearchActivity::class.java))
                 true
             }
             R.id.action_settings -> {

@@ -3,6 +3,8 @@ package com.myvideolibrary.app.data.repository
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.myvideolibrary.app.data.model.SortOrder
+import com.myvideolibrary.app.data.model.SourceFilter
+import com.myvideolibrary.app.data.model.VideoSource
 
 /**
  * Immutable description of the current library filter + sort. Converted to a
@@ -13,6 +15,7 @@ data class LibraryQuery(
     val folderId: Long? = null,
     val favoritesOnly: Boolean = false,
     val category: String? = null,
+    val sourceFilter: SourceFilter = SourceFilter.ALL,
     val sortOrder: SortOrder = SortOrder.DATE_ADDED_DESC
 ) {
 
@@ -36,6 +39,22 @@ data class LibraryQuery(
         category?.let {
             where.append(" AND category = ?")
             args.add(it)
+        }
+        when (sourceFilter) {
+            SourceFilter.TIKTOK -> {
+                where.append(" AND source = ?")
+                args.add(VideoSource.TIKTOK.id)
+            }
+            SourceFilter.YOUTUBE -> {
+                where.append(" AND source = ?")
+                args.add(VideoSource.YOUTUBE.id)
+            }
+            SourceFilter.OTHER -> {
+                where.append(" AND source NOT IN (?, ?)")
+                args.add(VideoSource.TIKTOK.id)
+                args.add(VideoSource.YOUTUBE.id)
+            }
+            SourceFilter.ALL -> Unit
         }
 
         val orderBy = when (sortOrder) {

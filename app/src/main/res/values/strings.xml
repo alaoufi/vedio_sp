@@ -5,6 +5,9 @@
     <!-- Library -->
     <string name="library_stats">%1$d videos · %2$s</string>
     <string name="filter_all">All</string>
+    <string name="source_tiktok">TikTok</string>
+    <string name="source_youtube">YouTube</string>
+    <string name="source_other">Other</string>
     <string name="search_hint">Search videos</string>
     <string name="empty_library_title">Your library is empty</string>
     <string name="empty_library_message">Tap the + button to import videos from your device.</string>
@@ -77,6 +80,9 @@
     <string name="download_failed">Download failed</string>
 
     <!-- Add download (providers) -->
+    <string name="search_title">Search &amp; download</string>
+    <string name="action_search">Search</string>
+    <string name="tiktok_link_hint">TikTok has no keyword search — paste a TikTok link, then press Search to download it.</string>
     <string name="add_download_title">Download from link</string>
     <string name="add_download_hint">Paste a TikTok or YouTube link. TikTok videos are saved without watermark. Extraction depends on the platform and may occasionally fail.</string>
     <string name="paste_url_hint">Video URL</string>

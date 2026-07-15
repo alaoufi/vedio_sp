@@ -59,6 +59,19 @@ enum class LibraryViewMode(val id: String) {
     }
 }
 
+/** Library filter by originating source. */
+enum class SourceFilter(val id: String) {
+    ALL("all"),
+    TIKTOK("tiktok"),
+    YOUTUBE("youtube"),
+    OTHER("other");
+
+    companion object {
+        fun fromId(id: String?): SourceFilter =
+            entries.firstOrNull { it.id == id } ?: ALL
+    }
+}
+
 /** UI theme preference. */
 enum class AppTheme(val id: String) {
     SYSTEM("system"),

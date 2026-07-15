@@ -9,6 +9,7 @@ import com.myvideolibrary.app.data.local.entity.SettingsEntity
 import com.myvideolibrary.app.data.local.entity.VideoEntity
 import com.myvideolibrary.app.data.model.LibraryViewMode
 import com.myvideolibrary.app.data.model.SortOrder
+import com.myvideolibrary.app.data.model.SourceFilter
 import com.myvideolibrary.app.data.repository.FolderRepository
 import com.myvideolibrary.app.data.repository.LibraryQuery
 import com.myvideolibrary.app.data.repository.SettingsRepository
@@ -34,6 +35,7 @@ data class LibraryUiState(
     val search: String = "",
     val folderId: Long? = null,
     val favoritesOnly: Boolean = false,
+    val sourceFilter: SourceFilter = SourceFilter.ALL,
     val videoCount: Int = 0,
     val totalSize: Long = 0,
     val folders: List<FolderEntity> = emptyList(),
@@ -55,6 +57,7 @@ class LibraryViewModel @Inject constructor(
     private val _search = MutableStateFlow("")
     private val _folderFilter = MutableStateFlow<Long?>(null)
     private val _favoritesOnly = MutableStateFlow(false)
+    private val _sourceFilter = MutableStateFlow(SourceFilter.ALL)
 
     /** Paged videos, recomputed whenever the query changes. */
     val videos: Flow<PagingData<VideoEntity>> =
@@ -73,9 +76,9 @@ class LibraryViewModel @Inject constructor(
 
     // Active filter selections.
     private val filters = combine(
-        _search, _folderFilter, _favoritesOnly
-    ) { search, folderId, favoritesOnly ->
-        LibraryFilters(search, folderId, favoritesOnly)
+        _search, _folderFilter, _favoritesOnly, _sourceFilter
+    ) { search, folderId, favoritesOnly, sourceFilter ->
+        LibraryFilters(search, folderId, favoritesOnly, sourceFilter)
     }
 
     val uiState: StateFlow<LibraryUiState> = combine(
@@ -87,6 +90,7 @@ class LibraryViewModel @Inject constructor(
             search = f.search,
             folderId = f.folderId,
             favoritesOnly = f.favoritesOnly,
+            sourceFilter = f.sourceFilter,
             videoCount = m.count,
             totalSize = m.size,
             folders = m.folders,
@@ -102,12 +106,14 @@ class LibraryViewModel @Inject constructor(
                 settingsRepository.observeSettings(),
                 _search,
                 _folderFilter,
-                _favoritesOnly
-            ) { settings, search, folderId, favoritesOnly ->
+                _favoritesOnly,
+                _sourceFilter
+            ) { settings, search, folderId, favoritesOnly, sourceFilter ->
                 LibraryQuery(
                     search = search,
                     folderId = folderId,
                     favoritesOnly = favoritesOnly,
+                    sourceFilter = sourceFilter,
                     sortOrder = SortOrder.fromId(settings.sortOrder)
                 )
             }.collect { queryState.value = it }
@@ -121,6 +127,8 @@ class LibraryViewModel @Inject constructor(
     fun setFolderFilter(folderId: Long?) { _folderFilter.value = folderId }
 
     fun setFavoritesOnly(only: Boolean) { _favoritesOnly.value = only }
+
+    fun setSourceFilter(filter: SourceFilter) { _sourceFilter.value = filter }
 
     fun setSortOrder(order: SortOrder) = viewModelScope.launch {
         settingsRepository.update { it.copy(sortOrder = order.id) }
@@ -200,6 +208,7 @@ class LibraryViewModel @Inject constructor(
     private data class LibraryFilters(
         val search: String,
         val folderId: Long?,
-        val favoritesOnly: Boolean
+        val favoritesOnly: Boolean,
+        val sourceFilter: SourceFilter
     )
 }

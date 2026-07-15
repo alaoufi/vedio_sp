@@ -27,7 +27,7 @@ data class SettingsEntity(
 
     // ---- Download preferences (used by the download manager phase) ----
     @ColumnInfo(name = "wifi_only_downloads")
-    val wifiOnlyDownloads: Boolean = true,
+    val wifiOnlyDownloads: Boolean = false,
 
     @ColumnInfo(name = "max_concurrent_downloads")
     val maxConcurrentDownloads: Int = 2,

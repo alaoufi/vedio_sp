@@ -56,6 +56,12 @@
             android:exported="false"
             android:parentActivityName=".ui.main.MainActivity" />
 
+        <!-- Search providers (YouTube) and download. -->
+        <activity
+            android:name=".ui.search.SearchActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.main.MainActivity" />
+
         <!-- Add a download from a pasted or shared TikTok/YouTube link. -->
         <activity
             android:name=".ui.provider.AddDownloadActivity"
