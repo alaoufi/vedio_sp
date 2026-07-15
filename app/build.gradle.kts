@@ -137,7 +137,8 @@ dependencies {
     implementation(libs.androidx.security.crypto)
     implementation(libs.androidx.biometric)
 
-    // NewPipeExtractor (YouTube provider) is added in the provider phase.
+    // NewPipeExtractor (YouTube provider, community maintained)
+    implementation(libs.newpipe.extractor)
 
     // Java 8+ API desugaring (java.time on minSdk 24)
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.2")

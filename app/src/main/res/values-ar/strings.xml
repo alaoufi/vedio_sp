@@ -56,6 +56,26 @@
     <string name="brightness_label">السطوع %1$d%%</string>
     <string name="volume_label">الصوت %1$d%%</string>
 
+    <!-- Downloads -->
+    <string name="downloads_title">التحميلات</string>
+    <string name="downloads_empty">لا توجد تحميلات بعد</string>
+    <string name="clear_completed">مسح المكتمل</string>
+    <string name="action_downloads">التحميلات</string>
+    <string name="action_resume">استئناف</string>
+    <string name="action_pause">إيقاف مؤقت</string>
+    <string name="action_retry">إعادة المحاولة</string>
+    <string name="status_waiting">في الانتظار…</string>
+    <string name="status_downloading">%1$d%% · %2$s</string>
+    <string name="status_paused">متوقف مؤقتًا</string>
+    <string name="status_completed">مكتمل · %1$s</string>
+    <string name="status_failed">فشل</string>
+    <string name="status_canceled">أُلغي</string>
+    <string name="download_channel_name">التحميلات</string>
+    <string name="download_channel_desc">يعرض تقدّم تحميل الفيديوهات</string>
+    <string name="download_preparing">جارٍ التحضير…</string>
+    <string name="download_complete">اكتمل التحميل</string>
+    <string name="download_failed">فشل التحميل</string>
+
     <!-- Content descriptions -->
     <string name="cd_thumbnail">مصغّرة الفيديو</string>
     <string name="cd_favorite">مفضلة</string>

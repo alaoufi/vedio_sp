@@ -23,6 +23,7 @@ import com.myvideolibrary.app.data.local.entity.VideoEntity
 import com.myvideolibrary.app.data.model.LibraryViewMode
 import com.myvideolibrary.app.data.model.SortOrder
 import com.myvideolibrary.app.databinding.ActivityMainBinding
+import com.myvideolibrary.app.ui.downloads.DownloadsActivity
 import com.myvideolibrary.app.ui.importer.ImportActivity
 import com.myvideolibrary.app.ui.player.PlayerActivity
 import com.myvideolibrary.app.util.Formatters
@@ -226,6 +227,10 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.action_new_folder -> { promptNewFolder(); true }
+            R.id.action_downloads -> {
+                startActivity(Intent(this, DownloadsActivity::class.java))
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }

@@ -56,6 +56,26 @@
     <string name="brightness_label">Brightness %1$d%%</string>
     <string name="volume_label">Volume %1$d%%</string>
 
+    <!-- Downloads -->
+    <string name="downloads_title">Downloads</string>
+    <string name="downloads_empty">No downloads yet</string>
+    <string name="clear_completed">Clear completed</string>
+    <string name="action_downloads">Downloads</string>
+    <string name="action_resume">Resume</string>
+    <string name="action_pause">Pause</string>
+    <string name="action_retry">Retry</string>
+    <string name="status_waiting">Waiting…</string>
+    <string name="status_downloading">%1$d%% · %2$s</string>
+    <string name="status_paused">Paused</string>
+    <string name="status_completed">Completed · %1$s</string>
+    <string name="status_failed">Failed</string>
+    <string name="status_canceled">Canceled</string>
+    <string name="download_channel_name">Downloads</string>
+    <string name="download_channel_desc">Shows progress of video downloads</string>
+    <string name="download_preparing">Preparing…</string>
+    <string name="download_complete">Download complete</string>
+    <string name="download_failed">Download failed</string>
+
     <!-- Content descriptions -->
     <string name="cd_thumbnail">Video thumbnail</string>
     <string name="cd_favorite">Favorite</string>

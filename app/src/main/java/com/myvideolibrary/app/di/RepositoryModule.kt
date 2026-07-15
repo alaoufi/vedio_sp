@@ -1,5 +1,7 @@
 package com.myvideolibrary.app.di
 
+import com.myvideolibrary.app.data.repository.DownloadRepository
+import com.myvideolibrary.app.data.repository.DownloadRepositoryImpl
 import com.myvideolibrary.app.data.repository.FolderRepository
 import com.myvideolibrary.app.data.repository.FolderRepositoryImpl
 import com.myvideolibrary.app.data.repository.SettingsRepository
@@ -27,4 +29,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindDownloadRepository(impl: DownloadRepositoryImpl): DownloadRepository
 }
