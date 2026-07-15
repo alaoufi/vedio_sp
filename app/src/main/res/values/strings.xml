@@ -78,7 +78,7 @@
 
     <!-- Add download (providers) -->
     <string name="add_download_title">Download from link</string>
-    <string name="add_download_hint">Paste a TikTok or YouTube link. Extraction depends on the platform and may occasionally fail.</string>
+    <string name="add_download_hint">Paste a TikTok or YouTube link. TikTok videos are saved without watermark. Extraction depends on the platform and may occasionally fail.</string>
     <string name="paste_url_hint">Video URL</string>
     <string name="paste">Paste</string>
     <string name="fetch_info">Fetch info</string>

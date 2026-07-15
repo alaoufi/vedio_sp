@@ -78,7 +78,7 @@
 
     <!-- Add download (providers) -->
     <string name="add_download_title">تحميل من رابط</string>
-    <string name="add_download_hint">الصق رابط تيك توك أو يوتيوب. الاستخراج يعتمد على المنصّة وقد يفشل أحيانًا.</string>
+    <string name="add_download_hint">الصق رابط تيك توك أو يوتيوب. فيديوهات تيك توك تُحفظ بدون علامة مائية. الاستخراج يعتمد على المنصّة وقد يفشل أحيانًا.</string>
     <string name="paste_url_hint">رابط الفيديو</string>
     <string name="paste">لصق</string>
     <string name="fetch_info">جلب المعلومات</string>

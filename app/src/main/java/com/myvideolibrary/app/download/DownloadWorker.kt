@@ -97,7 +97,13 @@ class DownloadWorker @AssistedInject constructor(
     ): Boolean = withContext(Dispatchers.IO) {
         val existing = if (destFile.exists()) destFile.length() else 0L
 
-        val requestBuilder = Request.Builder().url(url)
+        val requestBuilder = Request.Builder()
+            .url(url)
+            .header("User-Agent", BROWSER_UA)
+        // TikTok's CDN rejects requests without a matching Referer.
+        if (isTikTokCdn(url)) {
+            requestBuilder.header("Referer", "https://www.tiktok.com/")
+        }
         if (existing > 0) requestBuilder.header("Range", "bytes=$existing-")
         val response = okHttpClient.newCall(requestBuilder.build()).execute()
 
@@ -195,10 +201,19 @@ class DownloadWorker @AssistedInject constructor(
         }
     }
 
+    private fun isTikTokCdn(url: String): Boolean {
+        val u = url.lowercase()
+        return listOf("tiktok", "tiktokcdn", "byteicdn", "muscdn", "ibyteimg", "ttwstatic")
+            .any { u.contains(it) }
+    }
+
     companion object {
         const val KEY_DOWNLOAD_ID = "download_id"
         private const val BUFFER_SIZE = 64 * 1024
         private const val PROGRESS_INTERVAL_MS = 500L
         private const val MAX_ATTEMPTS = 3
+        private const val BROWSER_UA =
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+                "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"
     }
 }
