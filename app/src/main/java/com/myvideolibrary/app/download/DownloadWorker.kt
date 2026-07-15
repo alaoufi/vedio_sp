@@ -39,6 +39,18 @@ class DownloadWorker @AssistedInject constructor(
     private val notifier: DownloadNotifier
 ) : CoroutineWorker(appContext, params) {
 
+    /**
+     * Provides the notification for expedited/foreground execution. Required so
+     * WorkManager can run this as a foreground service promptly (and so restrictive
+     * OEMs don't defer it in the background).
+     */
+    override suspend fun getForegroundInfo(): androidx.work.ForegroundInfo {
+        val id = inputData.getLong(KEY_DOWNLOAD_ID, -1)
+        val title = runCatching { downloadRepository.get(id)?.title }.getOrNull()
+            ?: "Downloading"
+        return notifier.foregroundInfo(id.toInt().coerceAtLeast(1), title, 0, true, 0)
+    }
+
     override suspend fun doWork(): Result {
         val downloadId = inputData.getLong(KEY_DOWNLOAD_ID, -1)
         if (downloadId <= 0) return Result.failure()

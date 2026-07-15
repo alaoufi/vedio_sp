@@ -94,7 +94,7 @@
             android:launchMode="singleTask"
             android:theme="@style/Theme.MyVideoLibrary.Player" />
 
-        <!-- FileProvider for sharing exported backups (used in later phases). -->
+        <!-- FileProvider for sharing exported backups. -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -103,6 +103,20 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
+        </provider>
+
+        <!-- Use on-demand WorkManager init (via the app's Configuration.Provider +
+             HiltWorkerFactory). Removing the default initializer avoids the
+             androidx.startup ContentProvider running before Hilt injects the factory. -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
         </provider>
 
     </application>

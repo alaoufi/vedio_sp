@@ -2,9 +2,8 @@ package com.myvideolibrary.app.download
 
 import android.content.Context
 import androidx.work.BackoffPolicy
-import androidx.work.Constraints
+import androidx.work.OutOfQuotaPolicy
 import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
@@ -63,19 +62,13 @@ class DownloadManager @Inject constructor(
 
     /** (Re)starts the worker for an existing download record. */
     suspend fun startWork(id: Long) {
-        val wifiOnly = settingsRepository.getSettings().wifiOnlyDownloads
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(
-                if (wifiOnly) NetworkType.UNMETERED else NetworkType.CONNECTED
-            )
-            .build()
-
-        // No setExpedited: expedited jobs have per-app quotas on Android 12+, and
-        // once the quota is spent the job is deferred and can sit in ENQUEUED
-        // ("Waiting") indefinitely. A normal foreground worker starts promptly.
+        // No network constraint: aggressive OEM battery managers (e.g. MIUI) leave a
+        // constrained/background job stuck in ENQUEUED ("Waiting"). Expedited work
+        // runs promptly as a foreground service, which those OEMs allow because it is
+        // user-initiated and shows a notification.
         val request = OneTimeWorkRequestBuilder<DownloadWorker>()
             .setInputData(workDataOf(DownloadWorker.KEY_DOWNLOAD_ID to id))
-            .setConstraints(constraints)
+            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
             .addTag(TAG_DOWNLOAD)
             .build()
