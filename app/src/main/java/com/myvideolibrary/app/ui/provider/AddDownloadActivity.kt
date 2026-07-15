@@ -32,9 +32,6 @@ class AddDownloadActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.toolbar.setNavigationOnClickListener { finish() }
 
-        // Pre-fill from a shared link if the activity was launched via ACTION_SEND.
-        readSharedUrl()?.let { binding.urlInput.setText(it) }
-
         binding.resolveButton.setOnClickListener {
             viewModel.resolve(binding.urlInput.text?.toString().orEmpty())
         }
@@ -42,6 +39,40 @@ class AddDownloadActivity : AppCompatActivity() {
         binding.downloadButton.setOnClickListener { viewModel.download() }
 
         observe()
+
+        // Auto-detect a link: a shared URL wins; otherwise sniff the clipboard.
+        val shared = readSharedUrl()
+        if (!shared.isNullOrBlank()) {
+            binding.urlInput.setText(shared)
+            viewModel.resolve(shared)
+        } else {
+            autoDetectFromClipboard()
+        }
+    }
+
+    /** If the clipboard holds a supported link, fill it and fetch info automatically. */
+    private fun autoDetectFromClipboard() {
+        val text = clipboardText() ?: return
+        val link = extractSupportedLink(text) ?: return
+        binding.urlInput.setText(link)
+        viewModel.resolve(link)
+    }
+
+    private fun clipboardText(): String? {
+        val clipboard = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
+        return clipboard.primaryClip?.getItemAt(0)?.coerceToText(this)?.toString()
+    }
+
+    /** Pulls the first tiktok/youtube URL out of arbitrary text (e.g. a shared caption). */
+    private fun extractSupportedLink(text: String): String? {
+        val token = text.split(Regex("\\s+")).firstOrNull { candidate ->
+            val c = candidate.lowercase()
+            (c.startsWith("http")) && (
+                c.contains("tiktok.com") || c.contains("vm.tiktok") || c.contains("vt.tiktok") ||
+                    c.contains("youtube.com") || c.contains("youtu.be")
+                )
+        }
+        return token
     }
 
     private fun observe() {
