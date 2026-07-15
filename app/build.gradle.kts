@@ -155,8 +155,10 @@ dependencies {
     // NewPipeExtractor (YouTube provider, community maintained)
     implementation(libs.newpipe.extractor)
 
-    // Java 8+ API desugaring (java.time on minSdk 24)
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.2")
+    // Java 8+ API desugaring. The _nio variant (matching NewPipe) backports the
+    // broader java.* surface NewPipeExtractor needs on older Android — notably
+    // URLDecoder.decode(String, Charset), which otherwise crashes below API 33.
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs_nio:2.1.5")
 
     // Testing
     testImplementation(libs.junit)
