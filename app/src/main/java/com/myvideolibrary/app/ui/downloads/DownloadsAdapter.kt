@@ -62,9 +62,10 @@ class DownloadsAdapter(
                 status == DownloadStatus.WAITING || status == DownloadStatus.PAUSED
 
             // Action button visibility per state.
-            binding.pauseButton.isVisible = status == DownloadStatus.DOWNLOADING ||
+            binding.pauseButton.isVisible = status == DownloadStatus.DOWNLOADING
+            // Resume also re-kicks a stuck "Waiting" job with the current settings.
+            binding.resumeButton.isVisible = status == DownloadStatus.PAUSED ||
                 status == DownloadStatus.WAITING
-            binding.resumeButton.isVisible = status == DownloadStatus.PAUSED
             binding.retryButton.isVisible = status == DownloadStatus.FAILED ||
                 status == DownloadStatus.CANCELED
             binding.cancelButton.isVisible = status == DownloadStatus.DOWNLOADING ||

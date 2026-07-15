@@ -6,7 +6,6 @@ import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.myvideolibrary.app.data.local.entity.DownloadEntity
@@ -71,11 +70,13 @@ class DownloadManager @Inject constructor(
             )
             .build()
 
+        // No setExpedited: expedited jobs have per-app quotas on Android 12+, and
+        // once the quota is spent the job is deferred and can sit in ENQUEUED
+        // ("Waiting") indefinitely. A normal foreground worker starts promptly.
         val request = OneTimeWorkRequestBuilder<DownloadWorker>()
             .setInputData(workDataOf(DownloadWorker.KEY_DOWNLOAD_ID to id))
             .setConstraints(constraints)
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
-            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             .addTag(TAG_DOWNLOAD)
             .build()
 
