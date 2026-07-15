@@ -38,6 +38,8 @@ class SettingsActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.toolbar.setNavigationOnClickListener { finish() }
 
+        binding.versionValue.text = com.myvideolibrary.app.BuildConfig.VERSION_NAME
+
         bindActions()
         observe()
     }

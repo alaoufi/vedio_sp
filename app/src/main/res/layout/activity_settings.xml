@@ -137,6 +137,17 @@
                     <TextView style="@style/SettingsTitle" android:text="@string/restore" />
                 </LinearLayout>
             </LinearLayout>
+
+            <!-- About -->
+            <TextView style="@style/SettingsHeader" android:text="@string/section_about" />
+
+            <LinearLayout style="@style/SettingsRow">
+                <LinearLayout style="@style/SettingsRowText">
+                    <TextView style="@style/SettingsTitle" android:text="@string/version" />
+                    <TextView android:id="@+id/versionValue" style="@style/SettingsSubtitle"
+                        tools:text="1.0.0" />
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

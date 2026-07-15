@@ -110,6 +110,8 @@
 
     <!-- Settings -->
     <string name="settings_title">الإعدادات</string>
+    <string name="section_about">حول</string>
+    <string name="version">الإصدار</string>
     <string name="action_settings">الإعدادات</string>
     <string name="section_appearance">المظهر</string>
     <string name="section_downloads">التحميلات</string>
