@@ -61,8 +61,11 @@ class SearchViewModel @Inject constructor(
                 _state.value = _state.value.copy(loading = false, results = results)
             } catch (e: ProviderException) {
                 _state.value = _state.value.copy(loading = false, error = e.message)
-            } catch (e: Exception) {
-                _state.value = _state.value.copy(loading = false, error = e.message)
+            } catch (e: Throwable) {
+                _state.value = _state.value.copy(
+                    loading = false,
+                    error = "${e.javaClass.simpleName}: ${e.message ?: "no message"}"
+                )
             }
         }
     }
@@ -90,8 +93,11 @@ class SearchViewModel @Inject constructor(
                 _state.value = _state.value.copy(loading = false, message = "queued")
             } catch (e: ProviderException) {
                 _state.value = _state.value.copy(loading = false, error = e.message)
-            } catch (e: Exception) {
-                _state.value = _state.value.copy(loading = false, error = e.message)
+            } catch (e: Throwable) {
+                _state.value = _state.value.copy(
+                    loading = false,
+                    error = "${e.javaClass.simpleName}: ${e.message ?: "no message"}"
+                )
             }
         }
     }

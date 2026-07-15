@@ -54,10 +54,12 @@ class AddDownloadViewModel @Inject constructor(
                     errorType = e.type,
                     errorMessage = e.message
                 )
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
+                // Catch Throwable (not just Exception) so an Error from an extractor
+                // shows a message instead of crashing the app. Surface the real cause.
                 _state.value = AddDownloadUiState(
                     errorType = ProviderErrorType.UNKNOWN,
-                    errorMessage = e.message
+                    errorMessage = "${e.javaClass.simpleName}: ${e.message ?: "no message"}"
                 )
             }
         }
@@ -66,15 +68,22 @@ class AddDownloadViewModel @Inject constructor(
     fun download() {
         val resolved = _state.value.resolved ?: return
         viewModelScope.launch {
-            downloadManager.enqueue(
-                title = resolved.title,
-                source = resolved.source.id,
-                sourceUrl = resolved.sourceUrl,
-                directUrl = resolved.directUrl,
-                audioUrl = resolved.audioUrl,
-                thumbnailUrl = resolved.thumbnailUrl
-            )
-            _state.value = _state.value.copy(enqueued = true)
+            try {
+                downloadManager.enqueue(
+                    title = resolved.title,
+                    source = resolved.source.id,
+                    sourceUrl = resolved.sourceUrl,
+                    directUrl = resolved.directUrl,
+                    audioUrl = resolved.audioUrl,
+                    thumbnailUrl = resolved.thumbnailUrl
+                )
+                _state.value = _state.value.copy(enqueued = true)
+            } catch (e: Throwable) {
+                _state.value = _state.value.copy(
+                    errorType = ProviderErrorType.UNKNOWN,
+                    errorMessage = "${e.javaClass.simpleName}: ${e.message ?: "no message"}"
+                )
+            }
         }
     }
 
