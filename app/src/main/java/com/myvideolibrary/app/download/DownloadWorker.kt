@@ -99,7 +99,15 @@ class DownloadWorker @AssistedInject constructor(
         }
     }
 
-    /** Returns true if the file finished, false if the run was stopped/paused. */
+    /**
+     * Downloads [url] into [destFile] in fixed-size **Range chunks**. YouTube (and
+     * some CDNs) throttle a single long-lived connection; requesting the file in
+     * chunks keeps each request near full speed. Resuming is automatic: it always
+     * continues from the current file length, so a killed worker picks up where it
+     * left off instead of restarting.
+     *
+     * @return true when finished, false if the run was stopped/paused.
+     */
     private suspend fun downloadFile(
         url: String,
         destFile: File,
@@ -107,63 +115,85 @@ class DownloadWorker @AssistedInject constructor(
         title: String,
         notificationId: Int
     ): Boolean = withContext(Dispatchers.IO) {
-        val existing = if (destFile.exists()) destFile.length() else 0L
+        var downloaded = if (destFile.exists()) destFile.length() else 0L
+        var total = -1L
+        val raf = RandomAccessFile(destFile, "rw")
+        raf.seek(downloaded)
 
-        val requestBuilder = Request.Builder()
-            .url(url)
-            .header("User-Agent", BROWSER_UA)
-        // TikTok's CDN rejects requests without a matching Referer.
-        if (isTikTokCdn(url)) {
-            requestBuilder.header("Referer", "https://www.tiktok.com/")
-        }
-        if (existing > 0) requestBuilder.header("Range", "bytes=$existing-")
-        val response = okHttpClient.newCall(requestBuilder.build()).execute()
+        val buffer = ByteArray(BUFFER_SIZE)
+        var lastTick = 0L
+        var lastBytes = downloaded
+        var lastPercent = -1
 
-        response.use { resp ->
-            if (!resp.isSuccessful) throw IllegalStateException("HTTP ${resp.code}")
-            val body = resp.body ?: throw IllegalStateException("Empty body")
+        try {
+            while (total < 0 || downloaded < total) {
+                if (isStopped) return@withContext false
 
-            val partial = resp.code == 206 && existing > 0
-            val reportedLength = body.contentLength().takeIf { it > 0 } ?: -1
-            val total = if (partial && reportedLength > 0) existing + reportedLength else reportedLength
+                val rangeStart = downloaded
+                val rangeEnd = rangeStart + CHUNK_SIZE - 1
+                val builder = Request.Builder()
+                    .url(url)
+                    .header("User-Agent", BROWSER_UA)
+                    .header("Range", "bytes=$rangeStart-$rangeEnd")
+                if (isTikTokCdn(url)) builder.header("Referer", "https://www.tiktok.com/")
 
-            val raf = RandomAccessFile(destFile, "rw")
-            if (partial) raf.seek(existing) else raf.setLength(0)
+                val response = okHttpClient.newCall(builder.build()).execute()
+                var streamedWhole = false
+                var chunkBytes = 0L
 
-            var downloaded = if (partial) existing else 0L
-            val buffer = ByteArray(BUFFER_SIZE)
-            val source = body.byteStream()
-
-            var lastTick = 0L
-            var lastBytes = downloaded
-            var lastPercent = -1
-
-            raf.use { file ->
-                source.use { input ->
-                    while (true) {
-                        if (isStopped) return@withContext false
-                        val read = input.read(buffer)
-                        if (read == -1) break
-                        file.write(buffer, 0, read)
-                        downloaded += read
-
-                        val now = System.currentTimeMillis()
-                        if (now - lastTick >= PROGRESS_INTERVAL_MS) {
-                            val speed = if (lastTick == 0L) 0
-                            else (downloaded - lastBytes) * 1000 / (now - lastTick).coerceAtLeast(1)
-                            val percent = if (total > 0) ((downloaded * 100) / total).toInt() else 0
-                            if (percent != lastPercent) {
-                                downloadRepository.updateProgress(
-                                    downloadId, DownloadStatus.DOWNLOADING,
-                                    percent, downloaded, total.coerceAtLeast(0), speed
-                                )
-                                lastPercent = percent
+                response.use { resp ->
+                    when (resp.code) {
+                        416 -> { total = downloaded; return@use } // past EOF: done
+                        200 -> {
+                            // Server ignored Range and is sending the whole file.
+                            streamedWhole = true
+                            raf.setLength(0); raf.seek(0); downloaded = 0
+                            total = resp.body?.contentLength()?.takeIf { it > 0 } ?: -1
+                        }
+                        206 -> {
+                            if (total < 0) {
+                                total = parseContentRangeTotal(resp.header("Content-Range"))
+                                    ?: resp.body?.contentLength()?.takeIf { it > 0 }
+                                        ?.let { rangeStart + it } ?: -1
                             }
-                            lastTick = now
-                            lastBytes = downloaded
+                        }
+                        else -> throw IllegalStateException("HTTP ${resp.code}")
+                    }
+
+                    val input = (resp.body ?: throw IllegalStateException("Empty body")).byteStream()
+                    input.use {
+                        while (true) {
+                            if (isStopped) return@withContext false
+                            val read = input.read(buffer)
+                            if (read == -1) break
+                            raf.write(buffer, 0, read)
+                            downloaded += read
+                            chunkBytes += read
+
+                            val now = System.currentTimeMillis()
+                            if (now - lastTick >= PROGRESS_INTERVAL_MS) {
+                                val speed = if (lastTick == 0L) 0
+                                else (downloaded - lastBytes) * 1000 / (now - lastTick).coerceAtLeast(1)
+                                val percent = if (total > 0) ((downloaded * 100) / total).toInt() else 0
+                                if (percent != lastPercent) {
+                                    downloadRepository.updateProgress(
+                                        downloadId, DownloadStatus.DOWNLOADING,
+                                        percent, downloaded, total.coerceAtLeast(0), speed
+                                    )
+                                    lastPercent = percent
+                                }
+                                lastTick = now
+                                lastBytes = downloaded
+                            }
                         }
                     }
                 }
+
+                // End conditions: whole file already streamed, reached total, or the
+                // last chunk came up short (EOF) when the total was never advertised.
+                if (streamedWhole) break
+                if (total in 0..downloaded) break
+                if (chunkBytes < CHUNK_SIZE) { total = downloaded; break }
             }
 
             downloadRepository.updateProgress(
@@ -171,13 +201,22 @@ class DownloadWorker @AssistedInject constructor(
                 total.coerceAtLeast(downloaded), 0
             )
             true
+        } finally {
+            runCatching { raf.close() }
         }
+    }
+
+    /** Parses the total size from a `Content-Range: bytes start-end/total` header. */
+    private fun parseContentRangeTotal(header: String?): Long? {
+        val slash = header?.lastIndexOf('/') ?: return null
+        if (slash < 0) return null
+        return header.substring(slash + 1).trim().toLongOrNull()
     }
 
     /**
      * Downloads a video-only and an audio-only stream, then muxes them into
-     * [destFile]. Temp files are recreated per run (no cross-retry resume) to keep
-     * the merge deterministic. Returns false if stopped/paused mid-way.
+     * [destFile]. Temp files are kept between runs so a stopped/killed worker
+     * resumes each part instead of restarting. Returns false if stopped/paused.
      */
     private suspend fun downloadAndMux(
         videoUrl: String,
@@ -189,8 +228,6 @@ class DownloadWorker @AssistedInject constructor(
     ): Boolean = withContext(Dispatchers.IO) {
         val videoTmp = File(destFile.parentFile, destFile.name + ".video.part")
         val audioTmp = File(destFile.parentFile, destFile.name + ".audio.part")
-        videoTmp.takeIf(File::exists)?.delete()
-        audioTmp.takeIf(File::exists)?.delete()
 
         if (!downloadFile(videoUrl, videoTmp, downloadId, title, notificationId)) {
             return@withContext false
@@ -250,6 +287,10 @@ class DownloadWorker @AssistedInject constructor(
     companion object {
         const val KEY_DOWNLOAD_ID = "download_id"
         private const val BUFFER_SIZE = 64 * 1024
+
+        /** Per-request Range size. Chunking keeps each request near full speed and
+         *  sidesteps YouTube's single-connection throttling. */
+        private const val CHUNK_SIZE = 8L * 1024 * 1024
         private const val PROGRESS_INTERVAL_MS = 500L
         private const val MAX_ATTEMPTS = 3
         private const val BROWSER_UA =
