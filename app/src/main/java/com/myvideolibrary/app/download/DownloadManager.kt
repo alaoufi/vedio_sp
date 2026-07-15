@@ -2,7 +2,6 @@ package com.myvideolibrary.app.download
 
 import android.content.Context
 import androidx.work.BackoffPolicy
-import androidx.work.OutOfQuotaPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -62,13 +61,12 @@ class DownloadManager @Inject constructor(
 
     /** (Re)starts the worker for an existing download record. */
     suspend fun startWork(id: Long) {
-        // No network constraint: aggressive OEM battery managers (e.g. MIUI) leave a
-        // constrained/background job stuck in ENQUEUED ("Waiting"). Expedited work
-        // runs promptly as a foreground service, which those OEMs allow because it is
-        // user-initiated and shows a notification.
+        // Plain background worker, no constraints and no foreground service:
+        // starting a dataSync foreground service crashed the app on Android 14/15,
+        // and a network constraint left the job stuck in "Waiting" on restrictive
+        // OEMs. WorkManager runs this immediately while the app is in the foreground.
         val request = OneTimeWorkRequestBuilder<DownloadWorker>()
             .setInputData(workDataOf(DownloadWorker.KEY_DOWNLOAD_ID to id))
-            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
             .addTag(TAG_DOWNLOAD)
             .build()
