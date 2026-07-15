@@ -32,6 +32,17 @@ android {
         }
     }
 
+    signingConfigs {
+        // A committed, stable debug key so every CI-built APK is signed identically
+        // and installs as an update over the previous one (no uninstall needed).
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -45,6 +56,7 @@ android {
             isMinifyEnabled = false
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 

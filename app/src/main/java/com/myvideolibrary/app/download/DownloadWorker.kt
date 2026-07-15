@@ -53,11 +53,13 @@ class DownloadWorker @AssistedInject constructor(
         }
 
         val notificationId = downloadId.toInt()
-        setForeground(notifier.foregroundInfo(notificationId, download.title, 0, true, 0))
-
         val destFile = File(download.destPath ?: storageManager.newVideoFile("mp4").absolutePath)
         return try {
             downloadRepository.setStatus(downloadId, DownloadStatus.DOWNLOADING)
+            // Best-effort foreground promotion. On Android 14/15 starting a
+            // foreground service can throw; if so we keep going as a plain worker so
+            // the download still runs instead of getting stuck in "Waiting".
+            safeSetForeground(notificationId, download.title, 0, true, 0)
 
             val audioUrl = download.audioUrl
             val finished = if (audioUrl.isNullOrBlank()) {
@@ -159,11 +161,7 @@ class DownloadWorker @AssistedInject constructor(
                                     downloadId, DownloadStatus.DOWNLOADING,
                                     percent, downloaded, total.coerceAtLeast(0), speed
                                 )
-                                setForeground(
-                                    notifier.foregroundInfo(
-                                        notificationId, title, percent, total <= 0, speed
-                                    )
-                                )
+                                safeSetForeground(notificationId, title, percent, total <= 0, speed)
                                 lastPercent = percent
                             }
                             lastTick = now
@@ -207,7 +205,7 @@ class DownloadWorker @AssistedInject constructor(
         }
 
         // Merge phase: show an indeterminate notification while muxing.
-        setForeground(notifier.foregroundInfo(notificationId, title, 100, true, 0))
+        safeSetForeground(notificationId, title, 100, true, 0)
         val merged = VideoMuxer.mux(videoTmp, audioTmp, destFile)
         videoTmp.delete()
         audioTmp.delete()
@@ -245,6 +243,25 @@ class DownloadWorker @AssistedInject constructor(
                     destPath = destFile.absolutePath,
                     errorMessage = null
                 )
+            )
+        }
+    }
+
+    /**
+     * Promotes the worker to a foreground service, swallowing the exceptions that
+     * Android 14/15 can throw when a foreground service of type dataSync cannot be
+     * started. The download continues either way.
+     */
+    private suspend fun safeSetForeground(
+        notificationId: Int,
+        title: String,
+        progress: Int,
+        indeterminate: Boolean,
+        speed: Long
+    ) {
+        runCatching {
+            setForeground(
+                notifier.foregroundInfo(notificationId, title, progress, indeterminate, speed)
             )
         }
     }
