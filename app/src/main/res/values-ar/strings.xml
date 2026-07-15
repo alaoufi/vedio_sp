@@ -93,6 +93,55 @@
     <string name="error_extraction">تعذّر استخراج الفيديو. قد يكون المصدر تغيّر.</string>
     <string name="error_unknown">حدث خطأ ما.</string>
 
+    <!-- Security / lock -->
+    <string name="unlock_title">فتح القفل</string>
+    <string name="unlock">فتح</string>
+    <string name="pin_hint">أدخل رمز PIN</string>
+    <string name="wrong_pin">رمز PIN غير صحيح</string>
+    <string name="use_biometric">استخدم البصمة</string>
+    <string name="use_pin">استخدم رمز PIN</string>
+    <string name="unlock_biometric_subtitle">استوثق لفتح مكتبتك</string>
+
+    <!-- Settings -->
+    <string name="settings_title">الإعدادات</string>
+    <string name="action_settings">الإعدادات</string>
+    <string name="section_appearance">المظهر</string>
+    <string name="section_downloads">التحميلات</string>
+    <string name="section_security">الأمان</string>
+    <string name="section_storage">التخزين والنسخ الاحتياطي</string>
+    <string name="theme">السمة</string>
+    <string name="theme_system">حسب النظام</string>
+    <string name="theme_light">فاتح</string>
+    <string name="theme_dark">داكن</string>
+    <string name="wifi_only">التحميل عبر Wi-Fi فقط</string>
+    <string name="wifi_only_desc">التحميل فقط على شبكة غير محدودة</string>
+    <string name="max_concurrent">أقصى عدد تحميلات متزامنة</string>
+    <string name="app_lock">قفل التطبيق</string>
+    <string name="app_lock_desc">طلب رمز PIN لفتح التطبيق</string>
+    <string name="change_pin">تغيير رمز PIN</string>
+    <string name="biometric">فتح بالبصمة</string>
+    <string name="prevent_screenshots">منع لقطات الشاشة</string>
+    <string name="hide_recents">إخفاء المحتوى في التطبيقات الأخيرة</string>
+    <string name="storage_used">المساحة المستخدمة</string>
+    <string name="clear_cache">مسح الذاكرة المؤقتة</string>
+    <string name="cache_cleared">تم مسح الذاكرة المؤقتة</string>
+    <string name="backup">نسخ احتياطي</string>
+    <string name="backup_desc">تصدير ملف نسخة احتياطية مشفّر</string>
+    <string name="restore">استعادة</string>
+    <string name="set_pin">تعيين رمز PIN</string>
+    <string name="save">حفظ</string>
+    <string name="pin_length_error">يجب أن يكون رمز PIN من 4 إلى 12 رقمًا</string>
+    <string name="backup_encrypt_title">تشفير النسخة الاحتياطية</string>
+    <string name="backup_encrypt_message">اختر كلمة مرور. ستحتاجها للاستعادة.</string>
+    <string name="backup_password_hint">كلمة المرور</string>
+    <string name="export">تصدير</string>
+    <string name="password_too_short">يجب ألا تقل كلمة المرور عن 6 أحرف</string>
+    <string name="restore_title">استعادة نسخة احتياطية</string>
+    <string name="restore_message">أدخل كلمة المرور المستخدمة لإنشاء هذه النسخة.</string>
+    <string name="backup_exported">حُفظت النسخة: %1$s</string>
+    <string name="backup_restored">استُعيد %1$d فيديو</string>
+    <string name="backup_restore_failed">فشلت الاستعادة — كلمة مرور خاطئة أو ملف تالف</string>
+
     <!-- Content descriptions -->
     <string name="cd_thumbnail">مصغّرة الفيديو</string>
     <string name="cd_favorite">مفضلة</string>

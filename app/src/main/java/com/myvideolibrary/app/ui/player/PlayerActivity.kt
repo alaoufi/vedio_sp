@@ -27,6 +27,8 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import com.myvideolibrary.app.R
 import com.myvideolibrary.app.databinding.ActivityPlayerBinding
+import com.myvideolibrary.app.security.SecurityManager
+import com.myvideolibrary.app.security.applyScreenshotPolicy
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -38,6 +40,9 @@ class PlayerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPlayerBinding
     private val viewModel: PlayerViewModel by viewModels()
+
+    @javax.inject.Inject
+    lateinit var securityManager: SecurityManager
 
     private var player: ExoPlayer? = null
     private var videoId: Long = -1
@@ -51,6 +56,7 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        applyScreenshotPolicy(securityManager)
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

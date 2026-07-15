@@ -9,7 +9,7 @@ an **encrypted** database inside the app's private storage.
 > extraction from platforms such as YouTube/TikTok is inherently fragile and may break
 > when those platforms change.
 
-## Status — foundation (phases 0–4)
+## Status — complete (phases 0–8)
 
 Implemented and wired end‑to‑end:
 
@@ -24,14 +24,24 @@ Implemented and wired end‑to‑end:
 - **Player** — Media3 **ExoPlayer**: resume position, playback speed, rotation,
   picture‑in‑picture, brightness/volume gestures, lock controls, background toggle,
   subtitle button.
+- **Download manager** — WorkManager + foreground service, resumable (HTTP Range),
+  progress/speed notifications, retry with backoff, queue with pause/resume/cancel;
+  finished files auto‑added to the library.
+- **Provider system** — `VideoProvider` interface + registry (Hilt multibinding).
+  **YouTubeProvider** (NewPipeExtractor) and **TikTokProvider** (oEmbed metadata +
+  page extraction) are isolated modules; paste or share a link to download.
+- **Security** — PIN + biometric app‑lock gate, re‑lock on background, `FLAG_SECURE`
+  to block screenshots and hide content from the recent‑apps preview.
+- **Settings** — theme (light/dark/system), Wi‑Fi‑only + max concurrent downloads,
+  security toggles, storage usage, clear cache, and **encrypted backup/restore**
+  (AES‑256‑GCM, PBKDF2 password).
 
-### Planned next (later phases)
-
-- Download manager (WorkManager + foreground service, queue, pause/resume).
-- Provider system with **TikTok** and **YouTube** modules (isolated, independently
-  updatable).
-- Security screen (PIN, biometric, hide‑from‑recents, screenshot blocking).
-- Settings + encrypted backup/restore.
+> **On downloading from TikTok/YouTube** — this is the fragile part by nature.
+> There is no official download API; extraction reverse‑engineers each platform and
+> can break when they change. The provider architecture isolates this so only the
+> affected module (or the NewPipeExtractor dependency) needs updating — the rest of
+> the app keeps working. You may need to bump `newpipe` in
+> `gradle/libs.versions.toml` over time.
 
 ## Architecture
 

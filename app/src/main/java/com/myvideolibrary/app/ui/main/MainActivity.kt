@@ -23,6 +23,8 @@ import com.myvideolibrary.app.data.local.entity.VideoEntity
 import com.myvideolibrary.app.data.model.LibraryViewMode
 import com.myvideolibrary.app.data.model.SortOrder
 import com.myvideolibrary.app.databinding.ActivityMainBinding
+import com.myvideolibrary.app.security.SecurityManager
+import com.myvideolibrary.app.security.applyScreenshotPolicy
 import com.myvideolibrary.app.ui.downloads.DownloadsActivity
 import com.myvideolibrary.app.ui.importer.ImportActivity
 import com.myvideolibrary.app.ui.player.PlayerActivity
@@ -38,10 +40,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val viewModel: LibraryViewModel by viewModels()
 
+    @javax.inject.Inject lateinit var securityManager: SecurityManager
+
     private lateinit var adapter: VideoPagingAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        applyScreenshotPolicy(securityManager)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
@@ -234,6 +239,10 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.action_add_download -> {
                 startActivity(AddDownloadActivity.intent(this))
+                true
+            }
+            R.id.action_settings -> {
+                startActivity(Intent(this, com.myvideolibrary.app.ui.settings.SettingsActivity::class.java))
                 true
             }
             else -> super.onOptionsItemSelected(item)

@@ -93,6 +93,55 @@
     <string name="error_extraction">Could not extract the video. The source may have changed.</string>
     <string name="error_unknown">Something went wrong.</string>
 
+    <!-- Security / lock -->
+    <string name="unlock_title">Unlock</string>
+    <string name="unlock">Unlock</string>
+    <string name="pin_hint">Enter PIN</string>
+    <string name="wrong_pin">Wrong PIN</string>
+    <string name="use_biometric">Use fingerprint</string>
+    <string name="use_pin">Use PIN</string>
+    <string name="unlock_biometric_subtitle">Authenticate to open your library</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_appearance">Appearance</string>
+    <string name="section_downloads">Downloads</string>
+    <string name="section_security">Security</string>
+    <string name="section_storage">Storage &amp; backup</string>
+    <string name="theme">Theme</string>
+    <string name="theme_system">Follow system</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="wifi_only">Wi-Fi only downloads</string>
+    <string name="wifi_only_desc">Download only on an unmetered network</string>
+    <string name="max_concurrent">Max simultaneous downloads</string>
+    <string name="app_lock">App lock</string>
+    <string name="app_lock_desc">Require a PIN to open the app</string>
+    <string name="change_pin">Change PIN</string>
+    <string name="biometric">Fingerprint unlock</string>
+    <string name="prevent_screenshots">Prevent screenshots</string>
+    <string name="hide_recents">Hide content in recent apps</string>
+    <string name="storage_used">Storage used</string>
+    <string name="clear_cache">Clear cache</string>
+    <string name="cache_cleared">Cache cleared</string>
+    <string name="backup">Backup</string>
+    <string name="backup_desc">Export an encrypted backup file</string>
+    <string name="restore">Restore</string>
+    <string name="set_pin">Set PIN</string>
+    <string name="save">Save</string>
+    <string name="pin_length_error">PIN must be 4–12 digits</string>
+    <string name="backup_encrypt_title">Encrypt backup</string>
+    <string name="backup_encrypt_message">Choose a password. You will need it to restore.</string>
+    <string name="backup_password_hint">Password</string>
+    <string name="export">Export</string>
+    <string name="password_too_short">Password must be at least 6 characters</string>
+    <string name="restore_title">Restore backup</string>
+    <string name="restore_message">Enter the password used to create this backup.</string>
+    <string name="backup_exported">Backup saved: %1$s</string>
+    <string name="backup_restored">Restored %1$d videos</string>
+    <string name="backup_restore_failed">Restore failed — wrong password or corrupt file</string>
+
     <!-- Content descriptions -->
     <string name="cd_thumbnail">Video thumbnail</string>
     <string name="cd_favorite">Favorite</string>

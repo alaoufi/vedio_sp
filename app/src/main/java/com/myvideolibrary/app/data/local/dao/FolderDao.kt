@@ -27,6 +27,10 @@ interface FolderDao {
     @Query("SELECT * FROM folders WHERE id = :id")
     suspend fun getById(id: Long): FolderEntity?
 
+    /** All folders in one shot (used by backup export). */
+    @Query("SELECT * FROM folders ORDER BY created_date ASC")
+    suspend fun getAllOnce(): List<FolderEntity>
+
     @Query("SELECT COUNT(*) FROM folders WHERE name = :name COLLATE NOCASE")
     suspend fun countByName(name: String): Int
 }

@@ -51,6 +51,10 @@ interface VideoDao {
     @Query("SELECT * FROM videos WHERE local_path = :path LIMIT 1")
     suspend fun getByLocalPath(path: String): VideoEntity?
 
+    /** All videos in one shot (used by backup export). */
+    @Query("SELECT * FROM videos ORDER BY created_date ASC")
+    suspend fun getAllOnce(): List<VideoEntity>
+
     /**
      * Flexible, sorted, filtered library query backing Paging 3. The query is
      * assembled in the repository so sort order and filters can vary at runtime.

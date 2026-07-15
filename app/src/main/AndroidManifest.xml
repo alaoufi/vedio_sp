@@ -34,8 +34,9 @@
 
         <!-- ===== Activities ===== -->
 
+        <!-- Launcher gate: PIN / biometric lock, then routes to the library. -->
         <activity
-            android:name=".ui.main.MainActivity"
+            android:name=".ui.security.LockActivity"
             android:exported="true"
             android:theme="@style/Theme.MyVideoLibrary">
             <intent-filter>
@@ -43,6 +44,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.main.MainActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyVideoLibrary" />
 
         <!-- Import videos from device storage (MediaStore). -->
         <activity
@@ -65,6 +71,11 @@
         <!-- Download management. -->
         <activity
             android:name=".ui.downloads.DownloadsActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.main.MainActivity" />
+
+        <activity
+            android:name=".ui.settings.SettingsActivity"
             android:exported="false"
             android:parentActivityName=".ui.main.MainActivity" />
 
