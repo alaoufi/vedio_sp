@@ -1,11 +1,16 @@
 name: Build APK
 
-# Builds a debug APK on every push so it can be downloaded and installed without
-# a local Android Studio setup. The APK appears under the run's "Artifacts".
+# Builds a debug APK on every push and publishes it to a GitHub Release so it has a
+# stable, direct download link:
+#   https://github.com/alaoufi/vedio_sp/releases/download/apk-latest/app-debug.apk
+# The APK is also uploaded as a run artifact.
 on:
   push:
     branches: ["**"]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -19,6 +24,7 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
+          cache: gradle
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
@@ -29,10 +35,21 @@ jobs:
       - name: Build debug APK
         run: ./gradlew assembleDebug --stacktrace
 
-      - name: Upload APK
+      - name: Upload APK artifact
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: my-video-library-debug-apk
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+
+      - name: Publish APK to a Release (direct link)
+        if: success()
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-latest
+          name: My Video Library (latest debug APK)
+          body: |
+            Latest debug APK, rebuilt automatically on each push.
+            Direct link: https://github.com/${{ github.repository }}/releases/download/apk-latest/app-debug.apk
+          files: app/build/outputs/apk/debug/app-debug.apk
