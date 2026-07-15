@@ -31,8 +31,9 @@ Implemented and wired end‑to‑end:
   **YouTubeProvider** (NewPipeExtractor) picks the best single-file stream, or a
   high-res video-only + audio pair that the download manager **merges on-device via
   `MediaMuxer`** (no re-encode). **TikTokProvider** returns the **watermark-free**
-  `playAddr` using three extraction strategies (universal-data / SIGI / next-data).
-  Paste or share a link to download.
+  video via a public resolver service (tikwm) for reliability — an explicit,
+  user-chosen trade-off: the link is sent to that service, but only the link leaves
+  the device and the video is stored locally. Paste or share a link to download.
 - **Security** — PIN + biometric app‑lock gate, re‑lock on background, `FLAG_SECURE`
   to block screenshots and hide content from the recent‑apps preview.
 - **Settings** — theme (light/dark/system), Wi‑Fi‑only + max concurrent downloads,
