@@ -29,7 +29,9 @@ data class ProviderSearchItem(
     val title: String,
     val thumbnailUrl: String? = null,
     val author: String? = null,
-    val durationMs: Long = 0
+    val durationMs: Long = 0,
+    /** When set, the direct downloadable URL is already known (skip re-resolving). */
+    val directUrl: String? = null
 )
 
 /** Categorised, user-presentable failure reasons for provider operations. */

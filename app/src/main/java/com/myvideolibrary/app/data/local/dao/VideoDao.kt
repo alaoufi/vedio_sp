@@ -76,6 +76,17 @@ interface VideoDao {
     @Query("UPDATE videos SET title = :title WHERE id = :id")
     suspend fun rename(id: Long, title: String)
 
+    @Query("UPDATE videos SET category = :category WHERE id IN (:ids)")
+    suspend fun setCategory(ids: List<Long>, category: String?)
+
+    /** Distinct non-empty category labels currently in use, alphabetised. */
+    @Query(
+        "SELECT DISTINCT category FROM videos " +
+            "WHERE category IS NOT NULL AND TRIM(category) != '' " +
+            "ORDER BY category COLLATE NOCASE ASC"
+    )
+    fun observeCategories(): Flow<List<String>>
+
     @Query(
         "UPDATE videos SET last_played_position = :position, " +
             "last_played_date = :playedAt, play_count = play_count + :incrementPlays " +

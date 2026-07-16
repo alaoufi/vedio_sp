@@ -162,6 +162,28 @@
     <string name="video_locked">This video is locked</string>
     <string name="share_failed">Cannot share this video</string>
 
+    <!-- Protected videos -->
+    <string name="protected_videos">Protected videos</string>
+    <string name="protected_set_pin_hint">Set a PIN in Settings to protect videos.</string>
+    <string name="protected_title">Protected · %1$d</string>
+
+    <!-- Categories -->
+    <string name="category">Category</string>
+    <string name="category_none">Uncategorized</string>
+    <string name="category_all">All categories</string>
+    <string name="set_category">Set category</string>
+    <string name="category_hint">Category name</string>
+    <string name="category_general">General</string>
+    <string name="category_education">Education</string>
+    <string name="category_entertainment">Entertainment</string>
+    <string name="category_music">Music</string>
+    <string name="category_sports">Sports</string>
+    <string name="category_news">News</string>
+    <string name="category_cooking">Cooking</string>
+    <string name="category_tech">Technology</string>
+    <string name="category_religion">Religion</string>
+    <string name="category_kids">Kids</string>
+
     <!-- Content descriptions -->
     <string name="cd_thumbnail">Video thumbnail</string>
     <string name="cd_favorite">Favorite</string>

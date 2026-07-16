@@ -6,6 +6,7 @@ import com.myvideolibrary.app.data.model.VideoSource
 import com.myvideolibrary.app.provider.VideoProvider
 import com.myvideolibrary.app.provider.model.ProviderErrorType
 import com.myvideolibrary.app.provider.model.ProviderException
+import com.myvideolibrary.app.provider.model.ProviderSearchItem
 import com.myvideolibrary.app.provider.model.ResolvedVideo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -90,6 +91,50 @@ class TikTokProvider @Inject constructor(
             durationMs = (data.num("duration") ?: 0) * 1000
         )
     }
+
+    override suspend fun search(query: String): List<ProviderSearchItem> =
+        withContext(Dispatchers.IO) {
+            val q = query.trim()
+            if (q.isEmpty()) return@withContext emptyList()
+            val api = "$RESOLVER_BASE/api/feed/search?count=20&keywords=" +
+                URLEncoder.encode(q, "UTF-8")
+            val request = Request.Builder().url(api).header("User-Agent", UA).build()
+
+            val body = try {
+                client.newCall(request).execute().use { resp ->
+                    if (!resp.isSuccessful) return@withContext emptyList()
+                    resp.body?.string()
+                }
+            } catch (e: IOException) {
+                throw ProviderException(ProviderErrorType.NETWORK, "Network error", e)
+            } ?: return@withContext emptyList()
+
+            val root = runCatching { gson.fromJson(body, JsonObject::class.java) }.getOrNull()
+                ?: return@withContext emptyList()
+            if ((root.get("code")?.takeIf { !it.isJsonNull }?.asInt ?: -1) != 0) {
+                return@withContext emptyList()
+            }
+            val videos = root.obj("data")?.get("videos")?.takeIf { it.isJsonArray }?.asJsonArray
+                ?: return@withContext emptyList()
+
+            videos.mapNotNull { el ->
+                val v = el.asJsonObject
+                val id = v.str("video_id") ?: v.str("id") ?: return@mapNotNull null
+                val author = v.obj("author")
+                val handle = author?.str("unique_id")
+                ProviderSearchItem(
+                    source = VideoSource.TIKTOK,
+                    url = if (handle != null) "https://www.tiktok.com/@$handle/video/$id"
+                    else "https://www.tiktok.com/video/$id",
+                    title = v.str("title")?.takeIf { it.isNotBlank() } ?: "TikTok video",
+                    thumbnailUrl = v.str("cover")?.let { absolutize(it) },
+                    author = author?.str("nickname"),
+                    durationMs = (v.num("duration") ?: 0) * 1000,
+                    // tikwm already gives the watermark-free URL in search results.
+                    directUrl = v.str("play")?.let { absolutize(it) }
+                )
+            }
+        }
 
     private fun mapError(msg: String): ProviderException {
         val m = msg.lowercase()

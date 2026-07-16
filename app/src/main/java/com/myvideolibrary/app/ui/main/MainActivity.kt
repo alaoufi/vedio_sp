@@ -122,6 +122,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        // Privacy: don't keep the last search term around after leaving the screen.
+        if (binding.searchInput.text?.isNotEmpty() == true) {
+            binding.searchInput.text?.clear()
+        }
+    }
+
     private fun applyLayoutManager(mode: LibraryViewMode) {
         binding.recyclerView.layoutManager = when (mode) {
             LibraryViewMode.GRID -> GridLayoutManager(this, gridSpanCount())
@@ -188,8 +196,10 @@ class MainActivity : AppCompatActivity() {
                     adapter.setSelection(state.selectionMode, state.selectedIds)
                     renderStats(state)
                     renderSourceChips(state)
+                    renderCategoryChips(state)
                     renderFolderChips(state)
                     renderSelectionBar(state)
+                    renderProtectedTitle(state)
                     invalidateOptionsMenu()
                 }
             }
@@ -240,6 +250,98 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /** Preset category labels offered in the "Set category" dialog. */
+    private val presetCategoryRes = listOf(
+        R.string.category_general,
+        R.string.category_education,
+        R.string.category_entertainment,
+        R.string.category_music,
+        R.string.category_sports,
+        R.string.category_news,
+        R.string.category_cooking,
+        R.string.category_tech,
+        R.string.category_religion,
+        R.string.category_kids
+    )
+
+    private fun renderCategoryChips(state: LibraryUiState) {
+        val scroll = binding.categoryChipsScroll
+        val group = binding.categoryChips
+        // Only show the category row once at least one video is categorised.
+        scroll.isVisible = state.categories.isNotEmpty()
+        if (state.categories.isEmpty()) {
+            group.removeAllViews()
+            group.tag = null
+            return
+        }
+        // Rebuild only when the set of categories changes to avoid flicker.
+        if (group.tag != state.categories) {
+            group.tag = state.categories
+            group.removeAllViews()
+
+            val allChip = Chip(this).apply {
+                text = getString(R.string.category_all)
+                isCheckable = true
+                tag = null
+                setOnClickListener { viewModel.setCategoryFilter(null) }
+            }
+            group.addView(allChip)
+
+            state.categories.forEach { category ->
+                val chip = Chip(this).apply {
+                    text = category
+                    isCheckable = true
+                    tag = category
+                    setOnClickListener { viewModel.setCategoryFilter(category) }
+                }
+                group.addView(chip)
+            }
+        }
+        // Sync checked state with the active filter.
+        for (i in 0 until group.childCount) {
+            val chip = group.getChildAt(i) as? Chip ?: continue
+            chip.isChecked = chip.tag == state.categoryFilter
+        }
+    }
+
+    private fun promptSetCategory(video: VideoEntity) {
+        val presets = presetCategoryRes.map { getString(it) }
+        val labels = presets + getString(R.string.category_none) + getString(R.string.set_category)
+        AlertDialog.Builder(this)
+            .setTitle(R.string.set_category)
+            .setItems(labels.toTypedArray()) { _, which ->
+                when {
+                    which < presets.size -> viewModel.setCategory(video.id, presets[which])
+                    which == presets.size -> viewModel.setCategory(video.id, null)
+                    else -> promptCustomCategory(video)
+                }
+            }
+            .show()
+    }
+
+    private fun promptCustomCategory(video: VideoEntity) {
+        val input = EditText(this).apply {
+            hint = getString(R.string.category_hint)
+            setText(video.category.orEmpty())
+        }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.set_category)
+            .setView(input)
+            .setPositiveButton(R.string.save) { _, _ ->
+                viewModel.setCategory(video.id, input.text.toString().trim().ifEmpty { null })
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun renderProtectedTitle(state: LibraryUiState) {
+        supportActionBar?.title = if (state.protectedMode) {
+            getString(R.string.protected_title, state.videoCount)
+        } else {
+            getString(R.string.app_name)
+        }
+    }
+
     private fun renderSelectionBar(state: LibraryUiState) {
         binding.selectionBar.isVisible = state.selectionMode
         if (state.selectionMode) {
@@ -250,6 +352,61 @@ class MainActivity : AppCompatActivity() {
             binding.selectionFavorite.setOnClickListener { viewModel.favoriteSelected(true) }
             binding.selectionMove.setOnClickListener { promptMoveSelected(state) }
             binding.selectionClose.setOnClickListener { viewModel.clearSelection() }
+        }
+    }
+
+    private fun toggleProtected() {
+        if (viewModel.uiState.value.protectedMode) {
+            viewModel.setProtectedMode(false)
+            return
+        }
+        if (securityManager.isLockConfigured) {
+            authenticate { viewModel.setProtectedMode(true) }
+        } else {
+            viewModel.setProtectedMode(true)
+            android.widget.Toast.makeText(
+                this, R.string.protected_set_pin_hint, android.widget.Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
+    /** Requires biometric (if enabled) or the PIN before running [onSuccess]. */
+    private fun authenticate(onSuccess: () -> Unit) {
+        val canBiometric = androidx.biometric.BiometricManager.from(this).canAuthenticate(
+            androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK
+        ) == androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
+
+        if (securityManager.biometricEnabled && canBiometric) {
+            val prompt = androidx.biometric.BiometricPrompt(
+                this, androidx.core.content.ContextCompat.getMainExecutor(this),
+                object : androidx.biometric.BiometricPrompt.AuthenticationCallback() {
+                    override fun onAuthenticationSucceeded(
+                        result: androidx.biometric.BiometricPrompt.AuthenticationResult
+                    ) { onSuccess() }
+                }
+            )
+            prompt.authenticate(
+                androidx.biometric.BiometricPrompt.PromptInfo.Builder()
+                    .setTitle(getString(R.string.protected_videos))
+                    .setNegativeButtonText(getString(R.string.use_pin))
+                    .setAllowedAuthenticators(androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK)
+                    .build()
+            )
+        } else {
+            val input = EditText(this).apply {
+                inputType = android.text.InputType.TYPE_CLASS_NUMBER or
+                    android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD
+                hint = getString(R.string.pin_hint)
+            }
+            AlertDialog.Builder(this)
+                .setTitle(R.string.protected_videos)
+                .setView(input)
+                .setPositiveButton(R.string.unlock) { _, _ ->
+                    if (securityManager.verifyPin(input.text.toString())) onSuccess()
+                    else android.widget.Toast.makeText(this, R.string.wrong_pin, android.widget.Toast.LENGTH_SHORT).show()
+                }
+                .setNegativeButton(R.string.cancel, null)
+                .show()
         }
     }
 
@@ -272,15 +429,17 @@ class MainActivity : AppCompatActivity() {
             0, 3, 2,
             getString(if (video.isLocked) R.string.unlock_video else R.string.lock_video)
         )
-        popup.menu.add(0, 4, 3, getString(R.string.rename))
-        popup.menu.add(0, 5, 4, getString(R.string.delete))
+        popup.menu.add(0, 4, 3, getString(R.string.set_category))
+        popup.menu.add(0, 5, 4, getString(R.string.rename))
+        popup.menu.add(0, 6, 5, getString(R.string.delete))
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 1 -> { onVideoClick(video); true }
                 2 -> { shareVideo(video); true }
                 3 -> { viewModel.toggleLock(video); true }
-                4 -> { promptRenameVideo(video); true }
-                5 -> { confirmDeleteSingle(video); true }
+                4 -> { promptSetCategory(video); true }
+                5 -> { promptRenameVideo(video); true }
+                6 -> { confirmDeleteSingle(video); true }
                 else -> false
             }
         }
@@ -375,6 +534,7 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.action_new_folder -> { promptNewFolder(); true }
+            R.id.action_protected -> { toggleProtected(); true }
             R.id.action_downloads -> {
                 startActivity(Intent(this, DownloadsActivity::class.java))
                 true
@@ -436,11 +596,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (viewModel.uiState.value.selectionMode) {
-            viewModel.clearSelection()
-        } else {
-            @Suppress("DEPRECATION")
-            super.onBackPressed()
+        val state = viewModel.uiState.value
+        when {
+            state.selectionMode -> viewModel.clearSelection()
+            state.protectedMode -> viewModel.setProtectedMode(false)
+            else -> {
+                @Suppress("DEPRECATION")
+                super.onBackPressed()
+            }
         }
     }
 }

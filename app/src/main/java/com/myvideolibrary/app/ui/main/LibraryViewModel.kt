@@ -36,6 +36,10 @@ data class LibraryUiState(
     val folderId: Long? = null,
     val favoritesOnly: Boolean = false,
     val sourceFilter: SourceFilter = SourceFilter.ALL,
+    val protectedMode: Boolean = false,
+    /** Selected category label, or null for "all categories". */
+    val categoryFilter: String? = null,
+    val categories: List<String> = emptyList(),
     val videoCount: Int = 0,
     val totalSize: Long = 0,
     val folders: List<FolderEntity> = emptyList(),
@@ -64,6 +68,13 @@ class LibraryViewModel @Inject constructor(
     private val _folderFilter = MutableStateFlow<Long?>(null)
     private val _favoritesOnly = MutableStateFlow(false)
     private val _sourceFilter = MutableStateFlow(SourceFilter.ALL)
+    private val _protectedMode = MutableStateFlow(false)
+    private val _categoryFilter = MutableStateFlow<String?>(null)
+
+    /** Merged source + protected + category, kept as one flow for combine arity. */
+    private val extraFilters = combine(
+        _sourceFilter, _protectedMode, _categoryFilter
+    ) { source, protectedMode, category -> ExtraFilters(source, protectedMode, category) }
 
     /** Paged videos, recomputed whenever the query changes. */
     val videos: Flow<PagingData<VideoEntity>> =
@@ -75,16 +86,17 @@ class LibraryViewModel @Inject constructor(
         settingsRepository.observeSettings(),
         folderRepository.observeFolders(),
         videoRepository.observeCount(),
-        videoRepository.observeTotalSize()
-    ) { settings, folders, count, size ->
-        LibraryMeta(settings, folders, count, size)
+        videoRepository.observeTotalSize(),
+        videoRepository.observeCategories()
+    ) { settings, folders, count, size, categories ->
+        LibraryMeta(settings, folders, count, size, categories)
     }
 
     // Active filter selections.
     private val filters = combine(
-        _search, _folderFilter, _favoritesOnly, _sourceFilter
-    ) { search, folderId, favoritesOnly, sourceFilter ->
-        LibraryFilters(search, folderId, favoritesOnly, sourceFilter)
+        _search, _folderFilter, _favoritesOnly, extraFilters
+    ) { search, folderId, favoritesOnly, extra ->
+        LibraryFilters(search, folderId, favoritesOnly, extra)
     }
 
     val uiState: StateFlow<LibraryUiState> = combine(
@@ -96,7 +108,10 @@ class LibraryViewModel @Inject constructor(
             search = f.search,
             folderId = f.folderId,
             favoritesOnly = f.favoritesOnly,
-            sourceFilter = f.sourceFilter,
+            sourceFilter = f.extra.sourceFilter,
+            protectedMode = f.extra.protectedMode,
+            categoryFilter = f.extra.category,
+            categories = m.categories,
             videoCount = m.count,
             totalSize = m.size,
             folders = m.folders,
@@ -113,16 +128,28 @@ class LibraryViewModel @Inject constructor(
                 _search,
                 _folderFilter,
                 _favoritesOnly,
-                _sourceFilter
-            ) { settings, search, folderId, favoritesOnly, sourceFilter ->
+                extraFilters
+            ) { settings, search, folderId, favoritesOnly, extra ->
                 LibraryQuery(
                     search = search,
                     folderId = folderId,
                     favoritesOnly = favoritesOnly,
-                    sourceFilter = sourceFilter,
+                    category = extra.category,
+                    sourceFilter = extra.sourceFilter,
+                    protectedOnly = extra.protectedMode,
                     sortOrder = SortOrder.fromId(settings.sortOrder)
                 )
             }.collect { queryState.value = it }
+        }
+        // Clear a category filter once its last video is gone, so the library
+        // doesn't stay stuck on an empty, un-selectable category.
+        viewModelScope.launch {
+            videoRepository.observeCategories().collect { categories ->
+                val current = _categoryFilter.value
+                if (current != null && current !in categories) {
+                    _categoryFilter.value = null
+                }
+            }
         }
     }
 
@@ -135,6 +162,10 @@ class LibraryViewModel @Inject constructor(
     fun setFavoritesOnly(only: Boolean) { _favoritesOnly.value = only }
 
     fun setSourceFilter(filter: SourceFilter) { _sourceFilter.value = filter }
+
+    fun setProtectedMode(on: Boolean) { _protectedMode.value = on }
+
+    fun setCategoryFilter(category: String?) { _categoryFilter.value = category }
 
     fun setSortOrder(order: SortOrder) = viewModelScope.launch {
         settingsRepository.update { it.copy(sortOrder = order.id) }
@@ -203,6 +234,16 @@ class LibraryViewModel @Inject constructor(
         videoRepository.rename(id, title)
     }
 
+    fun setCategory(id: Long, category: String?) = viewModelScope.launch {
+        videoRepository.setCategory(listOf(id), category)
+    }
+
+    fun setCategorySelected(category: String?) = viewModelScope.launch {
+        val ids = _selection.value.ids.toList()
+        if (ids.isNotEmpty()) videoRepository.setCategory(ids, category)
+        clearSelection()
+    }
+
     fun createFolder(name: String) = viewModelScope.launch {
         folderRepository.createFolder(name, null)
     }
@@ -216,13 +257,20 @@ class LibraryViewModel @Inject constructor(
         val settings: SettingsEntity,
         val folders: List<FolderEntity>,
         val count: Int,
-        val size: Long
+        val size: Long,
+        val categories: List<String>
+    )
+
+    private data class ExtraFilters(
+        val sourceFilter: SourceFilter,
+        val protectedMode: Boolean,
+        val category: String?
     )
 
     private data class LibraryFilters(
         val search: String,
         val folderId: Long?,
         val favoritesOnly: Boolean,
-        val sourceFilter: SourceFilter
+        val extra: ExtraFilters
     )
 }

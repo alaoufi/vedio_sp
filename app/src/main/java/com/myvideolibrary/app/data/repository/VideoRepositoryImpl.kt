@@ -63,6 +63,11 @@ class VideoRepositoryImpl @Inject constructor(
 
     override suspend fun rename(id: Long, title: String) = videoDao.rename(id, title)
 
+    override suspend fun setCategory(ids: List<Long>, category: String?) =
+        videoDao.setCategory(ids, category?.trim()?.takeIf { it.isNotEmpty() })
+
+    override fun observeCategories(): Flow<List<String>> = videoDao.observeCategories()
+
     override suspend fun moveToFolder(ids: List<Long>, folderId: Long?) =
         videoDao.moveToFolder(ids, folderId)
 

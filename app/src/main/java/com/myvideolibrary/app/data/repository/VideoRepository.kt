@@ -28,6 +28,10 @@ interface VideoRepository {
 
     suspend fun rename(id: Long, title: String)
 
+    suspend fun setCategory(ids: List<Long>, category: String?)
+
+    fun observeCategories(): Flow<List<String>>
+
     suspend fun moveToFolder(ids: List<Long>, folderId: Long?)
 
     suspend fun recordPlayback(id: Long, position: Long, countAsPlay: Boolean)

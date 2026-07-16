@@ -24,6 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="12dp"
             app:startIconDrawable="@drawable/ic_search"
+            app:endIconMode="clear_text"
             android:hint="@string/search_hint">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -31,7 +32,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:imeOptions="actionSearch"
-                android:inputType="text"
+                android:inputType="textNoSuggestions"
+                android:importantForAutofill="no"
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -43,6 +45,23 @@
 
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/sourceChips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:singleLine="true"
+                app:selectionRequired="true"
+                app:singleSelection="true" />
+        </HorizontalScrollView>
+
+        <HorizontalScrollView
+            android:id="@+id/categoryChipsScroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            android:paddingHorizontal="12dp"
+            android:visibility="gone">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/categoryChips"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:singleLine="true"

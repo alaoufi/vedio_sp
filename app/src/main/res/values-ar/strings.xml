@@ -162,6 +162,28 @@
     <string name="video_locked">هذا الفيديو مقفل</string>
     <string name="share_failed">تعذّرت مشاركة هذا الفيديو</string>
 
+    <!-- Protected videos -->
+    <string name="protected_videos">الفيديوهات المحمية</string>
+    <string name="protected_set_pin_hint">عيّن رمز PIN في الإعدادات لحماية الفيديوهات.</string>
+    <string name="protected_title">محمي · %1$d</string>
+
+    <!-- Categories -->
+    <string name="category">التصنيف</string>
+    <string name="category_none">بدون تصنيف</string>
+    <string name="category_all">كل التصنيفات</string>
+    <string name="set_category">تعيين التصنيف</string>
+    <string name="category_hint">اسم التصنيف</string>
+    <string name="category_general">عام</string>
+    <string name="category_education">تعليمي</string>
+    <string name="category_entertainment">ترفيه</string>
+    <string name="category_music">موسيقى</string>
+    <string name="category_sports">رياضة</string>
+    <string name="category_news">أخبار</string>
+    <string name="category_cooking">طبخ</string>
+    <string name="category_tech">تقنية</string>
+    <string name="category_religion">دين</string>
+    <string name="category_kids">أطفال</string>
+
     <!-- Content descriptions -->
     <string name="cd_thumbnail">مصغّرة الفيديو</string>
     <string name="cd_favorite">مفضلة</string>

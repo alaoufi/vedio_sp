@@ -33,10 +33,10 @@ class SearchViewModel @Inject constructor(
     val state: StateFlow<SearchUiState> = _state.asStateFlow()
 
     fun setSource(source: VideoSource) {
-        // Keyword search is only available for YouTube; TikTok is link-based.
+        // Both TikTok (via resolver) and YouTube (via NewPipe) support keyword search.
         _state.value = _state.value.copy(
             source = source,
-            searchSupported = source == VideoSource.YOUTUBE,
+            searchSupported = true,
             results = emptyList(),
             error = null
         )
@@ -47,8 +47,8 @@ class SearchViewModel @Inject constructor(
         if (q.isEmpty()) return
         val source = _state.value.source
 
-        // TikTok has no keyword search: treat the input as a link and resolve it.
-        if (source == VideoSource.TIKTOK) {
+        // If the user pasted a link, resolve it directly regardless of source.
+        if (q.startsWith("http")) {
             downloadLink(q)
             return
         }
@@ -70,7 +70,32 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    fun downloadItem(item: ProviderSearchItem) = downloadLink(item.url)
+    fun downloadItem(item: ProviderSearchItem) {
+        // Search results that already carry a direct URL (TikTok) enqueue instantly.
+        val direct = item.directUrl
+        if (direct != null) {
+            _state.value = _state.value.copy(loading = true, error = null)
+            viewModelScope.launch {
+                try {
+                    downloadManager.enqueue(
+                        title = item.title,
+                        source = item.source.id,
+                        sourceUrl = item.url,
+                        directUrl = direct,
+                        thumbnailUrl = item.thumbnailUrl
+                    )
+                    _state.value = _state.value.copy(loading = false, message = "queued")
+                } catch (e: Throwable) {
+                    _state.value = _state.value.copy(
+                        loading = false,
+                        error = "${e.javaClass.simpleName}: ${e.message ?: "no message"}"
+                    )
+                }
+            }
+        } else {
+            downloadLink(item.url)
+        }
+    }
 
     private fun downloadLink(url: String) {
         val provider = providerRegistry.providerForUrl(url)
