@@ -163,8 +163,8 @@
     <string name="open_source">فتح من المصدر</string>
     <string name="favorite">إضافة إلى المفضلة</string>
     <string name="unfavorite">إزالة من المفضلة</string>
-    <string name="lock_video">حماية (قفل)</string>
-    <string name="unlock_video">إلغاء الحماية</string>
+    <string name="lock_video">خاص</string>
+    <string name="unlock_video">خاص</string>
 
     <!-- Save location -->
     <string name="save_location">مسار الحفظ</string>
@@ -179,10 +179,10 @@
     <string name="link_badge">رابط محفوظ</string>
 
     <!-- Protected videos -->
-    <string name="protected_videos">الفيديوهات المحمية</string>
-    <string name="protected_set_pin_hint">تمت الحماية. عيّن رمزًا/بصمة من الإعدادات ← الأمان لقفل حقيقي.</string>
-    <string name="protected_moved_hint">نُقل إلى الفيديوهات المحمية (القائمة ← الفيديوهات المحمية).</string>
-    <string name="protected_title">محمي · %1$d</string>
+    <string name="protected_videos">الفيديوهات الخاصة</string>
+    <string name="protected_set_pin_hint">أصبح خاصًا. عيّن رمزًا/بصمة من الإعدادات ← الأمان لقفل حقيقي.</string>
+    <string name="protected_moved_hint">نُقل إلى الفيديوهات الخاصة (القائمة ← الفيديوهات الخاصة).</string>
+    <string name="protected_title">خاص · %1$d</string>
 
     <!-- Categories -->
     <string name="category">التصنيف</string>

@@ -163,8 +163,8 @@
     <string name="open_source">Open in source</string>
     <string name="favorite">Add to favorites</string>
     <string name="unfavorite">Remove from favorites</string>
-    <string name="lock_video">Protect (lock)</string>
-    <string name="unlock_video">Remove protection</string>
+    <string name="lock_video">Private</string>
+    <string name="unlock_video">Private</string>
 
     <!-- Save location -->
     <string name="save_location">Save location</string>
@@ -179,10 +179,10 @@
     <string name="link_badge">Saved link</string>
 
     <!-- Protected videos -->
-    <string name="protected_videos">Protected videos</string>
-    <string name="protected_set_pin_hint">Protected. Set a PIN/fingerprint in Settings → Security for a real lock.</string>
-    <string name="protected_moved_hint">Moved to Protected videos (menu → Protected videos).</string>
-    <string name="protected_title">Protected · %1$d</string>
+    <string name="protected_videos">Private videos</string>
+    <string name="protected_set_pin_hint">Marked private. Set a PIN/fingerprint in Settings → Security for a real lock.</string>
+    <string name="protected_moved_hint">Moved to Private videos (menu → Private videos).</string>
+    <string name="protected_title">Private · %1$d</string>
 
     <!-- Categories -->
     <string name="category">Category</string>

@@ -376,9 +376,9 @@ class MainActivity : AppCompatActivity() {
         val state = viewModel.uiState.value
         if (state.selectionMode) {
             viewModel.toggleSelected(video.id)
-        } else if (video.isLocked) {
-            android.widget.Toast.makeText(this, R.string.video_locked, android.widget.Toast.LENGTH_SHORT).show()
         } else {
+            // Private videos only appear in the already-unlocked private view, so
+            // they play normally from there (no separate "locked" block).
             startActivity(PlayerActivity.intent(this, video.id))
         }
     }
@@ -394,10 +394,11 @@ class MainActivity : AppCompatActivity() {
         // Saved links can be downloaded to a local file on demand.
         if (video.isLinkOnly) popup.menu.add(0, 7, 2, getString(R.string.download))
         popup.menu.add(0, 2, 3, getString(R.string.action_share))
-        popup.menu.add(
-            0, 3, 4,
-            getString(if (video.isLocked) R.string.unlock_video else R.string.lock_video)
-        )
+        // A single "Private" toggle: checked means the clip is in the private view.
+        popup.menu.add(0, 3, 4, getString(R.string.lock_video)).apply {
+            isCheckable = true
+            isChecked = video.isLocked
+        }
         popup.menu.add(0, 4, 5, getString(R.string.set_category))
         popup.menu.add(0, 5, 6, getString(R.string.rename))
         // Open the original TikTok/YouTube page in its app or the browser.
