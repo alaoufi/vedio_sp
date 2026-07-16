@@ -237,12 +237,12 @@
                 android:contentDescription="@string/action_favorites" />
 
             <ImageButton
-                android:id="@+id/selectionMove"
+                android:id="@+id/selectionCategory"
                 style="@style/Widget.Material3.Button.IconButton"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:src="@drawable/ic_folder"
-                android:contentDescription="@string/move_to_folder" />
+                android:src="@drawable/ic_filter_list"
+                android:contentDescription="@string/set_category" />
 
             <ImageButton
                 android:id="@+id/selectionDelete"

@@ -159,7 +159,7 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    /** All source/category/folder filters in one popup, anchored to the filter button. */
+    /** All source/type/category filters in one popup, anchored to the filter button. */
     private fun showFilterMenu(anchor: android.view.View) {
         val state = viewModel.uiState.value
         val popup = android.widget.PopupMenu(this, anchor)
@@ -211,20 +211,6 @@ class MainActivity : AppCompatActivity() {
             cat.findItem(checkedId)?.isChecked = true
         }
 
-        // --- Folder (only when folders exist) ---
-        if (state.folders.isNotEmpty()) {
-            val folder = menu.addSubMenu(getString(R.string.filter_folder))
-            folder.add(GROUP_FOLDER, ID_FOLDER_ALL, 0, R.string.filter_all)
-            state.folders.forEachIndexed { i, f ->
-                folder.add(GROUP_FOLDER, ID_FOLDER_BASE + i, i + 1, f.name)
-            }
-            folder.setGroupCheckable(GROUP_FOLDER, true, true)
-            val checkedId = state.folderId
-                ?.let { id -> ID_FOLDER_BASE + state.folders.indexOfFirst { it.id == id } }
-                ?: ID_FOLDER_ALL
-            folder.findItem(checkedId)?.isChecked = true
-        }
-
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 ID_SRC_ALL -> viewModel.setSourceFilter(SourceFilter.ALL)
@@ -236,11 +222,8 @@ class MainActivity : AppCompatActivity() {
                 ID_TYPE_AUDIO -> viewModel.setMediaTypeFilter("audio")
                 ID_TYPE_IMAGE -> viewModel.setMediaTypeFilter("image")
                 ID_CAT_ALL -> viewModel.setCategoryFilter(null)
-                ID_FOLDER_ALL -> viewModel.setFolderFilter(null)
-                in ID_CAT_BASE until ID_FOLDER_ALL ->
+                in ID_CAT_BASE..(ID_CAT_BASE + 9999) ->
                     viewModel.setCategoryFilter(state.categories.getOrNull(item.itemId - ID_CAT_BASE))
-                in ID_FOLDER_BASE..(ID_FOLDER_BASE + 9999) ->
-                    viewModel.setFolderFilter(state.folders.getOrNull(item.itemId - ID_FOLDER_BASE)?.id)
                 else -> return@setOnMenuItemClickListener false
             }
             true
@@ -259,14 +242,12 @@ class MainActivity : AppCompatActivity() {
         popup.menu.add(0, 2, 1, getString(R.string.action_add_download))
         popup.menu.add(0, 3, 2, getString(R.string.action_downloads))
         popup.menu.add(0, 4, 3, getString(R.string.import_title))
-        popup.menu.add(0, 5, 4, getString(R.string.new_folder))
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 1 -> startActivity(Intent(this, com.myvideolibrary.app.ui.search.SearchActivity::class.java))
                 2 -> startActivity(AddDownloadActivity.intent(this))
                 3 -> startActivity(Intent(this, DownloadsActivity::class.java))
                 4 -> startActivity(Intent(this, ImportActivity::class.java))
-                5 -> promptNewFolder()
                 else -> return@setOnMenuItemClickListener false
             }
             true
@@ -362,7 +343,7 @@ class MainActivity : AppCompatActivity() {
             )
             binding.selectionDelete.setOnClickListener { confirmDeleteSelected() }
             binding.selectionFavorite.setOnClickListener { viewModel.favoriteSelected(true) }
-            binding.selectionMove.setOnClickListener { promptMoveSelected(state) }
+            binding.selectionCategory.setOnClickListener { promptSetCategoryForSelection() }
             binding.selectionClose.setOnClickListener { viewModel.clearSelection() }
         }
     }
@@ -617,14 +598,31 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun promptMoveSelected(state: LibraryUiState) {
-        val names = listOf(getString(R.string.no_folder)) + state.folders.map { it.name }
+    /** Bulk-assign a category to every selected clip. */
+    private fun promptSetCategoryForSelection() {
+        val existing = viewModel.uiState.value.categories
+        val labels = existing + getString(R.string.category_none) + getString(R.string.add_category)
         AlertDialog.Builder(this)
-            .setTitle(R.string.move_to_folder)
-            .setItems(names.toTypedArray()) { _, which ->
-                val folderId = if (which == 0) null else state.folders[which - 1].id
-                viewModel.moveSelectedToFolder(folderId)
+            .setTitle(R.string.set_category)
+            .setItems(labels.toTypedArray()) { _, which ->
+                when {
+                    which < existing.size -> viewModel.setCategorySelected(existing[which])
+                    which == existing.size -> viewModel.setCategorySelected(null)
+                    else -> promptCustomCategoryForSelection()
+                }
             }
+            .show()
+    }
+
+    private fun promptCustomCategoryForSelection() {
+        val input = EditText(this).apply { hint = getString(R.string.category_hint) }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.set_category)
+            .setView(input)
+            .setPositiveButton(R.string.save) { _, _ ->
+                viewModel.setCategorySelected(input.text.toString().trim().ifEmpty { null })
+            }
+            .setNegativeButton(R.string.cancel, null)
             .show()
     }
 
@@ -691,23 +689,9 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun promptNewFolder() {
-        val input = EditText(this).apply { hint = getString(R.string.folder_name_hint) }
-        AlertDialog.Builder(this)
-            .setTitle(R.string.new_folder)
-            .setView(input)
-            .setPositiveButton(R.string.create) { _, _ ->
-                val name = input.text.toString().trim()
-                if (name.isNotEmpty()) viewModel.createFolder(name)
-            }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
-    }
-
     private companion object {
         const val GROUP_SOURCE = 1
         const val GROUP_CATEGORY = 2
-        const val GROUP_FOLDER = 3
         const val ID_SRC_ALL = 100
         const val ID_SRC_TIKTOK = 101
         const val ID_SRC_YOUTUBE = 102
@@ -719,8 +703,6 @@ class MainActivity : AppCompatActivity() {
         const val ID_TYPE_IMAGE = 153
         const val ID_CAT_ALL = 200
         const val ID_CAT_BASE = 201
-        const val ID_FOLDER_ALL = 1000
-        const val ID_FOLDER_BASE = 1001
     }
 
     override fun onBackPressed() {
