@@ -198,4 +198,10 @@
     <string name="cd_pip">صورة داخل صورة</string>
     <string name="cd_background">التشغيل في الخلفية</string>
     <string name="cd_import">استيراد الفيديوهات</string>
+    <string name="cd_resize">تحجيم الفيديو</string>
+
+    <!-- Player resize modes -->
+    <string name="resize_fit">احتواء</string>
+    <string name="resize_zoom">تكبير (قص)</string>
+    <string name="resize_fill">ملء (تمديد)</string>
 </resources>

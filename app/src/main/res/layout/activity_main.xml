@@ -111,35 +111,49 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
+                android:orientation="vertical"
                 android:padding="10dp">
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_download"
-                    app:tint="?attr/colorOnPrimaryContainer"
-                    android:contentDescription="@null" />
-
-                <TextView
-                    android:id="@+id/downloadBannerText"
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="10dp"
-                    android:textColor="?attr/colorOnPrimaryContainer"
-                    android:textAppearance="?attr/textAppearanceBodyMedium"
-                    tools:text="Downloading 1 · 45%" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_arrow_back"
-                    android:rotation="180"
-                    android:alpha="0.7"
-                    app:tint="?attr/colorOnPrimaryContainer"
-                    android:contentDescription="@null" />
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_download"
+                        app:tint="?attr/colorOnPrimaryContainer"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:id="@+id/downloadBannerText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="10dp"
+                        android:textColor="?attr/colorOnPrimaryContainer"
+                        android:textAppearance="?attr/textAppearanceBodyMedium"
+                        tools:text="Downloading 1 · 45%" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_arrow_back"
+                        android:rotation="180"
+                        android:alpha="0.7"
+                        app:tint="?attr/colorOnPrimaryContainer"
+                        android:contentDescription="@null" />
+                </LinearLayout>
+
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/downloadBannerProgress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:max="100"
+                    app:trackCornerRadius="4dp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

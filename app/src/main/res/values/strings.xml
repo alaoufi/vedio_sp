@@ -198,4 +198,10 @@
     <string name="cd_pip">Picture in picture</string>
     <string name="cd_background">Background playback</string>
     <string name="cd_import">Import videos</string>
+    <string name="cd_resize">Resize video</string>
+
+    <!-- Player resize modes -->
+    <string name="resize_fit">Fit</string>
+    <string name="resize_zoom">Zoom (crop)</string>
+    <string name="resize_fill">Fill (stretch)</string>
 </resources>

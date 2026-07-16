@@ -98,9 +98,17 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
+    private val resizeModes = intArrayOf(
+        androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT,
+        androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM,
+        androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FILL
+    )
+    private var resizeIndex = 0
+
     private fun setupControls() {
         binding.lockButton.setOnClickListener { toggleLock() }
         binding.rotateButton.setOnClickListener { toggleOrientation() }
+        binding.resizeButton.setOnClickListener { cycleResizeMode() }
         binding.speedButton.text = getString(R.string.speed_format, speeds[speedIndex])
         binding.speedButton.setOnClickListener { cycleSpeed() }
         binding.backButton.setOnClickListener { finish() }
@@ -148,6 +156,18 @@ class PlayerActivity : AppCompatActivity() {
             if (controlsLocked) R.drawable.ic_lock else R.drawable.ic_lock_open
         )
         binding.playerView.useController = !controlsLocked
+    }
+
+    /** Cycles the video scaling: fit (letterbox) → zoom (crop) → fill (stretch). */
+    private fun cycleResizeMode() {
+        resizeIndex = (resizeIndex + 1) % resizeModes.size
+        binding.playerView.resizeMode = resizeModes[resizeIndex]
+        val label = when (resizeModes[resizeIndex]) {
+            androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM -> R.string.resize_zoom
+            androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FILL -> R.string.resize_fill
+            else -> R.string.resize_fit
+        }
+        showGestureHint(getString(label))
     }
 
     private fun toggleOrientation() {

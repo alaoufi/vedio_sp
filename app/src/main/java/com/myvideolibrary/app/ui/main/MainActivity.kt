@@ -76,8 +76,14 @@ class MainActivity : AppCompatActivity() {
                             it.status == com.myvideolibrary.app.data.model.DownloadStatus.DOWNLOADING.id
                         }
                         val percent = downloading?.progress ?: 0
-                        binding.downloadBannerText.text =
-                            getString(R.string.downloading_banner, active.size, percent)
+                        val text = getString(R.string.downloading_banner, active.size, percent)
+                        binding.downloadBannerText.text = text
+                        binding.downloadBannerProgress.progress = percent
+                        // Redundant, always-visible cue at the top bar (banner can be
+                        // brief for fast TikTok downloads).
+                        if (!viewModel.uiState.value.protectedMode) supportActionBar?.subtitle = text
+                    } else {
+                        supportActionBar?.subtitle = null
                     }
                 }
             }
@@ -623,6 +629,12 @@ class MainActivity : AppCompatActivity() {
         when {
             state.selectionMode -> viewModel.clearSelection()
             state.protectedMode -> viewModel.setProtectedMode(false)
+            // Back first returns to the full, unfiltered library.
+            state.categoryFilter != null -> viewModel.setCategoryFilter(null)
+            state.search.isNotEmpty() -> {
+                binding.searchInput.text?.clear()
+                viewModel.setSearch("")
+            }
             else -> {
                 @Suppress("DEPRECATION")
                 super.onBackPressed()
