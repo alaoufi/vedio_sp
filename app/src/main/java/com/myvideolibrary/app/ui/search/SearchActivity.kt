@@ -54,8 +54,44 @@ class SearchActivity : AppCompatActivity() {
         binding.searchInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) { submit(); true } else false
         }
+        binding.downloadBanner.setOnClickListener {
+            startActivity(
+                android.content.Intent(
+                    this, com.myvideolibrary.app.ui.downloads.DownloadsActivity::class.java
+                )
+            )
+        }
 
         observe()
+        observeDownloads()
+    }
+
+    /** Mirrors the library's live download indicator so progress is visible here too. */
+    private fun observeDownloads() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.activeDownloads.collectLatest { active ->
+                    val show = active.isNotEmpty()
+                    binding.downloadBanner.isVisible = show
+                    if (show) {
+                        val downloading = active.firstOrNull {
+                            it.status ==
+                                com.myvideolibrary.app.data.model.DownloadStatus.DOWNLOADING.id
+                        }
+                        val percent = downloading?.progress ?: 0
+                        binding.downloadBannerText.text =
+                            getString(R.string.downloading_banner, active.size, percent)
+                        val bar = binding.downloadBannerProgress
+                        if (downloading == null) {
+                            bar.isIndeterminate = true
+                        } else {
+                            bar.isIndeterminate = false
+                            bar.setProgressCompat(percent, true)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun submit() {

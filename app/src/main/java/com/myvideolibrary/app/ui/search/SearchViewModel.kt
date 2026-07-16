@@ -5,14 +5,17 @@ import androidx.lifecycle.viewModelScope
 import com.myvideolibrary.app.data.local.entity.VideoEntity
 import com.myvideolibrary.app.data.model.VideoSource
 import com.myvideolibrary.app.data.repository.VideoRepository
+import com.myvideolibrary.app.data.repository.DownloadRepository
 import com.myvideolibrary.app.download.DownloadManager
 import com.myvideolibrary.app.provider.ProviderRegistry
 import com.myvideolibrary.app.provider.model.ProviderException
 import com.myvideolibrary.app.provider.model.ProviderSearchItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,11 +37,17 @@ data class SearchUiState(
 class SearchViewModel @Inject constructor(
     private val providerRegistry: ProviderRegistry,
     private val downloadManager: DownloadManager,
-    private val videoRepository: VideoRepository
+    private val videoRepository: VideoRepository,
+    downloadRepository: DownloadRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SearchUiState())
     val state: StateFlow<SearchUiState> = _state.asStateFlow()
+
+    /** Active (waiting/downloading) jobs, so the screen can show a live banner. */
+    val activeDownloads: StateFlow<List<com.myvideolibrary.app.data.local.entity.DownloadEntity>> =
+        downloadRepository.observeActive()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun setSource(source: VideoSource) {
         // Both TikTok (via resolver) and YouTube (via NewPipe) support keyword search.
