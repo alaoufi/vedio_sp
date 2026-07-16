@@ -22,7 +22,11 @@ sealed interface PlayerUiState {
         val resumeMs: Long = 0,
         /** DB id for playback bookkeeping; null for ad-hoc streams. */
         val trackId: Long? = null,
-        val streaming: Boolean = false
+        val streaming: Boolean = false,
+        /** True when the track has no video — show cover art, not a black frame. */
+        val isAudio: Boolean = false,
+        /** Cover image (file path or URL) to display while playing audio. */
+        val artwork: String? = null
     ) : PlayerUiState
     data class Error(val message: String?) : PlayerUiState
 }
@@ -62,7 +66,10 @@ class PlayerViewModel @Inject constructor(
                     url = video.localPath,
                     resumeMs = video.lastPlayedPosition,
                     trackId = id,
-                    streaming = false
+                    streaming = false,
+                    isAudio = video.mediaType ==
+                        com.myvideolibrary.app.data.model.MediaType.AUDIO.id,
+                    artwork = video.thumbnailPath
                 )
             }
         }

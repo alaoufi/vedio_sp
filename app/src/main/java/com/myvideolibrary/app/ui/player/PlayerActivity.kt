@@ -84,6 +84,7 @@ class PlayerActivity : AppCompatActivity() {
                         is PlayerUiState.Ready -> {
                             binding.loadingBar.isVisible = false
                             binding.titleText.text = state.title
+                            showArtworkIfAudio(state.isAudio, state.artwork)
                             preparePlayer(state.url, state.resumeMs)
                         }
                         is PlayerUiState.Error -> {
@@ -119,6 +120,23 @@ class PlayerActivity : AppCompatActivity() {
             binding.backgroundToggle.setImageResource(
                 if (backgroundPlayback) R.drawable.ic_headphones_on else R.drawable.ic_headphones
             )
+        }
+    }
+
+    /**
+     * Audio tracks have no video frame, so the bare player surface is just
+     * black ("a video without picture"). Overlay the cover art instead so it
+     * plays like real audio. The resize toggle is meaningless for audio.
+     */
+    private fun showArtworkIfAudio(isAudio: Boolean, artwork: String?) {
+        binding.audioArtwork.isVisible = isAudio
+        binding.resizeButton.isVisible = !isAudio
+        if (isAudio && !artwork.isNullOrBlank()) {
+            com.bumptech.glide.Glide.with(this)
+                .load(artwork)
+                .placeholder(R.drawable.ic_headphones)
+                .error(R.drawable.ic_headphones)
+                .into(binding.audioArtwork)
         }
     }
 
