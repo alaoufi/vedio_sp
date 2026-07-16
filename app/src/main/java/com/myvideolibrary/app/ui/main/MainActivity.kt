@@ -458,7 +458,8 @@ class MainActivity : AppCompatActivity() {
         popup.menu.add(0, 5, 6, getString(R.string.rename))
         // Open the original TikTok/YouTube page in its app or the browser.
         if (!video.sourceUrl.isNullOrBlank()) popup.menu.add(0, 8, 7, getString(R.string.open_source))
-        popup.menu.add(0, 6, 8, getString(R.string.delete))
+        popup.menu.add(0, 10, 8, getString(R.string.file_info))
+        popup.menu.add(0, 6, 9, getString(R.string.delete))
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 1 -> { onVideoClick(video); true }
@@ -469,6 +470,7 @@ class MainActivity : AppCompatActivity() {
                 6 -> { confirmDeleteSingle(video); true }
                 8 -> { openSource(video); true }
                 9 -> { viewModel.toggleFavorite(video); true }
+                10 -> { showFileInfo(video); true }
                 7 -> {
                     viewModel.downloadLink(video)
                     android.widget.Toast.makeText(
@@ -480,6 +482,37 @@ class MainActivity : AppCompatActivity() {
             }
         }
         popup.show()
+    }
+
+    /** Shows the file's format (MP4/M4A/JPG…), type, size, resolution and duration. */
+    private fun showFileInfo(video: VideoEntity) {
+        val mediaType = com.myvideolibrary.app.data.model.MediaType.fromId(video.mediaType)
+        val typeLabel = when (mediaType) {
+            com.myvideolibrary.app.data.model.MediaType.VIDEO -> getString(R.string.type_video)
+            com.myvideolibrary.app.data.model.MediaType.AUDIO -> getString(R.string.type_audio)
+            com.myvideolibrary.app.data.model.MediaType.IMAGE -> getString(R.string.type_image)
+        }
+        val format = when {
+            video.isLinkOnly -> getString(R.string.link_badge)
+            else -> video.localPath.substringAfterLast('.', "").uppercase()
+                .ifBlank { "—" }
+        }
+        val lines = buildList {
+            add(getString(R.string.info_format, format))
+            add(getString(R.string.info_type, typeLabel))
+            if (!video.isLinkOnly) add(getString(R.string.info_size, Formatters.fileSize(video.fileSize)))
+            if (video.width > 0 && video.height > 0) {
+                add(getString(R.string.info_resolution, video.width, video.height))
+            }
+            if (video.duration > 0) {
+                add(getString(R.string.info_duration, Formatters.duration(video.duration)))
+            }
+        }
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.file_info)
+            .setMessage(lines.joinToString("\n"))
+            .setPositiveButton(android.R.string.ok, null)
+            .show()
     }
 
     /** Protects/unprotects a video; when protecting without a lock, points to Settings. */

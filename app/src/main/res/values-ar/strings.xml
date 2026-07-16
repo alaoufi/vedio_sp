@@ -175,6 +175,14 @@
     <string name="lock_video">خاص</string>
     <string name="unlock_video">خاص</string>
 
+    <!-- File info -->
+    <string name="file_info">معلومات الملف</string>
+    <string name="info_format">الصيغة: %1$s</string>
+    <string name="info_type">النوع: %1$s</string>
+    <string name="info_size">الحجم: %1$s</string>
+    <string name="info_resolution">الدقة: %1$d × %2$d</string>
+    <string name="info_duration">المدة: %1$s</string>
+
     <!-- Save location -->
     <string name="save_location">مسار الحفظ</string>
     <string name="save_location_default">تخزين التطبيق (الافتراضي)</string>

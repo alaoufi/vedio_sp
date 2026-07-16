@@ -175,6 +175,14 @@
     <string name="lock_video">Private</string>
     <string name="unlock_video">Private</string>
 
+    <!-- File info -->
+    <string name="file_info">File info</string>
+    <string name="info_format">Format: %1$s</string>
+    <string name="info_type">Type: %1$s</string>
+    <string name="info_size">Size: %1$s</string>
+    <string name="info_resolution">Resolution: %1$d × %2$d</string>
+    <string name="info_duration">Duration: %1$s</string>
+
     <!-- Save location -->
     <string name="save_location">Save location</string>
     <string name="save_location_default">App storage (default)</string>
