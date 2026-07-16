@@ -55,6 +55,19 @@
                 android:contentDescription="@string/cd_lock"
                 android:visibility="gone" />
 
+            <ImageView
+                android:id="@+id/linkBadge"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="bottom|start"
+                android:layout_margin="4dp"
+                android:src="@drawable/ic_link"
+                app:tint="@color/white"
+                android:background="@color/scrim"
+                android:padding="2dp"
+                android:contentDescription="@string/link_badge"
+                android:visibility="gone" />
+
             <View
                 android:id="@+id/selectionOverlay"
                 android:layout_width="match_parent"

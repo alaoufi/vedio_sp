@@ -162,6 +162,11 @@
     <string name="video_locked">This video is locked</string>
     <string name="share_failed">Cannot share this video</string>
 
+    <!-- Streaming / saved links -->
+    <string name="save_link">Save link</string>
+    <string name="link_saved">Link saved to library</string>
+    <string name="link_badge">Saved link</string>
+
     <!-- Protected videos -->
     <string name="protected_videos">Protected videos</string>
     <string name="protected_set_pin_hint">Set a PIN in Settings to protect videos.</string>

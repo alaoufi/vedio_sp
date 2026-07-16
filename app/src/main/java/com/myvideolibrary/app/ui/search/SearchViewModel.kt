@@ -2,7 +2,9 @@ package com.myvideolibrary.app.ui.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.myvideolibrary.app.data.local.entity.VideoEntity
 import com.myvideolibrary.app.data.model.VideoSource
+import com.myvideolibrary.app.data.repository.VideoRepository
 import com.myvideolibrary.app.download.DownloadManager
 import com.myvideolibrary.app.provider.ProviderRegistry
 import com.myvideolibrary.app.provider.model.ProviderException
@@ -14,19 +16,25 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/** One-shot request to open the streaming player for a search result. */
+data class StreamRequest(val sourceUrl: String, val title: String)
+
 data class SearchUiState(
     val source: VideoSource = VideoSource.YOUTUBE,
     val loading: Boolean = false,
     val results: List<ProviderSearchItem> = emptyList(),
     val searchSupported: Boolean = true,
     val error: String? = null,
-    val message: String? = null
+    val message: String? = null,
+    val savedLink: Boolean = false,
+    val streamRequest: StreamRequest? = null
 )
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val providerRegistry: ProviderRegistry,
-    private val downloadManager: DownloadManager
+    private val downloadManager: DownloadManager,
+    private val videoRepository: VideoRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SearchUiState())
@@ -97,6 +105,38 @@ class SearchViewModel @Inject constructor(
         }
     }
 
+    /** Preview: open the platform stream in the player without downloading. */
+    fun play(item: ProviderSearchItem) {
+        _state.value = _state.value.copy(
+            streamRequest = StreamRequest(item.url, item.title)
+        )
+    }
+
+    /** Save a link-only library entry (streams on demand, downloadable later). */
+    fun saveLink(item: ProviderSearchItem) {
+        viewModelScope.launch {
+            try {
+                videoRepository.addVideo(
+                    VideoEntity(
+                        title = item.title,
+                        localPath = "",
+                        source = item.source.id,
+                        sourceUrl = item.url,
+                        thumbnailPath = item.thumbnailUrl,
+                        duration = item.durationMs,
+                        createdDate = System.currentTimeMillis(),
+                        isLinkOnly = true
+                    )
+                )
+                _state.value = _state.value.copy(savedLink = true)
+            } catch (e: Throwable) {
+                _state.value = _state.value.copy(
+                    error = "${e.javaClass.simpleName}: ${e.message ?: "no message"}"
+                )
+            }
+        }
+    }
+
     private fun downloadLink(url: String) {
         val provider = providerRegistry.providerForUrl(url)
         if (provider == null) {
@@ -128,4 +168,8 @@ class SearchViewModel @Inject constructor(
     }
 
     fun consumeMessage() { _state.value = _state.value.copy(message = null) }
+
+    fun consumeSavedLink() { _state.value = _state.value.copy(savedLink = false) }
+
+    fun consumeStreamRequest() { _state.value = _state.value.copy(streamRequest = null) }
 }

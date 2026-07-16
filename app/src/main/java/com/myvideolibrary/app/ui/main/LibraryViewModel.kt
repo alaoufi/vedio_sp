@@ -53,7 +53,9 @@ class LibraryViewModel @Inject constructor(
     private val videoRepository: VideoRepository,
     private val folderRepository: FolderRepository,
     private val settingsRepository: SettingsRepository,
-    private val downloadRepository: com.myvideolibrary.app.data.repository.DownloadRepository
+    private val downloadRepository: com.myvideolibrary.app.data.repository.DownloadRepository,
+    private val downloadManager: com.myvideolibrary.app.download.DownloadManager,
+    private val providerRegistry: com.myvideolibrary.app.provider.ProviderRegistry
 ) : ViewModel() {
 
     /** Active (waiting/downloading/paused) downloads, for the dashboard banner. */
@@ -236,6 +238,23 @@ class LibraryViewModel @Inject constructor(
 
     fun setCategory(id: Long, category: String?) = viewModelScope.launch {
         videoRepository.setCategory(listOf(id), category)
+    }
+
+    /** Downloads a saved link on demand, resolving its best quality first. */
+    fun downloadLink(video: VideoEntity) = viewModelScope.launch {
+        val url = video.sourceUrl ?: return@launch
+        val provider = providerRegistry.providerForUrl(url) ?: return@launch
+        runCatching {
+            val r = provider.resolve(url)
+            downloadManager.enqueue(
+                title = r.title,
+                source = r.source.id,
+                sourceUrl = r.sourceUrl,
+                directUrl = r.directUrl,
+                audioUrl = r.audioUrl,
+                thumbnailUrl = r.thumbnailUrl
+            )
+        }
     }
 
     fun setCategorySelected(category: String?) = viewModelScope.launch {

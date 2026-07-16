@@ -45,7 +45,6 @@ class PlayerActivity : AppCompatActivity() {
     lateinit var securityManager: SecurityManager
 
     private var player: ExoPlayer? = null
-    private var videoId: Long = -1
     private var controlsLocked = false
     private var backgroundPlayback = false
 
@@ -60,19 +59,39 @@ class PlayerActivity : AppCompatActivity() {
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        videoId = intent.getLongExtra(EXTRA_VIDEO_ID, -1)
-        if (videoId <= 0) { finish(); return }
+        val videoId = intent.getLongExtra(EXTRA_VIDEO_ID, -1)
+        val streamUrl = intent.getStringExtra(EXTRA_STREAM_URL)
 
         setupControls()
         setupGestures()
-        viewModel.load(videoId)
+
+        when {
+            videoId > 0 -> viewModel.loadVideo(videoId)
+            streamUrl != null -> viewModel.loadStream(
+                streamUrl, intent.getStringExtra(EXTRA_STREAM_TITLE).orEmpty()
+            )
+            else -> { finish(); return }
+        }
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.video.collectLatest { video ->
-                    if (video != null) {
-                        binding.titleText.text = video.title
-                        preparePlayer(video.localPath, viewModel.resumePosition())
+                viewModel.state.collectLatest { state ->
+                    when (state) {
+                        is PlayerUiState.Loading -> {
+                            binding.loadingBar.isVisible = true
+                            binding.errorText.isVisible = false
+                        }
+                        is PlayerUiState.Ready -> {
+                            binding.loadingBar.isVisible = false
+                            binding.titleText.text = state.title
+                            preparePlayer(state.url, state.resumeMs)
+                        }
+                        is PlayerUiState.Error -> {
+                            binding.loadingBar.isVisible = false
+                            binding.errorText.isVisible = true
+                            binding.errorText.text =
+                                state.message ?: getString(R.string.playback_error)
+                        }
                     }
                 }
             }
@@ -100,10 +119,10 @@ class PlayerActivity : AppCompatActivity() {
         val exo = ExoPlayer.Builder(this).build()
         binding.playerView.player = exo
 
-        val uri = if (source.startsWith("content://")) {
-            Uri.parse(source)
-        } else {
-            Uri.fromFile(java.io.File(source))
+        val uri = when {
+            source.startsWith("content://") -> Uri.parse(source)
+            source.startsWith("http") -> Uri.parse(source)
+            else -> Uri.fromFile(java.io.File(source))
         }
         exo.setMediaItem(MediaItem.fromUri(uri))
         exo.playWhenReady = true
@@ -260,8 +279,16 @@ class PlayerActivity : AppCompatActivity() {
 
     companion object {
         private const val EXTRA_VIDEO_ID = "extra_video_id"
+        private const val EXTRA_STREAM_URL = "extra_stream_url"
+        private const val EXTRA_STREAM_TITLE = "extra_stream_title"
 
         fun intent(context: Context, videoId: Long): Intent =
             Intent(context, PlayerActivity::class.java).putExtra(EXTRA_VIDEO_ID, videoId)
+
+        /** Streams a video straight from its platform page URL, no download. */
+        fun streamIntent(context: Context, sourceUrl: String, title: String): Intent =
+            Intent(context, PlayerActivity::class.java)
+                .putExtra(EXTRA_STREAM_URL, sourceUrl)
+                .putExtra(EXTRA_STREAM_TITLE, title)
     }
 }

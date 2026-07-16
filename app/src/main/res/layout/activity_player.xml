@@ -115,4 +115,12 @@
         android:visibility="gone"
         tools:text="Unable to play this video" />
 
+    <ProgressBar
+        android:id="@+id/loadingBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminateTint="@color/white"
+        android:visibility="gone" />
+
 </FrameLayout>

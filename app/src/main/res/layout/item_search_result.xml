@@ -10,14 +10,29 @@
     android:paddingVertical="6dp"
     android:background="?attr/selectableItemBackground">
 
-    <ImageView
-        android:id="@+id/thumbnail"
+    <FrameLayout
         android:layout_width="120dp"
-        android:layout_height="68dp"
-        android:background="#20000000"
-        android:contentDescription="@string/cd_thumbnail"
-        android:scaleType="centerCrop"
-        tools:src="@drawable/ic_video_placeholder" />
+        android:layout_height="68dp">
+
+        <ImageView
+            android:id="@+id/thumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#20000000"
+            android:contentDescription="@string/cd_thumbnail"
+            android:scaleType="centerCrop"
+            tools:src="@drawable/ic_video_placeholder" />
+
+        <!-- Play affordance: the row streams from the platform on tap. -->
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_play_arrow"
+            android:alpha="0.9"
+            app:tint="@android:color/white"
+            android:contentDescription="@string/play" />
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="0dp"
@@ -44,6 +59,14 @@
             android:textSize="12sp"
             tools:text="Channel · 3:24" />
     </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/saveLinkButton"
+        style="@style/Widget.Material3.Button.IconButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:icon="@drawable/ic_link"
+        android:contentDescription="@string/save_link" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/downloadButton"

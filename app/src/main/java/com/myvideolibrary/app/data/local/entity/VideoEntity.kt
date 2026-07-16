@@ -102,6 +102,13 @@ data class VideoEntity(
     @ColumnInfo(name = "is_locked")
     val isLocked: Boolean = false,
 
+    /**
+     * When true this row is a saved *link* only — no local file. It streams from
+     * its [sourceUrl] on playback and can be downloaded on demand later.
+     */
+    @ColumnInfo(name = "is_link_only")
+    val isLinkOnly: Boolean = false,
+
     @ColumnInfo(name = "play_count")
     val playCount: Int = 0,
 

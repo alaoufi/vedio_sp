@@ -72,6 +72,9 @@ class VideoPagingAdapter(
             binding.duration.text = Formatters.duration(video.duration)
             binding.favoriteIcon.isVisible = video.isFavorite
             binding.lockIcon.isVisible = video.isLocked
+            binding.linkBadge.isVisible = video.isLinkOnly
+            // A saved link has no duration until downloaded.
+            binding.duration.isVisible = video.duration > 0
             loadThumbnail(binding.thumbnail, video)
             binding.selectionOverlay.isVisible = selectionMode && video.id in selectedIds
             binding.menuButton.setOnClickListener { onMenu(video, it) }
@@ -93,6 +96,9 @@ class VideoPagingAdapter(
             )
             binding.favoriteButton.setOnClickListener { onFavorite(video) }
             binding.lockIcon.isVisible = video.isLocked
+            binding.linkBadge.isVisible = video.isLinkOnly
+            binding.duration.isVisible = video.duration > 0
+            binding.size.isVisible = !video.isLinkOnly
             binding.menuButton.setOnClickListener { onMenu(video, it) }
             loadThumbnail(binding.thumbnail, video)
             binding.selectionOverlay.isVisible = selectionMode && video.id in selectedIds

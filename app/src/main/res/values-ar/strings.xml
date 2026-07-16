@@ -162,6 +162,11 @@
     <string name="video_locked">هذا الفيديو مقفل</string>
     <string name="share_failed">تعذّرت مشاركة هذا الفيديو</string>
 
+    <!-- Streaming / saved links -->
+    <string name="save_link">حفظ الرابط</string>
+    <string name="link_saved">حُفظ الرابط في المكتبة</string>
+    <string name="link_badge">رابط محفوظ</string>
+
     <!-- Protected videos -->
     <string name="protected_videos">الفيديوهات المحمية</string>
     <string name="protected_set_pin_hint">عيّن رمز PIN في الإعدادات لحماية الفيديوهات.</string>

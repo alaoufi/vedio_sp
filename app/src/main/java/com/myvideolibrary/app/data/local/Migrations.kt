@@ -16,3 +16,10 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
         db.execSQL("ALTER TABLE videos ADD COLUMN is_locked INTEGER NOT NULL DEFAULT 0")
     }
 }
+
+/** Adds is_link_only for saved links that stream instead of storing a file. */
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE videos ADD COLUMN is_link_only INTEGER NOT NULL DEFAULT 0")
+    }
+}

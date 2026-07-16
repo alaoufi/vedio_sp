@@ -32,7 +32,11 @@ class SearchActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.toolbar.setNavigationOnClickListener { finish() }
 
-        adapter = SearchResultAdapter(onDownload = viewModel::downloadItem)
+        adapter = SearchResultAdapter(
+            onPlay = viewModel::play,
+            onSaveLink = viewModel::saveLink,
+            onDownload = viewModel::downloadItem
+        )
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = adapter
 
@@ -77,6 +81,20 @@ class SearchActivity : AppCompatActivity() {
                     state.message?.let {
                         Toast.makeText(this@SearchActivity, R.string.download_started, Toast.LENGTH_LONG).show()
                         viewModel.consumeMessage()
+                    }
+
+                    if (state.savedLink) {
+                        Toast.makeText(this@SearchActivity, R.string.link_saved, Toast.LENGTH_SHORT).show()
+                        viewModel.consumeSavedLink()
+                    }
+
+                    state.streamRequest?.let { req ->
+                        startActivity(
+                            com.myvideolibrary.app.ui.player.PlayerActivity.streamIntent(
+                                this@SearchActivity, req.sourceUrl, req.title
+                            )
+                        )
+                        viewModel.consumeStreamRequest()
                     }
                 }
             }

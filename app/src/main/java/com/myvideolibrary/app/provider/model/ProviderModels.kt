@@ -22,6 +22,19 @@ data class ResolvedVideo(
     val quality: String? = null
 )
 
+/**
+ * A single, directly-playable progressive stream URL for previewing a video
+ * without downloading it. Unlike [ResolvedVideo] this is always one muxed URL
+ * (never a split video/audio pair), so a player can open it as-is.
+ */
+data class StreamSource(
+    val source: VideoSource,
+    val sourceUrl: String,
+    val title: String,
+    val streamUrl: String,
+    val thumbnailUrl: String? = null
+)
+
 /** Lightweight search result (used by providers that support search). */
 data class ProviderSearchItem(
     val source: VideoSource,

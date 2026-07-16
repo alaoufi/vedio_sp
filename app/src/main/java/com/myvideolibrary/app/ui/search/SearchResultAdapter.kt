@@ -12,6 +12,8 @@ import com.myvideolibrary.app.provider.model.ProviderSearchItem
 import com.myvideolibrary.app.util.Formatters
 
 class SearchResultAdapter(
+    private val onPlay: (ProviderSearchItem) -> Unit,
+    private val onSaveLink: (ProviderSearchItem) -> Unit,
     private val onDownload: (ProviderSearchItem) -> Unit
 ) : ListAdapter<ProviderSearchItem, SearchResultAdapter.VH>(DIFF) {
 
@@ -37,8 +39,10 @@ class SearchResultAdapter(
                 .placeholder(R.drawable.ic_video_placeholder)
                 .centerCrop()
                 .into(binding.thumbnail)
+            binding.saveLinkButton.setOnClickListener { onSaveLink(item) }
             binding.downloadButton.setOnClickListener { onDownload(item) }
-            binding.root.setOnClickListener { onDownload(item) }
+            // Tapping the row previews the video streamed from its platform.
+            binding.root.setOnClickListener { onPlay(item) }
         }
     }
 

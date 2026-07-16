@@ -111,6 +111,38 @@ class YouTubeProvider @Inject constructor(
         }
     }
 
+    override suspend fun resolveStream(url: String): com.myvideolibrary.app.provider.model.StreamSource =
+        withContext(Dispatchers.IO) {
+            ensureInitialised()
+            try {
+                val info = StreamInfo.getInfo(ServiceList.YouTube, url)
+                // Preview needs ONE playable URL, so pick the best single-file muxed
+                // stream (YouTube caps these ~720p) rather than a split hi-res pair.
+                val muxed = info.videoStreams
+                    .filter { !it.isVideoOnly && !it.content.isNullOrBlank() }
+                    .maxByOrNull { resolutionValue(it.getResolution()) }
+                    ?: throw ProviderException(
+                        ProviderErrorType.EXTRACTION_FAILED, "No playable stream found"
+                    )
+                com.myvideolibrary.app.provider.model.StreamSource(
+                    source = VideoSource.YOUTUBE,
+                    sourceUrl = url,
+                    title = info.name ?: "YouTube video",
+                    streamUrl = muxed.content,
+                    thumbnailUrl = info.thumbnails.lastOrNull()?.url
+                )
+            } catch (e: ContentNotAvailableException) {
+                throw ProviderException(ProviderErrorType.NOT_FOUND, "Video is unavailable", e)
+            } catch (e: ExtractionException) {
+                throw ProviderException(
+                    ProviderErrorType.EXTRACTION_FAILED,
+                    "YouTube extraction failed (the extractor may need updating)", e
+                )
+            } catch (e: IOException) {
+                throw ProviderException(ProviderErrorType.NETWORK, "Network error", e)
+            }
+        }
+
     override suspend fun search(query: String): List<ProviderSearchItem> =
         withContext(Dispatchers.IO) {
             ensureInitialised()

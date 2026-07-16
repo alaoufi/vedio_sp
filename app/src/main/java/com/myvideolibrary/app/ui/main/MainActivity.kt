@@ -424,14 +424,16 @@ class MainActivity : AppCompatActivity() {
     private fun showVideoMenu(video: VideoEntity, anchor: android.view.View) {
         val popup = android.widget.PopupMenu(this, anchor)
         popup.menu.add(0, 1, 0, getString(R.string.play))
-        popup.menu.add(0, 2, 1, getString(R.string.action_share))
+        // Saved links can be downloaded to a local file on demand.
+        if (video.isLinkOnly) popup.menu.add(0, 7, 1, getString(R.string.download))
+        popup.menu.add(0, 2, 2, getString(R.string.action_share))
         popup.menu.add(
-            0, 3, 2,
+            0, 3, 3,
             getString(if (video.isLocked) R.string.unlock_video else R.string.lock_video)
         )
-        popup.menu.add(0, 4, 3, getString(R.string.set_category))
-        popup.menu.add(0, 5, 4, getString(R.string.rename))
-        popup.menu.add(0, 6, 5, getString(R.string.delete))
+        popup.menu.add(0, 4, 4, getString(R.string.set_category))
+        popup.menu.add(0, 5, 5, getString(R.string.rename))
+        popup.menu.add(0, 6, 6, getString(R.string.delete))
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 1 -> { onVideoClick(video); true }
@@ -440,6 +442,13 @@ class MainActivity : AppCompatActivity() {
                 4 -> { promptSetCategory(video); true }
                 5 -> { promptRenameVideo(video); true }
                 6 -> { confirmDeleteSingle(video); true }
+                7 -> {
+                    viewModel.downloadLink(video)
+                    android.widget.Toast.makeText(
+                        this, R.string.download_started, android.widget.Toast.LENGTH_SHORT
+                    ).show()
+                    true
+                }
                 else -> false
             }
         }
@@ -447,6 +456,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun shareVideo(video: VideoEntity) {
+        // A saved link has no local file — share its source URL as text.
+        if (video.isLinkOnly) {
+            val url = video.sourceUrl
+            if (url.isNullOrBlank()) {
+                android.widget.Toast.makeText(this, R.string.share_failed, android.widget.Toast.LENGTH_SHORT).show()
+                return
+            }
+            val share = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, url)
+            }
+            startActivity(Intent.createChooser(share, getString(R.string.action_share)))
+            return
+        }
         try {
             val uri: android.net.Uri = if (video.localPath.startsWith("content://")) {
                 android.net.Uri.parse(video.localPath)
