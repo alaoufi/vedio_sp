@@ -86,7 +86,10 @@ class TikTokProvider @Inject constructor(
             sourceUrl = url,
             title = data.str("title")?.takeIf { it.isNotBlank() } ?: "TikTok video",
             directUrl = absolutize(play),
-            thumbnailUrl = data.str("cover")?.let { absolutize(it) },
+            // Prefer origin_cover: the clean full-resolution frame with no
+            // play-button overlay or badge, so an image-only save is pure.
+            thumbnailUrl = (data.str("origin_cover") ?: data.str("cover"))
+                ?.let { absolutize(it) },
             author = data.obj("author")?.str("nickname"),
             durationMs = (data.num("duration") ?: 0) * 1000
         )
@@ -127,7 +130,8 @@ class TikTokProvider @Inject constructor(
                     url = if (handle != null) "https://www.tiktok.com/@$handle/video/$id"
                     else "https://www.tiktok.com/video/$id",
                     title = v.str("title")?.takeIf { it.isNotBlank() } ?: "TikTok video",
-                    thumbnailUrl = v.str("cover")?.let { absolutize(it) },
+                    thumbnailUrl = (v.str("origin_cover") ?: v.str("cover"))
+                        ?.let { absolutize(it) },
                     author = author?.str("nickname"),
                     durationMs = (v.num("duration") ?: 0) * 1000,
                     // tikwm already gives the watermark-free URL in search results.

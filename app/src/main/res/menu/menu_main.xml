@@ -21,24 +21,6 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_search_online"
-        android:icon="@drawable/ic_search"
-        android:title="@string/search_title"
-        app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/action_add_download"
-        android:icon="@drawable/ic_link"
-        android:title="@string/action_add_download"
-        app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/action_downloads"
-        android:icon="@drawable/ic_download"
-        android:title="@string/action_downloads"
-        app:showAsAction="ifRoom" />
-
-    <item
         android:id="@+id/action_protected"
         android:icon="@drawable/ic_lock"
         android:title="@string/protected_videos"
@@ -48,12 +30,6 @@
         android:id="@+id/action_manage_categories"
         android:icon="@drawable/ic_filter_list"
         android:title="@string/manage_categories"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_new_folder"
-        android:icon="@drawable/ic_create_new_folder"
-        android:title="@string/action_new_folder"
         app:showAsAction="never" />
 
     <item

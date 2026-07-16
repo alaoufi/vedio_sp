@@ -249,9 +249,29 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupFab() {
-        binding.fabImport.setOnClickListener {
-            startActivity(Intent(this, ImportActivity::class.java))
+        binding.fabImport.setOnClickListener { showAddMenu(it) }
+    }
+
+    /** The bottom "+" opens the download/import actions, within easy thumb reach. */
+    private fun showAddMenu(anchor: android.view.View) {
+        val popup = android.widget.PopupMenu(this, anchor)
+        popup.menu.add(0, 1, 0, getString(R.string.search_title))
+        popup.menu.add(0, 2, 1, getString(R.string.action_add_download))
+        popup.menu.add(0, 3, 2, getString(R.string.action_downloads))
+        popup.menu.add(0, 4, 3, getString(R.string.import_title))
+        popup.menu.add(0, 5, 4, getString(R.string.new_folder))
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                1 -> startActivity(Intent(this, com.myvideolibrary.app.ui.search.SearchActivity::class.java))
+                2 -> startActivity(AddDownloadActivity.intent(this))
+                3 -> startActivity(Intent(this, DownloadsActivity::class.java))
+                4 -> startActivity(Intent(this, ImportActivity::class.java))
+                5 -> promptNewFolder()
+                else -> return@setOnMenuItemClickListener false
+            }
+            true
         }
+        popup.show()
     }
 
     private fun observeState() {
@@ -588,24 +608,11 @@ class MainActivity : AppCompatActivity() {
                 viewModel.setFavoritesOnly(!viewModel.uiState.value.favoritesOnly)
                 true
             }
-            R.id.action_new_folder -> { promptNewFolder(); true }
             R.id.action_manage_categories -> {
                 startActivity(com.myvideolibrary.app.ui.categories.CategoriesActivity.intent(this))
                 true
             }
             R.id.action_protected -> { toggleProtected(); true }
-            R.id.action_downloads -> {
-                startActivity(Intent(this, DownloadsActivity::class.java))
-                true
-            }
-            R.id.action_add_download -> {
-                startActivity(AddDownloadActivity.intent(this))
-                true
-            }
-            R.id.action_search_online -> {
-                startActivity(Intent(this, com.myvideolibrary.app.ui.search.SearchActivity::class.java))
-                true
-            }
             R.id.action_settings -> {
                 startActivity(Intent(this, com.myvideolibrary.app.ui.settings.SettingsActivity::class.java))
                 true
