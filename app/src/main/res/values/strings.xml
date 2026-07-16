@@ -62,6 +62,7 @@
     <!-- Downloads -->
     <string name="downloads_title">Downloads</string>
     <string name="downloads_empty">No downloads yet</string>
+    <string name="downloading_banner">Downloading %1$d · %2$d%%</string>
     <string name="clear_completed">Clear completed</string>
     <string name="action_downloads">Downloads</string>
     <string name="action_resume">Resume</string>
@@ -149,6 +150,17 @@
     <string name="backup_exported">Backup saved: %1$s</string>
     <string name="backup_restored">Restored %1$d videos</string>
     <string name="backup_restore_failed">Restore failed — wrong password or corrupt file</string>
+
+    <!-- Per-video actions -->
+    <string name="delete">Delete</string>
+    <string name="play">Play</string>
+    <string name="action_share">Share</string>
+    <string name="rename">Rename</string>
+    <string name="more_options">More options</string>
+    <string name="lock_video">Lock</string>
+    <string name="unlock_video">Unlock</string>
+    <string name="video_locked">This video is locked</string>
+    <string name="share_failed">Cannot share this video</string>
 
     <!-- Content descriptions -->
     <string name="cd_thumbnail">Video thumbnail</string>

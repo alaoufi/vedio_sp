@@ -62,6 +62,7 @@
     <!-- Downloads -->
     <string name="downloads_title">التحميلات</string>
     <string name="downloads_empty">لا توجد تحميلات بعد</string>
+    <string name="downloading_banner">جارٍ تحميل %1$d · %2$d%%</string>
     <string name="clear_completed">مسح المكتمل</string>
     <string name="action_downloads">التحميلات</string>
     <string name="action_resume">استئناف</string>
@@ -149,6 +150,17 @@
     <string name="backup_exported">حُفظت النسخة: %1$s</string>
     <string name="backup_restored">استُعيد %1$d فيديو</string>
     <string name="backup_restore_failed">فشلت الاستعادة — كلمة مرور خاطئة أو ملف تالف</string>
+
+    <!-- Per-video actions -->
+    <string name="delete">حذف</string>
+    <string name="play">تشغيل</string>
+    <string name="action_share">مشاركة</string>
+    <string name="rename">إعادة تسمية</string>
+    <string name="more_options">المزيد</string>
+    <string name="lock_video">قفل</string>
+    <string name="unlock_video">فتح القفل</string>
+    <string name="video_locked">هذا الفيديو مقفل</string>
+    <string name="share_failed">تعذّرت مشاركة هذا الفيديو</string>
 
     <!-- Content descriptions -->
     <string name="cd_thumbnail">مصغّرة الفيديو</string>

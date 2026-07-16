@@ -67,6 +67,9 @@ interface VideoDao {
     @Query("UPDATE videos SET is_favorite = :favorite WHERE id = :id")
     suspend fun setFavorite(id: Long, favorite: Boolean)
 
+    @Query("UPDATE videos SET is_locked = :locked WHERE id = :id")
+    suspend fun setLocked(id: Long, locked: Boolean)
+
     @Query("UPDATE videos SET folder_id = :folderId WHERE id IN (:ids)")
     suspend fun moveToFolder(ids: List<Long>, folderId: Long?)
 

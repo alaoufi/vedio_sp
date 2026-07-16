@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
-    <!-- Only exported backups are ever shared, and only via an explicit user action. -->
+    <!-- Exported backups (shared via an explicit user action). -->
     <files-path name="backups" path="backups/" />
+    <!-- Downloaded/imported videos, for the per-video Share action. -->
+    <files-path name="videos" path="videos/" />
+    <files-path name="downloads" path="downloads/" />
 </paths>

@@ -51,10 +51,12 @@
         </HorizontalScrollView>
 
         <HorizontalScrollView
+            android:id="@+id/folderChipsScroll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scrollbars="none"
-            android:paddingHorizontal="12dp">
+            android:paddingHorizontal="12dp"
+            android:visibility="gone">
 
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/folderChips"
@@ -73,6 +75,54 @@
             android:textAppearance="?attr/textAppearanceLabelMedium"
             android:textColor="?android:attr/textColorSecondary"
             tools:text="0 videos · 0 B" />
+
+        <!-- Active-download banner: tap to open the Downloads screen. -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/downloadBanner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginBottom="6dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardCornerRadius="12dp"
+            app:cardBackgroundColor="?attr/colorPrimaryContainer"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="10dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_download"
+                    app:tint="?attr/colorOnPrimaryContainer"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/downloadBannerText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:textColor="?attr/colorOnPrimaryContainer"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    tools:text="Downloading 1 · 45%" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_arrow_back"
+                    android:rotation="180"
+                    android:alpha="0.7"
+                    app:tint="?attr/colorOnPrimaryContainer"
+                    android:contentDescription="@null" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
     </com.google.android.material.appbar.AppBarLayout>
 

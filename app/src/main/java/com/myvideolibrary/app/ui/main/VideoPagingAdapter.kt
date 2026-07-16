@@ -22,7 +22,8 @@ class VideoPagingAdapter(
     private var viewMode: LibraryViewMode,
     private val onClick: (VideoEntity) -> Unit,
     private val onLongClick: (VideoEntity) -> Unit,
-    private val onFavorite: (VideoEntity) -> Unit
+    private val onFavorite: (VideoEntity) -> Unit,
+    private val onMenu: (VideoEntity, android.view.View) -> Unit
 ) : PagingDataAdapter<VideoEntity, RecyclerView.ViewHolder>(DIFF) {
 
     private var selectedIds: Set<Long> = emptySet()
@@ -70,8 +71,10 @@ class VideoPagingAdapter(
             binding.title.text = video.title
             binding.duration.text = Formatters.duration(video.duration)
             binding.favoriteIcon.isVisible = video.isFavorite
+            binding.lockIcon.isVisible = video.isLocked
             loadThumbnail(binding.thumbnail, video)
             binding.selectionOverlay.isVisible = selectionMode && video.id in selectedIds
+            binding.menuButton.setOnClickListener { onMenu(video, it) }
             binding.root.setOnClickListener { onClick(video) }
             binding.root.setOnLongClickListener { onLongClick(video); true }
         }
@@ -89,6 +92,8 @@ class VideoPagingAdapter(
                 if (video.isFavorite) R.drawable.ic_favorite else R.drawable.ic_favorite_border
             )
             binding.favoriteButton.setOnClickListener { onFavorite(video) }
+            binding.lockIcon.isVisible = video.isLocked
+            binding.menuButton.setOnClickListener { onMenu(video, it) }
             loadThumbnail(binding.thumbnail, video)
             binding.selectionOverlay.isVisible = selectionMode && video.id in selectedIds
             binding.root.setOnClickListener { onClick(video) }

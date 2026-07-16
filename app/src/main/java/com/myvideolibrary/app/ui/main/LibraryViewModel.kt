@@ -48,8 +48,14 @@ data class LibraryUiState(
 class LibraryViewModel @Inject constructor(
     private val videoRepository: VideoRepository,
     private val folderRepository: FolderRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val downloadRepository: com.myvideolibrary.app.data.repository.DownloadRepository
 ) : ViewModel() {
+
+    /** Active (waiting/downloading/paused) downloads, for the dashboard banner. */
+    val activeDownloads: StateFlow<List<com.myvideolibrary.app.data.local.entity.DownloadEntity>> =
+        downloadRepository.observeActive()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val queryState = MutableStateFlow(LibraryQuery())
 
@@ -183,6 +189,14 @@ class LibraryViewModel @Inject constructor(
 
     fun toggleFavorite(video: VideoEntity) = viewModelScope.launch {
         videoRepository.setFavorite(video.id, !video.isFavorite)
+    }
+
+    fun toggleLock(video: VideoEntity) = viewModelScope.launch {
+        videoRepository.setLocked(video.id, !video.isLocked)
+    }
+
+    fun deleteVideo(id: Long, alsoFile: Boolean) = viewModelScope.launch {
+        videoRepository.deleteVideos(listOf(id), alsoFile)
     }
 
     fun rename(id: Long, title: String) = viewModelScope.launch {

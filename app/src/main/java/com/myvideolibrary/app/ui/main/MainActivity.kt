@@ -58,7 +58,30 @@ class MainActivity : AppCompatActivity() {
         setupFab()
         observeState()
         observeVideos()
+        observeDownloads()
+        binding.downloadBanner.setOnClickListener {
+            startActivity(Intent(this, DownloadsActivity::class.java))
+        }
         requestNotificationPermissionIfNeeded()
+    }
+
+    private fun observeDownloads() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.activeDownloads.collectLatest { active ->
+                    val show = active.isNotEmpty()
+                    binding.downloadBanner.isVisible = show
+                    if (show) {
+                        val downloading = active.firstOrNull {
+                            it.status == com.myvideolibrary.app.data.model.DownloadStatus.DOWNLOADING.id
+                        }
+                        val percent = downloading?.progress ?: 0
+                        binding.downloadBannerText.text =
+                            getString(R.string.downloading_banner, active.size, percent)
+                    }
+                }
+            }
+        }
     }
 
     private val notificationPermissionLauncher = registerForActivityResult(
@@ -81,7 +104,8 @@ class MainActivity : AppCompatActivity() {
             viewMode = LibraryViewMode.GRID,
             onClick = ::onVideoClick,
             onLongClick = { viewModel.enterSelection(it.id) },
-            onFavorite = { viewModel.toggleFavorite(it) }
+            onFavorite = { viewModel.toggleFavorite(it) },
+            onMenu = ::showVideoMenu
         )
         binding.recyclerView.adapter = adapter
 
@@ -189,6 +213,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun renderFolderChips(state: LibraryUiState) {
+        // Hide the folder row entirely until the user actually has folders.
+        binding.folderChipsScroll.isVisible = state.folders.isNotEmpty()
         val group = binding.folderChips
         // Rebuild only when the folder set changes to avoid flicker.
         if (group.tag == state.folders.map { it.id }) return
@@ -231,9 +257,77 @@ class MainActivity : AppCompatActivity() {
         val state = viewModel.uiState.value
         if (state.selectionMode) {
             viewModel.toggleSelected(video.id)
+        } else if (video.isLocked) {
+            android.widget.Toast.makeText(this, R.string.video_locked, android.widget.Toast.LENGTH_SHORT).show()
         } else {
             startActivity(PlayerActivity.intent(this, video.id))
         }
+    }
+
+    private fun showVideoMenu(video: VideoEntity, anchor: android.view.View) {
+        val popup = android.widget.PopupMenu(this, anchor)
+        popup.menu.add(0, 1, 0, getString(R.string.play))
+        popup.menu.add(0, 2, 1, getString(R.string.action_share))
+        popup.menu.add(
+            0, 3, 2,
+            getString(if (video.isLocked) R.string.unlock_video else R.string.lock_video)
+        )
+        popup.menu.add(0, 4, 3, getString(R.string.rename))
+        popup.menu.add(0, 5, 4, getString(R.string.delete))
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                1 -> { onVideoClick(video); true }
+                2 -> { shareVideo(video); true }
+                3 -> { viewModel.toggleLock(video); true }
+                4 -> { promptRenameVideo(video); true }
+                5 -> { confirmDeleteSingle(video); true }
+                else -> false
+            }
+        }
+        popup.show()
+    }
+
+    private fun shareVideo(video: VideoEntity) {
+        try {
+            val uri: android.net.Uri = if (video.localPath.startsWith("content://")) {
+                android.net.Uri.parse(video.localPath)
+            } else {
+                androidx.core.content.FileProvider.getUriForFile(
+                    this, "$packageName.fileprovider", java.io.File(video.localPath)
+                )
+            }
+            val share = Intent(Intent.ACTION_SEND).apply {
+                type = "video/*"
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            startActivity(Intent.createChooser(share, getString(R.string.action_share)))
+        } catch (e: Exception) {
+            android.widget.Toast.makeText(this, R.string.share_failed, android.widget.Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun promptRenameVideo(video: VideoEntity) {
+        val input = EditText(this).apply { setText(video.title) }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.rename)
+            .setView(input)
+            .setPositiveButton(R.string.save) { _, _ ->
+                val name = input.text.toString().trim()
+                if (name.isNotEmpty()) viewModel.rename(video.id, name)
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun confirmDeleteSingle(video: VideoEntity) {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.delete_videos_title)
+            .setMessage(video.title)
+            .setPositiveButton(R.string.delete_files) { _, _ -> viewModel.deleteVideo(video.id, true) }
+            .setNeutralButton(R.string.remove_only) { _, _ -> viewModel.deleteVideo(video.id, false) }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     private fun confirmDeleteSelected() {

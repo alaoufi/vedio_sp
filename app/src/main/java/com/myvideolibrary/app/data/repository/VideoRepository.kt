@@ -24,6 +24,8 @@ interface VideoRepository {
 
     suspend fun setFavorite(id: Long, favorite: Boolean)
 
+    suspend fun setLocked(id: Long, locked: Boolean)
+
     suspend fun rename(id: Long, title: String)
 
     suspend fun moveToFolder(ids: List<Long>, folderId: Long?)

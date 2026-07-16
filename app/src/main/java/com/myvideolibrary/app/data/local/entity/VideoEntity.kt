@@ -98,6 +98,10 @@ data class VideoEntity(
     @ColumnInfo(name = "is_favorite")
     val isFavorite: Boolean = false,
 
+    /** When true the video is locked and won't open without the app lock. */
+    @ColumnInfo(name = "is_locked")
+    val isLocked: Boolean = false,
+
     @ColumnInfo(name = "play_count")
     val playCount: Int = 0,
 

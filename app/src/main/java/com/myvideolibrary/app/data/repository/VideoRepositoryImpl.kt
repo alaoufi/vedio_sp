@@ -58,6 +58,9 @@ class VideoRepositoryImpl @Inject constructor(
     override suspend fun setFavorite(id: Long, favorite: Boolean) =
         videoDao.setFavorite(id, favorite)
 
+    override suspend fun setLocked(id: Long, locked: Boolean) =
+        videoDao.setLocked(id, locked)
+
     override suspend fun rename(id: Long, title: String) = videoDao.rename(id, title)
 
     override suspend fun moveToFolder(ids: List<Long>, folderId: Long?) =
