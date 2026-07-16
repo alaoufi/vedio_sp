@@ -409,7 +409,9 @@ class MainActivity : AppCompatActivity() {
         )
         popup.menu.add(0, 4, 4, getString(R.string.set_category))
         popup.menu.add(0, 5, 5, getString(R.string.rename))
-        popup.menu.add(0, 6, 6, getString(R.string.delete))
+        // Open the original TikTok/YouTube page in its app or the browser.
+        if (!video.sourceUrl.isNullOrBlank()) popup.menu.add(0, 8, 6, getString(R.string.open_source))
+        popup.menu.add(0, 6, 7, getString(R.string.delete))
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 1 -> { onVideoClick(video); true }
@@ -418,6 +420,7 @@ class MainActivity : AppCompatActivity() {
                 4 -> { promptSetCategory(video); true }
                 5 -> { promptRenameVideo(video); true }
                 6 -> { confirmDeleteSingle(video); true }
+                8 -> { openSource(video); true }
                 7 -> {
                     viewModel.downloadLink(video)
                     android.widget.Toast.makeText(
@@ -429,6 +432,17 @@ class MainActivity : AppCompatActivity() {
             }
         }
         popup.show()
+    }
+
+    /** Opens the video's original page (TikTok/YouTube) in an external app or browser. */
+    private fun openSource(video: VideoEntity) {
+        val url = video.sourceUrl
+        if (url.isNullOrBlank()) return
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url)))
+        } catch (e: Exception) {
+            android.widget.Toast.makeText(this, R.string.error_unknown, android.widget.Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun shareVideo(video: VideoEntity) {
