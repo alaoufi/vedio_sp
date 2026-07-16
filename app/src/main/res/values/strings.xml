@@ -163,8 +163,13 @@
     <string name="open_source">Open in source</string>
     <string name="favorite">Add to favorites</string>
     <string name="unfavorite">Remove from favorites</string>
-    <string name="lock_video">Lock</string>
-    <string name="unlock_video">Unlock</string>
+    <string name="lock_video">Protect (lock)</string>
+    <string name="unlock_video">Remove protection</string>
+
+    <!-- Save location -->
+    <string name="save_location">Save location</string>
+    <string name="save_location_default">App storage (default)</string>
+    <string name="choose_folder">Choose folder…</string>
     <string name="video_locked">This video is locked</string>
     <string name="share_failed">Cannot share this video</string>
 
@@ -175,7 +180,8 @@
 
     <!-- Protected videos -->
     <string name="protected_videos">Protected videos</string>
-    <string name="protected_set_pin_hint">Set a PIN in Settings to protect videos.</string>
+    <string name="protected_set_pin_hint">Protected. Set a PIN/fingerprint in Settings → Security for a real lock.</string>
+    <string name="protected_moved_hint">Moved to Protected videos (menu → Protected videos).</string>
     <string name="protected_title">Protected · %1$d</string>
 
     <!-- Categories -->

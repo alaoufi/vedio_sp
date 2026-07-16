@@ -29,6 +29,8 @@ data class SettingsUiState(
     val preventScreenshots: Boolean = true,
     val hideInRecents: Boolean = true,
     val storageUsed: Long = 0,
+    /** User-chosen SAF tree URI for a copy of finished downloads; null = app storage only. */
+    val saveLocation: String? = null,
     val message: String? = null,
     val exportedFile: java.io.File? = null
 )
@@ -61,8 +63,16 @@ class SettingsViewModel @Inject constructor(
                 biometricEnabled = securityManager.biometricEnabled,
                 preventScreenshots = securityManager.preventScreenshots,
                 hideInRecents = securityManager.hideInRecents,
-                storageUsed = used
+                storageUsed = used,
+                saveLocation = settings.storagePath
             )
+        }
+    }
+
+    fun setSaveLocation(treeUri: String?) {
+        viewModelScope.launch {
+            settingsRepository.update { it.copy(storagePath = treeUri) }
+            _state.value = _state.value.copy(saveLocation = treeUri)
         }
     }
 

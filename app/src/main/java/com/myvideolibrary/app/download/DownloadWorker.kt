@@ -8,6 +8,7 @@ import androidx.work.workDataOf
 import com.myvideolibrary.app.data.local.entity.VideoEntity
 import com.myvideolibrary.app.data.model.DownloadStatus
 import com.myvideolibrary.app.data.repository.DownloadRepository
+import com.myvideolibrary.app.data.repository.SettingsRepository
 import com.myvideolibrary.app.data.repository.VideoRepository
 import com.myvideolibrary.app.util.StorageManager
 import com.myvideolibrary.app.util.ThumbnailGenerator
@@ -45,6 +46,7 @@ class DownloadWorker @AssistedInject constructor(
     private val okHttpClient: OkHttpClient,
     private val downloadRepository: DownloadRepository,
     private val videoRepository: VideoRepository,
+    private val settingsRepository: SettingsRepository,
     private val storageManager: StorageManager,
     private val thumbnailGenerator: ThumbnailGenerator,
     private val notifier: DownloadNotifier
@@ -435,6 +437,30 @@ class DownloadWorker @AssistedInject constructor(
                     errorMessage = null
                 )
             )
+        }
+
+        // If the user chose a save folder, drop a copy there so it also shows up
+        // in their gallery / file manager. Best-effort: never fail the download.
+        val saveTree = settingsRepository.getSettings().storagePath
+        if (!saveTree.isNullOrBlank()) {
+            withContext(Dispatchers.IO) { copyToUserFolder(destFile, saveTree, title) }
+        }
+    }
+
+    private fun copyToUserFolder(source: File, treeUriString: String, title: String) {
+        runCatching {
+            val tree = androidx.documentfile.provider.DocumentFile.fromTreeUri(
+                applicationContext, android.net.Uri.parse(treeUriString)
+            ) ?: return
+            if (!tree.canWrite()) return
+            val safeName = title.replace(Regex("[^\\p{L}\\p{N} ._-]"), "_")
+                .take(80).trim().ifEmpty { "video" } + ".mp4"
+            // Skip if a copy with this name already exists.
+            if (tree.findFile(safeName) != null) return
+            val target = tree.createFile("video/mp4", safeName) ?: return
+            applicationContext.contentResolver.openOutputStream(target.uri)?.use { out ->
+                source.inputStream().use { it.copyTo(out) }
+            }
         }
     }
 

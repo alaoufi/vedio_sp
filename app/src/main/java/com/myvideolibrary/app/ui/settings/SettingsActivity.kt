@@ -30,6 +30,22 @@ class SettingsActivity : AppCompatActivity() {
         ActivityResultContracts.OpenDocument()
     ) { uri -> uri?.let { promptRestorePassword(it) } }
 
+    private val folderPicker = registerForActivityResult(
+        ActivityResultContracts.OpenDocumentTree()
+    ) { uri ->
+        if (uri != null) {
+            // Persist access across reboots so downloads can be copied there later.
+            runCatching {
+                contentResolver.takePersistableUriPermission(
+                    uri,
+                    android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                        android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+            }
+            viewModel.setSaveLocation(uri.toString())
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySettingsBinding.inflate(layoutInflater)
@@ -65,6 +81,7 @@ class SettingsActivity : AppCompatActivity() {
             viewModel.setHideInRecents(binding.recentsSwitch.isChecked)
         }
 
+        binding.saveLocationRow.setOnClickListener { showSaveLocationDialog() }
         binding.clearCacheRow.setOnClickListener { viewModel.clearCache() }
         binding.backupRow.setOnClickListener { promptBackupPassword() }
         binding.restoreRow.setOnClickListener {
@@ -94,6 +111,9 @@ class SettingsActivity : AppCompatActivity() {
         binding.screenshotsSwitch.isChecked = state.preventScreenshots
         binding.recentsSwitch.isChecked = state.hideInRecents
         binding.storageValue.text = Formatters.fileSize(state.storageUsed)
+        binding.saveLocationValue.text = state.saveLocation
+            ?.let { runCatching { folderLabel(Uri.parse(it)) }.getOrNull() }
+            ?: getString(R.string.save_location_default)
 
         state.message?.let {
             Toast.makeText(this, it, Toast.LENGTH_LONG).show()
@@ -120,6 +140,29 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     // ---- Dialogs ----
+
+    private fun showSaveLocationDialog() {
+        val hasCustom = viewModel.state.value.saveLocation != null
+        val options = if (hasCustom) {
+            arrayOf(getString(R.string.choose_folder), getString(R.string.save_location_default))
+        } else {
+            arrayOf(getString(R.string.choose_folder))
+        }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.save_location)
+            .setItems(options) { _, which ->
+                if (which == 0) runCatching { folderPicker.launch(null) }
+                    .onFailure { Toast.makeText(this, R.string.error_unknown, Toast.LENGTH_SHORT).show() }
+                else viewModel.setSaveLocation(null)
+            }
+            .show()
+    }
+
+    /** Human-readable name of the chosen SAF tree, falling back to the last path segment. */
+    private fun folderLabel(uri: Uri): String {
+        val doc = androidx.documentfile.provider.DocumentFile.fromTreeUri(this, uri)
+        return doc?.name ?: uri.lastPathSegment ?: uri.toString()
+    }
 
     private fun showThemeDialog() {
         val labels = arrayOf(

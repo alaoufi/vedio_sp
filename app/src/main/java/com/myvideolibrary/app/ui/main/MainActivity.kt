@@ -407,7 +407,7 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 1 -> { onVideoClick(video); true }
                 2 -> { shareVideo(video); true }
-                3 -> { viewModel.toggleLock(video); true }
+                3 -> { protectVideo(video); true }
                 4 -> { promptSetCategory(video); true }
                 5 -> { promptRenameVideo(video); true }
                 6 -> { confirmDeleteSingle(video); true }
@@ -424,6 +424,20 @@ class MainActivity : AppCompatActivity() {
             }
         }
         popup.show()
+    }
+
+    /** Protects/unprotects a video; when protecting without a lock, points to Settings. */
+    private fun protectVideo(video: VideoEntity) {
+        viewModel.toggleLock(video)
+        // video.isLocked is the state *before* the toggle: false => we just protected it.
+        if (!video.isLocked) {
+            val msg = if (securityManager.isLockConfigured) {
+                R.string.protected_moved_hint
+            } else {
+                R.string.protected_set_pin_hint
+            }
+            android.widget.Toast.makeText(this, msg, android.widget.Toast.LENGTH_LONG).show()
+        }
     }
 
     /** Opens the video's original page (TikTok/YouTube) in an external app or browser. */

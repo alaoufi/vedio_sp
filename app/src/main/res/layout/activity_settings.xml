@@ -120,6 +120,14 @@
                     tools:text="1.4 GB" />
             </LinearLayout>
 
+            <LinearLayout android:id="@+id/saveLocationRow" style="@style/SettingsRow">
+                <LinearLayout style="@style/SettingsRowText">
+                    <TextView style="@style/SettingsTitle" android:text="@string/save_location" />
+                    <TextView android:id="@+id/saveLocationValue" style="@style/SettingsSubtitle"
+                        tools:text="Downloads" />
+                </LinearLayout>
+            </LinearLayout>
+
             <LinearLayout android:id="@+id/clearCacheRow" style="@style/SettingsRow">
                 <LinearLayout style="@style/SettingsRowText">
                     <TextView style="@style/SettingsTitle" android:text="@string/clear_cache" />
