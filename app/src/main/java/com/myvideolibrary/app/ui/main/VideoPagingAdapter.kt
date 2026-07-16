@@ -74,6 +74,7 @@ class VideoPagingAdapter(
             binding.linkBadge.isVisible = video.isLinkOnly
             // A saved link has no duration until downloaded.
             binding.duration.isVisible = video.duration > 0
+            bindCategory(binding.category, video)
             loadThumbnail(binding.thumbnail, video)
             binding.selectionOverlay.isVisible = selectionMode && video.id in selectedIds
             binding.menuButton.setOnClickListener { onMenu(video, it) }
@@ -95,12 +96,20 @@ class VideoPagingAdapter(
             binding.linkBadge.isVisible = video.isLinkOnly
             binding.duration.isVisible = video.duration > 0
             binding.size.isVisible = !video.isLinkOnly
+            bindCategory(binding.category, video)
             binding.menuButton.setOnClickListener { onMenu(video, it) }
             loadThumbnail(binding.thumbnail, video)
             binding.selectionOverlay.isVisible = selectionMode && video.id in selectedIds
             binding.root.setOnClickListener { onClick(video) }
             binding.root.setOnLongClickListener { onLongClick(video); true }
         }
+    }
+
+    /** Shows the clip's category as a chip, hidden when it has none. */
+    private fun bindCategory(textView: android.widget.TextView, video: VideoEntity) {
+        val label = video.category?.takeIf { it.isNotBlank() }
+        textView.text = label
+        textView.isVisible = label != null
     }
 
     private fun loadThumbnail(
