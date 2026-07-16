@@ -463,32 +463,21 @@ class DownloadWorker @AssistedInject constructor(
     ) {
         val download = downloadRepository.get(downloadId)
 
-        if (kind == com.myvideolibrary.app.data.model.DownloadKind.IMAGE_ONLY) {
-            // A still image doesn't belong in the video library; just complete it
-            // and drop a copy in the user's folder / gallery.
-            download?.let {
-                downloadRepository.update(
-                    it.copy(
-                        status = DownloadStatus.COMPLETED.id,
-                        progress = 100,
-                        destPath = destFile.absolutePath,
-                        errorMessage = null
-                    )
-                )
-            }
-            val saveTree = settingsRepository.getSettings().storagePath
-            if (!saveTree.isNullOrBlank()) {
-                withContext(Dispatchers.IO) { copyToUserFolder(destFile, saveTree, title) }
-            }
-            return
+        val mediaType = when (kind) {
+            com.myvideolibrary.app.data.model.DownloadKind.AUDIO_ONLY ->
+                com.myvideolibrary.app.data.model.MediaType.AUDIO
+            com.myvideolibrary.app.data.model.DownloadKind.IMAGE_ONLY ->
+                com.myvideolibrary.app.data.model.MediaType.IMAGE
+            else -> com.myvideolibrary.app.data.model.MediaType.VIDEO
         }
 
-        val meta = thumbnailGenerator.readMetadata(destFile.absolutePath)
-        // Audio has no frame to grab; fall back to the remote cover thumbnail.
-        val thumb = if (kind == com.myvideolibrary.app.data.model.DownloadKind.AUDIO_ONLY) {
-            download?.thumbnailUrl
-        } else {
-            thumbnailGenerator.generateThumbnail(destFile.absolutePath) ?: download?.thumbnailUrl
+        val meta = if (mediaType == com.myvideolibrary.app.data.model.MediaType.IMAGE) null
+        else thumbnailGenerator.readMetadata(destFile.absolutePath)
+        val thumb = when (mediaType) {
+            // The image is its own thumbnail; audio has no frame → use the cover.
+            com.myvideolibrary.app.data.model.MediaType.IMAGE -> destFile.absolutePath
+            com.myvideolibrary.app.data.model.MediaType.AUDIO -> download?.thumbnailUrl
+            else -> thumbnailGenerator.generateThumbnail(destFile.absolutePath) ?: download?.thumbnailUrl
         }
 
         val videoId = videoRepository.addVideo(
@@ -497,6 +486,7 @@ class DownloadWorker @AssistedInject constructor(
                 thumbnailPath = thumb,
                 localPath = destFile.absolutePath,
                 source = download?.source ?: "other",
+                mediaType = mediaType.id,
                 sourceUrl = download?.sourceUrl,
                 duration = meta?.durationMs ?: 0,
                 fileSize = destFile.length(),

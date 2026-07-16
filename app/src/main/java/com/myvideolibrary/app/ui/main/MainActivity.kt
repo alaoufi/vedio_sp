@@ -181,6 +181,22 @@ class MainActivity : AppCompatActivity() {
             }
         )?.isChecked = true
 
+        // --- Type (video / audio / image) ---
+        val type = menu.addSubMenu(getString(R.string.filter_type))
+        type.add(GROUP_TYPE, ID_TYPE_ALL, 0, R.string.filter_all)
+        type.add(GROUP_TYPE, ID_TYPE_VIDEO, 1, R.string.type_video)
+        type.add(GROUP_TYPE, ID_TYPE_AUDIO, 2, R.string.type_audio)
+        type.add(GROUP_TYPE, ID_TYPE_IMAGE, 3, R.string.type_image)
+        type.setGroupCheckable(GROUP_TYPE, true, true)
+        type.findItem(
+            when (state.mediaTypeFilter) {
+                "video" -> ID_TYPE_VIDEO
+                "audio" -> ID_TYPE_AUDIO
+                "image" -> ID_TYPE_IMAGE
+                else -> ID_TYPE_ALL
+            }
+        )?.isChecked = true
+
         // --- Category (only when categories exist) ---
         if (state.categories.isNotEmpty()) {
             val cat = menu.addSubMenu(getString(R.string.category))
@@ -215,6 +231,10 @@ class MainActivity : AppCompatActivity() {
                 ID_SRC_TIKTOK -> viewModel.setSourceFilter(SourceFilter.TIKTOK)
                 ID_SRC_YOUTUBE -> viewModel.setSourceFilter(SourceFilter.YOUTUBE)
                 ID_SRC_OTHER -> viewModel.setSourceFilter(SourceFilter.OTHER)
+                ID_TYPE_ALL -> viewModel.setMediaTypeFilter(null)
+                ID_TYPE_VIDEO -> viewModel.setMediaTypeFilter("video")
+                ID_TYPE_AUDIO -> viewModel.setMediaTypeFilter("audio")
+                ID_TYPE_IMAGE -> viewModel.setMediaTypeFilter("image")
                 ID_CAT_ALL -> viewModel.setCategoryFilter(null)
                 ID_FOLDER_ALL -> viewModel.setFolderFilter(null)
                 in ID_CAT_BASE until ID_FOLDER_ALL ->
@@ -374,12 +394,27 @@ class MainActivity : AppCompatActivity() {
 
     private fun onVideoClick(video: VideoEntity) {
         val state = viewModel.uiState.value
-        if (state.selectionMode) {
-            viewModel.toggleSelected(video.id)
-        } else {
+        when {
+            state.selectionMode -> viewModel.toggleSelected(video.id)
+            // A downloaded cover image opens in an image viewer, not the player.
+            video.mediaType == "image" -> openImage(video)
             // Private videos only appear in the already-unlocked private view, so
             // they play normally from there (no separate "locked" block).
-            startActivity(PlayerActivity.intent(this, video.id))
+            else -> startActivity(PlayerActivity.intent(this, video.id))
+        }
+    }
+
+    private fun openImage(video: VideoEntity) {
+        try {
+            val uri = androidx.core.content.FileProvider.getUriForFile(
+                this, "$packageName.fileprovider", java.io.File(video.localPath)
+            )
+            startActivity(Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, "image/*")
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            })
+        } catch (e: Exception) {
+            android.widget.Toast.makeText(this, R.string.share_failed, android.widget.Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -627,6 +662,11 @@ class MainActivity : AppCompatActivity() {
         const val ID_SRC_TIKTOK = 101
         const val ID_SRC_YOUTUBE = 102
         const val ID_SRC_OTHER = 103
+        const val GROUP_TYPE = 4
+        const val ID_TYPE_ALL = 150
+        const val ID_TYPE_VIDEO = 151
+        const val ID_TYPE_AUDIO = 152
+        const val ID_TYPE_IMAGE = 153
         const val ID_CAT_ALL = 200
         const val ID_CAT_BASE = 201
         const val ID_FOLDER_ALL = 1000

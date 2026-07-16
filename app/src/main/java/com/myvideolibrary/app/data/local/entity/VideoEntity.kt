@@ -51,6 +51,10 @@ data class VideoEntity(
     @ColumnInfo(name = "source")
     val source: String,
 
+    /** "video" (default), "audio", or "image" — see [com.myvideolibrary.app.data.model.MediaType]. */
+    @ColumnInfo(name = "media_type")
+    val mediaType: String = "video",
+
     /** Original remote URL, if imported from a provider. */
     @ColumnInfo(name = "source_url")
     val sourceUrl: String? = null,

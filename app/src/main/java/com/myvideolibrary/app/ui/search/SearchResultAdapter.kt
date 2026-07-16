@@ -14,7 +14,7 @@ import com.myvideolibrary.app.util.Formatters
 class SearchResultAdapter(
     private val onPlay: (ProviderSearchItem) -> Unit,
     private val onSaveLink: (ProviderSearchItem) -> Unit,
-    private val onDownload: (ProviderSearchItem) -> Unit
+    private val onDownload: (ProviderSearchItem, android.view.View) -> Unit
 ) : ListAdapter<ProviderSearchItem, SearchResultAdapter.VH>(DIFF) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
@@ -40,7 +40,7 @@ class SearchResultAdapter(
                 .centerCrop()
                 .into(binding.thumbnail)
             binding.saveLinkButton.setOnClickListener { onSaveLink(item) }
-            binding.downloadButton.setOnClickListener { onDownload(item) }
+            binding.downloadButton.setOnClickListener { onDownload(item, it) }
             // Tapping the row previews the video streamed from its platform.
             binding.root.setOnClickListener { onPlay(item) }
         }

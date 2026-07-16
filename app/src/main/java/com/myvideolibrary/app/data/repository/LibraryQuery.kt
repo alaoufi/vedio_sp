@@ -18,6 +18,8 @@ data class LibraryQuery(
     val sourceFilter: SourceFilter = SourceFilter.ALL,
     /** When true show only locked (protected) videos; when false hide them. */
     val protectedOnly: Boolean = false,
+    /** "video"/"audio"/"image", or null for all types. */
+    val mediaType: String? = null,
     val sortOrder: SortOrder = SortOrder.DATE_ADDED_DESC
 ) {
 
@@ -42,6 +44,10 @@ data class LibraryQuery(
         where.append(if (protectedOnly) " AND is_locked = 1" else " AND is_locked = 0")
         category?.let {
             where.append(" AND category = ?")
+            args.add(it)
+        }
+        mediaType?.let {
+            where.append(" AND media_type = ?")
             args.add(it)
         }
         when (sourceFilter) {

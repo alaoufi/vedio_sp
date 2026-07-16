@@ -8,6 +8,10 @@
     <string name="filter">Filter</string>
     <string name="filter_source">Source</string>
     <string name="filter_folder">Folder</string>
+    <string name="filter_type">Type</string>
+    <string name="type_video">Video</string>
+    <string name="type_audio">Audio</string>
+    <string name="type_image">Image</string>
     <string name="source_tiktok">TikTok</string>
     <string name="source_youtube">YouTube</string>
     <string name="source_other">Other</string>

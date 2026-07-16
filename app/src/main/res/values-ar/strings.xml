@@ -8,6 +8,10 @@
     <string name="filter">تصفية</string>
     <string name="filter_source">المصدر</string>
     <string name="filter_folder">المجلد</string>
+    <string name="filter_type">النوع</string>
+    <string name="type_video">فيديو</string>
+    <string name="type_audio">صوت</string>
+    <string name="type_image">صورة</string>
     <string name="source_tiktok">تيك توك</string>
     <string name="source_youtube">يوتيوب</string>
     <string name="source_other">أخرى</string>

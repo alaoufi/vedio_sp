@@ -36,8 +36,8 @@ class AddDownloadActivity : AppCompatActivity() {
             viewModel.resolve(binding.urlInput.text?.toString().orEmpty())
         }
         binding.pasteButton.setOnClickListener { pasteFromClipboard() }
-        binding.downloadButton.setOnClickListener {
-            DownloadKindDialog.show(this) { kind -> viewModel.download(kind) }
+        binding.downloadButton.setOnClickListener { anchor ->
+            DownloadKindDialog.show(anchor) { kind -> viewModel.download(kind) }
         }
 
         observe()

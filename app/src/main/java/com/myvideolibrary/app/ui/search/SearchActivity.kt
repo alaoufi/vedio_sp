@@ -62,8 +62,11 @@ class SearchActivity : AppCompatActivity() {
         viewModel.search(binding.searchInput.text?.toString().orEmpty())
     }
 
-    private fun chooseDownloadKind(item: com.myvideolibrary.app.provider.model.ProviderSearchItem) {
-        com.myvideolibrary.app.ui.provider.DownloadKindDialog.show(this) { kind ->
+    private fun chooseDownloadKind(
+        item: com.myvideolibrary.app.provider.model.ProviderSearchItem,
+        anchor: android.view.View
+    ) {
+        com.myvideolibrary.app.ui.provider.DownloadKindDialog.show(anchor) { kind ->
             viewModel.downloadItem(item, kind)
         }
     }

@@ -1,29 +1,32 @@
 package com.myvideolibrary.app.ui.provider
 
-import android.content.Context
-import androidx.appcompat.app.AlertDialog
+import android.view.View
+import android.widget.PopupMenu
 import com.myvideolibrary.app.R
 import com.myvideolibrary.app.data.model.DownloadKind
 
-/** Shared "what to download" chooser: full / video-only / audio-only / image. */
+/**
+ * "What to download" chooser, shown as a small dropdown anchored right next to
+ * the download button. Full video is listed first (the default choice).
+ */
 object DownloadKindDialog {
 
-    fun show(context: Context, onPick: (DownloadKind) -> Unit) {
-        val labels = arrayOf(
-            context.getString(R.string.kind_full),
-            context.getString(R.string.kind_video_only),
-            context.getString(R.string.kind_audio_only),
-            context.getString(R.string.kind_image_only)
-        )
-        val kinds = arrayOf(
-            DownloadKind.FULL,
-            DownloadKind.VIDEO_ONLY,
-            DownloadKind.AUDIO_ONLY,
-            DownloadKind.IMAGE_ONLY
-        )
-        AlertDialog.Builder(context)
-            .setTitle(R.string.download_options)
-            .setItems(labels) { _, which -> onPick(kinds[which]) }
-            .show()
+    private val ORDER = listOf(
+        DownloadKind.FULL to R.string.kind_full,
+        DownloadKind.VIDEO_ONLY to R.string.kind_video_only,
+        DownloadKind.AUDIO_ONLY to R.string.kind_audio_only,
+        DownloadKind.IMAGE_ONLY to R.string.kind_image_only
+    )
+
+    fun show(anchor: View, onPick: (DownloadKind) -> Unit) {
+        val popup = PopupMenu(anchor.context, anchor)
+        ORDER.forEachIndexed { i, (_, labelRes) ->
+            popup.menu.add(0, i, i, anchor.context.getString(labelRes))
+        }
+        popup.setOnMenuItemClickListener { item ->
+            ORDER.getOrNull(item.itemId)?.let { onPick(it.first) }
+            true
+        }
+        popup.show()
     }
 }

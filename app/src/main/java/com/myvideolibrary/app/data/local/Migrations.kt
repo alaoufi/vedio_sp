@@ -37,3 +37,10 @@ val MIGRATION_5_6 = object : Migration(5, 6) {
         db.execSQL("ALTER TABLE downloads ADD COLUMN kind TEXT NOT NULL DEFAULT 'full'")
     }
 }
+
+/** Adds media_type (video/audio/image) so audio + image items are filterable. */
+val MIGRATION_6_7 = object : Migration(6, 7) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE videos ADD COLUMN media_type TEXT NOT NULL DEFAULT 'video'")
+    }
+}
