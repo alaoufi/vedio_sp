@@ -5,6 +5,9 @@
     <!-- Library -->
     <string name="library_stats">%1$d فيديو · %2$s</string>
     <string name="filter_all">الكل</string>
+    <string name="filter">تصفية</string>
+    <string name="filter_source">المصدر</string>
+    <string name="filter_folder">المجلد</string>
     <string name="source_tiktok">تيك توك</string>
     <string name="source_youtube">يوتيوب</string>
     <string name="source_other">أخرى</string>

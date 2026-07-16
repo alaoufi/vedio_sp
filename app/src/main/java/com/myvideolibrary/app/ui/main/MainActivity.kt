@@ -17,7 +17,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.chip.Chip
 import com.myvideolibrary.app.R
 import com.myvideolibrary.app.data.local.entity.VideoEntity
 import com.myvideolibrary.app.data.model.LibraryViewMode
@@ -54,7 +53,7 @@ class MainActivity : AppCompatActivity() {
 
         setupRecycler()
         setupSearch()
-        setupSourceChips()
+        binding.filterButton.setOnClickListener { showFilterMenu(it) }
         setupFab()
         observeState()
         observeVideos()
@@ -76,14 +75,16 @@ class MainActivity : AppCompatActivity() {
                             it.status == com.myvideolibrary.app.data.model.DownloadStatus.DOWNLOADING.id
                         }
                         val percent = downloading?.progress ?: 0
-                        val text = getString(R.string.downloading_banner, active.size, percent)
-                        binding.downloadBannerText.text = text
-                        binding.downloadBannerProgress.progress = percent
-                        // Redundant, always-visible cue at the top bar (banner can be
-                        // brief for fast TikTok downloads).
-                        if (!viewModel.uiState.value.protectedMode) supportActionBar?.subtitle = text
-                    } else {
-                        supportActionBar?.subtitle = null
+                        binding.downloadBannerText.text =
+                            getString(R.string.downloading_banner, active.size, percent)
+                        val bar = binding.downloadBannerProgress
+                        if (downloading == null) {
+                            // Queued: animate an indeterminate bar so it shows instantly.
+                            bar.isIndeterminate = true
+                        } else {
+                            bar.isIndeterminate = false
+                            bar.setProgressCompat(percent, true)
+                        }
                     }
                 }
             }
@@ -159,33 +160,73 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    private val sourceChipModels = listOf(
-        SourceFilter.ALL to R.string.filter_all,
-        SourceFilter.TIKTOK to R.string.source_tiktok,
-        SourceFilter.YOUTUBE to R.string.source_youtube,
-        SourceFilter.OTHER to R.string.source_other
-    )
+    /** All source/category/folder filters in one popup, anchored to the filter button. */
+    private fun showFilterMenu(anchor: android.view.View) {
+        val state = viewModel.uiState.value
+        val popup = android.widget.PopupMenu(this, anchor)
+        val menu = popup.menu
 
-    private fun setupSourceChips() {
-        binding.sourceChips.removeAllViews()
-        sourceChipModels.forEach { (filter, labelRes) ->
-            val chip = com.google.android.material.chip.Chip(this).apply {
-                text = getString(labelRes)
-                isCheckable = true
-                isChecked = filter == SourceFilter.ALL
-                tag = filter
-                setOnClickListener { viewModel.setSourceFilter(filter) }
+        // --- Source ---
+        val source = menu.addSubMenu(getString(R.string.filter_source))
+        source.add(GROUP_SOURCE, ID_SRC_ALL, 0, R.string.filter_all)
+        source.add(GROUP_SOURCE, ID_SRC_TIKTOK, 1, R.string.source_tiktok)
+        source.add(GROUP_SOURCE, ID_SRC_YOUTUBE, 2, R.string.source_youtube)
+        source.add(GROUP_SOURCE, ID_SRC_OTHER, 3, R.string.source_other)
+        source.setGroupCheckable(GROUP_SOURCE, true, true)
+        source.findItem(
+            when (state.sourceFilter) {
+                SourceFilter.TIKTOK -> ID_SRC_TIKTOK
+                SourceFilter.YOUTUBE -> ID_SRC_YOUTUBE
+                SourceFilter.OTHER -> ID_SRC_OTHER
+                SourceFilter.ALL -> ID_SRC_ALL
             }
-            binding.sourceChips.addView(chip)
-        }
-    }
+        )?.isChecked = true
 
-    private fun renderSourceChips(state: LibraryUiState) {
-        for (i in 0 until binding.sourceChips.childCount) {
-            val chip = binding.sourceChips.getChildAt(i)
-                    as? com.google.android.material.chip.Chip ?: continue
-            chip.isChecked = chip.tag == state.sourceFilter
+        // --- Category (only when categories exist) ---
+        if (state.categories.isNotEmpty()) {
+            val cat = menu.addSubMenu(getString(R.string.category))
+            cat.add(GROUP_CATEGORY, ID_CAT_ALL, 0, R.string.category_all)
+            state.categories.forEachIndexed { i, c ->
+                cat.add(GROUP_CATEGORY, ID_CAT_BASE + i, i + 1, c)
+            }
+            cat.setGroupCheckable(GROUP_CATEGORY, true, true)
+            val checkedId = state.categoryFilter
+                ?.let { c -> ID_CAT_BASE + state.categories.indexOf(c) }
+                ?: ID_CAT_ALL
+            cat.findItem(checkedId)?.isChecked = true
         }
+
+        // --- Folder (only when folders exist) ---
+        if (state.folders.isNotEmpty()) {
+            val folder = menu.addSubMenu(getString(R.string.filter_folder))
+            folder.add(GROUP_FOLDER, ID_FOLDER_ALL, 0, R.string.filter_all)
+            state.folders.forEachIndexed { i, f ->
+                folder.add(GROUP_FOLDER, ID_FOLDER_BASE + i, i + 1, f.name)
+            }
+            folder.setGroupCheckable(GROUP_FOLDER, true, true)
+            val checkedId = state.folderId
+                ?.let { id -> ID_FOLDER_BASE + state.folders.indexOfFirst { it.id == id } }
+                ?: ID_FOLDER_ALL
+            folder.findItem(checkedId)?.isChecked = true
+        }
+
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                ID_SRC_ALL -> viewModel.setSourceFilter(SourceFilter.ALL)
+                ID_SRC_TIKTOK -> viewModel.setSourceFilter(SourceFilter.TIKTOK)
+                ID_SRC_YOUTUBE -> viewModel.setSourceFilter(SourceFilter.YOUTUBE)
+                ID_SRC_OTHER -> viewModel.setSourceFilter(SourceFilter.OTHER)
+                ID_CAT_ALL -> viewModel.setCategoryFilter(null)
+                ID_FOLDER_ALL -> viewModel.setFolderFilter(null)
+                in ID_CAT_BASE until ID_FOLDER_ALL ->
+                    viewModel.setCategoryFilter(state.categories.getOrNull(item.itemId - ID_CAT_BASE))
+                in ID_FOLDER_BASE..(ID_FOLDER_BASE + 9999) ->
+                    viewModel.setFolderFilter(state.folders.getOrNull(item.itemId - ID_FOLDER_BASE)?.id)
+                else -> return@setOnMenuItemClickListener false
+            }
+            true
+        }
+        popup.show()
     }
 
     private fun setupFab() {
@@ -201,9 +242,6 @@ class MainActivity : AppCompatActivity() {
                     applyLayoutManager(state.viewMode)
                     adapter.setSelection(state.selectionMode, state.selectedIds)
                     renderStats(state)
-                    renderSourceChips(state)
-                    renderCategoryChips(state)
-                    renderFolderChips(state)
                     renderSelectionBar(state)
                     renderProtectedTitle(state)
                     invalidateOptionsMenu()
@@ -228,34 +266,6 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun renderFolderChips(state: LibraryUiState) {
-        // Hide the folder row entirely until the user actually has folders.
-        binding.folderChipsScroll.isVisible = state.folders.isNotEmpty()
-        val group = binding.folderChips
-        // Rebuild only when the folder set changes to avoid flicker.
-        if (group.tag == state.folders.map { it.id }) return
-        group.tag = state.folders.map { it.id }
-        group.removeAllViews()
-
-        val allChip = Chip(this).apply {
-            text = getString(R.string.filter_all)
-            isCheckable = true
-            isChecked = state.folderId == null
-            setOnClickListener { viewModel.setFolderFilter(null) }
-        }
-        group.addView(allChip)
-
-        state.folders.forEach { folder ->
-            val chip = Chip(this).apply {
-                text = folder.name
-                isCheckable = true
-                isChecked = state.folderId == folder.id
-                setOnClickListener { viewModel.setFolderFilter(folder.id) }
-            }
-            group.addView(chip)
-        }
-    }
-
     /** Preset category labels offered in the "Set category" dialog. */
     private val presetCategoryRes = listOf(
         R.string.category_general,
@@ -269,46 +279,6 @@ class MainActivity : AppCompatActivity() {
         R.string.category_religion,
         R.string.category_kids
     )
-
-    private fun renderCategoryChips(state: LibraryUiState) {
-        val scroll = binding.categoryChipsScroll
-        val group = binding.categoryChips
-        // Only show the category row once at least one video is categorised.
-        scroll.isVisible = state.categories.isNotEmpty()
-        if (state.categories.isEmpty()) {
-            group.removeAllViews()
-            group.tag = null
-            return
-        }
-        // Rebuild only when the set of categories changes to avoid flicker.
-        if (group.tag != state.categories) {
-            group.tag = state.categories
-            group.removeAllViews()
-
-            val allChip = Chip(this).apply {
-                text = getString(R.string.category_all)
-                isCheckable = true
-                tag = null
-                setOnClickListener { viewModel.setCategoryFilter(null) }
-            }
-            group.addView(allChip)
-
-            state.categories.forEach { category ->
-                val chip = Chip(this).apply {
-                    text = category
-                    isCheckable = true
-                    tag = category
-                    setOnClickListener { viewModel.setCategoryFilter(category) }
-                }
-                group.addView(chip)
-            }
-        }
-        // Sync checked state with the active filter.
-        for (i in 0 until group.childCount) {
-            val chip = group.getChildAt(i) as? Chip ?: continue
-            chip.isChecked = chip.tag == state.categoryFilter
-        }
-    }
 
     private fun promptSetCategory(video: VideoEntity) {
         val presets = presetCategoryRes.map { getString(it) }
@@ -622,6 +592,20 @@ class MainActivity : AppCompatActivity() {
             }
             .setNegativeButton(R.string.cancel, null)
             .show()
+    }
+
+    private companion object {
+        const val GROUP_SOURCE = 1
+        const val GROUP_CATEGORY = 2
+        const val GROUP_FOLDER = 3
+        const val ID_SRC_ALL = 100
+        const val ID_SRC_TIKTOK = 101
+        const val ID_SRC_YOUTUBE = 102
+        const val ID_SRC_OTHER = 103
+        const val ID_CAT_ALL = 200
+        const val ID_CAT_BASE = 201
+        const val ID_FOLDER_ALL = 1000
+        const val ID_FOLDER_BASE = 1001
     }
 
     override fun onBackPressed() {

@@ -5,6 +5,9 @@
     <!-- Library -->
     <string name="library_stats">%1$d videos · %2$s</string>
     <string name="filter_all">All</string>
+    <string name="filter">Filter</string>
+    <string name="filter_source">Source</string>
+    <string name="filter_folder">Folder</string>
     <string name="source_tiktok">TikTok</string>
     <string name="source_youtube">YouTube</string>
     <string name="source_other">Other</string>
