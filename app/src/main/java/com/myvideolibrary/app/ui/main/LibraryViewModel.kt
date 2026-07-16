@@ -144,14 +144,17 @@ class LibraryViewModel @Inject constructor(
                 )
             }.collect { queryState.value = it }
         }
-        // Clear a category filter once its last video is gone, so the library
-        // doesn't stay stuck on an empty, un-selectable category.
+        // Clear a category filter only when the category no longer exists at all
+        // (deleted). Added-but-empty categories remain selectable.
         viewModelScope.launch {
-            videoRepository.observeCategories().collect { categories ->
+            combine(
+                videoRepository.observeCategories(),
+                settingsRepository.observeSettings()
+            ) { present, settings ->
+                com.myvideolibrary.app.util.CategoryOrder.apply(present, settings.categoryOrder)
+            }.collect { known ->
                 val current = _categoryFilter.value
-                if (current != null && current !in categories) {
-                    _categoryFilter.value = null
-                }
+                if (current != null && current !in known) _categoryFilter.value = null
             }
         }
     }

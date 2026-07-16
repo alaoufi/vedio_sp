@@ -42,6 +42,7 @@ class CategoriesActivity : AppCompatActivity() {
         )
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = adapter
+        binding.addButton.setOnClickListener { promptAdd() }
 
         setupDragReorder()
 
@@ -80,6 +81,16 @@ class CategoriesActivity : AppCompatActivity() {
         }
         touchHelper = ItemTouchHelper(callback)
         touchHelper.attachToRecyclerView(binding.recyclerView)
+    }
+
+    private fun promptAdd() {
+        val input = EditText(this).apply { hint = getString(R.string.category_hint) }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.add_category)
+            .setView(input)
+            .setPositiveButton(R.string.create) { _, _ -> viewModel.add(input.text.toString()) }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     private fun promptRename(name: String) {

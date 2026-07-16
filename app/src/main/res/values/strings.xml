@@ -193,7 +193,8 @@
     <string name="category_religion">Religion</string>
     <string name="category_kids">Kids</string>
     <string name="manage_categories">Manage categories</string>
-    <string name="no_categories">No categories yet. Set a category on a video first.</string>
+    <string name="add_category">Add category</string>
+    <string name="no_categories">No categories yet. Tap + to add one.</string>
     <string name="reorder">Reorder</string>
     <string name="delete_category_message">Remove the category \"%1$s\"? Videos keep, but become uncategorized.</string>
 
