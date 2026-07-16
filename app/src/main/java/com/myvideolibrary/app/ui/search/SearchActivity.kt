@@ -35,7 +35,7 @@ class SearchActivity : AppCompatActivity() {
         adapter = SearchResultAdapter(
             onPlay = viewModel::play,
             onSaveLink = viewModel::saveLink,
-            onDownload = viewModel::downloadItem
+            onDownload = ::chooseDownloadKind
         )
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = adapter
@@ -60,6 +60,12 @@ class SearchActivity : AppCompatActivity() {
 
     private fun submit() {
         viewModel.search(binding.searchInput.text?.toString().orEmpty())
+    }
+
+    private fun chooseDownloadKind(item: com.myvideolibrary.app.provider.model.ProviderSearchItem) {
+        com.myvideolibrary.app.ui.provider.DownloadKindDialog.show(this) { kind ->
+            viewModel.downloadItem(item, kind)
+        }
     }
 
     private fun observe() {

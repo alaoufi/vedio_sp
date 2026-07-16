@@ -8,6 +8,7 @@ import com.myvideolibrary.app.data.local.MIGRATION_1_2
 import com.myvideolibrary.app.data.local.MIGRATION_2_3
 import com.myvideolibrary.app.data.local.MIGRATION_3_4
 import com.myvideolibrary.app.data.local.MIGRATION_4_5
+import com.myvideolibrary.app.data.local.MIGRATION_5_6
 import com.myvideolibrary.app.data.local.dao.DownloadDao
 import com.myvideolibrary.app.data.local.dao.FolderDao
 import com.myvideolibrary.app.data.local.dao.SettingsDao
@@ -49,7 +50,9 @@ object DatabaseModule {
             AppDatabase.DATABASE_NAME
         )
             .openHelperFactory(factory)
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+            .addMigrations(
+                MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6
+            )
             .fallbackToDestructiveMigrationOnDowngrade()
             .build()
     }

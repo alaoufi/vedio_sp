@@ -54,6 +54,34 @@ object VideoMuxer {
         }
     }
 
+    /** Copies only the video track into [output] (drops audio). */
+    fun stripAudio(input: File, output: File): Boolean = copySingleTrack(input, output, "video/")
+
+    /** Copies only the audio track into [output] (an .m4a/AAC container). */
+    fun extractAudio(input: File, output: File): Boolean = copySingleTrack(input, output, "audio/")
+
+    private fun copySingleTrack(input: File, output: File, prefix: String): Boolean {
+        var muxer: MediaMuxer? = null
+        val extractor = MediaExtractor()
+        return try {
+            extractor.setDataSource(input.absolutePath)
+            val track = firstTrack(extractor, prefix) ?: error("No $prefix track")
+            extractor.selectTrack(track)
+            muxer = MediaMuxer(output.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+            val outTrack = muxer.addTrack(extractor.getTrackFormat(track))
+            muxer.start()
+            copyTrack(extractor, muxer, outTrack)
+            muxer.stop()
+            true
+        } catch (e: Exception) {
+            output.takeIf(File::exists)?.delete()
+            false
+        } finally {
+            runCatching { extractor.release() }
+            runCatching { muxer?.release() }
+        }
+    }
+
     private fun firstTrack(extractor: MediaExtractor, prefix: String): Int? {
         for (i in 0 until extractor.trackCount) {
             val mime = extractor.getTrackFormat(i).getString(MediaFormat.KEY_MIME) ?: continue

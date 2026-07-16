@@ -57,8 +57,11 @@ class DownloadWorker @AssistedInject constructor(
         if (downloadId <= 0) return Result.failure()
 
         val download = downloadRepository.get(downloadId) ?: return Result.failure()
+        val kind = com.myvideolibrary.app.data.model.DownloadKind.fromId(download.kind)
         val url = download.downloadUrl
-        if (url.isNullOrBlank()) {
+        val primaryUrl =
+            if (kind == com.myvideolibrary.app.data.model.DownloadKind.IMAGE_ONLY) download.thumbnailUrl else url
+        if (primaryUrl.isNullOrBlank()) {
             downloadRepository.setStatus(
                 downloadId, DownloadStatus.FAILED, "Missing download URL"
             )
@@ -70,18 +73,28 @@ class DownloadWorker @AssistedInject constructor(
         return try {
             downloadRepository.setStatus(downloadId, DownloadStatus.DOWNLOADING)
 
-            val audioUrl = download.audioUrl
-            val finished = if (audioUrl.isNullOrBlank()) {
-                downloadSmart(url, destFile, downloadId, download.title)
-            } else {
-                downloadAndMux(
-                    videoUrl = url,
-                    audioUrl = audioUrl,
-                    destFile = destFile,
-                    downloadId = downloadId,
-                    title = download.title,
-                    notificationId = notificationId
-                )
+            val finished = when (kind) {
+                com.myvideolibrary.app.data.model.DownloadKind.IMAGE_ONLY ->
+                    downloadSmart(primaryUrl, destFile, downloadId, download.title)
+                com.myvideolibrary.app.data.model.DownloadKind.AUDIO_ONLY ->
+                    downloadAudioOnly(download, destFile, downloadId)
+                com.myvideolibrary.app.data.model.DownloadKind.VIDEO_ONLY ->
+                    downloadVideoOnly(download, destFile, downloadId)
+                com.myvideolibrary.app.data.model.DownloadKind.FULL -> {
+                    val audioUrl = download.audioUrl
+                    if (audioUrl.isNullOrBlank()) {
+                        downloadSmart(url!!, destFile, downloadId, download.title)
+                    } else {
+                        downloadAndMux(
+                            videoUrl = url!!,
+                            audioUrl = audioUrl,
+                            destFile = destFile,
+                            downloadId = downloadId,
+                            title = download.title,
+                            notificationId = notificationId
+                        )
+                    }
+                }
             }
 
             if (!finished) {
@@ -90,7 +103,7 @@ class DownloadWorker @AssistedInject constructor(
                 return Result.success()
             }
 
-            finalize(downloadId, download.title, destFile)
+            finalize(downloadId, download.title, destFile, kind)
             notifier.showComplete(notificationId, download.title, true)
             Result.success(workDataOf(KEY_DOWNLOAD_ID to downloadId))
         } catch (e: Exception) {
@@ -406,10 +419,77 @@ class DownloadWorker @AssistedInject constructor(
         true
     }
 
-    private suspend fun finalize(downloadId: Long, title: String, destFile: File) {
-        val meta = thumbnailGenerator.readMetadata(destFile.absolutePath)
-        val thumb = thumbnailGenerator.generateThumbnail(destFile.absolutePath)
+    /** Audio-only: use a dedicated audio stream when available, else extract it. */
+    private suspend fun downloadAudioOnly(
+        download: com.myvideolibrary.app.data.local.entity.DownloadEntity,
+        destFile: File,
+        downloadId: Long
+    ): Boolean {
+        val audioUrl = download.audioUrl
+        if (!audioUrl.isNullOrBlank()) {
+            return downloadSmart(audioUrl, destFile, downloadId, download.title)
+        }
+        val src = File(destFile.parentFile, destFile.name + ".src")
+        if (!downloadSmart(download.downloadUrl!!, src, downloadId, download.title)) return false
+        val ok = withContext(Dispatchers.IO) { VideoMuxer.extractAudio(src, destFile) }
+        src.delete()
+        if (!ok) throw IllegalStateException("Failed to extract audio")
+        return true
+    }
+
+    /** Video-only: use the video-only stream when available, else strip the audio. */
+    private suspend fun downloadVideoOnly(
+        download: com.myvideolibrary.app.data.local.entity.DownloadEntity,
+        destFile: File,
+        downloadId: Long
+    ): Boolean {
+        if (!download.audioUrl.isNullOrBlank()) {
+            // downloadUrl is already a video-only stream (YouTube quality path).
+            return downloadSmart(download.downloadUrl!!, destFile, downloadId, download.title)
+        }
+        val src = File(destFile.parentFile, destFile.name + ".src")
+        if (!downloadSmart(download.downloadUrl!!, src, downloadId, download.title)) return false
+        val ok = withContext(Dispatchers.IO) { VideoMuxer.stripAudio(src, destFile) }
+        src.delete()
+        if (!ok) throw IllegalStateException("Failed to remove audio")
+        return true
+    }
+
+    private suspend fun finalize(
+        downloadId: Long,
+        title: String,
+        destFile: File,
+        kind: com.myvideolibrary.app.data.model.DownloadKind
+    ) {
         val download = downloadRepository.get(downloadId)
+
+        if (kind == com.myvideolibrary.app.data.model.DownloadKind.IMAGE_ONLY) {
+            // A still image doesn't belong in the video library; just complete it
+            // and drop a copy in the user's folder / gallery.
+            download?.let {
+                downloadRepository.update(
+                    it.copy(
+                        status = DownloadStatus.COMPLETED.id,
+                        progress = 100,
+                        destPath = destFile.absolutePath,
+                        errorMessage = null
+                    )
+                )
+            }
+            val saveTree = settingsRepository.getSettings().storagePath
+            if (!saveTree.isNullOrBlank()) {
+                withContext(Dispatchers.IO) { copyToUserFolder(destFile, saveTree, title) }
+            }
+            return
+        }
+
+        val meta = thumbnailGenerator.readMetadata(destFile.absolutePath)
+        // Audio has no frame to grab; fall back to the remote cover thumbnail.
+        val thumb = if (kind == com.myvideolibrary.app.data.model.DownloadKind.AUDIO_ONLY) {
+            download?.thumbnailUrl
+        } else {
+            thumbnailGenerator.generateThumbnail(destFile.absolutePath) ?: download?.thumbnailUrl
+        }
 
         val videoId = videoRepository.addVideo(
             VideoEntity(
@@ -453,11 +533,17 @@ class DownloadWorker @AssistedInject constructor(
                 applicationContext, android.net.Uri.parse(treeUriString)
             ) ?: return
             if (!tree.canWrite()) return
+            val ext = source.extension.ifEmpty { "mp4" }
+            val mime = when (ext) {
+                "m4a" -> "audio/mp4"
+                "jpg", "jpeg" -> "image/jpeg"
+                else -> "video/mp4"
+            }
             val safeName = title.replace(Regex("[^\\p{L}\\p{N} ._-]"), "_")
-                .take(80).trim().ifEmpty { "video" } + ".mp4"
+                .take(80).trim().ifEmpty { "video" } + ".$ext"
             // Skip if a copy with this name already exists.
             if (tree.findFile(safeName) != null) return
-            val target = tree.createFile("video/mp4", safeName) ?: return
+            val target = tree.createFile(mime, safeName) ?: return
             applicationContext.contentResolver.openOutputStream(target.uri)?.use { out ->
                 source.inputStream().use { it.copyTo(out) }
             }

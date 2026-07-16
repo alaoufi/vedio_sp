@@ -30,3 +30,10 @@ val MIGRATION_4_5 = object : Migration(4, 5) {
         db.execSQL("ALTER TABLE settings ADD COLUMN category_order TEXT")
     }
 }
+
+/** Adds the download kind (full/video/audio/image). */
+val MIGRATION_5_6 = object : Migration(5, 6) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE downloads ADD COLUMN kind TEXT NOT NULL DEFAULT 'full'")
+    }
+}

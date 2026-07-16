@@ -65,7 +65,10 @@ class AddDownloadViewModel @Inject constructor(
         }
     }
 
-    fun download() {
+    fun download(
+        kind: com.myvideolibrary.app.data.model.DownloadKind =
+            com.myvideolibrary.app.data.model.DownloadKind.FULL
+    ) {
         val resolved = _state.value.resolved ?: return
         viewModelScope.launch {
             try {
@@ -75,7 +78,8 @@ class AddDownloadViewModel @Inject constructor(
                     sourceUrl = resolved.sourceUrl,
                     directUrl = resolved.directUrl,
                     audioUrl = resolved.audioUrl,
-                    thumbnailUrl = resolved.thumbnailUrl
+                    thumbnailUrl = resolved.thumbnailUrl,
+                    kind = kind
                 )
                 _state.value = _state.value.copy(enqueued = true)
             } catch (e: Throwable) {

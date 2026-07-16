@@ -45,6 +45,10 @@ data class DownloadEntity(
     @ColumnInfo(name = "thumbnail_url")
     val thumbnailUrl: String? = null,
 
+    /** [com.myvideolibrary.app.data.model.DownloadKind.id]: full/video/audio/image. */
+    @ColumnInfo(name = "kind")
+    val kind: String = "full",
+
     /** Destination file path inside app storage. */
     @ColumnInfo(name = "dest_path")
     val destPath: String? = null,

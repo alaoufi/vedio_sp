@@ -94,6 +94,11 @@
     <string name="fetch_info">Fetch info</string>
     <string name="download">Download</string>
     <string name="download_started">Download added to the queue</string>
+    <string name="download_options">Download options</string>
+    <string name="kind_full">Full video (sound + picture)</string>
+    <string name="kind_video_only">Video without sound</string>
+    <string name="kind_audio_only">Audio only</string>
+    <string name="kind_image_only">Image only (cover)</string>
     <string name="action_add_download">Download from link</string>
     <string name="error_invalid_link">This link is not valid.</string>
     <string name="error_private">This video is private.</string>

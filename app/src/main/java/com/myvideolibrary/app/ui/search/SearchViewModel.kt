@@ -78,7 +78,11 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    fun downloadItem(item: ProviderSearchItem) {
+    fun downloadItem(
+        item: ProviderSearchItem,
+        kind: com.myvideolibrary.app.data.model.DownloadKind =
+            com.myvideolibrary.app.data.model.DownloadKind.FULL
+    ) {
         // Search results that already carry a direct URL (TikTok) enqueue instantly.
         val direct = item.directUrl
         if (direct != null) {
@@ -90,7 +94,8 @@ class SearchViewModel @Inject constructor(
                         source = item.source.id,
                         sourceUrl = item.url,
                         directUrl = direct,
-                        thumbnailUrl = item.thumbnailUrl
+                        thumbnailUrl = item.thumbnailUrl,
+                        kind = kind
                     )
                     _state.value = _state.value.copy(loading = false, message = "queued")
                 } catch (e: Throwable) {
@@ -101,7 +106,7 @@ class SearchViewModel @Inject constructor(
                 }
             }
         } else {
-            downloadLink(item.url)
+            downloadLink(item.url, kind)
         }
     }
 
@@ -137,7 +142,11 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    private fun downloadLink(url: String) {
+    private fun downloadLink(
+        url: String,
+        kind: com.myvideolibrary.app.data.model.DownloadKind =
+            com.myvideolibrary.app.data.model.DownloadKind.FULL
+    ) {
         val provider = providerRegistry.providerForUrl(url)
         if (provider == null) {
             _state.value = _state.value.copy(error = "Unsupported link")
@@ -153,7 +162,8 @@ class SearchViewModel @Inject constructor(
                     sourceUrl = resolved.sourceUrl,
                     directUrl = resolved.directUrl,
                     audioUrl = resolved.audioUrl,
-                    thumbnailUrl = resolved.thumbnailUrl
+                    thumbnailUrl = resolved.thumbnailUrl,
+                    kind = kind
                 )
                 _state.value = _state.value.copy(loading = false, message = "queued")
             } catch (e: ProviderException) {

@@ -39,9 +39,16 @@ class DownloadManager @Inject constructor(
         sourceUrl: String,
         directUrl: String,
         audioUrl: String? = null,
-        thumbnailUrl: String? = null
+        thumbnailUrl: String? = null,
+        kind: com.myvideolibrary.app.data.model.DownloadKind =
+            com.myvideolibrary.app.data.model.DownloadKind.FULL
     ): Long {
-        val dest = storageManager.newVideoFile("mp4").absolutePath
+        val ext = when (kind) {
+            com.myvideolibrary.app.data.model.DownloadKind.AUDIO_ONLY -> "m4a"
+            com.myvideolibrary.app.data.model.DownloadKind.IMAGE_ONLY -> "jpg"
+            else -> "mp4"
+        }
+        val dest = storageManager.newVideoFile(ext).absolutePath
         val id = downloadRepository.create(
             DownloadEntity(
                 title = title,
@@ -50,6 +57,7 @@ class DownloadManager @Inject constructor(
                 downloadUrl = directUrl,
                 audioUrl = audioUrl,
                 thumbnailUrl = thumbnailUrl,
+                kind = kind.id,
                 destPath = dest,
                 status = DownloadStatus.WAITING.id,
                 downloadDate = System.currentTimeMillis()

@@ -94,6 +94,11 @@
     <string name="fetch_info">جلب المعلومات</string>
     <string name="download">تحميل</string>
     <string name="download_started">أُضيف التحميل إلى الطابور</string>
+    <string name="download_options">خيارات التحميل</string>
+    <string name="kind_full">فيديو كامل (صوت وصورة)</string>
+    <string name="kind_video_only">مقطع بدون صوت</string>
+    <string name="kind_audio_only">صوت فقط</string>
+    <string name="kind_image_only">صورة فقط (الغلاف)</string>
     <string name="action_add_download">تحميل من رابط</string>
     <string name="error_invalid_link">هذا الرابط غير صالح.</string>
     <string name="error_private">هذا الفيديو خاص.</string>
