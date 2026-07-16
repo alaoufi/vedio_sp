@@ -73,9 +73,15 @@ class TikTokProvider @Inject constructor(
         val data = root.obj("data")
             ?: throw ProviderException(ProviderErrorType.EXTRACTION_FAILED, "No data")
 
-        // hdplay / play are both watermark-free; prefer HD.
+        // The clean still image (photo-post picture, else full-res poster).
+        val cleanImage = data.cleanImage()
+
+        // hdplay / play are both watermark-free; prefer HD. Photo/slideshow
+        // posts have no video — fall back to the still image so an image-only
+        // save still works instead of failing outright.
         val play = data.str("hdplay")?.takeIf { it.isNotBlank() }
             ?: data.str("play")?.takeIf { it.isNotBlank() }
+            ?: cleanImage
             ?: throw ProviderException(
                 ProviderErrorType.EXTRACTION_FAILED,
                 "No watermark-free URL returned"
@@ -86,10 +92,9 @@ class TikTokProvider @Inject constructor(
             sourceUrl = url,
             title = data.str("title")?.takeIf { it.isNotBlank() } ?: "TikTok video",
             directUrl = absolutize(play),
-            // Prefer origin_cover: the clean full-resolution frame with no
-            // play-button overlay or badge, so an image-only save is pure.
-            thumbnailUrl = (data.str("origin_cover") ?: data.str("cover"))
-                ?.let { absolutize(it) },
+            // A pure image with no play-button overlay, badge, or watermark, so
+            // an image-only save is the raw picture — never a screenshot.
+            thumbnailUrl = cleanImage,
             author = data.obj("author")?.str("nickname"),
             durationMs = (data.num("duration") ?: 0) * 1000
         )
@@ -130,8 +135,7 @@ class TikTokProvider @Inject constructor(
                     url = if (handle != null) "https://www.tiktok.com/@$handle/video/$id"
                     else "https://www.tiktok.com/video/$id",
                     title = v.str("title")?.takeIf { it.isNotBlank() } ?: "TikTok video",
-                    thumbnailUrl = (v.str("origin_cover") ?: v.str("cover"))
-                        ?.let { absolutize(it) },
+                    thumbnailUrl = v.cleanImage(),
                     author = author?.str("nickname"),
                     durationMs = (v.num("duration") ?: 0) * 1000,
                     // tikwm already gives the watermark-free URL in search results.
@@ -170,6 +174,21 @@ class TikTokProvider @Inject constructor(
 
     private fun JsonObject.num(name: String): Long? =
         get(name)?.let { if (it.isJsonNull) null else runCatching { it.asLong }.getOrNull() }
+
+    /** First image of a TikTok photo/slideshow post, if this is one. */
+    private fun JsonObject.firstImage(): String? =
+        get("images")?.takeIf { it.isJsonArray }?.asJsonArray
+            ?.firstOrNull { !it.isJsonNull }
+            ?.let { runCatching { it.asString }.getOrNull() }
+            ?.takeIf { it.isNotBlank() }
+
+    /**
+     * The cleanest still image for an "image only" save: for a photo post the
+     * original uploaded picture (no watermark, no chrome); otherwise the
+     * full-resolution poster frame. Falls back to the smaller cover.
+     */
+    private fun JsonObject.cleanImage(): String? =
+        (firstImage() ?: str("origin_cover") ?: str("cover"))?.let { absolutize(it) }
 
     companion object {
         private const val RESOLVER_BASE = "https://www.tikwm.com"
