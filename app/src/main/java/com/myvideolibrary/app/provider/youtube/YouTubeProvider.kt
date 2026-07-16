@@ -62,24 +62,9 @@ class YouTubeProvider @Inject constructor(
                 .filter { !it.content.isNullOrBlank() && it.format == MediaFormat.M4A }
                 .maxByOrNull { it.averageBitrate }
 
-            val muxedRes = bestMuxed?.let { resolutionValue(it.getResolution()) } ?: 0
-            val hiRes = bestVideoOnly?.let { resolutionValue(it.getResolution()) } ?: 0
-
             val resolved = when {
-                // Higher quality available by merging a video-only + audio stream.
-                bestVideoOnly != null && bestAudio != null && hiRes > muxedRes ->
-                    ResolvedVideo(
-                        source = VideoSource.YOUTUBE,
-                        sourceUrl = url,
-                        title = info.name ?: "YouTube video",
-                        directUrl = bestVideoOnly.content,
-                        audioUrl = bestAudio.content,
-                        thumbnailUrl = info.thumbnails.lastOrNull()?.url,
-                        author = info.uploaderName,
-                        durationMs = info.duration * 1000,
-                        quality = bestVideoOnly.getResolution()
-                    )
-                // Otherwise the single-file muxed stream.
+                // Prefer the single-file muxed stream: no on-device merge, smaller,
+                // and it downloads fast with the parallel/segmented downloader.
                 bestMuxed != null ->
                     ResolvedVideo(
                         source = VideoSource.YOUTUBE,
@@ -90,6 +75,19 @@ class YouTubeProvider @Inject constructor(
                         author = info.uploaderName,
                         durationMs = info.duration * 1000,
                         quality = bestMuxed.getResolution()
+                    )
+                // No muxed stream: fall back to merging best video-only + audio.
+                bestVideoOnly != null && bestAudio != null ->
+                    ResolvedVideo(
+                        source = VideoSource.YOUTUBE,
+                        sourceUrl = url,
+                        title = info.name ?: "YouTube video",
+                        directUrl = bestVideoOnly.content,
+                        audioUrl = bestAudio.content,
+                        thumbnailUrl = info.thumbnails.lastOrNull()?.url,
+                        author = info.uploaderName,
+                        durationMs = info.duration * 1000,
+                        quality = bestVideoOnly.getResolution()
                     )
                 else -> throw ProviderException(
                     ProviderErrorType.EXTRACTION_FAILED,

@@ -14,12 +14,23 @@ import com.myvideolibrary.app.util.ThumbnailGenerator
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.File
 import java.io.RandomAccessFile
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.coroutines.coroutineContext
 
 /**
@@ -59,7 +70,7 @@ class DownloadWorker @AssistedInject constructor(
 
             val audioUrl = download.audioUrl
             val finished = if (audioUrl.isNullOrBlank()) {
-                downloadFile(url, destFile, downloadId, download.title, notificationId)
+                downloadSmart(url, destFile, downloadId, download.title)
             } else {
                 downloadAndMux(
                     videoUrl = url,
@@ -95,6 +106,155 @@ class DownloadWorker @AssistedInject constructor(
                 )
                 notifier.showComplete(notificationId, download.title, false)
                 Result.failure()
+            }
+        }
+    }
+
+    /**
+     * Picks the fastest safe strategy: parallel segmented download when the server
+     * advertises a total size and honours ranges (bypasses YouTube's per-connection
+     * throttle by using several connections at once); otherwise the sequential
+     * chunked download. Falls back to sequential if the parallel attempt errors.
+     */
+    private suspend fun downloadSmart(
+        url: String,
+        destFile: File,
+        downloadId: Long,
+        title: String
+    ): Boolean {
+        val total = runCatching { probeTotalSize(url) }.getOrNull()
+        if (total != null && total > MIN_PARALLEL_SIZE) {
+            try {
+                return downloadParallel(url, destFile, downloadId, total)
+            } catch (e: Exception) {
+                if (isStopped) return false
+                // Parallel failed: discard the sparse pre-allocated file and retry
+                // sequentially so we never keep a half-written file.
+                runCatching { destFile.delete() }
+                runCatching { File(destFile.parentFile, destFile.name + PARTS_SUFFIX).delete() }
+            }
+        }
+        return downloadFile(url, destFile, downloadId, title, 0)
+    }
+
+    /** Asks for one byte to learn the total size (only if the server returns 206). */
+    private suspend fun probeTotalSize(url: String): Long? = withContext(Dispatchers.IO) {
+        val builder = Request.Builder()
+            .url(url)
+            .header("User-Agent", BROWSER_UA)
+            .header("Range", "bytes=0-0")
+        if (isTikTokCdn(url)) builder.header("Referer", "https://www.tiktok.com/")
+        okHttpClient.newCall(builder.build()).execute().use { resp ->
+            if (resp.code == 206) parseContentRangeTotal(resp.header("Content-Range")) else null
+        }
+    }
+
+    /**
+     * Downloads [url] into a pre-allocated [destFile] using several parallel Range
+     * segments. Completed segment offsets are recorded in a sidecar so a killed
+     * worker resumes only the missing segments. Returns false if stopped/paused.
+     */
+    private suspend fun downloadParallel(
+        url: String,
+        destFile: File,
+        downloadId: Long,
+        total: Long
+    ): Boolean = coroutineScope {
+        val partsFile = File(destFile.parentFile, destFile.name + PARTS_SUFFIX)
+        val reusable = destFile.exists() && destFile.length() == total
+        if (!reusable) {
+            RandomAccessFile(destFile, "rw").use { it.setLength(total) }
+            runCatching { partsFile.delete() }
+        }
+        val done = (if (partsFile.exists()) {
+            partsFile.readLines().mapNotNull { it.toLongOrNull() }
+        } else emptyList()).toHashSet()
+
+        val segments = ArrayList<Pair<Long, Long>>()
+        var s = 0L
+        while (s < total) {
+            segments.add(s to minOf(s + SEGMENT_SIZE - 1, total - 1))
+            s += SEGMENT_SIZE
+        }
+
+        val downloaded = AtomicLong(done.sumOf { minOf(SEGMENT_SIZE, total - it) })
+        val partsMutex = Mutex()
+        val sem = Semaphore(PARALLELISM)
+
+        // Single reporter polls the shared counter so segments stay lock-free.
+        val progressJob = launch(Dispatchers.IO) {
+            var lastBytes = downloaded.get()
+            var lastTime = System.currentTimeMillis()
+            var lastPercent = -1
+            while (isActive) {
+                delay(PROGRESS_INTERVAL_MS)
+                val d = downloaded.get()
+                val now = System.currentTimeMillis()
+                val speed = (d - lastBytes) * 1000 / (now - lastTime).coerceAtLeast(1)
+                val percent = ((d * 100) / total).toInt().coerceIn(0, 100)
+                if (percent != lastPercent) {
+                    downloadRepository.updateProgress(
+                        downloadId, DownloadStatus.DOWNLOADING, percent, d, total, speed
+                    )
+                    lastPercent = percent
+                }
+                lastBytes = d
+                lastTime = now
+            }
+        }
+
+        val results = segments.filter { it.first !in done }.map { (start, end) ->
+            async(Dispatchers.IO) {
+                sem.withPermit {
+                    if (isStopped) return@withPermit false
+                    fetchSegment(url, destFile, start, end) { downloaded.addAndGet(it.toLong()) }
+                    if (isStopped) return@withPermit false
+                    partsMutex.withLock { partsFile.appendText("$start\n") }
+                    true
+                }
+            }
+        }.awaitAll()
+
+        progressJob.cancel()
+        if (isStopped || results.any { it == false }) return@coroutineScope false
+
+        runCatching { partsFile.delete() }
+        downloadRepository.updateProgress(
+            downloadId, DownloadStatus.DOWNLOADING, 100, total, total, 0
+        )
+        true
+    }
+
+    /** Downloads one byte range into [destFile] at its offset. Requires a 206. */
+    private fun fetchSegment(
+        url: String,
+        destFile: File,
+        start: Long,
+        end: Long,
+        onBytes: (Int) -> Unit
+    ) {
+        val builder = Request.Builder()
+            .url(url)
+            .header("User-Agent", BROWSER_UA)
+            .header("Range", "bytes=$start-$end")
+        if (isTikTokCdn(url)) builder.header("Referer", "https://www.tiktok.com/")
+
+        okHttpClient.newCall(builder.build()).execute().use { resp ->
+            // Parallel writes require partial content; a 200 would overwrite the file.
+            if (resp.code != 206) throw IllegalStateException("HTTP ${resp.code}")
+            val body = resp.body ?: throw IllegalStateException("Empty body")
+            RandomAccessFile(destFile, "rw").use { raf ->
+                raf.seek(start)
+                val buffer = ByteArray(BUFFER_SIZE)
+                body.byteStream().use { input ->
+                    while (true) {
+                        if (isStopped) return
+                        val read = input.read(buffer)
+                        if (read == -1) break
+                        raf.write(buffer, 0, read)
+                        onBytes(read)
+                    }
+                }
             }
         }
     }
@@ -229,10 +389,10 @@ class DownloadWorker @AssistedInject constructor(
         val videoTmp = File(destFile.parentFile, destFile.name + ".video.part")
         val audioTmp = File(destFile.parentFile, destFile.name + ".audio.part")
 
-        if (!downloadFile(videoUrl, videoTmp, downloadId, title, notificationId)) {
+        if (!downloadSmart(videoUrl, videoTmp, downloadId, title)) {
             return@withContext false
         }
-        if (!downloadFile(audioUrl, audioTmp, downloadId, title, notificationId)) {
+        if (!downloadSmart(audioUrl, audioTmp, downloadId, title)) {
             return@withContext false
         }
 
@@ -288,9 +448,16 @@ class DownloadWorker @AssistedInject constructor(
         const val KEY_DOWNLOAD_ID = "download_id"
         private const val BUFFER_SIZE = 64 * 1024
 
-        /** Per-request Range size. Chunking keeps each request near full speed and
-         *  sidesteps YouTube's single-connection throttling. */
+        /** Per-request Range size for the sequential fallback path. */
         private const val CHUNK_SIZE = 8L * 1024 * 1024
+
+        // Parallel download tuning: several connections defeat YouTube's
+        // per-connection throttle, so the whole file arrives much faster.
+        private const val SEGMENT_SIZE = 4L * 1024 * 1024
+        private const val PARALLELISM = 6
+        private const val MIN_PARALLEL_SIZE = 2L * 1024 * 1024
+        private const val PARTS_SUFFIX = ".parts"
+
         private const val PROGRESS_INTERVAL_MS = 500L
         private const val MAX_ATTEMPTS = 3
         private const val BROWSER_UA =
