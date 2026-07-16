@@ -111,7 +111,6 @@ class MainActivity : AppCompatActivity() {
             viewMode = LibraryViewMode.GRID,
             onClick = ::onVideoClick,
             onLongClick = { viewModel.enterSelection(it.id) },
-            onFavorite = { viewModel.toggleFavorite(it) },
             onMenu = ::showVideoMenu
         )
         binding.recyclerView.adapter = adapter
@@ -266,29 +265,16 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    /** Preset category labels offered in the "Set category" dialog. */
-    private val presetCategoryRes = listOf(
-        R.string.category_general,
-        R.string.category_education,
-        R.string.category_entertainment,
-        R.string.category_music,
-        R.string.category_sports,
-        R.string.category_news,
-        R.string.category_cooking,
-        R.string.category_tech,
-        R.string.category_religion,
-        R.string.category_kids
-    )
-
     private fun promptSetCategory(video: VideoEntity) {
-        val presets = presetCategoryRes.map { getString(it) }
-        val labels = presets + getString(R.string.category_none) + getString(R.string.set_category)
+        // Offer the same categories shown in "Manage categories", so the two match.
+        val existing = viewModel.uiState.value.categories
+        val labels = existing + getString(R.string.category_none) + getString(R.string.add_category)
         AlertDialog.Builder(this)
             .setTitle(R.string.set_category)
             .setItems(labels.toTypedArray()) { _, which ->
                 when {
-                    which < presets.size -> viewModel.setCategory(video.id, presets[which])
-                    which == presets.size -> viewModel.setCategory(video.id, null)
+                    which < existing.size -> viewModel.setCategory(video.id, existing[which])
+                    which == existing.size -> viewModel.setCategory(video.id, null)
                     else -> promptCustomCategory(video)
                 }
             }
@@ -400,18 +386,23 @@ class MainActivity : AppCompatActivity() {
     private fun showVideoMenu(video: VideoEntity, anchor: android.view.View) {
         val popup = android.widget.PopupMenu(this, anchor)
         popup.menu.add(0, 1, 0, getString(R.string.play))
-        // Saved links can be downloaded to a local file on demand.
-        if (video.isLinkOnly) popup.menu.add(0, 7, 1, getString(R.string.download))
-        popup.menu.add(0, 2, 2, getString(R.string.action_share))
+        // Favorite lives here now (the per-row heart was removed to save space).
         popup.menu.add(
-            0, 3, 3,
+            0, 9, 1,
+            getString(if (video.isFavorite) R.string.unfavorite else R.string.favorite)
+        )
+        // Saved links can be downloaded to a local file on demand.
+        if (video.isLinkOnly) popup.menu.add(0, 7, 2, getString(R.string.download))
+        popup.menu.add(0, 2, 3, getString(R.string.action_share))
+        popup.menu.add(
+            0, 3, 4,
             getString(if (video.isLocked) R.string.unlock_video else R.string.lock_video)
         )
-        popup.menu.add(0, 4, 4, getString(R.string.set_category))
-        popup.menu.add(0, 5, 5, getString(R.string.rename))
+        popup.menu.add(0, 4, 5, getString(R.string.set_category))
+        popup.menu.add(0, 5, 6, getString(R.string.rename))
         // Open the original TikTok/YouTube page in its app or the browser.
-        if (!video.sourceUrl.isNullOrBlank()) popup.menu.add(0, 8, 6, getString(R.string.open_source))
-        popup.menu.add(0, 6, 7, getString(R.string.delete))
+        if (!video.sourceUrl.isNullOrBlank()) popup.menu.add(0, 8, 7, getString(R.string.open_source))
+        popup.menu.add(0, 6, 8, getString(R.string.delete))
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 1 -> { onVideoClick(video); true }
@@ -421,6 +412,7 @@ class MainActivity : AppCompatActivity() {
                 5 -> { promptRenameVideo(video); true }
                 6 -> { confirmDeleteSingle(video); true }
                 8 -> { openSource(video); true }
+                9 -> { viewModel.toggleFavorite(video); true }
                 7 -> {
                     viewModel.downloadLink(video)
                     android.widget.Toast.makeText(

@@ -22,7 +22,6 @@ class VideoPagingAdapter(
     private var viewMode: LibraryViewMode,
     private val onClick: (VideoEntity) -> Unit,
     private val onLongClick: (VideoEntity) -> Unit,
-    private val onFavorite: (VideoEntity) -> Unit,
     private val onMenu: (VideoEntity, android.view.View) -> Unit
 ) : PagingDataAdapter<VideoEntity, RecyclerView.ViewHolder>(DIFF) {
 
@@ -91,10 +90,7 @@ class VideoPagingAdapter(
             binding.duration.text = Formatters.duration(video.duration)
             binding.size.text = Formatters.fileSize(video.fileSize)
             binding.quality.text = video.quality ?: "—"
-            binding.favoriteButton.setImageResource(
-                if (video.isFavorite) R.drawable.ic_favorite else R.drawable.ic_favorite_border
-            )
-            binding.favoriteButton.setOnClickListener { onFavorite(video) }
+            binding.favoriteIcon.isVisible = video.isFavorite
             binding.lockIcon.isVisible = video.isLocked
             binding.linkBadge.isVisible = video.isLinkOnly
             binding.duration.isVisible = video.duration > 0

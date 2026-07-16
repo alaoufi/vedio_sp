@@ -161,6 +161,8 @@
     <string name="rename">إعادة تسمية</string>
     <string name="more_options">المزيد</string>
     <string name="open_source">فتح من المصدر</string>
+    <string name="favorite">إضافة إلى المفضلة</string>
+    <string name="unfavorite">إزالة من المفضلة</string>
     <string name="lock_video">قفل</string>
     <string name="unlock_video">فتح القفل</string>
     <string name="video_locked">هذا الفيديو مقفل</string>

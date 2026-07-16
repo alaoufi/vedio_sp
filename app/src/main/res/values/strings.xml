@@ -161,6 +161,8 @@
     <string name="rename">Rename</string>
     <string name="more_options">More options</string>
     <string name="open_source">Open in source</string>
+    <string name="favorite">Add to favorites</string>
+    <string name="unfavorite">Remove from favorites</string>
     <string name="lock_video">Lock</string>
     <string name="unlock_video">Unlock</string>
     <string name="video_locked">This video is locked</string>
