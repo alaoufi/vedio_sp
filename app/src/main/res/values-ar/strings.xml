@@ -192,6 +192,10 @@
     <string name="category_tech">تقنية</string>
     <string name="category_religion">دين</string>
     <string name="category_kids">أطفال</string>
+    <string name="manage_categories">إدارة التصنيفات</string>
+    <string name="no_categories">لا توجد تصنيفات بعد. عيّن تصنيفًا على فيديو أولًا.</string>
+    <string name="reorder">إعادة الترتيب</string>
+    <string name="delete_category_message">حذف التصنيف \"%1$s\"؟ تبقى الفيديوهات لكن تصبح بدون تصنيف.</string>
 
     <!-- Content descriptions -->
     <string name="cd_thumbnail">مصغّرة الفيديو</string>

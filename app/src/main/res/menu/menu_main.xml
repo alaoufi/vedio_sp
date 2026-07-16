@@ -45,6 +45,12 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/action_manage_categories"
+        android:icon="@drawable/ic_filter_list"
+        android:title="@string/manage_categories"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_new_folder"
         android:icon="@drawable/ic_create_new_folder"
         android:title="@string/action_new_folder"

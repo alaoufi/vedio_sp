@@ -60,7 +60,11 @@ data class SettingsEntity(
 
     // ---- Maintenance ----
     @ColumnInfo(name = "auto_cleanup_enabled")
-    val autoCleanupEnabled: Boolean = false
+    val autoCleanupEnabled: Boolean = false,
+
+    /** User-defined category display order, newline-separated names. */
+    @ColumnInfo(name = "category_order")
+    val categoryOrder: String? = null
 ) {
     companion object {
         const val SINGLETON_ID = 1

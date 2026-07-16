@@ -91,7 +91,8 @@ class LibraryViewModel @Inject constructor(
         videoRepository.observeTotalSize(),
         videoRepository.observeCategories()
     ) { settings, folders, count, size, categories ->
-        LibraryMeta(settings, folders, count, size, categories)
+        val ordered = com.myvideolibrary.app.util.CategoryOrder.apply(categories, settings.categoryOrder)
+        LibraryMeta(settings, folders, count, size, ordered)
     }
 
     // Active filter selections.

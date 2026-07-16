@@ -79,6 +79,12 @@ interface VideoDao {
     @Query("UPDATE videos SET category = :category WHERE id IN (:ids)")
     suspend fun setCategory(ids: List<Long>, category: String?)
 
+    @Query("UPDATE videos SET category = :newName WHERE category = :oldName")
+    suspend fun renameCategory(oldName: String, newName: String)
+
+    @Query("UPDATE videos SET category = NULL WHERE category = :name")
+    suspend fun clearCategory(name: String)
+
     /** Distinct non-empty category labels currently in use, alphabetised. */
     @Query(
         "SELECT DISTINCT category FROM videos " +

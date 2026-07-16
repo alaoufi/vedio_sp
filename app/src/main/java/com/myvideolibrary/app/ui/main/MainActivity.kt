@@ -547,6 +547,10 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.action_new_folder -> { promptNewFolder(); true }
+            R.id.action_manage_categories -> {
+                startActivity(com.myvideolibrary.app.ui.categories.CategoriesActivity.intent(this))
+                true
+            }
             R.id.action_protected -> { toggleProtected(); true }
             R.id.action_downloads -> {
                 startActivity(Intent(this, DownloadsActivity::class.java))

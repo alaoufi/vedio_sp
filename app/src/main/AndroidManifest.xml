@@ -85,6 +85,11 @@
             android:exported="false"
             android:parentActivityName=".ui.main.MainActivity" />
 
+        <activity
+            android:name=".ui.categories.CategoriesActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.main.MainActivity" />
+
         <!-- Player: supports PiP, rotation, and keeps screen on. -->
         <activity
             android:name=".ui.player.PlayerActivity"
