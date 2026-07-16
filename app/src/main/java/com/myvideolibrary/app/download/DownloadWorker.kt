@@ -454,7 +454,7 @@ class DownloadWorker @AssistedInject constructor(
         // Parallel download tuning: several connections defeat YouTube's
         // per-connection throttle, so the whole file arrives much faster.
         private const val SEGMENT_SIZE = 4L * 1024 * 1024
-        private const val PARALLELISM = 6
+        private const val PARALLELISM = 8
         private const val MIN_PARALLEL_SIZE = 2L * 1024 * 1024
         private const val PARTS_SUFFIX = ".parts"
 

@@ -62,22 +62,14 @@ class YouTubeProvider @Inject constructor(
                 .filter { !it.content.isNullOrBlank() && it.format == MediaFormat.M4A }
                 .maxByOrNull { it.averageBitrate }
 
+            val muxedRes = bestMuxed?.let { resolutionValue(it.getResolution()) } ?: 0
+            val hiRes = bestVideoOnly?.let { resolutionValue(it.getResolution()) } ?: 0
+
             val resolved = when {
-                // Prefer the single-file muxed stream: no on-device merge, smaller,
-                // and it downloads fast with the parallel/segmented downloader.
-                bestMuxed != null ->
-                    ResolvedVideo(
-                        source = VideoSource.YOUTUBE,
-                        sourceUrl = url,
-                        title = info.name ?: "YouTube video",
-                        directUrl = bestMuxed.content,
-                        thumbnailUrl = info.thumbnails.lastOrNull()?.url,
-                        author = info.uploaderName,
-                        durationMs = info.duration * 1000,
-                        quality = bestMuxed.getResolution()
-                    )
-                // No muxed stream: fall back to merging best video-only + audio.
-                bestVideoOnly != null && bestAudio != null ->
+                // Quality first: prefer the highest-resolution video-only (up to
+                // 1080p H.264) + audio and merge them. Parallel download keeps this
+                // fast, so we no longer trade quality for speed.
+                bestVideoOnly != null && bestAudio != null && hiRes >= muxedRes ->
                     ResolvedVideo(
                         source = VideoSource.YOUTUBE,
                         sourceUrl = url,
@@ -88,6 +80,18 @@ class YouTubeProvider @Inject constructor(
                         author = info.uploaderName,
                         durationMs = info.duration * 1000,
                         quality = bestVideoOnly.getResolution()
+                    )
+                // Otherwise the best single-file muxed stream.
+                bestMuxed != null ->
+                    ResolvedVideo(
+                        source = VideoSource.YOUTUBE,
+                        sourceUrl = url,
+                        title = info.name ?: "YouTube video",
+                        directUrl = bestMuxed.content,
+                        thumbnailUrl = info.thumbnails.lastOrNull()?.url,
+                        author = info.uploaderName,
+                        durationMs = info.duration * 1000,
+                        quality = bestMuxed.getResolution()
                     )
                 else -> throw ProviderException(
                     ProviderErrorType.EXTRACTION_FAILED,
