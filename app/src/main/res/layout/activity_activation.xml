@@ -109,5 +109,15 @@
             android:text="@string/activation_owner_recovery"
             android:textColor="?android:attr/textColorSecondary"
             android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/versionText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="11sp"
+            android:alpha="0.7"
+            tools:text="v1.0.44 · UNI2/UNI3" />
     </LinearLayout>
 </ScrollView>

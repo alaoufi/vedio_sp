@@ -33,6 +33,14 @@ class ActivationActivity : AppCompatActivity() {
 
         binding.deviceId.text = licenseManager.deviceIdPretty()
 
+        // Diagnostics line: which build + which activation schemes it accepts.
+        val version = try {
+            packageManager.getPackageInfo(packageName, 0).versionName
+        } catch (e: Exception) {
+            "?"
+        }
+        binding.versionText.text = "v$version · ${licenseManager.acceptedSchemes()}"
+
         binding.copyButton.setOnClickListener {
             val clip = ContextCompat.getSystemService(this, ClipboardManager::class.java)
             clip?.setPrimaryClip(ClipData.newPlainText("device", licenseManager.deviceId()))

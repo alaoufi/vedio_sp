@@ -109,8 +109,8 @@ class LicenseManager @Inject constructor(
         return try {
             val seed = ByteArray(32) { h.substring(it * 2, it * 2 + 2).toInt(16).toByte() }
             val pub = Ed25519PrivateKeyParameters(seed, 0).generatePublicKey().encoded
-            val ours = Base64.decode(PUBLIC_KEY_B64, Base64.DEFAULT)
-            if (pub.contentEquals(ours)) {
+            val matches = SCHEMES.any { pub.contentEquals(Base64.decode(it.keyB64, Base64.DEFAULT)) }
+            if (matches) {
                 writeRecord(Record(0, System.currentTimeMillis(), System.currentTimeMillis()))
                 true
             } else false
@@ -131,25 +131,35 @@ class LicenseManager @Inject constructor(
         if (pkt.size != 66) return null
         val days = ((pkt[0].toInt() and 0xFF) shl 8) or (pkt[1].toInt() and 0xFF)
         val sig = pkt.copyOfRange(2, 66)
-        val msg = "$PREFIX|${deviceId()}|$days".toByteArray(Charsets.UTF_8)
-        return try {
-            val pub = Ed25519PublicKeyParameters(Base64.decode(PUBLIC_KEY_B64, Base64.DEFAULT), 0)
-            val signer = Ed25519Signer().apply {
-                init(false, pub)
-                update(msg, 0, msg.size)
+        val device = deviceId()
+        // Accept a code from any supported scheme (prefix + key pair).
+        for (scheme in SCHEMES) {
+            val msg = "${scheme.prefix}|$device|$days".toByteArray(Charsets.UTF_8)
+            val ok = try {
+                val pub = Ed25519PublicKeyParameters(Base64.decode(scheme.keyB64, Base64.DEFAULT), 0)
+                Ed25519Signer().apply {
+                    init(false, pub)
+                    update(msg, 0, msg.size)
+                }.verifySignature(sig)
+            } catch (e: Exception) {
+                false
             }
-            if (signer.verifySignature(sig)) days else null
-        } catch (e: Exception) {
-            null
+            if (ok) return days
         }
+        return null
     }
 
     private fun protectionDisabled(): Boolean =
-        PUBLIC_KEY_B64.isBlank() || PUBLIC_KEY_B64.startsWith("REPLACE_")
+        SCHEMES.isEmpty() || SCHEMES[0].keyB64.startsWith("REPLACE_")
 
     // ---- Licence record persistence ----
 
     private data class Record(val days: Int, val activatedAt: Long, val lastSeen: Long)
+
+    private data class Scheme(val prefix: String, val keyB64: String)
+
+    /** Prefixes of accepted schemes (e.g. "UNI2/UNI3"), for a diagnostics label. */
+    fun acceptedSchemes(): String = SCHEMES.joinToString("/") { it.prefix }
 
     private fun readRecord(): Record? {
         val json = prefs.getString(KEY_LICENSE, null) ?: return null
@@ -212,13 +222,15 @@ class LicenseManager @Inject constructor(
 
     companion object {
         /**
-         * Unified public key (Base64) + prefix for the shared UNI2 generator, so
-         * codes from that one generator activate this app too. Verified end-to-end
-         * against the generator's real seed. Verification uses the public key
-         * only; the secret seed never ships in the app.
+         * Accepted schemes (prefix + public key). UNI2 is the active unified
+         * generator (verified end-to-end against its real seed); UNI3 is kept for
+         * forward/backward compatibility. A code from any scheme activates the
+         * app. Verification uses public keys only; no secret ever ships.
          */
-        const val PUBLIC_KEY_B64 = "4gIH/wo/1T9Dq1yGXCED8ZpRk/QefaMq8qQFqKPKHmQ="
-        private const val PREFIX = "UNI2"
+        private val SCHEMES = listOf(
+            Scheme("UNI2", "4gIH/wo/1T9Dq1yGXCED8ZpRk/QefaMq8qQFqKPKHmQ="),
+            Scheme("UNI3", "W5Kc9hRB7lb9xSh/VqdR4T8GT6VaDznEwYQgXZpLZz0=")
+        )
         private const val B32 = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
         private const val DAY_MS = 86_400_000L
         private const val KEY_DEVICE = "device_id"
