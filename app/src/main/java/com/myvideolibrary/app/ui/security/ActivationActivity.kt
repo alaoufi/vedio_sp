@@ -1,0 +1,93 @@
+package com.myvideolibrary.app.ui.security
+
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Intent
+import android.os.Bundle
+import android.widget.EditText
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.myvideolibrary.app.R
+import com.myvideolibrary.app.databinding.ActivityActivationBinding
+import com.myvideolibrary.app.security.LicenseManager
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+
+/**
+ * Offline activation gate. Shows the device number and accepts a signed code
+ * (or the owner's secret seed). Blocks the app until activated.
+ */
+@AndroidEntryPoint
+class ActivationActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityActivationBinding
+
+    @Inject lateinit var licenseManager: LicenseManager
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityActivationBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        binding.deviceId.text = licenseManager.deviceIdPretty()
+
+        binding.copyButton.setOnClickListener {
+            val clip = ContextCompat.getSystemService(this, ClipboardManager::class.java)
+            clip?.setPrimaryClip(ClipData.newPlainText("device", licenseManager.deviceId()))
+            showMessage(getString(R.string.activation_copied), success = true)
+        }
+
+        binding.activateButton.setOnClickListener { attemptActivation() }
+        binding.ownerRecovery.setOnClickListener { promptOwnerRecovery() }
+    }
+
+    private fun attemptActivation() {
+        val code = binding.codeInput.text?.toString().orEmpty()
+        if (licenseManager.tryActivate(code)) {
+            proceed()
+        } else {
+            showMessage(getString(R.string.activation_invalid), success = false)
+        }
+    }
+
+    private fun promptOwnerRecovery() {
+        val input = EditText(this).apply {
+            hint = getString(R.string.activation_seed_hint)
+        }
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.activation_owner_recovery)
+            .setView(input)
+            .setPositiveButton(R.string.activation_activate) { _, _ ->
+                if (licenseManager.recoverWithSeed(input.text.toString())) {
+                    proceed()
+                } else {
+                    showMessage(getString(R.string.activation_seed_invalid), success = false)
+                }
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun showMessage(text: String, success: Boolean) {
+        binding.messageText.isVisible = true
+        binding.messageText.text = text
+        binding.messageText.setTextColor(
+            ContextCompat.getColor(
+                this,
+                if (success) android.R.color.holo_green_dark else android.R.color.holo_red_dark
+            )
+        )
+    }
+
+    private fun proceed() {
+        startActivity(Intent(this, LockActivity::class.java))
+        finish()
+    }
+
+    override fun onBackPressed() {
+        // The gate can't be dismissed; leaving the app is the only exit.
+        finishAffinity()
+    }
+}

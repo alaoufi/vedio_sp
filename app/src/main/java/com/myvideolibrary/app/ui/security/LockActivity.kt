@@ -26,10 +26,18 @@ class LockActivity : AppCompatActivity() {
 
     @Inject lateinit var securityManager: SecurityManager
     @Inject lateinit var appLockManager: AppLockManager
+    @Inject lateinit var licenseManager: com.myvideolibrary.app.security.LicenseManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applySecureFlags()
+
+        // License gate first: an unactivated app must be activated before anything.
+        if (licenseManager.needsActivation()) {
+            startActivity(Intent(this, ActivationActivity::class.java))
+            finish()
+            return
+        }
 
         if (!appLockManager.shouldLock()) {
             proceed()

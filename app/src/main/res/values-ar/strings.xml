@@ -177,6 +177,24 @@
     <string name="lock_video">خاص</string>
     <string name="unlock_video">خاص</string>
 
+    <!-- Activation -->
+    <string name="activation_title">تفعيل التطبيق</string>
+    <string name="activation_desc">أرسل «رقم الجهاز» للمطوّر لتصلك رمز التفعيل. يعمل بدون إنترنت.</string>
+    <string name="activation_device_id">رقم الجهاز</string>
+    <string name="activation_copy_device">نسخ رقم الجهاز</string>
+    <string name="activation_copied">تم النسخ ✓</string>
+    <string name="activation_code_hint">أدخل رمز التفعيل</string>
+    <string name="activation_activate">تفعيل</string>
+    <string name="activation_invalid">رمز غير صالح لهذا الجهاز.</string>
+    <string name="activation_owner_recovery">استرجاع المالك (البذرة السرّية)</string>
+    <string name="activation_seed_hint">بذرة المالك (٦٤ hex)</string>
+    <string name="activation_seed_invalid">البذرة غير مطابقة.</string>
+    <string name="activation_activated">تم التفعيل ✅</string>
+    <string name="activation_status">الترخيص</string>
+    <string name="activation_status_permanent">مفعّل (دائم)</string>
+    <string name="activation_status_days">مفعّل · متبقٍّ %1$d يوم</string>
+    <string name="activation_deactivate">إلغاء التفعيل (إعادة القفل)</string>
+
     <!-- File info -->
     <string name="file_info">معلومات الملف</string>
     <string name="info_format">الصيغة: %1$s</string>

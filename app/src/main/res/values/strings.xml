@@ -177,6 +177,24 @@
     <string name="lock_video">Private</string>
     <string name="unlock_video">Private</string>
 
+    <!-- Activation -->
+    <string name="activation_title">Activate the app</string>
+    <string name="activation_desc">Send your device number to the developer to receive an activation code. Works offline.</string>
+    <string name="activation_device_id">Device number</string>
+    <string name="activation_copy_device">Copy device number</string>
+    <string name="activation_copied">Copied ✓</string>
+    <string name="activation_code_hint">Enter activation code</string>
+    <string name="activation_activate">Activate</string>
+    <string name="activation_invalid">Invalid code for this device.</string>
+    <string name="activation_owner_recovery">Owner recovery (secret seed)</string>
+    <string name="activation_seed_hint">Owner seed (64 hex)</string>
+    <string name="activation_seed_invalid">Seed does not match.</string>
+    <string name="activation_activated">Activated ✅</string>
+    <string name="activation_status">License</string>
+    <string name="activation_status_permanent">Activated (permanent)</string>
+    <string name="activation_status_days">Activated · %1$d days left</string>
+    <string name="activation_deactivate">Deactivate (re-lock)</string>
+
     <!-- File info -->
     <string name="file_info">File info</string>
     <string name="info_format">Format: %1$s</string>

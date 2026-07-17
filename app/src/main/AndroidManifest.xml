@@ -45,6 +45,12 @@
             </intent-filter>
         </activity>
 
+        <!-- Offline license activation gate. -->
+        <activity
+            android:name=".ui.security.ActivationActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyVideoLibrary" />
+
         <activity
             android:name=".ui.main.MainActivity"
             android:exported="false"

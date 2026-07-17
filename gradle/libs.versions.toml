@@ -28,6 +28,7 @@ biometric = "1.1.0"
 swiperefresh = "1.1.0"
 preference = "1.2.1"
 newpipe = "v0.26.3"
+bouncycastle = "1.78.1"
 junit = "4.13.2"
 androidxJunit = "1.2.1"
 espresso = "3.6.1"
@@ -101,6 +102,9 @@ androidx-biometric = { group = "androidx.biometric", name = "biometric", version
 
 # NewPipeExtractor (YouTube provider, community maintained)
 newpipe-extractor = { group = "com.github.TeamNewPipe", name = "NewPipeExtractor", version.ref = "newpipe" }
+
+# BouncyCastle — Ed25519 verification for offline license activation
+bouncycastle = { group = "org.bouncycastle", name = "bcprov-jdk18on", version.ref = "bouncycastle" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
