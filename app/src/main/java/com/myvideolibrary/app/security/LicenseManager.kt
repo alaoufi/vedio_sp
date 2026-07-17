@@ -193,11 +193,12 @@ class LicenseManager @Inject constructor(
 
     companion object {
         /**
-         * Public key (Base64). Replace with your own from `node keygen.mjs new`.
-         * To share one licence across your apps ("universal"), use the SAME key
-         * and prefix in each app.
+         * Public key (Base64). This is the shared "حلالي" key with the UNIV1
+         * prefix, so the same generator seed and owner code activate this app too
+         * — one universal licence across the apps. Verification uses the public
+         * key only; the secret seed never ships in the app.
          */
-        const val PUBLIC_KEY_B64 = "7FjmkPiGy9/FUXc5nOnfGlrakC8qa68/zBDIp5fv5js="
+        const val PUBLIC_KEY_B64 = "ucd/BzIBLoU2ol9GVwYeEjoTb7SsbfOgPtNwYls0rI0="
         private const val PREFIX = "UNIV1"
         private const val B32 = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
         private const val DAY_MS = 86_400_000L
