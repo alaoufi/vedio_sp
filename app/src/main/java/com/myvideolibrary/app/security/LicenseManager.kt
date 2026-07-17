@@ -212,13 +212,13 @@ class LicenseManager @Inject constructor(
 
     companion object {
         /**
-         * Unified public key (Base64) + prefix for the shared UNI3 generator, so
-         * codes from that one generator activate this app too. Verified against
-         * the scheme's official test vector. Verification uses the public key
+         * Unified public key (Base64) + prefix for the shared UNI2 generator, so
+         * codes from that one generator activate this app too. Verified end-to-end
+         * against the generator's real seed. Verification uses the public key
          * only; the secret seed never ships in the app.
          */
-        const val PUBLIC_KEY_B64 = "W5Kc9hRB7lb9xSh/VqdR4T8GT6VaDznEwYQgXZpLZz0="
-        private const val PREFIX = "UNI3"
+        const val PUBLIC_KEY_B64 = "4gIH/wo/1T9Dq1yGXCED8ZpRk/QefaMq8qQFqKPKHmQ="
+        private const val PREFIX = "UNI2"
         private const val B32 = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
         private const val DAY_MS = 86_400_000L
         private const val KEY_DEVICE = "device_id"
