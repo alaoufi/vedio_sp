@@ -12,19 +12,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:resize_mode="fit"
+        app:show_buffering="when_playing"
         app:show_subtitle_button="true"
+        app:artwork_display_mode="off"
         app:use_controller="true" />
-
-    <!-- Cover art shown for audio-only tracks (no video frame to display). -->
-    <ImageView
-        android:id="@+id/audioArtwork"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:scaleType="centerCrop"
-        android:visibility="gone"
-        android:contentDescription="@string/type_audio"
-        tools:visibility="visible" />
 
     <!-- Custom top bar. Hidden while controls are locked. -->
     <LinearLayout

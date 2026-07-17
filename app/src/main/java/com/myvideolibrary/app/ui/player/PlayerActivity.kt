@@ -129,20 +129,50 @@ class PlayerActivity : AppCompatActivity() {
      * plays like real audio. The resize toggle is meaningless for audio.
      */
     private fun showArtworkIfAudio(isAudio: Boolean, artwork: String?) {
-        binding.audioArtwork.isVisible = isAudio
         binding.resizeButton.isVisible = !isAudio
-        if (isAudio && !artwork.isNullOrBlank()) {
+        // Use the PlayerView's own artwork slot (not an overlay) so the play/pause
+        // controller and seek bar stay visible on top of the cover for audio.
+        binding.playerView.artworkDisplayMode = if (isAudio) {
+            androidx.media3.ui.PlayerView.ARTWORK_DISPLAY_MODE_FIT
+        } else {
+            androidx.media3.ui.PlayerView.ARTWORK_DISPLAY_MODE_OFF
+        }
+        if (!isAudio) {
+            binding.playerView.defaultArtwork = null
+            return
+        }
+        binding.playerView.defaultArtwork =
+            androidx.core.content.ContextCompat.getDrawable(this, R.drawable.ic_headphones)
+        if (!artwork.isNullOrBlank()) {
             com.bumptech.glide.Glide.with(this)
                 .load(artwork)
                 .placeholder(R.drawable.ic_headphones)
                 .error(R.drawable.ic_headphones)
-                .into(binding.audioArtwork)
+                .into(object : com.bumptech.glide.request.target.CustomTarget<android.graphics.drawable.Drawable>() {
+                    override fun onResourceReady(
+                        resource: android.graphics.drawable.Drawable,
+                        transition: com.bumptech.glide.request.transition.Transition<in android.graphics.drawable.Drawable>?
+                    ) {
+                        binding.playerView.defaultArtwork = resource
+                    }
+                    override fun onLoadCleared(placeholder: android.graphics.drawable.Drawable?) {}
+                })
         }
     }
 
     private fun preparePlayer(source: String, resumeMs: Long) {
         if (player != null) return
-        val exo = ExoPlayer.Builder(this).build()
+        // Start playback as soon as ~0.5s is buffered instead of ExoPlayer's
+        // default 2.5s, so a tapped clip starts almost immediately.
+        val loadControl = androidx.media3.exoplayer.DefaultLoadControl.Builder()
+            .setBufferDurationsMs(
+                androidx.media3.exoplayer.DefaultLoadControl.DEFAULT_MIN_BUFFER_MS,
+                androidx.media3.exoplayer.DefaultLoadControl.DEFAULT_MAX_BUFFER_MS,
+                500,
+                1000
+            )
+            .build()
+        val exo = ExoPlayer.Builder(this).setLoadControl(loadControl).build()
         binding.playerView.player = exo
 
         val uri = when {
@@ -157,6 +187,10 @@ class PlayerActivity : AppCompatActivity() {
         exo.prepare()
 
         exo.addListener(object : Player.Listener {
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                // Show the spinner while buffering so it's clear playback is loading.
+                binding.loadingBar.isVisible = playbackState == Player.STATE_BUFFERING
+            }
             override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
                 binding.errorText.isVisible = true
                 binding.errorText.text = getString(R.string.playback_error)
@@ -298,6 +332,13 @@ class PlayerActivity : AppCompatActivity() {
         super.onStop()
         window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         savePosition()
+        // Closing the PiP window (its X) finishes the activity — release the player
+        // so audio actually stops, even when background playback is enabled.
+        if (isFinishing) {
+            player?.release()
+            player = null
+            return
+        }
         val inPip = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode
         if (!backgroundPlayback && !inPip) {
             player?.pause()
