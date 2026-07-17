@@ -14,6 +14,8 @@
     <string name="type_image">Image</string>
     <string name="source_tiktok">TikTok</string>
     <string name="source_youtube">YouTube</string>
+    <string name="source_instagram">Instagram</string>
+    <string name="source_snapchat">Snapchat</string>
     <string name="source_other">Other</string>
     <string name="search_hint">Search videos</string>
     <string name="empty_library_title">Your library is empty</string>
@@ -92,7 +94,7 @@
     <string name="action_search">Search</string>
     <string name="tiktok_link_hint">TikTok has no keyword search — paste a TikTok link, then press Search to download it.</string>
     <string name="add_download_title">Download from link</string>
-    <string name="add_download_hint">Paste a TikTok or YouTube link. TikTok videos are saved without watermark. Extraction depends on the platform and may occasionally fail.</string>
+    <string name="add_download_hint">Paste a TikTok, YouTube, Instagram or Snapchat link. TikTok videos are saved without watermark. Instagram and Snapchat work only for public posts. Extraction depends on the platform and may occasionally fail.</string>
     <string name="paste_url_hint">Video URL</string>
     <string name="paste">Paste</string>
     <string name="fetch_info">Fetch info</string>

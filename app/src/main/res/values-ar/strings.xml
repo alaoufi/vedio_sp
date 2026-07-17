@@ -14,6 +14,8 @@
     <string name="type_image">صورة</string>
     <string name="source_tiktok">تيك توك</string>
     <string name="source_youtube">يوتيوب</string>
+    <string name="source_instagram">انستقرام</string>
+    <string name="source_snapchat">سناب شات</string>
     <string name="source_other">أخرى</string>
     <string name="search_hint">ابحث عن فيديو</string>
     <string name="empty_library_title">مكتبتك فارغة</string>
@@ -92,7 +94,7 @@
     <string name="action_search">بحث</string>
     <string name="tiktok_link_hint">تيك توك لا يدعم البحث بالكلمات — الصق رابط تيك توك ثم اضغط بحث لتحميله.</string>
     <string name="add_download_title">تحميل من رابط</string>
-    <string name="add_download_hint">الصق رابط تيك توك أو يوتيوب. فيديوهات تيك توك تُحفظ بدون علامة مائية. الاستخراج يعتمد على المنصّة وقد يفشل أحيانًا.</string>
+    <string name="add_download_hint">الصق رابط تيك توك أو يوتيوب أو انستقرام أو سناب شات. فيديوهات تيك توك تُحفظ بدون علامة مائية. انستقرام وسناب شات يعملان فقط للمنشورات العامة. الاستخراج يعتمد على المنصّة وقد يفشل أحيانًا.</string>
     <string name="paste_url_hint">رابط الفيديو</string>
     <string name="paste">لصق</string>
     <string name="fetch_info">جلب المعلومات</string>

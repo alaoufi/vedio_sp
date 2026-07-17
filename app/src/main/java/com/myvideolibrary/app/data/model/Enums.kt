@@ -8,6 +8,8 @@ enum class VideoSource(val id: String) {
     LOCAL_IMPORT("local_import"),
     TIKTOK("tiktok"),
     YOUTUBE("youtube"),
+    INSTAGRAM("instagram"),
+    SNAPCHAT("snapchat"),
     OTHER("other");
 
     companion object {
