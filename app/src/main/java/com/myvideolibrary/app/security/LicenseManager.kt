@@ -193,13 +193,13 @@ class LicenseManager @Inject constructor(
 
     companion object {
         /**
-         * Public key (Base64). This is the shared "حلالي" key with the UNIV1
-         * prefix, so the same generator seed and owner code activate this app too
-         * — one universal licence across the apps. Verification uses the public
-         * key only; the secret seed never ships in the app.
+         * Unified public key (Base64) + prefix for the shared UNI3 generator, so
+         * codes from that one generator activate this app too. Verified against
+         * the scheme's official test vector. Verification uses the public key
+         * only; the secret seed never ships in the app.
          */
-        const val PUBLIC_KEY_B64 = "ucd/BzIBLoU2ol9GVwYeEjoTb7SsbfOgPtNwYls0rI0="
-        private const val PREFIX = "UNIV1"
+        const val PUBLIC_KEY_B64 = "W5Kc9hRB7lb9xSh/VqdR4T8GT6VaDznEwYQgXZpLZz0="
+        private const val PREFIX = "UNI3"
         private const val B32 = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
         private const val DAY_MS = 86_400_000L
         private const val KEY_DEVICE = "device_id"
