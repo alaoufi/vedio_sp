@@ -35,13 +35,32 @@ class LicenseManager @Inject constructor(
 
     // ---- Public API ----
 
-    /** Stable per-install device number shown on the activation screen. */
+    /**
+     * Device number shown on the activation screen. Derived from the stable
+     * Android ID so it stays the SAME across reinstalls — a code generated once
+     * keeps working — falling back to a random value only if that's unavailable.
+     */
     fun deviceId(): String {
         prefs.getString(KEY_DEVICE, null)?.takeIf { it.length >= 16 }?.let { return it }
-        val raw = ByteArray(10).also { SecureRandom().nextBytes(it) }
+        val raw = hardwareRaw() ?: ByteArray(10).also { SecureRandom().nextBytes(it) }
         val id = base32Encode(raw)
         prefs.edit().putString(KEY_DEVICE, id).apply()
         return id
+    }
+
+    /** 10 bytes from SHA-256("app:" + Android ID); stable across reinstalls. */
+    private fun hardwareRaw(): ByteArray? {
+        val androidId = try {
+            android.provider.Settings.Secure.getString(
+                context.contentResolver, android.provider.Settings.Secure.ANDROID_ID
+            )
+        } catch (e: Exception) {
+            null
+        }
+        if (androidId.isNullOrBlank()) return null
+        return java.security.MessageDigest.getInstance("SHA-256")
+            .digest("app:$androidId".toByteArray(Charsets.UTF_8))
+            .copyOf(10)
     }
 
     /** Device number formatted in groups of four for display. */
