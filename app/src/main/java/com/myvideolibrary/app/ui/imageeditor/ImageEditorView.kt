@@ -97,18 +97,21 @@ class ImageEditorView @JvmOverloads constructor(
         return true
     }
 
-    /** Pixelates the selected region to hide a name/ad; false if no selection. */
+    /**
+     * Fully hides the selected region with a solid fill of its average colour —
+     * no ghost/remnant of the text is left, and it blends with the surroundings.
+     */
     fun applyHide(): Boolean {
         val b = bmp ?: return false
         val r = bitmapSelection() ?: return false
         val w = r.width().toInt()
         val h = r.height().toInt()
-        if (w < 8 || h < 8) return false
+        if (w < 4 || h < 4) return false
         val sub = Bitmap.createBitmap(b, r.left.toInt(), r.top.toInt(), w, h)
-        val blocks = max(1, min(w, h) / 12)
-        val small = Bitmap.createScaledBitmap(sub, max(1, w / blocks), max(1, h / blocks), false)
-        val mosaic = Bitmap.createScaledBitmap(small, w, h, false)
-        Canvas(b).drawBitmap(mosaic, r.left, r.top, null)
+        val onePx = Bitmap.createScaledBitmap(sub, 1, 1, true)
+        val avg = onePx.getPixel(0, 0)
+        val fill = Paint().apply { color = avg; style = Paint.Style.FILL }
+        Canvas(b).drawRect(r, fill)
         selection = null
         invalidate()
         return true

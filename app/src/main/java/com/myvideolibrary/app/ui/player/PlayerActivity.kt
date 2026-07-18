@@ -144,14 +144,15 @@ class PlayerActivity : AppCompatActivity() {
         if (hideEditing) {
             android.widget.Toast.makeText(this, R.string.hide_text_hint, android.widget.Toast.LENGTH_LONG).show()
         } else {
-            // Persist the drawn box (per video) so it returns next time.
-            if (videoId > 0) {
-                val n = binding.hideBox.normalizedRect()
-                if (n != null) {
-                    hideBoxPrefs().edit().putString("v$videoId", n.joinToString(",")).apply()
-                }
-            }
+            saveHideBox()
         }
+    }
+
+    /** Persist the drawn box (per video) so it returns next time. */
+    private fun saveHideBox() {
+        if (videoId <= 0) return
+        val n = binding.hideBox.normalizedRect() ?: return
+        hideBoxPrefs().edit().putString("v$videoId", n.joinToString(",")).apply()
     }
 
     private fun loadHideBox() {
@@ -370,6 +371,7 @@ class PlayerActivity : AppCompatActivity() {
         super.onStop()
         window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         savePosition()
+        saveHideBox()
         // Closing the PiP window (its X) finishes the activity — release the player
         // so audio actually stops, even when background playback is enabled.
         if (isFinishing) {
