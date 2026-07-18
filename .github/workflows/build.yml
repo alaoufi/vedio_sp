@@ -46,9 +46,11 @@ jobs:
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
 
-      - name: Remove the old APK asset (renamed to مكتبة-الفيديو.apk)
+      - name: Remove old APK assets (renamed to vedio_lb.apk)
         if: success()
-        run: gh release delete-asset apk-latest app-debug.apk -y || true
+        run: |
+          gh release delete-asset apk-latest app-debug.apk -y || true
+          gh release delete-asset apk-latest مكتبة-الفيديو.apk -y || true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -60,5 +62,5 @@ jobs:
           name: My Video Library — v1.0.${{ github.run_number }}
           body: |
             Version 1.0.${{ github.run_number }} (debug), rebuilt automatically on each push.
-            Download page: https://github.com/${{ github.repository }}/releases/tag/apk-latest
+            Direct link: https://github.com/${{ github.repository }}/releases/download/apk-latest/vedio_lb.apk
           files: app/build/outputs/apk/debug/*.apk
