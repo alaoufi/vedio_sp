@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">حافظة المقاطع</string>
+    <string name="app_name">مكتبة الفيديو</string>
 
     <!-- Library -->
     <string name="library_stats">%1$d videos · %2$s</string>
