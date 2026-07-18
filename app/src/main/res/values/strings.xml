@@ -272,6 +272,11 @@
     <string name="cd_import">Import videos</string>
     <string name="cd_resize">Resize video</string>
 
+    <!-- Hide floating text on video (playback overlay) -->
+    <string name="hide_text">Cover text</string>
+    <string name="hide_text_hint">Drag to cover the text; drag the corner to resize. Tap the button again to lock. Long-press to remove.</string>
+    <string name="hide_text_cleared">Cover removed</string>
+
     <!-- Player resize modes -->
     <string name="resize_fit">Fit</string>
     <string name="resize_zoom">Zoom (crop)</string>

@@ -47,6 +47,8 @@ class PlayerActivity : AppCompatActivity() {
     private var player: ExoPlayer? = null
     private var controlsLocked = false
     private var backgroundPlayback = false
+    private var videoId = -1L
+    private var hideEditing = false
 
     private val speeds = floatArrayOf(0.5f, 0.75f, 1f, 1.25f, 1.5f, 2f)
     private var speedIndex = 2
@@ -60,10 +62,12 @@ class PlayerActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val videoId = intent.getLongExtra(EXTRA_VIDEO_ID, -1)
+        this.videoId = videoId
         val streamUrl = intent.getStringExtra(EXTRA_STREAM_URL)
 
         setupControls()
         setupGestures()
+        loadHideBox()
 
         when {
             videoId > 0 -> viewModel.loadVideo(videoId)
@@ -121,6 +125,40 @@ class PlayerActivity : AppCompatActivity() {
                 if (backgroundPlayback) R.drawable.ic_headphones_on else R.drawable.ic_headphones
             )
         }
+        binding.hideTextButton.setOnClickListener { toggleHideBox() }
+        binding.hideTextButton.setOnLongClickListener {
+            binding.hideBox.clearBox()
+            hideBoxPrefs().edit().remove("v$videoId").apply()
+            showGestureHint(getString(R.string.hide_text_cleared))
+            true
+        }
+    }
+
+    // ---- Hide-box: cover floating text during playback ----
+
+    private fun hideBoxPrefs() = getSharedPreferences("hidebox", MODE_PRIVATE)
+
+    private fun toggleHideBox() {
+        hideEditing = !hideEditing
+        binding.hideBox.setEditable(hideEditing)
+        if (hideEditing) {
+            android.widget.Toast.makeText(this, R.string.hide_text_hint, android.widget.Toast.LENGTH_LONG).show()
+        } else {
+            // Persist the drawn box (per video) so it returns next time.
+            if (videoId > 0) {
+                val n = binding.hideBox.normalizedRect()
+                if (n != null) {
+                    hideBoxPrefs().edit().putString("v$videoId", n.joinToString(",")).apply()
+                }
+            }
+        }
+    }
+
+    private fun loadHideBox() {
+        if (videoId <= 0) return
+        val saved = hideBoxPrefs().getString("v$videoId", null) ?: return
+        val n = saved.split(",").mapNotNull { it.toFloatOrNull() }
+        if (n.size == 4) binding.hideBox.setNormalizedRect(n.toFloatArray())
     }
 
     /**

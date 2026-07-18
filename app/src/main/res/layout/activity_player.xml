@@ -17,6 +17,12 @@
         app:artwork_display_mode="off"
         app:use_controller="true" />
 
+    <!-- Cover box for hiding floating text on the video (playback only). -->
+    <com.myvideolibrary.app.ui.player.HideBoxView
+        android:id="@+id/hideBox"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <!-- Custom top bar. Hidden while controls are locked. -->
     <LinearLayout
         android:id="@+id/controlsGroup"
@@ -91,6 +97,14 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_screen_rotation"
             android:contentDescription="@string/cd_rotate" />
+
+        <ImageButton
+            android:id="@+id/hideTextButton"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_hide_box"
+            android:contentDescription="@string/hide_text" />
     </LinearLayout>
 
     <!-- Always-visible lock toggle so the user can unlock again. -->

@@ -272,6 +272,11 @@
     <string name="cd_import">استيراد الفيديوهات</string>
     <string name="cd_resize">تحجيم الفيديو</string>
 
+    <!-- Hide floating text on video (playback overlay) -->
+    <string name="hide_text">تغطية النص</string>
+    <string name="hide_text_hint">اسحب لتغطية النص، واسحب الزاوية لتغيير الحجم. اضغط الزر مجدداً للتثبيت. اضغط مطولاً للإزالة.</string>
+    <string name="hide_text_cleared">أُزيلت التغطية</string>
+
     <!-- Player resize modes -->
     <string name="resize_fit">احتواء</string>
     <string name="resize_zoom">تكبير (قص)</string>
