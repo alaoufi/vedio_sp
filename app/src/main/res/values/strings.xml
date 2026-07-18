@@ -274,8 +274,10 @@
 
     <!-- Hide floating text on video (playback overlay) -->
     <string name="hide_text">Cover text</string>
-    <string name="hide_text_hint">Drag to cover the text; drag the corner to resize. Tap the button again to lock. Long-press to remove.</string>
+    <string name="hide_text_hint">Drag to cover the text; drag the corner to resize. Open the menu and tap Cover text again to lock.</string>
     <string name="hide_text_cleared">Cover removed</string>
+    <string name="hide_text_remove">Remove cover</string>
+    <string name="background_play">Background playback (audio only)</string>
 
     <!-- Player resize modes -->
     <string name="resize_fit">Fit</string>

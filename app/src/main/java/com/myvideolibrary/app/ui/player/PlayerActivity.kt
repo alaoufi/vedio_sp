@@ -49,6 +49,7 @@ class PlayerActivity : AppCompatActivity() {
     private var backgroundPlayback = false
     private var videoId = -1L
     private var hideEditing = false
+    private var isAudioTrack = false
 
     private val speeds = floatArrayOf(0.5f, 0.75f, 1f, 1.25f, 1.5f, 2f)
     private var speedIndex = 2
@@ -112,26 +113,44 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun setupControls() {
         binding.lockButton.setOnClickListener { toggleLock() }
-        binding.rotateButton.setOnClickListener { toggleOrientation() }
-        binding.resizeButton.setOnClickListener { cycleResizeMode() }
         binding.speedButton.text = getString(R.string.speed_format, speeds[speedIndex])
         binding.speedButton.setOnClickListener { cycleSpeed() }
         binding.backButton.setOnClickListener { finish() }
-        binding.pipButton.isVisible = supportsPip()
-        binding.pipButton.setOnClickListener { enterPipIfPossible() }
-        binding.backgroundToggle.setOnClickListener {
-            backgroundPlayback = !backgroundPlayback
-            binding.backgroundToggle.setImageResource(
-                if (backgroundPlayback) R.drawable.ic_headphones_on else R.drawable.ic_headphones
-            )
+        binding.moreButton.setOnClickListener { showPlayerMenu(it) }
+    }
+
+    /** Overflow menu grouping the less-frequent player actions, each clearly named. */
+    private fun showPlayerMenu(anchor: View) {
+        val popup = android.widget.PopupMenu(this, anchor)
+        val m = popup.menu
+        if (!isAudioTrack) {
+            m.add(0, 1, 0, getString(R.string.cd_rotate))
+            m.add(0, 2, 1, getString(R.string.cd_resize))
+            m.add(0, 5, 2, getString(R.string.hide_text))
+            if (binding.hideBox.hasBox) m.add(0, 6, 3, getString(R.string.hide_text_remove))
         }
-        binding.hideTextButton.setOnClickListener { toggleHideBox() }
-        binding.hideTextButton.setOnLongClickListener {
-            binding.hideBox.clearBox()
-            hideBoxPrefs().edit().remove("v$videoId").apply()
-            showGestureHint(getString(R.string.hide_text_cleared))
-            true
+        m.add(0, 3, 4, getString(R.string.background_play)).apply {
+            isCheckable = true
+            isChecked = backgroundPlayback
         }
+        if (supportsPip() && !isAudioTrack) m.add(0, 4, 5, getString(R.string.cd_pip))
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                1 -> { toggleOrientation(); true }
+                2 -> { cycleResizeMode(); true }
+                3 -> { backgroundPlayback = !backgroundPlayback; true }
+                4 -> { enterPipIfPossible(); true }
+                5 -> { toggleHideBox(); true }
+                6 -> {
+                    binding.hideBox.clearBox()
+                    hideBoxPrefs().edit().remove("v$videoId").apply()
+                    showGestureHint(getString(R.string.hide_text_cleared))
+                    true
+                }
+                else -> false
+            }
+        }
+        popup.show()
     }
 
     // ---- Hide-box: cover floating text during playback ----
@@ -168,7 +187,7 @@ class PlayerActivity : AppCompatActivity() {
      * plays like real audio. The resize toggle is meaningless for audio.
      */
     private fun showArtworkIfAudio(isAudio: Boolean, artwork: String?) {
-        binding.resizeButton.isVisible = !isAudio
+        isAudioTrack = isAudio
         // Use the PlayerView's own artwork slot (not an overlay) so the play/pause
         // controller and seek bar stay visible on top of the cover for audio.
         binding.playerView.artworkDisplayMode = if (isAudio) {
