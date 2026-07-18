@@ -15,29 +15,51 @@
         app:navigationIconTint="?attr/colorOnSurface"
         app:title="@string/search_title" />
 
-    <com.google.android.material.button.MaterialButtonToggleGroup
-        android:id="@+id/sourceToggle"
-        android:layout_width="wrap_content"
+    <HorizontalScrollView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
         android:layout_marginTop="8dp"
-        app:singleSelection="true"
-        app:selectionRequired="true">
+        android:scrollbars="none"
+        android:fillViewport="true">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/sourceYoutube"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/sourceToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/source_youtube" />
+            android:layout_gravity="center_horizontal"
+            android:paddingHorizontal="12dp"
+            app:singleSelection="true"
+            app:selectionRequired="true">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/sourceTiktok"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/source_tiktok" />
-    </com.google.android.material.button.MaterialButtonToggleGroup>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/sourceYoutube"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/source_youtube" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/sourceTiktok"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/source_tiktok" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/sourceInstagram"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/source_instagram" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/sourceSnapchat"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/source_snapchat" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+    </HorizontalScrollView>
 
     <LinearLayout
         android:layout_width="match_parent"

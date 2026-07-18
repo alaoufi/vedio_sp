@@ -50,10 +50,12 @@ class SearchViewModel @Inject constructor(
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun setSource(source: VideoSource) {
-        // Both TikTok (via resolver) and YouTube (via NewPipe) support keyword search.
+        // TikTok (resolver) and YouTube (NewPipe) support keyword search;
+        // Instagram/Snapchat are link-only (paste a public post link).
+        val searchable = source == VideoSource.TIKTOK || source == VideoSource.YOUTUBE
         _state.value = _state.value.copy(
             source = source,
-            searchSupported = true,
+            searchSupported = searchable,
             results = emptyList(),
             error = null
         )

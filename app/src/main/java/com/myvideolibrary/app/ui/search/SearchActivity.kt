@@ -45,7 +45,12 @@ class SearchActivity : AppCompatActivity() {
         binding.sourceToggle.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked) {
                 viewModel.setSource(
-                    if (checkedId == R.id.sourceTiktok) VideoSource.TIKTOK else VideoSource.YOUTUBE
+                    when (checkedId) {
+                        R.id.sourceTiktok -> VideoSource.TIKTOK
+                        R.id.sourceInstagram -> VideoSource.INSTAGRAM
+                        R.id.sourceSnapchat -> VideoSource.SNAPCHAT
+                        else -> VideoSource.YOUTUBE
+                    }
                 )
             }
         }
@@ -114,8 +119,10 @@ class SearchActivity : AppCompatActivity() {
                     binding.progressBar.isVisible = state.loading
                     adapter.submitList(state.results)
 
-                    // TikTok = link-based; hint the user and change the field mode.
+                    // Link-based sources (TikTok/Instagram/Snapchat): hint the user
+                    // to paste a link and switch the field to URL mode.
                     binding.hintText.isVisible = !state.searchSupported
+                    binding.hintText.setText(R.string.link_only_hint)
                     binding.searchInput.hint = getString(
                         if (state.searchSupported) R.string.search_hint else R.string.paste_url_hint
                     )
