@@ -7,7 +7,6 @@ import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters
 import org.bouncycastle.crypto.signers.Ed25519Signer
 import org.json.JSONObject
-import java.security.SecureRandom
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -41,26 +40,19 @@ class LicenseManager @Inject constructor(
      * keeps working — falling back to a random value only if that's unavailable.
      */
     fun deviceId(): String {
-        prefs.getString(KEY_DEVICE, null)?.takeIf { it.length >= 16 }?.let { return it }
-        val raw = hardwareRaw() ?: ByteArray(10).also { SecureRandom().nextBytes(it) }
-        val id = base32Encode(raw)
-        prefs.edit().putString(KEY_DEVICE, id).apply()
-        return id
-    }
-
-    /** 10 bytes from SHA-256("app:" + Android ID); stable across reinstalls. */
-    private fun hardwareRaw(): ByteArray? {
-        val androidId = try {
+        // Mandatory unified formula (UNI3 standard): Base32(SHA-256(SALT + ANDROID_ID)[0..10]).
+        // Deterministic — no random, no cache — so every app of the owner shows the
+        // SAME number on a device and one code unlocks them all.
+        val hardwareId = try {
             android.provider.Settings.Secure.getString(
                 context.contentResolver, android.provider.Settings.Secure.ANDROID_ID
-            )
+            ) ?: ""
         } catch (e: Exception) {
-            null
+            ""
         }
-        if (androidId.isNullOrBlank()) return null
-        return java.security.MessageDigest.getInstance("SHA-256")
-            .digest("app:$androidId".toByteArray(Charsets.UTF_8))
-            .copyOf(10)
+        val digest = java.security.MessageDigest.getInstance("SHA-256")
+            .digest((DEVICE_SALT + hardwareId).toByteArray(Charsets.UTF_8))
+        return base32Encode(digest.copyOfRange(0, 10))
     }
 
     /** Device number formatted in groups of four for display. */
@@ -222,18 +214,19 @@ class LicenseManager @Inject constructor(
 
     companion object {
         /**
-         * Accepted schemes (prefix + public key). UNI2 is the active unified
-         * generator (verified end-to-end against its real seed); UNI3 is kept for
-         * forward/backward compatibility. A code from any scheme activates the
-         * app. Verification uses public keys only; no secret ever ships.
+         * Accepted schemes (prefix + public key). UNI3 is the mandatory unified
+         * standard; UNI2 is kept as an extra accepted key for compatibility. A
+         * code from any scheme activates the app; verification uses public keys
+         * only and no secret ever ships.
          */
         private val SCHEMES = listOf(
-            Scheme("UNI2", "4gIH/wo/1T9Dq1yGXCED8ZpRk/QefaMq8qQFqKPKHmQ="),
-            Scheme("UNI3", "W5Kc9hRB7lb9xSh/VqdR4T8GT6VaDznEwYQgXZpLZz0=")
+            Scheme("UNI3", "W5Kc9hRB7lb9xSh/VqdR4T8GT6VaDznEwYQgXZpLZz0="),
+            Scheme("UNI2", "4gIH/wo/1T9Dq1yGXCED8ZpRk/QefaMq8qQFqKPKHmQ=")
         )
+        /** Mandatory device-number salt for the unified UNI3 standard. */
+        private const val DEVICE_SALT = "alaoufi:"
         private const val B32 = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
         private const val DAY_MS = 86_400_000L
-        private const val KEY_DEVICE = "device_id"
         private const val KEY_LICENSE = "license_rec"
     }
 }
