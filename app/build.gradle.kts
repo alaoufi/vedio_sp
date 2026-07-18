@@ -32,6 +32,14 @@ android {
         }
     }
 
+    // Name the built APK after the app instead of the default "app-debug.apk".
+    applicationVariants.all {
+        outputs.all {
+            (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl)
+                .outputFileName = "مكتبة-الفيديو.apk"
+        }
+    }
+
     signingConfigs {
         // A committed, stable debug key so every CI-built APK is signed identically
         // and installs as an update over the previous one (no uninstall needed).

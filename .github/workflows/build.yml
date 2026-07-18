@@ -46,6 +46,12 @@ jobs:
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
 
+      - name: Remove the old APK asset (renamed to مكتبة-الفيديو.apk)
+        if: success()
+        run: gh release delete-asset apk-latest app-debug.apk -y || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Publish APK to a Release (direct link)
         if: success()
         uses: softprops/action-gh-release@v2
@@ -54,5 +60,5 @@ jobs:
           name: My Video Library — v1.0.${{ github.run_number }}
           body: |
             Version 1.0.${{ github.run_number }} (debug), rebuilt automatically on each push.
-            Direct link: https://github.com/${{ github.repository }}/releases/download/apk-latest/app-debug.apk
-          files: app/build/outputs/apk/debug/app-debug.apk
+            Download page: https://github.com/${{ github.repository }}/releases/tag/apk-latest
+          files: app/build/outputs/apk/debug/*.apk
