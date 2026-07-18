@@ -216,6 +216,10 @@
 
     <!-- File info -->
     <string name="file_info">معلومات الملف</string>
+    <string name="edit_info">تعديل المعلومات</string>
+    <string name="info_title_hint">العنوان</string>
+    <string name="info_desc_hint">الوصف / ملاحظات</string>
+    <string name="info_description">ملاحظات: %1$s</string>
     <string name="info_format">الصيغة: %1$s</string>
     <string name="info_type">النوع: %1$s</string>
     <string name="info_size">الحجم: %1$s</string>

@@ -216,6 +216,10 @@
 
     <!-- File info -->
     <string name="file_info">File info</string>
+    <string name="edit_info">Edit info</string>
+    <string name="info_title_hint">Title</string>
+    <string name="info_desc_hint">Description / notes</string>
+    <string name="info_description">Notes: %1$s</string>
     <string name="info_format">Format: %1$s</string>
     <string name="info_type">Type: %1$s</string>
     <string name="info_size">Size: %1$s</string>

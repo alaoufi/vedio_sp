@@ -76,6 +76,9 @@ interface VideoDao {
     @Query("UPDATE videos SET title = :title WHERE id = :id")
     suspend fun rename(id: Long, title: String)
 
+    @Query("UPDATE videos SET title = :title, description = :description WHERE id = :id")
+    suspend fun updateInfo(id: Long, title: String, description: String?)
+
     @Query("UPDATE videos SET category = :category WHERE id IN (:ids)")
     suspend fun setCategory(ids: List<Long>, category: String?)
 

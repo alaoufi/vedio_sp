@@ -28,6 +28,8 @@ interface VideoRepository {
 
     suspend fun rename(id: Long, title: String)
 
+    suspend fun updateInfo(id: Long, title: String, description: String?)
+
     suspend fun setCategory(ids: List<Long>, category: String?)
 
     suspend fun renameCategory(oldName: String, newName: String)

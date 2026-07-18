@@ -446,7 +446,7 @@ class MainActivity : AppCompatActivity() {
             isChecked = video.isLocked
         }
         popup.menu.add(0, 4, 5, getString(R.string.set_category))
-        popup.menu.add(0, 5, 6, getString(R.string.rename))
+        popup.menu.add(0, 5, 6, getString(R.string.edit_info))
         // Open the original TikTok/YouTube page in its app or the browser.
         if (!video.sourceUrl.isNullOrBlank()) popup.menu.add(0, 8, 7, getString(R.string.open_source))
         // Image editor (crop / hide / text / OCR) only for image items.
@@ -461,7 +461,7 @@ class MainActivity : AppCompatActivity() {
                 2 -> { shareVideo(video); true }
                 3 -> { protectVideo(video); true }
                 4 -> { promptSetCategory(video); true }
-                5 -> { promptRenameVideo(video); true }
+                5 -> { promptEditInfo(video); true }
                 6 -> { confirmDeleteSingle(video); true }
                 8 -> { openSource(video); true }
                 9 -> { viewModel.toggleFavorite(video); true }
@@ -509,6 +509,9 @@ class MainActivity : AppCompatActivity() {
             }
             if (video.duration > 0) {
                 add(getString(R.string.info_duration, Formatters.duration(video.duration)))
+            }
+            video.description?.takeIf { it.isNotBlank() }?.let {
+                add(getString(R.string.info_description, it))
             }
         }
         com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
@@ -577,14 +580,35 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun promptRenameVideo(video: VideoEntity) {
-        val input = EditText(this).apply { setText(video.title) }
+    /** Edit the clip's title and description in one dialog. */
+    private fun promptEditInfo(video: VideoEntity) {
+        val pad = (16 * resources.displayMetrics.density).toInt()
+        val container = android.widget.LinearLayout(this).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding(pad, pad / 2, pad, 0)
+        }
+        val titleInput = EditText(this).apply {
+            setText(video.title)
+            hint = getString(R.string.info_title_hint)
+            setSingleLine(true)
+        }
+        val descInput = EditText(this).apply {
+            setText(video.description.orEmpty())
+            hint = getString(R.string.info_desc_hint)
+            gravity = android.view.Gravity.TOP or android.view.Gravity.START
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or
+                android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE
+            setLines(3)
+        }
+        container.addView(titleInput)
+        container.addView(descInput)
         AlertDialog.Builder(this)
-            .setTitle(R.string.rename)
-            .setView(input)
+            .setTitle(R.string.edit_info)
+            .setView(container)
             .setPositiveButton(R.string.save) { _, _ ->
-                val name = input.text.toString().trim()
-                if (name.isNotEmpty()) viewModel.rename(video.id, name)
+                val name = titleInput.text.toString().trim()
+                val desc = descInput.text.toString().trim().ifEmpty { null }
+                if (name.isNotEmpty()) viewModel.updateInfo(video.id, name, desc)
             }
             .setNegativeButton(R.string.cancel, null)
             .show()

@@ -249,6 +249,10 @@ class LibraryViewModel @Inject constructor(
         videoRepository.rename(id, title)
     }
 
+    fun updateInfo(id: Long, title: String, description: String?) = viewModelScope.launch {
+        videoRepository.updateInfo(id, title, description)
+    }
+
     fun setCategory(id: Long, category: String?) = viewModelScope.launch {
         videoRepository.setCategory(listOf(id), category)
     }

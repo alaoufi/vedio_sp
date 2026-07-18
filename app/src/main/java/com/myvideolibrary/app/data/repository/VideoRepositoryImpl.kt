@@ -63,6 +63,9 @@ class VideoRepositoryImpl @Inject constructor(
 
     override suspend fun rename(id: Long, title: String) = videoDao.rename(id, title)
 
+    override suspend fun updateInfo(id: Long, title: String, description: String?) =
+        videoDao.updateInfo(id, title, description)
+
     override suspend fun setCategory(ids: List<Long>, category: String?) =
         videoDao.setCategory(ids, category?.trim()?.takeIf { it.isNotEmpty() })
 
