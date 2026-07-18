@@ -449,8 +449,12 @@ class MainActivity : AppCompatActivity() {
         popup.menu.add(0, 5, 6, getString(R.string.rename))
         // Open the original TikTok/YouTube page in its app or the browser.
         if (!video.sourceUrl.isNullOrBlank()) popup.menu.add(0, 8, 7, getString(R.string.open_source))
-        popup.menu.add(0, 10, 8, getString(R.string.file_info))
-        popup.menu.add(0, 6, 9, getString(R.string.delete))
+        // Image editor (crop / hide / text / OCR) only for image items.
+        if (video.mediaType == com.myvideolibrary.app.data.model.MediaType.IMAGE.id) {
+            popup.menu.add(0, 11, 8, getString(R.string.edit_image))
+        }
+        popup.menu.add(0, 10, 9, getString(R.string.file_info))
+        popup.menu.add(0, 6, 10, getString(R.string.delete))
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 1 -> { onVideoClick(video); true }
@@ -462,6 +466,14 @@ class MainActivity : AppCompatActivity() {
                 8 -> { openSource(video); true }
                 9 -> { viewModel.toggleFavorite(video); true }
                 10 -> { showFileInfo(video); true }
+                11 -> {
+                    startActivity(
+                        com.myvideolibrary.app.ui.imageeditor.ImageEditorActivity.intent(
+                            this, video.localPath
+                        )
+                    )
+                    true
+                }
                 7 -> {
                     viewModel.downloadLink(video)
                     android.widget.Toast.makeText(

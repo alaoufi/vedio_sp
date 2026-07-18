@@ -195,6 +195,24 @@
     <string name="activation_status_days">Activated · %1$d days left</string>
     <string name="activation_deactivate">Deactivate (re-lock)</string>
 
+    <!-- Image editor -->
+    <string name="edit_image">Edit image</string>
+    <string name="editor_hint">Drag on the image to select a region</string>
+    <string name="editor_crop">Crop</string>
+    <string name="editor_hide">Hide</string>
+    <string name="editor_text">Text</string>
+    <string name="editor_add">Add</string>
+    <string name="editor_extract_text">Extract text</string>
+    <string name="editor_need_selection">Drag to select a region first</string>
+    <string name="editor_ocr_running">Reading text…</string>
+    <string name="editor_ocr_empty">No text found</string>
+    <string name="editor_ocr_copied">Text copied</string>
+    <string name="editor_saved">Saved to library</string>
+    <string name="color_white">White</string>
+    <string name="color_yellow">Yellow</string>
+    <string name="color_red">Red</string>
+    <string name="color_black">Black</string>
+
     <!-- File info -->
     <string name="file_info">File info</string>
     <string name="info_format">Format: %1$s</string>

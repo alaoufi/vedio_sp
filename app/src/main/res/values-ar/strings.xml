@@ -195,6 +195,24 @@
     <string name="activation_status_days">مفعّل · متبقٍّ %1$d يوم</string>
     <string name="activation_deactivate">إلغاء التفعيل (إعادة القفل)</string>
 
+    <!-- Image editor -->
+    <string name="edit_image">تعديل الصورة</string>
+    <string name="editor_hint">اسحب على الصورة لتحديد منطقة</string>
+    <string name="editor_crop">قص</string>
+    <string name="editor_hide">إخفاء</string>
+    <string name="editor_text">نص</string>
+    <string name="editor_add">إضافة</string>
+    <string name="editor_extract_text">استخراج نص</string>
+    <string name="editor_need_selection">اسحب لتحديد منطقة أولاً</string>
+    <string name="editor_ocr_running">جارٍ قراءة النص…</string>
+    <string name="editor_ocr_empty">لم يُعثر على نص</string>
+    <string name="editor_ocr_copied">نُسخ النص</string>
+    <string name="editor_saved">حُفظت في المكتبة</string>
+    <string name="color_white">أبيض</string>
+    <string name="color_yellow">أصفر</string>
+    <string name="color_red">أحمر</string>
+    <string name="color_black">أسود</string>
+
     <!-- File info -->
     <string name="file_info">معلومات الملف</string>
     <string name="info_format">الصيغة: %1$s</string>

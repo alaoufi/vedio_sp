@@ -159,6 +159,9 @@ dependencies {
     // BouncyCastle — Ed25519 signature verification for offline license activation
     implementation(libs.bouncycastle)
 
+    // Tesseract — offline OCR for the image editor's "extract text"
+    implementation(libs.tesseract4android)
+
     // Java 8+ API desugaring. The _nio variant (matching NewPipe) backports the
     // broader java.* surface NewPipeExtractor needs on older Android — notably
     // URLDecoder.decode(String, Charset), which otherwise crashes below API 33.

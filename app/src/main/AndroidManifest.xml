@@ -56,6 +56,12 @@
             android:exported="false"
             android:theme="@style/Theme.MyVideoLibrary" />
 
+        <!-- Image editor: crop, hide, text, OCR. -->
+        <activity
+            android:name=".ui.imageeditor.ImageEditorActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyVideoLibrary" />
+
         <!-- Import videos from device storage (MediaStore). -->
         <activity
             android:name=".ui.importer.ImportActivity"
