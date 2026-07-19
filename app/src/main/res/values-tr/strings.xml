@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Video Kitaplığı</string>
+
+    <!-- Tabs / YouTube -->
+    <string name="tab_library">Kitaplık</string>
+    <string name="tab_youtube">YouTube</string>
+    <string name="hide_shorts">Shorts\'u gizle</string>
+    <string name="youtube_search_hint">YouTube\'da ara</string>
+    <string name="youtube_tab_hint">YouTube\'da ara — reklamsız oynatın veya indirin. Shorts gizlidir.</string>
+
+    <!-- Library -->
+    <string name="library_stats">%1$d video · %2$s</string>
+    <string name="filter_all">Tümü</string>
+    <string name="filter">Filtrele</string>
+    <string name="filter_source">Kaynak</string>
+    <string name="filter_folder">Klasör</string>
+    <string name="filter_type">Tür</string>
+    <string name="type_video">Video</string>
+    <string name="type_audio">Ses</string>
+    <string name="type_image">Görsel</string>
+    <string name="source_tiktok">TikTok</string>
+    <string name="source_youtube">YouTube</string>
+    <string name="source_instagram">Instagram</string>
+    <string name="source_snapchat">Snapchat</string>
+    <string name="source_other">Diğer</string>
+    <string name="search_hint">Video ara</string>
+    <string name="empty_library_title">Kitaplığınız boş</string>
+    <string name="empty_library_message">Cihazınızdan video içe aktarmak için + düğmesine dokunun.</string>
+
+    <!-- Selection -->
+    <string name="selected_count">%1$d seçildi</string>
+    <string name="delete_videos_title">Videoları sil</string>
+    <string name="delete_videos_message">Yalnızca kitaplıktan mı kaldırılsın, yoksa uygulamaya ait dosyalar da silinsin mi?</string>
+    <string name="delete_files">Dosyaları sil</string>
+    <string name="remove_only">Yalnızca kaldır</string>
+    <string name="move_to_folder">Klasöre taşı</string>
+    <string name="no_folder">Klasör yok</string>
+
+    <!-- Sort -->
+    <string name="sort_by">Sıralama ölçütü</string>
+    <string name="sort_date_new">Eklenme tarihi (en yeni)</string>
+    <string name="sort_date_old">Eklenme tarihi (en eski)</string>
+    <string name="sort_name_az">Ad (A–Z)</string>
+    <string name="sort_name_za">Ad (Z–A)</string>
+    <string name="sort_duration_long">Süre (en uzun)</string>
+    <string name="sort_duration_short">Süre (en kısa)</string>
+    <string name="sort_size_large">Boyut (en büyük)</string>
+    <string name="sort_size_small">Boyut (en küçük)</string>
+    <string name="sort_category">Kategori</string>
+
+    <!-- Folders -->
+    <string name="new_folder">Yeni klasör</string>
+    <string name="folder_name_hint">Klasör adı</string>
+    <string name="create">Oluştur</string>
+    <string name="cancel">İptal</string>
+    <string name="apply">Uygula</string>
+    <string name="play_next">Sonraki</string>
+    <string name="play_previous">Önceki</string>
+    <string name="autoplay">Sonrakini otomatik oynat</string>
+    <string name="language">Dil</string>
+    <string name="language_system">Sistem varsayılanı</string>
+    <string name="user_guide">Kullanım kılavuzu</string>
+    <string name="user_guide_desc">Her özelliğin nasıl kullanılacağı</string>
+
+    <!-- Menu -->
+    <string name="action_toggle_view">Görünümü değiştir</string>
+    <string name="action_sort">Sırala</string>
+    <string name="action_favorites">Favoriler</string>
+    <string name="action_new_folder">Yeni klasör</string>
+
+    <!-- Import -->
+    <string name="import_title">Videoları içe aktar</string>
+    <string name="import_select_all">Tümünü seç</string>
+    <string name="import_selected_count">İçe aktar (%1$d)</string>
+    <string name="import_item_meta">%1$s · %2$s</string>
+    <string name="import_done">%1$d video içe aktarıldı</string>
+    <string name="import_empty">Bu cihazda yeni video bulunamadı</string>
+    <string name="permission_denied_media">Videoları içe aktarmak için medya izni gereklidir.</string>
+
+    <!-- Player -->
+    <string name="speed_format">%.2f×</string>
+    <string name="playback_error">Bu video oynatılamıyor</string>
+    <string name="brightness_label">Parlaklık %%%1$d</string>
+    <string name="volume_label">Ses %%%1$d</string>
+
+    <!-- Downloads -->
+    <string name="downloads_title">İndirmeler</string>
+    <string name="downloads_empty">Henüz indirme yok</string>
+    <string name="downloading_banner">İndiriliyor %1$d · %%%2$d</string>
+    <string name="clear_completed">Tamamlananları temizle</string>
+    <string name="action_downloads">İndirmeler</string>
+    <string name="action_resume">Devam ettir</string>
+    <string name="action_pause">Duraklat</string>
+    <string name="action_retry">Yeniden dene</string>
+    <string name="status_waiting">Bekleniyor…</string>
+    <string name="status_downloading">%%%1$d · %2$s</string>
+    <string name="status_paused">Duraklatıldı</string>
+    <string name="status_completed">Tamamlandı · %1$s</string>
+    <string name="status_failed">Başarısız</string>
+    <string name="status_canceled">İptal edildi</string>
+    <string name="download_channel_name">İndirmeler</string>
+    <string name="download_channel_desc">Video indirmelerinin ilerlemesini gösterir</string>
+    <string name="download_preparing">Hazırlanıyor…</string>
+    <string name="download_complete">İndirme tamamlandı</string>
+    <string name="download_failed">İndirme başarısız</string>
+
+    <!-- Add download (providers) -->
+    <string name="search_title">Ara ve indir</string>
+    <string name="action_search">Ara</string>
+    <string name="tiktok_link_hint">TikTok\'ta anahtar kelime araması yoktur — bir TikTok bağlantısı yapıştırın, ardından indirmek için Ara\'ya basın.</string>
+    <string name="link_only_hint">Burada anahtar kelime araması yok — herkese açık bir gönderi bağlantısı yapıştırın, ardından indirmek için Ara\'ya basın. Instagram/Snapchat yalnızca herkese açık gönderiler için çalışır.</string>
+    <string name="add_download_title">Bağlantıdan indir</string>
+    <string name="add_download_hint">Bir TikTok, YouTube, Instagram veya Snapchat bağlantısı yapıştırın. TikTok videoları filigransız kaydedilir. Instagram ve Snapchat yalnızca herkese açık gönderiler için çalışır. Çıkarma platforma bağlıdır ve zaman zaman başarısız olabilir.</string>
+    <string name="paste_url_hint">Video URL\'si</string>
+    <string name="paste">Yapıştır</string>
+    <string name="fetch_info">Bilgileri getir</string>
+    <string name="download">İndir</string>
+    <string name="download_started">İndirme kuyruğa eklendi</string>
+    <string name="download_options">İndirme seçenekleri</string>
+    <string name="kind_full">Tam video (ses + görüntü)</string>
+    <string name="kind_video_only">Sessiz video</string>
+    <string name="kind_audio_only">Yalnızca ses</string>
+    <string name="kind_image_only">Yalnızca görsel (kapak)</string>
+    <string name="action_add_download">Bağlantıdan indir</string>
+    <string name="error_invalid_link">Bu bağlantı geçerli değil.</string>
+    <string name="error_private">Bu video özel.</string>
+    <string name="error_not_found">Video bulunamadı veya silindi.</string>
+    <string name="error_unsupported">Bu bağlantı desteklenmiyor.</string>
+    <string name="error_network">Ağ hatası. Bağlantınızı kontrol edin.</string>
+    <string name="error_extraction">Video çıkarılamadı. Kaynak değişmiş olabilir.</string>
+    <string name="error_unknown">Bir şeyler ters gitti.</string>
+
+    <!-- Security / lock -->
+    <string name="unlock_title">Kilidi aç</string>
+    <string name="unlock">Kilidi aç</string>
+    <string name="pin_hint">PIN girin</string>
+    <string name="wrong_pin">Yanlış PIN</string>
+    <string name="use_biometric">Parmak izini kullan</string>
+    <string name="use_pin">PIN kullan</string>
+    <string name="unlock_biometric_subtitle">Kitaplığınızı açmak için kimlik doğrulayın</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Ayarlar</string>
+    <string name="section_about">Hakkında</string>
+    <string name="version">Sürüm</string>
+    <string name="action_settings">Ayarlar</string>
+    <string name="section_appearance">Görünüm</string>
+    <string name="section_downloads">İndirmeler</string>
+    <string name="section_security">Güvenlik</string>
+    <string name="section_storage">Depolama ve yedekleme</string>
+    <string name="theme">Tema</string>
+    <string name="theme_system">Sistemi izle</string>
+    <string name="theme_light">Açık</string>
+    <string name="theme_dark">Koyu</string>
+    <string name="wifi_only">Yalnızca Wi-Fi\'de indir</string>
+    <string name="wifi_only_desc">Yalnızca sınırsız bir ağda indir</string>
+    <string name="max_concurrent">En fazla eşzamanlı indirme</string>
+    <string name="app_lock">Uygulama kilidi</string>
+    <string name="app_lock_desc">Uygulamayı açmak için PIN iste</string>
+    <string name="change_pin">PIN\'i değiştir</string>
+    <string name="biometric">Parmak iziyle kilit açma</string>
+    <string name="prevent_screenshots">Ekran görüntülerini engelle</string>
+    <string name="hide_recents">Son uygulamalarda içeriği gizle</string>
+    <string name="storage_used">Kullanılan depolama</string>
+    <string name="clear_cache">Önbelleği temizle</string>
+    <string name="cache_cleared">Önbellek temizlendi</string>
+    <string name="backup">Yedekle</string>
+    <string name="backup_desc">Şifreli bir yedek dosyası dışa aktar</string>
+    <string name="restore">Geri yükle</string>
+    <string name="set_pin">PIN belirle</string>
+    <string name="save">Kaydet</string>
+    <string name="pin_length_error">PIN 4–12 rakam olmalıdır</string>
+    <string name="backup_encrypt_title">Yedeği şifrele</string>
+    <string name="backup_encrypt_message">Bir parola seçin. Geri yüklemek için ona ihtiyacınız olacak.</string>
+    <string name="backup_password_hint">Parola</string>
+    <string name="export">Dışa aktar</string>
+    <string name="password_too_short">Parola en az 6 karakter olmalıdır</string>
+    <string name="restore_title">Yedeği geri yükle</string>
+    <string name="restore_message">Bu yedeği oluşturmak için kullanılan parolayı girin.</string>
+    <string name="backup_exported">Yedek kaydedildi: %1$s</string>
+    <string name="backup_restored">%1$d video geri yüklendi</string>
+    <string name="backup_restore_failed">Geri yükleme başarısız — yanlış parola veya bozuk dosya</string>
+
+    <!-- Per-video actions -->
+    <string name="delete">Sil</string>
+    <string name="play">Oynat</string>
+    <string name="action_share">Paylaş</string>
+    <string name="rename">Yeniden adlandır</string>
+    <string name="more_options">Diğer seçenekler</string>
+    <string name="open_source">Kaynakta aç</string>
+    <string name="favorite">Favorilere ekle</string>
+    <string name="unfavorite">Favorilerden çıkar</string>
+    <string name="lock_video">Özel</string>
+    <string name="unlock_video">Özel</string>
+
+    <!-- Activation -->
+    <string name="activation_title">Uygulamayı etkinleştir</string>
+    <string name="activation_desc">Etkinleştirme kodu almak için cihaz numaranızı geliştiriciye gönderin. Çevrimdışı çalışır.</string>
+    <string name="activation_device_id">Cihaz numarası</string>
+    <string name="activation_copy_device">Cihaz numarasını kopyala</string>
+    <string name="activation_copied">Kopyalandı ✓</string>
+    <string name="activation_code_hint">Etkinleştirme kodunu girin</string>
+    <string name="activation_activate">Etkinleştir</string>
+    <string name="activation_invalid">Bu cihaz için geçersiz kod.</string>
+    <string name="activation_owner_recovery">Sahip kurtarma (gizli tohum)</string>
+    <string name="activation_seed_hint">Sahip tohumu (64 onaltılık)</string>
+    <string name="activation_seed_invalid">Tohum eşleşmiyor.</string>
+    <string name="activation_activated">Etkinleştirildi ✅</string>
+    <string name="activation_status">Lisans</string>
+    <string name="activation_status_permanent">Etkinleştirildi (kalıcı)</string>
+    <string name="activation_status_days">Etkinleştirildi · %1$d gün kaldı</string>
+    <string name="activation_deactivate">Devre dışı bırak (yeniden kilitle)</string>
+
+    <!-- Image editor -->
+    <string name="edit_image">Görseli düzenle</string>
+    <string name="editor_hint">Bir bölge seçmek için görselin üzerinde sürükleyin</string>
+    <string name="editor_crop">Kırp</string>
+    <string name="editor_hide">Gizle</string>
+    <string name="editor_text">Metin</string>
+    <string name="editor_add">Ekle</string>
+    <string name="editor_extract_text">Metni çıkar</string>
+    <string name="editor_need_selection">Önce bir bölge seçmek için sürükleyin</string>
+    <string name="editor_ocr_running">Metin okunuyor…</string>
+    <string name="editor_ocr_empty">Metin bulunamadı</string>
+    <string name="editor_ocr_copied">Metin kopyalandı</string>
+    <string name="editor_saved">Kitaplığa kaydedildi</string>
+    <string name="color_white">Beyaz</string>
+    <string name="color_yellow">Sarı</string>
+    <string name="color_red">Kırmızı</string>
+    <string name="color_black">Siyah</string>
+
+    <!-- File info -->
+    <string name="file_info">Dosya bilgisi</string>
+    <string name="edit_info">Bilgiyi düzenle</string>
+    <string name="info_title_hint">Başlık</string>
+    <string name="info_desc_hint">Açıklama / notlar</string>
+    <string name="info_description">Notlar: %1$s</string>
+    <string name="info_format">Biçim: %1$s</string>
+    <string name="info_type">Tür: %1$s</string>
+    <string name="info_size">Boyut: %1$s</string>
+    <string name="info_resolution">Çözünürlük: %1$d × %2$d</string>
+    <string name="info_duration">Süre: %1$s</string>
+
+    <!-- Save location -->
+    <string name="save_location">Kaydetme konumu</string>
+    <string name="save_location_default">Uygulama depolaması (varsayılan)</string>
+    <string name="choose_folder">Klasör seç…</string>
+    <string name="video_locked">Bu video kilitli</string>
+    <string name="share_failed">Bu video paylaşılamıyor</string>
+
+    <!-- Streaming / saved links -->
+    <string name="save_link">Bağlantıyı kaydet</string>
+    <string name="link_saved">Bağlantı kitaplığa kaydedildi</string>
+    <string name="link_badge">Kaydedilmiş bağlantı</string>
+
+    <!-- Protected videos -->
+    <string name="protected_videos">Özel videolar</string>
+    <string name="protected_set_pin_hint">Özel olarak işaretlendi. Gerçek bir kilit için Ayarlar → Güvenlik\'ten bir PIN/parmak izi belirleyin.</string>
+    <string name="protected_moved_hint">Özel videolara taşındı (menü → Özel videolar).</string>
+    <string name="protected_title">Özel · %1$d</string>
+    <string name="protected_need_lock">Özel videoları açmak için telefonunuzda bir parmak izi veya ekran kilidi ayarlayın.</string>
+
+    <!-- Categories -->
+    <string name="category">Kategori</string>
+    <string name="category_none">Kategorisiz</string>
+    <string name="category_all">Tüm kategoriler</string>
+    <string name="set_category">Kategori ayarla</string>
+    <string name="category_hint">Kategori adı</string>
+    <string name="category_general">Genel</string>
+    <string name="category_education">Eğitim</string>
+    <string name="category_entertainment">Eğlence</string>
+    <string name="category_music">Müzik</string>
+    <string name="category_sports">Spor</string>
+    <string name="category_news">Haberler</string>
+    <string name="category_cooking">Yemek</string>
+    <string name="category_tech">Teknoloji</string>
+    <string name="category_religion">Din</string>
+    <string name="category_kids">Çocuklar</string>
+    <string name="manage_categories">Kategorileri yönet</string>
+    <string name="add_category">Kategori ekle</string>
+    <string name="no_categories">Henüz kategori yok. Bir tane eklemek için + simgesine dokunun.</string>
+    <string name="reorder">Yeniden sırala</string>
+    <string name="delete_category_message">\"%1$s\" kategorisi kaldırılsın mı? Videolar kalır ancak kategorisiz olur.</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_thumbnail">Video küçük resmi</string>
+    <string name="cd_favorite">Favori</string>
+    <string name="cd_back">Geri</string>
+    <string name="cd_lock">Kontrolleri kilitle</string>
+    <string name="cd_rotate">Döndür</string>
+    <string name="cd_pip">Görüntü içinde görüntü</string>
+    <string name="cd_background">Arka planda oynatma</string>
+    <string name="cd_import">Videoları içe aktar</string>
+    <string name="cd_resize">Videoyu yeniden boyutlandır</string>
+
+    <!-- Hide floating text on video (playback overlay) -->
+    <string name="hide_text">Metni ört</string>
+    <string name="hide_text_hint">Metni örtmek için sürükleyin; yeniden boyutlandırmak için köşeyi sürükleyin. Kilitlemek için menüyü açıp tekrar Metni ört\'e dokunun.</string>
+    <string name="hide_text_cleared">Örtü kaldırıldı</string>
+    <string name="hide_text_remove">Örtüyü kaldır</string>
+    <string name="background_play">Arka planda oynatma (yalnızca ses)</string>
+
+    <!-- Player resize modes -->
+    <string name="resize_fit">Sığdır</string>
+    <string name="resize_zoom">Yakınlaştır (kırp)</string>
+    <string name="resize_fill">Doldur (uzat)</string>
+</resources>

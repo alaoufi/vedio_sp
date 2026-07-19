@@ -46,6 +46,16 @@ interface VideoRepository {
 
     fun observeTotalSize(): Flow<Long>
 
+    fun observeTotalDuration(): Flow<Long>
+
+    fun observeTotalPlays(): Flow<Int>
+
+    fun observeCategoryCounts(): Flow<List<com.myvideolibrary.app.data.local.dao.CategoryCount>>
+
+    fun observeSourceCounts(): Flow<List<com.myvideolibrary.app.data.local.dao.SourceCount>>
+
+    fun observeMostPlayed(limit: Int): Flow<List<VideoEntity>>
+
     fun observeFavorites(): Flow<List<VideoEntity>>
 
     fun observeRecentlyPlayed(limit: Int): Flow<List<VideoEntity>>

@@ -94,6 +94,19 @@ class VideoRepositoryImpl @Inject constructor(
 
     override fun observeTotalSize(): Flow<Long> = videoDao.observeTotalSize()
 
+    override fun observeTotalDuration(): Flow<Long> = videoDao.observeTotalDuration()
+
+    override fun observeTotalPlays(): Flow<Int> = videoDao.observeTotalPlays()
+
+    override fun observeCategoryCounts(): Flow<List<com.myvideolibrary.app.data.local.dao.CategoryCount>> =
+        videoDao.observeCategoryCounts()
+
+    override fun observeSourceCounts(): Flow<List<com.myvideolibrary.app.data.local.dao.SourceCount>> =
+        videoDao.observeSourceCounts()
+
+    override fun observeMostPlayed(limit: Int): Flow<List<VideoEntity>> =
+        videoDao.observeMostPlayed(limit)
+
     override fun observeFavorites(): Flow<List<VideoEntity>> = videoDao.observeFavorites()
 
     override fun observeRecentlyPlayed(limit: Int): Flow<List<VideoEntity>> =

@@ -58,6 +58,22 @@
     <string name="play_next">التالي</string>
     <string name="play_previous">السابق</string>
     <string name="autoplay">تشغيل التالي تلقائياً</string>
+    <string name="language">اللغة</string>
+    <string name="language_system">لغة النظام</string>
+    <string name="user_guide">دليل الاستخدام</string>
+    <string name="user_guide_desc">شرح كل ميزة خطوة بخطوة</string>
+    <string name="statistics">الإحصائيات</string>
+    <string name="stat_videos">مقاطع</string>
+    <string name="stat_size">الحجم الكلي</string>
+    <string name="stat_duration">المدة الكلية</string>
+    <string name="stat_plays">مرات التشغيل</string>
+    <string name="stat_play_count">%d تشغيل</string>
+    <string name="stat_empty">لا شيء بعد</string>
+    <string name="most_played">الأكثر تشغيلاً</string>
+    <string name="recently_played">شُغّلت مؤخراً</string>
+    <string name="by_category">حسب التصنيف</string>
+    <string name="by_source">حسب المصدر</string>
+    <string name="source_device">الجهاز</string>
 
     <!-- Menu -->
     <string name="action_toggle_view">تبديل العرض</string>

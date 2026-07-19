@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">کتابخانه ویدیو</string>
+
+    <!-- Tabs / YouTube -->
+    <string name="tab_library">کتابخانه</string>
+    <string name="tab_youtube">یوتیوب</string>
+    <string name="hide_shorts">پنهان کردن شورت‌ها</string>
+    <string name="youtube_search_hint">جست‌وجو در یوتیوب</string>
+    <string name="youtube_tab_hint">در یوتیوب جست‌وجو کنید — بدون تبلیغات پخش کنید یا دانلود کنید. شورت‌ها پنهان هستند.</string>
+
+    <!-- Library -->
+    <string name="library_stats">%1$d ویدیو · %2$s</string>
+    <string name="filter_all">همه</string>
+    <string name="filter">فیلتر</string>
+    <string name="filter_source">منبع</string>
+    <string name="filter_folder">پوشه</string>
+    <string name="filter_type">نوع</string>
+    <string name="type_video">ویدیو</string>
+    <string name="type_audio">صدا</string>
+    <string name="type_image">تصویر</string>
+    <string name="source_tiktok">تیک‌تاک</string>
+    <string name="source_youtube">یوتیوب</string>
+    <string name="source_instagram">اینستاگرام</string>
+    <string name="source_snapchat">اسنپ‌چت</string>
+    <string name="source_other">دیگر</string>
+    <string name="search_hint">جست‌وجوی ویدیوها</string>
+    <string name="empty_library_title">کتابخانه شما خالی است</string>
+    <string name="empty_library_message">برای وارد کردن ویدیوها از دستگاه خود، روی دکمه + بزنید.</string>
+
+    <!-- Selection -->
+    <string name="selected_count">%1$d انتخاب‌شده</string>
+    <string name="delete_videos_title">حذف ویدیوها</string>
+    <string name="delete_videos_message">فقط از کتابخانه حذف شوند، یا فایل‌های متعلق به برنامه نیز حذف شوند؟</string>
+    <string name="delete_files">حذف فایل‌ها</string>
+    <string name="remove_only">فقط حذف از فهرست</string>
+    <string name="move_to_folder">انتقال به پوشه</string>
+    <string name="no_folder">بدون پوشه</string>
+
+    <!-- Sort -->
+    <string name="sort_by">مرتب‌سازی بر اساس</string>
+    <string name="sort_date_new">تاریخ افزودن (جدیدترین)</string>
+    <string name="sort_date_old">تاریخ افزودن (قدیمی‌ترین)</string>
+    <string name="sort_name_az">نام (الف–ی)</string>
+    <string name="sort_name_za">نام (ی–الف)</string>
+    <string name="sort_duration_long">مدت زمان (بلندترین)</string>
+    <string name="sort_duration_short">مدت زمان (کوتاه‌ترین)</string>
+    <string name="sort_size_large">اندازه (بزرگ‌ترین)</string>
+    <string name="sort_size_small">اندازه (کوچک‌ترین)</string>
+    <string name="sort_category">دسته‌بندی</string>
+
+    <!-- Folders -->
+    <string name="new_folder">پوشه جدید</string>
+    <string name="folder_name_hint">نام پوشه</string>
+    <string name="create">ایجاد</string>
+    <string name="cancel">لغو</string>
+    <string name="apply">اعمال</string>
+    <string name="play_next">بعدی</string>
+    <string name="play_previous">قبلی</string>
+    <string name="autoplay">پخش خودکار بعدی</string>
+    <string name="language">زبان</string>
+    <string name="language_system">پیش‌فرض سیستم</string>
+    <string name="user_guide">راهنمای کاربر</string>
+    <string name="user_guide_desc">نحوه استفاده از هر ویژگی</string>
+
+    <!-- Menu -->
+    <string name="action_toggle_view">تغییر نما</string>
+    <string name="action_sort">مرتب‌سازی</string>
+    <string name="action_favorites">موردعلاقه‌ها</string>
+    <string name="action_new_folder">پوشه جدید</string>
+
+    <!-- Import -->
+    <string name="import_title">وارد کردن ویدیوها</string>
+    <string name="import_select_all">انتخاب همه</string>
+    <string name="import_selected_count">وارد کردن (%1$d)</string>
+    <string name="import_item_meta">%1$s · %2$s</string>
+    <string name="import_done">%1$d ویدیو وارد شد</string>
+    <string name="import_empty">هیچ ویدیوی جدیدی در این دستگاه یافت نشد</string>
+    <string name="permission_denied_media">برای وارد کردن ویدیوها به مجوز رسانه نیاز است.</string>
+
+    <!-- Player -->
+    <string name="speed_format">%.2f×</string>
+    <string name="playback_error">پخش این ویدیو ممکن نیست</string>
+    <string name="brightness_label">روشنایی %1$d%%</string>
+    <string name="volume_label">صدا %1$d%%</string>
+
+    <!-- Downloads -->
+    <string name="downloads_title">دانلودها</string>
+    <string name="downloads_empty">هنوز دانلودی وجود ندارد</string>
+    <string name="downloading_banner">در حال دانلود %1$d · %2$d%%</string>
+    <string name="clear_completed">پاک کردن تکمیل‌شده‌ها</string>
+    <string name="action_downloads">دانلودها</string>
+    <string name="action_resume">ادامه</string>
+    <string name="action_pause">مکث</string>
+    <string name="action_retry">تلاش دوباره</string>
+    <string name="status_waiting">در انتظار…</string>
+    <string name="status_downloading">%1$d%% · %2$s</string>
+    <string name="status_paused">متوقف‌شده</string>
+    <string name="status_completed">تکمیل شد · %1$s</string>
+    <string name="status_failed">ناموفق</string>
+    <string name="status_canceled">لغو شد</string>
+    <string name="download_channel_name">دانلودها</string>
+    <string name="download_channel_desc">پیشرفت دانلود ویدیوها را نشان می‌دهد</string>
+    <string name="download_preparing">در حال آماده‌سازی…</string>
+    <string name="download_complete">دانلود کامل شد</string>
+    <string name="download_failed">دانلود ناموفق بود</string>
+
+    <!-- Add download (providers) -->
+    <string name="search_title">جست‌وجو و دانلود</string>
+    <string name="action_search">جست‌وجو</string>
+    <string name="tiktok_link_hint">تیک‌تاک جست‌وجوی کلمه کلیدی ندارد — یک پیوند تیک‌تاک بچسبانید، سپس برای دانلود آن جست‌وجو را بزنید.</string>
+    <string name="link_only_hint">اینجا جست‌وجوی کلمه کلیدی وجود ندارد — پیوند یک پست عمومی را بچسبانید، سپس برای دانلود آن جست‌وجو را بزنید. اینستاگرام/اسنپ‌چت تنها برای پست‌های عمومی کار می‌کنند.</string>
+    <string name="add_download_title">دانلود از پیوند</string>
+    <string name="add_download_hint">یک پیوند تیک‌تاک، یوتیوب، اینستاگرام یا اسنپ‌چت بچسبانید. ویدیوهای تیک‌تاک بدون واترمارک ذخیره می‌شوند. اینستاگرام و اسنپ‌چت تنها برای پست‌های عمومی کار می‌کنند. استخراج به پلتفرم بستگی دارد و ممکن است گاهی ناموفق باشد.</string>
+    <string name="paste_url_hint">نشانی ویدیو</string>
+    <string name="paste">چسباندن</string>
+    <string name="fetch_info">دریافت اطلاعات</string>
+    <string name="download">دانلود</string>
+    <string name="download_started">دانلود به صف اضافه شد</string>
+    <string name="download_options">گزینه‌های دانلود</string>
+    <string name="kind_full">ویدیوی کامل (صدا + تصویر)</string>
+    <string name="kind_video_only">ویدیو بدون صدا</string>
+    <string name="kind_audio_only">فقط صدا</string>
+    <string name="kind_image_only">فقط تصویر (جلد)</string>
+    <string name="action_add_download">دانلود از پیوند</string>
+    <string name="error_invalid_link">این پیوند معتبر نیست.</string>
+    <string name="error_private">این ویدیو خصوصی است.</string>
+    <string name="error_not_found">ویدیو یافت نشد یا حذف شده است.</string>
+    <string name="error_unsupported">این پیوند پشتیبانی نمی‌شود.</string>
+    <string name="error_network">خطای شبکه. اتصال خود را بررسی کنید.</string>
+    <string name="error_extraction">استخراج ویدیو ممکن نشد. ممکن است منبع تغییر کرده باشد.</string>
+    <string name="error_unknown">مشکلی پیش آمد.</string>
+
+    <!-- Security / lock -->
+    <string name="unlock_title">باز کردن قفل</string>
+    <string name="unlock">باز کردن قفل</string>
+    <string name="pin_hint">پین را وارد کنید</string>
+    <string name="wrong_pin">پین اشتباه است</string>
+    <string name="use_biometric">استفاده از اثر انگشت</string>
+    <string name="use_pin">استفاده از پین</string>
+    <string name="unlock_biometric_subtitle">برای باز کردن کتابخانه خود احراز هویت کنید</string>
+
+    <!-- Settings -->
+    <string name="settings_title">تنظیمات</string>
+    <string name="section_about">درباره</string>
+    <string name="version">نسخه</string>
+    <string name="action_settings">تنظیمات</string>
+    <string name="section_appearance">ظاهر</string>
+    <string name="section_downloads">دانلودها</string>
+    <string name="section_security">امنیت</string>
+    <string name="section_storage">فضای ذخیره و پشتیبان</string>
+    <string name="theme">پوسته</string>
+    <string name="theme_system">پیروی از سیستم</string>
+    <string name="theme_light">روشن</string>
+    <string name="theme_dark">تیره</string>
+    <string name="wifi_only">دانلود فقط با وای‌فای</string>
+    <string name="wifi_only_desc">فقط روی شبکه بدون محدودیت مصرف دانلود کنید</string>
+    <string name="max_concurrent">حداکثر دانلودهای همزمان</string>
+    <string name="app_lock">قفل برنامه</string>
+    <string name="app_lock_desc">برای باز کردن برنامه به پین نیاز باشد</string>
+    <string name="change_pin">تغییر پین</string>
+    <string name="biometric">باز کردن با اثر انگشت</string>
+    <string name="prevent_screenshots">جلوگیری از اسکرین‌شات</string>
+    <string name="hide_recents">پنهان کردن محتوا در برنامه‌های اخیر</string>
+    <string name="storage_used">فضای مصرف‌شده</string>
+    <string name="clear_cache">پاک کردن حافظه پنهان</string>
+    <string name="cache_cleared">حافظه پنهان پاک شد</string>
+    <string name="backup">پشتیبان‌گیری</string>
+    <string name="backup_desc">صدور یک فایل پشتیبان رمزگذاری‌شده</string>
+    <string name="restore">بازیابی</string>
+    <string name="set_pin">تنظیم پین</string>
+    <string name="save">ذخیره</string>
+    <string name="pin_length_error">پین باید ۴ تا ۱۲ رقم باشد</string>
+    <string name="backup_encrypt_title">رمزگذاری پشتیبان</string>
+    <string name="backup_encrypt_message">یک گذرواژه انتخاب کنید. برای بازیابی به آن نیاز خواهید داشت.</string>
+    <string name="backup_password_hint">گذرواژه</string>
+    <string name="export">صدور</string>
+    <string name="password_too_short">گذرواژه باید حداقل ۶ نویسه باشد</string>
+    <string name="restore_title">بازیابی پشتیبان</string>
+    <string name="restore_message">گذرواژه‌ای را که برای ساخت این پشتیبان استفاده شده وارد کنید.</string>
+    <string name="backup_exported">پشتیبان ذخیره شد: %1$s</string>
+    <string name="backup_restored">%1$d ویدیو بازیابی شد</string>
+    <string name="backup_restore_failed">بازیابی ناموفق بود — گذرواژه اشتباه یا فایل خراب</string>
+
+    <!-- Per-video actions -->
+    <string name="delete">حذف</string>
+    <string name="play">پخش</string>
+    <string name="action_share">اشتراک‌گذاری</string>
+    <string name="rename">تغییر نام</string>
+    <string name="more_options">گزینه‌های بیشتر</string>
+    <string name="open_source">باز کردن در منبع</string>
+    <string name="favorite">افزودن به موردعلاقه‌ها</string>
+    <string name="unfavorite">حذف از موردعلاقه‌ها</string>
+    <string name="lock_video">خصوصی</string>
+    <string name="unlock_video">خصوصی</string>
+
+    <!-- Activation -->
+    <string name="activation_title">فعال‌سازی برنامه</string>
+    <string name="activation_desc">شماره دستگاه خود را برای توسعه‌دهنده بفرستید تا کد فعال‌سازی دریافت کنید. به‌صورت آفلاین کار می‌کند.</string>
+    <string name="activation_device_id">شماره دستگاه</string>
+    <string name="activation_copy_device">کپی شماره دستگاه</string>
+    <string name="activation_copied">کپی شد ✓</string>
+    <string name="activation_code_hint">کد فعال‌سازی را وارد کنید</string>
+    <string name="activation_activate">فعال‌سازی</string>
+    <string name="activation_invalid">کد برای این دستگاه نامعتبر است.</string>
+    <string name="activation_owner_recovery">بازیابی مالک (بذر مخفی)</string>
+    <string name="activation_seed_hint">بذر مالک (۶۴ رقم هگز)</string>
+    <string name="activation_seed_invalid">بذر مطابقت ندارد.</string>
+    <string name="activation_activated">فعال شد ✅</string>
+    <string name="activation_status">مجوز</string>
+    <string name="activation_status_permanent">فعال‌شده (دائمی)</string>
+    <string name="activation_status_days">فعال‌شده · %1$d روز باقی‌مانده</string>
+    <string name="activation_deactivate">غیرفعال‌سازی (قفل مجدد)</string>
+
+    <!-- Image editor -->
+    <string name="edit_image">ویرایش تصویر</string>
+    <string name="editor_hint">روی تصویر بکشید تا یک ناحیه انتخاب کنید</string>
+    <string name="editor_crop">برش</string>
+    <string name="editor_hide">پنهان کردن</string>
+    <string name="editor_text">متن</string>
+    <string name="editor_add">افزودن</string>
+    <string name="editor_extract_text">استخراج متن</string>
+    <string name="editor_need_selection">ابتدا بکشید تا یک ناحیه انتخاب کنید</string>
+    <string name="editor_ocr_running">در حال خواندن متن…</string>
+    <string name="editor_ocr_empty">متنی یافت نشد</string>
+    <string name="editor_ocr_copied">متن کپی شد</string>
+    <string name="editor_saved">در کتابخانه ذخیره شد</string>
+    <string name="color_white">سفید</string>
+    <string name="color_yellow">زرد</string>
+    <string name="color_red">قرمز</string>
+    <string name="color_black">سیاه</string>
+
+    <!-- File info -->
+    <string name="file_info">اطلاعات فایل</string>
+    <string name="edit_info">ویرایش اطلاعات</string>
+    <string name="info_title_hint">عنوان</string>
+    <string name="info_desc_hint">توضیحات / یادداشت‌ها</string>
+    <string name="info_description">یادداشت‌ها: %1$s</string>
+    <string name="info_format">قالب: %1$s</string>
+    <string name="info_type">نوع: %1$s</string>
+    <string name="info_size">اندازه: %1$s</string>
+    <string name="info_resolution">وضوح: %1$d × %2$d</string>
+    <string name="info_duration">مدت زمان: %1$s</string>
+
+    <!-- Save location -->
+    <string name="save_location">محل ذخیره</string>
+    <string name="save_location_default">فضای ذخیره برنامه (پیش‌فرض)</string>
+    <string name="choose_folder">انتخاب پوشه…</string>
+    <string name="video_locked">این ویدیو قفل است</string>
+    <string name="share_failed">اشتراک‌گذاری این ویدیو ممکن نیست</string>
+
+    <!-- Streaming / saved links -->
+    <string name="save_link">ذخیره پیوند</string>
+    <string name="link_saved">پیوند در کتابخانه ذخیره شد</string>
+    <string name="link_badge">پیوند ذخیره‌شده</string>
+
+    <!-- Protected videos -->
+    <string name="protected_videos">ویدیوهای خصوصی</string>
+    <string name="protected_set_pin_hint">به‌عنوان خصوصی علامت‌گذاری شد. برای قفل واقعی، در تنظیمات ← امنیت یک پین/اثر انگشت تنظیم کنید.</string>
+    <string name="protected_moved_hint">به ویدیوهای خصوصی منتقل شد (منو ← ویدیوهای خصوصی).</string>
+    <string name="protected_title">خصوصی · %1$d</string>
+    <string name="protected_need_lock">برای باز کردن ویدیوهای خصوصی، روی گوشی خود یک اثر انگشت یا قفل صفحه تنظیم کنید.</string>
+
+    <!-- Categories -->
+    <string name="category">دسته‌بندی</string>
+    <string name="category_none">بدون دسته‌بندی</string>
+    <string name="category_all">همه دسته‌بندی‌ها</string>
+    <string name="set_category">تنظیم دسته‌بندی</string>
+    <string name="category_hint">نام دسته‌بندی</string>
+    <string name="category_general">عمومی</string>
+    <string name="category_education">آموزش</string>
+    <string name="category_entertainment">سرگرمی</string>
+    <string name="category_music">موسیقی</string>
+    <string name="category_sports">ورزش</string>
+    <string name="category_news">اخبار</string>
+    <string name="category_cooking">آشپزی</string>
+    <string name="category_tech">فناوری</string>
+    <string name="category_religion">مذهب</string>
+    <string name="category_kids">کودکان</string>
+    <string name="manage_categories">مدیریت دسته‌بندی‌ها</string>
+    <string name="add_category">افزودن دسته‌بندی</string>
+    <string name="no_categories">هنوز دسته‌بندی‌ای وجود ندارد. برای افزودن روی + بزنید.</string>
+    <string name="reorder">تغییر ترتیب</string>
+    <string name="delete_category_message">دسته‌بندی \"%1$s\" حذف شود؟ ویدیوها باقی می‌مانند اما بدون دسته‌بندی می‌شوند.</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_thumbnail">تصویر بندانگشتی ویدیو</string>
+    <string name="cd_favorite">موردعلاقه</string>
+    <string name="cd_back">بازگشت</string>
+    <string name="cd_lock">قفل کنترل‌ها</string>
+    <string name="cd_rotate">چرخش</string>
+    <string name="cd_pip">تصویر در تصویر</string>
+    <string name="cd_background">پخش در پس‌زمینه</string>
+    <string name="cd_import">وارد کردن ویدیوها</string>
+    <string name="cd_resize">تغییر اندازه ویدیو</string>
+
+    <!-- Hide floating text on video (playback overlay) -->
+    <string name="hide_text">پوشاندن متن</string>
+    <string name="hide_text_hint">بکشید تا متن را بپوشانید؛ گوشه را بکشید تا اندازه را تغییر دهید. منو را باز کنید و دوباره روی پوشاندن متن بزنید تا قفل شود.</string>
+    <string name="hide_text_cleared">پوشش حذف شد</string>
+    <string name="hide_text_remove">حذف پوشش</string>
+    <string name="background_play">پخش در پس‌زمینه (فقط صدا)</string>
+
+    <!-- Player resize modes -->
+    <string name="resize_fit">متناسب</string>
+    <string name="resize_zoom">بزرگ‌نمایی (برش)</string>
+    <string name="resize_fill">پر کردن (کشش)</string>
+</resources>

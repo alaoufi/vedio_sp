@@ -30,6 +30,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyVideoLibrary"
         android:enableOnBackInvokedCallback="true"
+        android:localeConfig="@xml/locales_config"
         tools:targetApi="34">
 
         <!-- ===== Activities ===== -->
@@ -102,6 +103,18 @@
             android:exported="false"
             android:parentActivityName=".ui.main.MainActivity" />
 
+        <!-- Offline multi-language usage guide. -->
+        <activity
+            android:name=".ui.help.HelpActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.settings.SettingsActivity" />
+
+        <!-- Library statistics dashboard. -->
+        <activity
+            android:name=".ui.stats.StatsActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.main.MainActivity" />
+
         <!-- Player: supports PiP, rotation, and keeps screen on. -->
         <activity
             android:name=".ui.player.PlayerActivity"
@@ -135,6 +148,17 @@
                 android:value="androidx.startup"
                 tools:node="remove" />
         </provider>
+
+        <!-- Persists the user's chosen app language across processes on API < 33
+             (backport for AppCompatDelegate.setApplicationLocales). -->
+        <service
+            android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
+            android:enabled="false"
+            android:exported="false">
+            <meta-data
+                android:name="autoStoreLocales"
+                android:value="true" />
+        </service>
 
     </application>
 

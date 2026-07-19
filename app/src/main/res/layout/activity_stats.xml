@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:title="@string/statistics" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="12dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Summary tiles -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
+
+                <include layout="@layout/item_stat_tile" android:id="@+id/tileVideos"
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+                <include layout="@layout/item_stat_tile" android:id="@+id/tileSize"
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
+
+                <include layout="@layout/item_stat_tile" android:id="@+id/tileDuration"
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+                <include layout="@layout/item_stat_tile" android:id="@+id/tilePlays"
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+            <TextView style="@style/SettingsHeader" android:text="@string/most_played" />
+            <LinearLayout android:id="@+id/mostPlayedContainer"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <TextView style="@style/SettingsHeader" android:text="@string/recently_played" />
+            <LinearLayout android:id="@+id/recentContainer"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <TextView style="@style/SettingsHeader" android:text="@string/by_category" />
+            <LinearLayout android:id="@+id/categoriesContainer"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <TextView style="@style/SettingsHeader" android:text="@string/by_source" />
+            <LinearLayout android:id="@+id/sourcesContainer"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

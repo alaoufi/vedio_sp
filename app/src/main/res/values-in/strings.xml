@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pustaka Video</string>
+
+    <!-- Tabs / YouTube -->
+    <string name="tab_library">Pustaka</string>
+    <string name="tab_youtube">YouTube</string>
+    <string name="hide_shorts">Sembunyikan Shorts</string>
+    <string name="youtube_search_hint">Cari YouTube</string>
+    <string name="youtube_tab_hint">Cari YouTube — putar bebas iklan atau unduh. Shorts disembunyikan.</string>
+
+    <!-- Library -->
+    <string name="library_stats">%1$d video · %2$s</string>
+    <string name="filter_all">Semua</string>
+    <string name="filter">Filter</string>
+    <string name="filter_source">Sumber</string>
+    <string name="filter_folder">Folder</string>
+    <string name="filter_type">Jenis</string>
+    <string name="type_video">Video</string>
+    <string name="type_audio">Audio</string>
+    <string name="type_image">Gambar</string>
+    <string name="source_tiktok">TikTok</string>
+    <string name="source_youtube">YouTube</string>
+    <string name="source_instagram">Instagram</string>
+    <string name="source_snapchat">Snapchat</string>
+    <string name="source_other">Lainnya</string>
+    <string name="search_hint">Cari video</string>
+    <string name="empty_library_title">Pustaka Anda kosong</string>
+    <string name="empty_library_message">Ketuk tombol + untuk mengimpor video dari perangkat Anda.</string>
+
+    <!-- Selection -->
+    <string name="selected_count">%1$d dipilih</string>
+    <string name="delete_videos_title">Hapus video</string>
+    <string name="delete_videos_message">Hapus dari pustaka saja, atau hapus juga berkas milik aplikasi?</string>
+    <string name="delete_files">Hapus berkas</string>
+    <string name="remove_only">Hapus saja</string>
+    <string name="move_to_folder">Pindah ke folder</string>
+    <string name="no_folder">Tanpa folder</string>
+
+    <!-- Sort -->
+    <string name="sort_by">Urutkan berdasarkan</string>
+    <string name="sort_date_new">Tanggal ditambahkan (terbaru)</string>
+    <string name="sort_date_old">Tanggal ditambahkan (terlama)</string>
+    <string name="sort_name_az">Nama (A–Z)</string>
+    <string name="sort_name_za">Nama (Z–A)</string>
+    <string name="sort_duration_long">Durasi (terpanjang)</string>
+    <string name="sort_duration_short">Durasi (terpendek)</string>
+    <string name="sort_size_large">Ukuran (terbesar)</string>
+    <string name="sort_size_small">Ukuran (terkecil)</string>
+    <string name="sort_category">Kategori</string>
+
+    <!-- Folders -->
+    <string name="new_folder">Folder baru</string>
+    <string name="folder_name_hint">Nama folder</string>
+    <string name="create">Buat</string>
+    <string name="cancel">Batal</string>
+    <string name="apply">Terapkan</string>
+    <string name="play_next">Berikutnya</string>
+    <string name="play_previous">Sebelumnya</string>
+    <string name="autoplay">Putar otomatis berikutnya</string>
+    <string name="language">Bahasa</string>
+    <string name="language_system">Bawaan sistem</string>
+    <string name="user_guide">Panduan pengguna</string>
+    <string name="user_guide_desc">Cara menggunakan setiap fitur</string>
+
+    <!-- Menu -->
+    <string name="action_toggle_view">Alihkan tampilan</string>
+    <string name="action_sort">Urutkan</string>
+    <string name="action_favorites">Favorit</string>
+    <string name="action_new_folder">Folder baru</string>
+
+    <!-- Import -->
+    <string name="import_title">Impor video</string>
+    <string name="import_select_all">Pilih semua</string>
+    <string name="import_selected_count">Impor (%1$d)</string>
+    <string name="import_item_meta">%1$s · %2$s</string>
+    <string name="import_done">%1$d video diimpor</string>
+    <string name="import_empty">Tidak ada video baru ditemukan di perangkat ini</string>
+    <string name="permission_denied_media">Izin media diperlukan untuk mengimpor video.</string>
+
+    <!-- Player -->
+    <string name="speed_format">%.2f×</string>
+    <string name="playback_error">Tidak dapat memutar video ini</string>
+    <string name="brightness_label">Kecerahan %1$d%%</string>
+    <string name="volume_label">Volume %1$d%%</string>
+
+    <!-- Downloads -->
+    <string name="downloads_title">Unduhan</string>
+    <string name="downloads_empty">Belum ada unduhan</string>
+    <string name="downloading_banner">Mengunduh %1$d · %2$d%%</string>
+    <string name="clear_completed">Bersihkan yang selesai</string>
+    <string name="action_downloads">Unduhan</string>
+    <string name="action_resume">Lanjutkan</string>
+    <string name="action_pause">Jeda</string>
+    <string name="action_retry">Coba lagi</string>
+    <string name="status_waiting">Menunggu…</string>
+    <string name="status_downloading">%1$d%% · %2$s</string>
+    <string name="status_paused">Dijeda</string>
+    <string name="status_completed">Selesai · %1$s</string>
+    <string name="status_failed">Gagal</string>
+    <string name="status_canceled">Dibatalkan</string>
+    <string name="download_channel_name">Unduhan</string>
+    <string name="download_channel_desc">Menampilkan progres unduhan video</string>
+    <string name="download_preparing">Menyiapkan…</string>
+    <string name="download_complete">Unduhan selesai</string>
+    <string name="download_failed">Unduhan gagal</string>
+
+    <!-- Add download (providers) -->
+    <string name="search_title">Cari &amp; unduh</string>
+    <string name="action_search">Cari</string>
+    <string name="tiktok_link_hint">TikTok tidak memiliki pencarian kata kunci — tempel tautan TikTok, lalu tekan Cari untuk mengunduhnya.</string>
+    <string name="link_only_hint">Tidak ada pencarian kata kunci di sini — tempel tautan postingan publik, lalu tekan Cari untuk mengunduhnya. Instagram/Snapchat hanya berfungsi untuk postingan publik.</string>
+    <string name="add_download_title">Unduh dari tautan</string>
+    <string name="add_download_hint">Tempel tautan TikTok, YouTube, Instagram, atau Snapchat. Video TikTok disimpan tanpa tanda air. Instagram dan Snapchat hanya berfungsi untuk postingan publik. Ekstraksi bergantung pada platform dan sesekali dapat gagal.</string>
+    <string name="paste_url_hint">URL video</string>
+    <string name="paste">Tempel</string>
+    <string name="fetch_info">Ambil info</string>
+    <string name="download">Unduh</string>
+    <string name="download_started">Unduhan ditambahkan ke antrean</string>
+    <string name="download_options">Opsi unduhan</string>
+    <string name="kind_full">Video lengkap (suara + gambar)</string>
+    <string name="kind_video_only">Video tanpa suara</string>
+    <string name="kind_audio_only">Hanya audio</string>
+    <string name="kind_image_only">Hanya gambar (sampul)</string>
+    <string name="action_add_download">Unduh dari tautan</string>
+    <string name="error_invalid_link">Tautan ini tidak valid.</string>
+    <string name="error_private">Video ini bersifat pribadi.</string>
+    <string name="error_not_found">Video tidak ditemukan atau telah dihapus.</string>
+    <string name="error_unsupported">Tautan ini tidak didukung.</string>
+    <string name="error_network">Kesalahan jaringan. Periksa koneksi Anda.</string>
+    <string name="error_extraction">Tidak dapat mengekstrak video. Sumber mungkin telah berubah.</string>
+    <string name="error_unknown">Terjadi kesalahan.</string>
+
+    <!-- Security / lock -->
+    <string name="unlock_title">Buka kunci</string>
+    <string name="unlock">Buka kunci</string>
+    <string name="pin_hint">Masukkan PIN</string>
+    <string name="wrong_pin">PIN salah</string>
+    <string name="use_biometric">Gunakan sidik jari</string>
+    <string name="use_pin">Gunakan PIN</string>
+    <string name="unlock_biometric_subtitle">Autentikasi untuk membuka pustaka Anda</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Pengaturan</string>
+    <string name="section_about">Tentang</string>
+    <string name="version">Versi</string>
+    <string name="action_settings">Pengaturan</string>
+    <string name="section_appearance">Tampilan</string>
+    <string name="section_downloads">Unduhan</string>
+    <string name="section_security">Keamanan</string>
+    <string name="section_storage">Penyimpanan &amp; cadangan</string>
+    <string name="theme">Tema</string>
+    <string name="theme_system">Ikuti sistem</string>
+    <string name="theme_light">Terang</string>
+    <string name="theme_dark">Gelap</string>
+    <string name="wifi_only">Unduhan hanya Wi-Fi</string>
+    <string name="wifi_only_desc">Unduh hanya pada jaringan tanpa kuota</string>
+    <string name="max_concurrent">Maks. unduhan bersamaan</string>
+    <string name="app_lock">Kunci aplikasi</string>
+    <string name="app_lock_desc">Wajibkan PIN untuk membuka aplikasi</string>
+    <string name="change_pin">Ubah PIN</string>
+    <string name="biometric">Buka kunci sidik jari</string>
+    <string name="prevent_screenshots">Cegah tangkapan layar</string>
+    <string name="hide_recents">Sembunyikan konten di aplikasi terkini</string>
+    <string name="storage_used">Penyimpanan terpakai</string>
+    <string name="clear_cache">Bersihkan cache</string>
+    <string name="cache_cleared">Cache dibersihkan</string>
+    <string name="backup">Cadangkan</string>
+    <string name="backup_desc">Ekspor berkas cadangan terenkripsi</string>
+    <string name="restore">Pulihkan</string>
+    <string name="set_pin">Atur PIN</string>
+    <string name="save">Simpan</string>
+    <string name="pin_length_error">PIN harus 4–12 digit</string>
+    <string name="backup_encrypt_title">Enkripsi cadangan</string>
+    <string name="backup_encrypt_message">Pilih kata sandi. Anda akan membutuhkannya untuk memulihkan.</string>
+    <string name="backup_password_hint">Kata sandi</string>
+    <string name="export">Ekspor</string>
+    <string name="password_too_short">Kata sandi harus minimal 6 karakter</string>
+    <string name="restore_title">Pulihkan cadangan</string>
+    <string name="restore_message">Masukkan kata sandi yang digunakan untuk membuat cadangan ini.</string>
+    <string name="backup_exported">Cadangan disimpan: %1$s</string>
+    <string name="backup_restored">%1$d video dipulihkan</string>
+    <string name="backup_restore_failed">Pemulihan gagal — kata sandi salah atau berkas rusak</string>
+
+    <!-- Per-video actions -->
+    <string name="delete">Hapus</string>
+    <string name="play">Putar</string>
+    <string name="action_share">Bagikan</string>
+    <string name="rename">Ganti nama</string>
+    <string name="more_options">Opsi lainnya</string>
+    <string name="open_source">Buka di sumber</string>
+    <string name="favorite">Tambahkan ke favorit</string>
+    <string name="unfavorite">Hapus dari favorit</string>
+    <string name="lock_video">Pribadi</string>
+    <string name="unlock_video">Pribadi</string>
+
+    <!-- Activation -->
+    <string name="activation_title">Aktifkan aplikasi</string>
+    <string name="activation_desc">Kirim nomor perangkat Anda ke pengembang untuk menerima kode aktivasi. Berfungsi offline.</string>
+    <string name="activation_device_id">Nomor perangkat</string>
+    <string name="activation_copy_device">Salin nomor perangkat</string>
+    <string name="activation_copied">Disalin ✓</string>
+    <string name="activation_code_hint">Masukkan kode aktivasi</string>
+    <string name="activation_activate">Aktifkan</string>
+    <string name="activation_invalid">Kode tidak valid untuk perangkat ini.</string>
+    <string name="activation_owner_recovery">Pemulihan pemilik (seed rahasia)</string>
+    <string name="activation_seed_hint">Seed pemilik (64 heks)</string>
+    <string name="activation_seed_invalid">Seed tidak cocok.</string>
+    <string name="activation_activated">Diaktifkan ✅</string>
+    <string name="activation_status">Lisensi</string>
+    <string name="activation_status_permanent">Diaktifkan (permanen)</string>
+    <string name="activation_status_days">Diaktifkan · %1$d hari tersisa</string>
+    <string name="activation_deactivate">Nonaktifkan (kunci ulang)</string>
+
+    <!-- Image editor -->
+    <string name="edit_image">Edit gambar</string>
+    <string name="editor_hint">Seret pada gambar untuk memilih area</string>
+    <string name="editor_crop">Potong</string>
+    <string name="editor_hide">Sembunyikan</string>
+    <string name="editor_text">Teks</string>
+    <string name="editor_add">Tambah</string>
+    <string name="editor_extract_text">Ekstrak teks</string>
+    <string name="editor_need_selection">Seret untuk memilih area terlebih dahulu</string>
+    <string name="editor_ocr_running">Membaca teks…</string>
+    <string name="editor_ocr_empty">Tidak ada teks ditemukan</string>
+    <string name="editor_ocr_copied">Teks disalin</string>
+    <string name="editor_saved">Disimpan ke pustaka</string>
+    <string name="color_white">Putih</string>
+    <string name="color_yellow">Kuning</string>
+    <string name="color_red">Merah</string>
+    <string name="color_black">Hitam</string>
+
+    <!-- File info -->
+    <string name="file_info">Info berkas</string>
+    <string name="edit_info">Edit info</string>
+    <string name="info_title_hint">Judul</string>
+    <string name="info_desc_hint">Deskripsi / catatan</string>
+    <string name="info_description">Catatan: %1$s</string>
+    <string name="info_format">Format: %1$s</string>
+    <string name="info_type">Jenis: %1$s</string>
+    <string name="info_size">Ukuran: %1$s</string>
+    <string name="info_resolution">Resolusi: %1$d × %2$d</string>
+    <string name="info_duration">Durasi: %1$s</string>
+
+    <!-- Save location -->
+    <string name="save_location">Lokasi penyimpanan</string>
+    <string name="save_location_default">Penyimpanan aplikasi (bawaan)</string>
+    <string name="choose_folder">Pilih folder…</string>
+    <string name="video_locked">Video ini terkunci</string>
+    <string name="share_failed">Tidak dapat membagikan video ini</string>
+
+    <!-- Streaming / saved links -->
+    <string name="save_link">Simpan tautan</string>
+    <string name="link_saved">Tautan disimpan ke pustaka</string>
+    <string name="link_badge">Tautan tersimpan</string>
+
+    <!-- Protected videos -->
+    <string name="protected_videos">Video pribadi</string>
+    <string name="protected_set_pin_hint">Ditandai pribadi. Atur PIN/sidik jari di Pengaturan → Keamanan untuk kunci yang sesungguhnya.</string>
+    <string name="protected_moved_hint">Dipindahkan ke Video pribadi (menu → Video pribadi).</string>
+    <string name="protected_title">Pribadi · %1$d</string>
+    <string name="protected_need_lock">Siapkan sidik jari atau kunci layar di ponsel Anda untuk membuka video pribadi.</string>
+
+    <!-- Categories -->
+    <string name="category">Kategori</string>
+    <string name="category_none">Tanpa kategori</string>
+    <string name="category_all">Semua kategori</string>
+    <string name="set_category">Atur kategori</string>
+    <string name="category_hint">Nama kategori</string>
+    <string name="category_general">Umum</string>
+    <string name="category_education">Pendidikan</string>
+    <string name="category_entertainment">Hiburan</string>
+    <string name="category_music">Musik</string>
+    <string name="category_sports">Olahraga</string>
+    <string name="category_news">Berita</string>
+    <string name="category_cooking">Memasak</string>
+    <string name="category_tech">Teknologi</string>
+    <string name="category_religion">Agama</string>
+    <string name="category_kids">Anak-anak</string>
+    <string name="manage_categories">Kelola kategori</string>
+    <string name="add_category">Tambah kategori</string>
+    <string name="no_categories">Belum ada kategori. Ketuk + untuk menambahkan.</string>
+    <string name="reorder">Susun ulang</string>
+    <string name="delete_category_message">Hapus kategori \"%1$s\"? Video tetap ada, tetapi menjadi tanpa kategori.</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_thumbnail">Gambar mini video</string>
+    <string name="cd_favorite">Favorit</string>
+    <string name="cd_back">Kembali</string>
+    <string name="cd_lock">Kunci kontrol</string>
+    <string name="cd_rotate">Putar</string>
+    <string name="cd_pip">Picture in picture</string>
+    <string name="cd_background">Pemutaran di latar belakang</string>
+    <string name="cd_import">Impor video</string>
+    <string name="cd_resize">Ubah ukuran video</string>
+
+    <!-- Hide floating text on video (playback overlay) -->
+    <string name="hide_text">Tutup teks</string>
+    <string name="hide_text_hint">Seret untuk menutupi teks; seret sudut untuk mengubah ukuran. Buka menu dan ketuk Tutup teks lagi untuk mengunci.</string>
+    <string name="hide_text_cleared">Penutup dihapus</string>
+    <string name="hide_text_remove">Hapus penutup</string>
+    <string name="background_play">Pemutaran di latar belakang (hanya audio)</string>
+
+    <!-- Player resize modes -->
+    <string name="resize_fit">Sesuaikan</string>
+    <string name="resize_zoom">Perbesar (potong)</string>
+    <string name="resize_fill">Isi (regangkan)</string>
+</resources>

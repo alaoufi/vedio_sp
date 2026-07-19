@@ -37,6 +37,14 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <LinearLayout android:id="@+id/languageRow" style="@style/SettingsRow">
+                <LinearLayout style="@style/SettingsRowText">
+                    <TextView style="@style/SettingsTitle" android:text="@string/language" />
+                    <TextView android:id="@+id/languageValue" style="@style/SettingsSubtitle"
+                        tools:text="العربية" />
+                </LinearLayout>
+            </LinearLayout>
+
             <!-- Downloads -->
             <TextView style="@style/SettingsHeader" android:text="@string/section_downloads" />
 
@@ -149,6 +157,13 @@
 
             <!-- About -->
             <TextView style="@style/SettingsHeader" android:text="@string/section_about" />
+
+            <LinearLayout android:id="@+id/guideRow" style="@style/SettingsRow">
+                <LinearLayout style="@style/SettingsRowText">
+                    <TextView style="@style/SettingsTitle" android:text="@string/user_guide" />
+                    <TextView style="@style/SettingsSubtitle" android:text="@string/user_guide_desc" />
+                </LinearLayout>
+            </LinearLayout>
 
             <LinearLayout style="@style/SettingsRow">
                 <LinearLayout style="@style/SettingsRowText">

@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Видеотека</string>
+
+    <!-- Tabs / YouTube -->
+    <string name="tab_library">Библиотека</string>
+    <string name="tab_youtube">YouTube</string>
+    <string name="hide_shorts">Скрыть Shorts</string>
+    <string name="youtube_search_hint">Поиск в YouTube</string>
+    <string name="youtube_tab_hint">Ищите в YouTube — смотрите без рекламы или скачивайте. Shorts скрыты.</string>
+
+    <!-- Library -->
+    <string name="library_stats">%1$d видео · %2$s</string>
+    <string name="filter_all">Все</string>
+    <string name="filter">Фильтр</string>
+    <string name="filter_source">Источник</string>
+    <string name="filter_folder">Папка</string>
+    <string name="filter_type">Тип</string>
+    <string name="type_video">Видео</string>
+    <string name="type_audio">Аудио</string>
+    <string name="type_image">Изображение</string>
+    <string name="source_tiktok">TikTok</string>
+    <string name="source_youtube">YouTube</string>
+    <string name="source_instagram">Instagram</string>
+    <string name="source_snapchat">Snapchat</string>
+    <string name="source_other">Другое</string>
+    <string name="search_hint">Поиск видео</string>
+    <string name="empty_library_title">Ваша библиотека пуста</string>
+    <string name="empty_library_message">Нажмите кнопку +, чтобы импортировать видео с вашего устройства.</string>
+
+    <!-- Selection -->
+    <string name="selected_count">Выбрано: %1$d</string>
+    <string name="delete_videos_title">Удалить видео</string>
+    <string name="delete_videos_message">Убрать только из библиотеки или также удалить файлы, принадлежащие приложению?</string>
+    <string name="delete_files">Удалить файлы</string>
+    <string name="remove_only">Только убрать</string>
+    <string name="move_to_folder">Переместить в папку</string>
+    <string name="no_folder">Без папки</string>
+
+    <!-- Sort -->
+    <string name="sort_by">Сортировать по</string>
+    <string name="sort_date_new">Дате добавления (сначала новые)</string>
+    <string name="sort_date_old">Дате добавления (сначала старые)</string>
+    <string name="sort_name_az">Названию (А–Я)</string>
+    <string name="sort_name_za">Названию (Я–А)</string>
+    <string name="sort_duration_long">Длительности (сначала длинные)</string>
+    <string name="sort_duration_short">Длительности (сначала короткие)</string>
+    <string name="sort_size_large">Размеру (сначала большие)</string>
+    <string name="sort_size_small">Размеру (сначала маленькие)</string>
+    <string name="sort_category">Категории</string>
+
+    <!-- Folders -->
+    <string name="new_folder">Новая папка</string>
+    <string name="folder_name_hint">Имя папки</string>
+    <string name="create">Создать</string>
+    <string name="cancel">Отмена</string>
+    <string name="apply">Применить</string>
+    <string name="play_next">Вперёд</string>
+    <string name="play_previous">Назад</string>
+    <string name="autoplay">Автовоспроизведение следующего</string>
+    <string name="language">Язык</string>
+    <string name="language_system">Системный по умолчанию</string>
+    <string name="user_guide">Руководство пользователя</string>
+    <string name="user_guide_desc">Как пользоваться каждой функцией</string>
+
+    <!-- Menu -->
+    <string name="action_toggle_view">Переключить вид</string>
+    <string name="action_sort">Сортировка</string>
+    <string name="action_favorites">Избранное</string>
+    <string name="action_new_folder">Новая папка</string>
+
+    <!-- Import -->
+    <string name="import_title">Импорт видео</string>
+    <string name="import_select_all">Выбрать все</string>
+    <string name="import_selected_count">Импортировать (%1$d)</string>
+    <string name="import_item_meta">%1$s · %2$s</string>
+    <string name="import_done">Импортировано видео: %1$d</string>
+    <string name="import_empty">На этом устройстве не найдено новых видео</string>
+    <string name="permission_denied_media">Для импорта видео требуется разрешение на доступ к медиафайлам.</string>
+
+    <!-- Player -->
+    <string name="speed_format">%.2f×</string>
+    <string name="playback_error">Не удаётся воспроизвести это видео</string>
+    <string name="brightness_label">Яркость %1$d%%</string>
+    <string name="volume_label">Громкость %1$d%%</string>
+
+    <!-- Downloads -->
+    <string name="downloads_title">Загрузки</string>
+    <string name="downloads_empty">Пока нет загрузок</string>
+    <string name="downloading_banner">Загрузка %1$d · %2$d%%</string>
+    <string name="clear_completed">Очистить завершённые</string>
+    <string name="action_downloads">Загрузки</string>
+    <string name="action_resume">Возобновить</string>
+    <string name="action_pause">Пауза</string>
+    <string name="action_retry">Повторить</string>
+    <string name="status_waiting">Ожидание…</string>
+    <string name="status_downloading">%1$d%% · %2$s</string>
+    <string name="status_paused">Приостановлено</string>
+    <string name="status_completed">Завершено · %1$s</string>
+    <string name="status_failed">Не удалось</string>
+    <string name="status_canceled">Отменено</string>
+    <string name="download_channel_name">Загрузки</string>
+    <string name="download_channel_desc">Показывает ход загрузки видео</string>
+    <string name="download_preparing">Подготовка…</string>
+    <string name="download_complete">Загрузка завершена</string>
+    <string name="download_failed">Загрузка не удалась</string>
+
+    <!-- Add download (providers) -->
+    <string name="search_title">Поиск &amp; скачивание</string>
+    <string name="action_search">Поиск</string>
+    <string name="tiktok_link_hint">В TikTok нет поиска по ключевым словам — вставьте ссылку TikTok, затем нажмите «Поиск», чтобы скачать её.</string>
+    <string name="link_only_hint">Здесь нет поиска по ключевым словам — вставьте ссылку на публичную запись, затем нажмите «Поиск», чтобы скачать её. Instagram/Snapchat работают только с публичными записями.</string>
+    <string name="add_download_title">Скачать по ссылке</string>
+    <string name="add_download_hint">Вставьте ссылку TikTok, YouTube, Instagram или Snapchat. Видео из TikTok сохраняются без водяного знака. Instagram и Snapchat работают только с публичными записями. Извлечение зависит от платформы и иногда может не удаться.</string>
+    <string name="paste_url_hint">URL видео</string>
+    <string name="paste">Вставить</string>
+    <string name="fetch_info">Получить информацию</string>
+    <string name="download">Скачать</string>
+    <string name="download_started">Загрузка добавлена в очередь</string>
+    <string name="download_options">Параметры загрузки</string>
+    <string name="kind_full">Полное видео (звук + изображение)</string>
+    <string name="kind_video_only">Видео без звука</string>
+    <string name="kind_audio_only">Только аудио</string>
+    <string name="kind_image_only">Только изображение (обложка)</string>
+    <string name="action_add_download">Скачать по ссылке</string>
+    <string name="error_invalid_link">Эта ссылка недействительна.</string>
+    <string name="error_private">Это видео личное.</string>
+    <string name="error_not_found">Видео не найдено или удалено.</string>
+    <string name="error_unsupported">Эта ссылка не поддерживается.</string>
+    <string name="error_network">Ошибка сети. Проверьте подключение.</string>
+    <string name="error_extraction">Не удалось извлечь видео. Возможно, источник изменился.</string>
+    <string name="error_unknown">Что-то пошло не так.</string>
+
+    <!-- Security / lock -->
+    <string name="unlock_title">Разблокировать</string>
+    <string name="unlock">Разблокировать</string>
+    <string name="pin_hint">Введите PIN-код</string>
+    <string name="wrong_pin">Неверный PIN-код</string>
+    <string name="use_biometric">Использовать отпечаток пальца</string>
+    <string name="use_pin">Использовать PIN-код</string>
+    <string name="unlock_biometric_subtitle">Пройдите аутентификацию, чтобы открыть библиотеку</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Настройки</string>
+    <string name="section_about">О приложении</string>
+    <string name="version">Версия</string>
+    <string name="action_settings">Настройки</string>
+    <string name="section_appearance">Внешний вид</string>
+    <string name="section_downloads">Загрузки</string>
+    <string name="section_security">Безопасность</string>
+    <string name="section_storage">Хранилище &amp; резервные копии</string>
+    <string name="theme">Тема</string>
+    <string name="theme_system">Как в системе</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_dark">Тёмная</string>
+    <string name="wifi_only">Загрузки только по Wi-Fi</string>
+    <string name="wifi_only_desc">Загружать только в безлимитной сети</string>
+    <string name="max_concurrent">Максимум одновременных загрузок</string>
+    <string name="app_lock">Блокировка приложения</string>
+    <string name="app_lock_desc">Требовать PIN-код для открытия приложения</string>
+    <string name="change_pin">Изменить PIN-код</string>
+    <string name="biometric">Разблокировка отпечатком пальца</string>
+    <string name="prevent_screenshots">Запретить скриншоты</string>
+    <string name="hide_recents">Скрывать содержимое в недавних приложениях</string>
+    <string name="storage_used">Использовано хранилища</string>
+    <string name="clear_cache">Очистить кэш</string>
+    <string name="cache_cleared">Кэш очищен</string>
+    <string name="backup">Резервная копия</string>
+    <string name="backup_desc">Экспортировать зашифрованный файл резервной копии</string>
+    <string name="restore">Восстановить</string>
+    <string name="set_pin">Задать PIN-код</string>
+    <string name="save">Сохранить</string>
+    <string name="pin_length_error">PIN-код должен содержать 4–12 цифр</string>
+    <string name="backup_encrypt_title">Зашифровать резервную копию</string>
+    <string name="backup_encrypt_message">Выберите пароль. Он понадобится для восстановления.</string>
+    <string name="backup_password_hint">Пароль</string>
+    <string name="export">Экспорт</string>
+    <string name="password_too_short">Пароль должен содержать не менее 6 символов</string>
+    <string name="restore_title">Восстановить резервную копию</string>
+    <string name="restore_message">Введите пароль, использованный при создании этой резервной копии.</string>
+    <string name="backup_exported">Резервная копия сохранена: %1$s</string>
+    <string name="backup_restored">Восстановлено видео: %1$d</string>
+    <string name="backup_restore_failed">Восстановление не удалось — неверный пароль или повреждённый файл</string>
+
+    <!-- Per-video actions -->
+    <string name="delete">Удалить</string>
+    <string name="play">Воспроизвести</string>
+    <string name="action_share">Поделиться</string>
+    <string name="rename">Переименовать</string>
+    <string name="more_options">Ещё</string>
+    <string name="open_source">Открыть в источнике</string>
+    <string name="favorite">Добавить в избранное</string>
+    <string name="unfavorite">Убрать из избранного</string>
+    <string name="lock_video">Личное</string>
+    <string name="unlock_video">Личное</string>
+
+    <!-- Activation -->
+    <string name="activation_title">Активируйте приложение</string>
+    <string name="activation_desc">Отправьте номер вашего устройства разработчику, чтобы получить код активации. Работает офлайн.</string>
+    <string name="activation_device_id">Номер устройства</string>
+    <string name="activation_copy_device">Копировать номер устройства</string>
+    <string name="activation_copied">Скопировано ✓</string>
+    <string name="activation_code_hint">Введите код активации</string>
+    <string name="activation_activate">Активировать</string>
+    <string name="activation_invalid">Недействительный код для этого устройства.</string>
+    <string name="activation_owner_recovery">Восстановление владельца (секретный сид)</string>
+    <string name="activation_seed_hint">Сид владельца (64 hex)</string>
+    <string name="activation_seed_invalid">Сид не совпадает.</string>
+    <string name="activation_activated">Активировано ✅</string>
+    <string name="activation_status">Лицензия</string>
+    <string name="activation_status_permanent">Активировано (навсегда)</string>
+    <string name="activation_status_days">Активировано · осталось дней: %1$d</string>
+    <string name="activation_deactivate">Деактивировать (заблокировать снова)</string>
+
+    <!-- Image editor -->
+    <string name="edit_image">Редактировать изображение</string>
+    <string name="editor_hint">Проведите по изображению, чтобы выделить область</string>
+    <string name="editor_crop">Обрезать</string>
+    <string name="editor_hide">Скрыть</string>
+    <string name="editor_text">Текст</string>
+    <string name="editor_add">Добавить</string>
+    <string name="editor_extract_text">Извлечь текст</string>
+    <string name="editor_need_selection">Сначала проведите, чтобы выделить область</string>
+    <string name="editor_ocr_running">Распознавание текста…</string>
+    <string name="editor_ocr_empty">Текст не найден</string>
+    <string name="editor_ocr_copied">Текст скопирован</string>
+    <string name="editor_saved">Сохранено в библиотеку</string>
+    <string name="color_white">Белый</string>
+    <string name="color_yellow">Жёлтый</string>
+    <string name="color_red">Красный</string>
+    <string name="color_black">Чёрный</string>
+
+    <!-- File info -->
+    <string name="file_info">Информация о файле</string>
+    <string name="edit_info">Изменить информацию</string>
+    <string name="info_title_hint">Название</string>
+    <string name="info_desc_hint">Описание / заметки</string>
+    <string name="info_description">Заметки: %1$s</string>
+    <string name="info_format">Формат: %1$s</string>
+    <string name="info_type">Тип: %1$s</string>
+    <string name="info_size">Размер: %1$s</string>
+    <string name="info_resolution">Разрешение: %1$d × %2$d</string>
+    <string name="info_duration">Длительность: %1$s</string>
+
+    <!-- Save location -->
+    <string name="save_location">Место сохранения</string>
+    <string name="save_location_default">Хранилище приложения (по умолчанию)</string>
+    <string name="choose_folder">Выбрать папку…</string>
+    <string name="video_locked">Это видео заблокировано</string>
+    <string name="share_failed">Не удаётся поделиться этим видео</string>
+
+    <!-- Streaming / saved links -->
+    <string name="save_link">Сохранить ссылку</string>
+    <string name="link_saved">Ссылка сохранена в библиотеку</string>
+    <string name="link_badge">Сохранённая ссылка</string>
+
+    <!-- Protected videos -->
+    <string name="protected_videos">Личные видео</string>
+    <string name="protected_set_pin_hint">Помечено как личное. Задайте PIN-код/отпечаток пальца в разделе «Настройки → Безопасность» для настоящей блокировки.</string>
+    <string name="protected_moved_hint">Перемещено в «Личные видео» (меню → Личные видео).</string>
+    <string name="protected_title">Личное · %1$d</string>
+    <string name="protected_need_lock">Настройте на телефоне отпечаток пальца или блокировку экрана, чтобы открыть личные видео.</string>
+
+    <!-- Categories -->
+    <string name="category">Категория</string>
+    <string name="category_none">Без категории</string>
+    <string name="category_all">Все категории</string>
+    <string name="set_category">Задать категорию</string>
+    <string name="category_hint">Название категории</string>
+    <string name="category_general">Общее</string>
+    <string name="category_education">Образование</string>
+    <string name="category_entertainment">Развлечения</string>
+    <string name="category_music">Музыка</string>
+    <string name="category_sports">Спорт</string>
+    <string name="category_news">Новости</string>
+    <string name="category_cooking">Кулинария</string>
+    <string name="category_tech">Технологии</string>
+    <string name="category_religion">Религия</string>
+    <string name="category_kids">Дети</string>
+    <string name="manage_categories">Управление категориями</string>
+    <string name="add_category">Добавить категорию</string>
+    <string name="no_categories">Пока нет категорий. Нажмите +, чтобы добавить.</string>
+    <string name="reorder">Изменить порядок</string>
+    <string name="delete_category_message">Удалить категорию \"%1$s\"? Видео сохранятся, но станут без категории.</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_thumbnail">Миниатюра видео</string>
+    <string name="cd_favorite">Избранное</string>
+    <string name="cd_back">Назад</string>
+    <string name="cd_lock">Заблокировать управление</string>
+    <string name="cd_rotate">Повернуть</string>
+    <string name="cd_pip">Картинка в картинке</string>
+    <string name="cd_background">Фоновое воспроизведение</string>
+    <string name="cd_import">Импорт видео</string>
+    <string name="cd_resize">Изменить размер видео</string>
+
+    <!-- Hide floating text on video (playback overlay) -->
+    <string name="hide_text">Закрыть текст</string>
+    <string name="hide_text_hint">Проведите, чтобы закрыть текст; тяните угол для изменения размера. Откройте меню и снова нажмите «Закрыть текст», чтобы зафиксировать.</string>
+    <string name="hide_text_cleared">Закрытие убрано</string>
+    <string name="hide_text_remove">Убрать закрытие</string>
+    <string name="background_play">Фоновое воспроизведение (только аудио)</string>
+
+    <!-- Player resize modes -->
+    <string name="resize_fit">Подгонка</string>
+    <string name="resize_zoom">Увеличение (обрезка)</string>
+    <string name="resize_fill">Заполнение (растянуть)</string>
+</resources>

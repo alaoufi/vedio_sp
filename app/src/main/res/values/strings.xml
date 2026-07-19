@@ -58,6 +58,59 @@
     <string name="play_next">Next</string>
     <string name="play_previous">Previous</string>
     <string name="autoplay">Autoplay next</string>
+    <string name="language">Language</string>
+    <string name="language_system">System default</string>
+    <string name="user_guide">User guide</string>
+    <string name="user_guide_desc">How to use every feature</string>
+    <string name="statistics">Statistics</string>
+    <string name="stat_videos">Videos</string>
+    <string name="stat_size">Total size</string>
+    <string name="stat_duration">Total length</string>
+    <string name="stat_plays">Total plays</string>
+    <string name="stat_play_count">%d plays</string>
+    <string name="stat_empty">Nothing yet</string>
+    <string name="most_played">Most played</string>
+    <string name="recently_played">Recently played</string>
+    <string name="by_category">By category</string>
+    <string name="by_source">By source</string>
+    <string name="source_device">Device</string>
+
+    <!-- Native language names, shown the same in every locale. Order must match
+         language_tags below. The first entry follows the system language. -->
+    <string-array name="language_names">
+        <item>@string/language_system</item>
+        <item>العربية</item>
+        <item>English</item>
+        <item>Türkçe</item>
+        <item>Español</item>
+        <item>Deutsch</item>
+        <item>Filipino</item>
+        <item>Français</item>
+        <item>Indonesia</item>
+        <item>Italiano</item>
+        <item>Melayu</item>
+        <item>हिन्दी</item>
+        <item>বাংলা</item>
+        <item>فارسی</item>
+        <item>Русский</item>
+    </string-array>
+    <string-array name="language_tags">
+        <item></item>
+        <item>ar</item>
+        <item>en</item>
+        <item>tr</item>
+        <item>es</item>
+        <item>de</item>
+        <item>fil</item>
+        <item>fr</item>
+        <item>id</item>
+        <item>it</item>
+        <item>ms</item>
+        <item>hi</item>
+        <item>bn</item>
+        <item>fa</item>
+        <item>ru</item>
+    </string-array>
 
     <!-- Menu -->
     <string name="action_toggle_view">Toggle view</string>

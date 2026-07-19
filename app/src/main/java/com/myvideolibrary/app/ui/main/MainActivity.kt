@@ -831,7 +831,7 @@ class MainActivity : AppCompatActivity() {
         // Search and view-toggle work on both tabs; the rest are library-only.
         for (id in intArrayOf(
             R.id.action_filter, R.id.action_favorites, R.id.action_sort,
-            R.id.action_protected, R.id.action_manage_categories
+            R.id.action_protected, R.id.action_manage_categories, R.id.action_stats
         )) menu.findItem(id)?.isVisible = !youtubeTab
         return super.onPrepareOptionsMenu(menu)
     }
@@ -862,6 +862,10 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.action_manage_categories -> {
                 startActivity(com.myvideolibrary.app.ui.categories.CategoriesActivity.intent(this))
+                true
+            }
+            R.id.action_stats -> {
+                startActivity(Intent(this, com.myvideolibrary.app.ui.stats.StatsActivity::class.java))
                 true
             }
             R.id.action_protected -> { toggleProtected(); true }

@@ -24,6 +24,18 @@ data class DuplicateGroup(
     val copies: Int
 )
 
+/** How many videos carry a given category (for the statistics screen). */
+data class CategoryCount(
+    val category: String?,
+    val count: Int
+)
+
+/** How many videos come from a given source (for the statistics screen). */
+data class SourceCount(
+    val source: String,
+    val count: Int
+)
+
 @Dao
 interface VideoDao {
 
@@ -115,6 +127,25 @@ interface VideoDao {
 
     @Query("SELECT COALESCE(SUM(file_size), 0) FROM videos")
     fun observeTotalSize(): Flow<Long>
+
+    @Query("SELECT COALESCE(SUM(duration), 0) FROM videos")
+    fun observeTotalDuration(): Flow<Long>
+
+    @Query("SELECT COALESCE(SUM(play_count), 0) FROM videos")
+    fun observeTotalPlays(): Flow<Int>
+
+    @Query(
+        "SELECT category, COUNT(*) AS count FROM videos " +
+            "WHERE category IS NOT NULL AND TRIM(category) != '' " +
+            "GROUP BY category ORDER BY count DESC"
+    )
+    fun observeCategoryCounts(): Flow<List<CategoryCount>>
+
+    @Query("SELECT source, COUNT(*) AS count FROM videos GROUP BY source ORDER BY count DESC")
+    fun observeSourceCounts(): Flow<List<SourceCount>>
+
+    @Query("SELECT * FROM videos WHERE play_count > 0 ORDER BY play_count DESC LIMIT :limit")
+    fun observeMostPlayed(limit: Int): Flow<List<VideoEntity>>
 
     @Query("SELECT folder_id AS folderId, COUNT(*) AS count FROM videos WHERE folder_id IS NOT NULL GROUP BY folder_id")
     fun observeFolderCounts(): Flow<List<FolderVideoCount>>

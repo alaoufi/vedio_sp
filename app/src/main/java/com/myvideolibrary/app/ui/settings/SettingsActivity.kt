@@ -62,6 +62,11 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun bindActions() {
         binding.themeRow.setOnClickListener { showThemeDialog() }
+        binding.languageRow.setOnClickListener { showLanguageDialog() }
+        binding.languageValue.text = currentLanguageLabel()
+        binding.guideRow.setOnClickListener {
+            startActivity(android.content.Intent(this, com.myvideolibrary.app.ui.help.HelpActivity::class.java))
+        }
         binding.wifiOnlySwitch.setOnClickListener {
             viewModel.setWifiOnly(binding.wifiOnlySwitch.isChecked)
         }
@@ -162,6 +167,42 @@ class SettingsActivity : AppCompatActivity() {
     private fun folderLabel(uri: Uri): String {
         val doc = androidx.documentfile.provider.DocumentFile.fromTreeUri(this, uri)
         return doc?.name ?: uri.lastPathSegment ?: uri.toString()
+    }
+
+    // ---- Language ----
+
+    /** Native display name of the currently applied app language. */
+    private fun currentLanguageLabel(): String {
+        val names = resources.getStringArray(R.array.language_names)
+        val tags = resources.getStringArray(R.array.language_tags)
+        val applied = androidx.appcompat.app.AppCompatDelegate.getApplicationLocales()
+        if (applied.isEmpty) return names[0]
+        val tag = applied.toLanguageTags()
+        val idx = tags.indexOfFirst { it.isNotEmpty() && tag.startsWith(it) }
+        return if (idx >= 0) names[idx] else names[0]
+    }
+
+    private fun showLanguageDialog() {
+        val names = resources.getStringArray(R.array.language_names)
+        val tags = resources.getStringArray(R.array.language_tags)
+        val applied = androidx.appcompat.app.AppCompatDelegate.getApplicationLocales()
+        val appliedTag = applied.toLanguageTags()
+        val current = if (applied.isEmpty) 0
+        else tags.indexOfFirst { it.isNotEmpty() && appliedTag.startsWith(it) }.coerceAtLeast(0)
+        AlertDialog.Builder(this)
+            .setTitle(R.string.language)
+            .setSingleChoiceItems(names, current) { dialog, which ->
+                val tag = tags[which]
+                val locales = if (tag.isEmpty()) {
+                    androidx.core.os.LocaleListCompat.getEmptyLocaleList()
+                } else {
+                    androidx.core.os.LocaleListCompat.forLanguageTags(tag)
+                }
+                // AppCompat recreates the activity to apply the new locale.
+                androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(locales)
+                dialog.dismiss()
+            }
+            .show()
     }
 
     private fun showThemeDialog() {

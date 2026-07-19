@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">वीडियो लाइब्रेरी</string>
+
+    <!-- Tabs / YouTube -->
+    <string name="tab_library">लाइब्रेरी</string>
+    <string name="tab_youtube">YouTube</string>
+    <string name="hide_shorts">Shorts छिपाएँ</string>
+    <string name="youtube_search_hint">YouTube खोजें</string>
+    <string name="youtube_tab_hint">YouTube खोजें — विज्ञापन-मुक्त चलाएँ या डाउनलोड करें। Shorts छिपे हुए हैं।</string>
+
+    <!-- Library -->
+    <string name="library_stats">%1$d वीडियो · %2$s</string>
+    <string name="filter_all">सभी</string>
+    <string name="filter">फ़िल्टर</string>
+    <string name="filter_source">स्रोत</string>
+    <string name="filter_folder">फ़ोल्डर</string>
+    <string name="filter_type">प्रकार</string>
+    <string name="type_video">वीडियो</string>
+    <string name="type_audio">ऑडियो</string>
+    <string name="type_image">छवि</string>
+    <string name="source_tiktok">TikTok</string>
+    <string name="source_youtube">YouTube</string>
+    <string name="source_instagram">Instagram</string>
+    <string name="source_snapchat">Snapchat</string>
+    <string name="source_other">अन्य</string>
+    <string name="search_hint">वीडियो खोजें</string>
+    <string name="empty_library_title">आपकी लाइब्रेरी खाली है</string>
+    <string name="empty_library_message">अपने डिवाइस से वीडियो आयात करने के लिए + बटन पर टैप करें।</string>
+
+    <!-- Selection -->
+    <string name="selected_count">%1$d चयनित</string>
+    <string name="delete_videos_title">वीडियो हटाएँ</string>
+    <string name="delete_videos_message">केवल लाइब्रेरी से हटाएँ, या ऐप के स्वामित्व वाली फ़ाइलें भी हटाएँ?</string>
+    <string name="delete_files">फ़ाइलें हटाएँ</string>
+    <string name="remove_only">केवल हटाएँ</string>
+    <string name="move_to_folder">फ़ोल्डर में ले जाएँ</string>
+    <string name="no_folder">कोई फ़ोल्डर नहीं</string>
+
+    <!-- Sort -->
+    <string name="sort_by">इसके अनुसार क्रमबद्ध करें</string>
+    <string name="sort_date_new">जोड़ी गई तिथि (नवीनतम)</string>
+    <string name="sort_date_old">जोड़ी गई तिथि (सबसे पुरानी)</string>
+    <string name="sort_name_az">नाम (A–Z)</string>
+    <string name="sort_name_za">नाम (Z–A)</string>
+    <string name="sort_duration_long">अवधि (सबसे लंबी)</string>
+    <string name="sort_duration_short">अवधि (सबसे छोटी)</string>
+    <string name="sort_size_large">आकार (सबसे बड़ा)</string>
+    <string name="sort_size_small">आकार (सबसे छोटा)</string>
+    <string name="sort_category">श्रेणी</string>
+
+    <!-- Folders -->
+    <string name="new_folder">नया फ़ोल्डर</string>
+    <string name="folder_name_hint">फ़ोल्डर का नाम</string>
+    <string name="create">बनाएँ</string>
+    <string name="cancel">रद्द करें</string>
+    <string name="apply">लागू करें</string>
+    <string name="play_next">अगला</string>
+    <string name="play_previous">पिछला</string>
+    <string name="autoplay">अगला स्वतः चलाएँ</string>
+    <string name="language">भाषा</string>
+    <string name="language_system">सिस्टम डिफ़ॉल्ट</string>
+    <string name="user_guide">उपयोगकर्ता गाइड</string>
+    <string name="user_guide_desc">हर सुविधा का उपयोग कैसे करें</string>
+
+    <!-- Menu -->
+    <string name="action_toggle_view">दृश्य बदलें</string>
+    <string name="action_sort">क्रमबद्ध करें</string>
+    <string name="action_favorites">पसंदीदा</string>
+    <string name="action_new_folder">नया फ़ोल्डर</string>
+
+    <!-- Import -->
+    <string name="import_title">वीडियो आयात करें</string>
+    <string name="import_select_all">सभी चुनें</string>
+    <string name="import_selected_count">आयात करें (%1$d)</string>
+    <string name="import_item_meta">%1$s · %2$s</string>
+    <string name="import_done">%1$d वीडियो आयात किए गए</string>
+    <string name="import_empty">इस डिवाइस पर कोई नया वीडियो नहीं मिला</string>
+    <string name="permission_denied_media">वीडियो आयात करने के लिए मीडिया अनुमति आवश्यक है।</string>
+
+    <!-- Player -->
+    <string name="speed_format">%.2f×</string>
+    <string name="playback_error">यह वीडियो चलाने में असमर्थ</string>
+    <string name="brightness_label">चमक %1$d%%</string>
+    <string name="volume_label">आवाज़ %1$d%%</string>
+
+    <!-- Downloads -->
+    <string name="downloads_title">डाउनलोड</string>
+    <string name="downloads_empty">अभी तक कोई डाउनलोड नहीं</string>
+    <string name="downloading_banner">%1$d डाउनलोड हो रहा है · %2$d%%</string>
+    <string name="clear_completed">पूर्ण हुए साफ़ करें</string>
+    <string name="action_downloads">डाउनलोड</string>
+    <string name="action_resume">फिर से शुरू करें</string>
+    <string name="action_pause">रोकें</string>
+    <string name="action_retry">पुनः प्रयास करें</string>
+    <string name="status_waiting">प्रतीक्षा कर रहा है…</string>
+    <string name="status_downloading">%1$d%% · %2$s</string>
+    <string name="status_paused">रुका हुआ</string>
+    <string name="status_completed">पूर्ण · %1$s</string>
+    <string name="status_failed">विफल</string>
+    <string name="status_canceled">रद्द किया गया</string>
+    <string name="download_channel_name">डाउनलोड</string>
+    <string name="download_channel_desc">वीडियो डाउनलोड की प्रगति दिखाता है</string>
+    <string name="download_preparing">तैयार हो रहा है…</string>
+    <string name="download_complete">डाउनलोड पूर्ण</string>
+    <string name="download_failed">डाउनलोड विफल</string>
+
+    <!-- Add download (providers) -->
+    <string name="search_title">खोजें &amp; डाउनलोड करें</string>
+    <string name="action_search">खोजें</string>
+    <string name="tiktok_link_hint">TikTok में कीवर्ड खोज नहीं है — एक TikTok लिंक पेस्ट करें, फिर उसे डाउनलोड करने के लिए खोजें दबाएँ।</string>
+    <string name="link_only_hint">यहाँ कीवर्ड खोज नहीं है — एक सार्वजनिक पोस्ट लिंक पेस्ट करें, फिर उसे डाउनलोड करने के लिए खोजें दबाएँ। Instagram/Snapchat केवल सार्वजनिक पोस्ट के लिए काम करते हैं।</string>
+    <string name="add_download_title">लिंक से डाउनलोड करें</string>
+    <string name="add_download_hint">एक TikTok, YouTube, Instagram या Snapchat लिंक पेस्ट करें। TikTok वीडियो बिना वॉटरमार्क के सहेजे जाते हैं। Instagram और Snapchat केवल सार्वजनिक पोस्ट के लिए काम करते हैं। निष्कर्षण प्लेटफ़ॉर्म पर निर्भर करता है और कभी-कभी विफल हो सकता है।</string>
+    <string name="paste_url_hint">वीडियो URL</string>
+    <string name="paste">पेस्ट करें</string>
+    <string name="fetch_info">जानकारी प्राप्त करें</string>
+    <string name="download">डाउनलोड करें</string>
+    <string name="download_started">डाउनलोड कतार में जोड़ा गया</string>
+    <string name="download_options">डाउनलोड विकल्प</string>
+    <string name="kind_full">पूरा वीडियो (ध्वनि + चित्र)</string>
+    <string name="kind_video_only">बिना ध्वनि के वीडियो</string>
+    <string name="kind_audio_only">केवल ऑडियो</string>
+    <string name="kind_image_only">केवल छवि (कवर)</string>
+    <string name="action_add_download">लिंक से डाउनलोड करें</string>
+    <string name="error_invalid_link">यह लिंक मान्य नहीं है।</string>
+    <string name="error_private">यह वीडियो निजी है।</string>
+    <string name="error_not_found">वीडियो नहीं मिला या हटा दिया गया।</string>
+    <string name="error_unsupported">यह लिंक समर्थित नहीं है।</string>
+    <string name="error_network">नेटवर्क त्रुटि। अपना कनेक्शन जांचें।</string>
+    <string name="error_extraction">वीडियो नहीं निकाला जा सका। हो सकता है स्रोत बदल गया हो।</string>
+    <string name="error_unknown">कुछ गलत हो गया।</string>
+
+    <!-- Security / lock -->
+    <string name="unlock_title">अनलॉक करें</string>
+    <string name="unlock">अनलॉक करें</string>
+    <string name="pin_hint">PIN दर्ज करें</string>
+    <string name="wrong_pin">गलत PIN</string>
+    <string name="use_biometric">फ़िंगरप्रिंट का उपयोग करें</string>
+    <string name="use_pin">PIN का उपयोग करें</string>
+    <string name="unlock_biometric_subtitle">अपनी लाइब्रेरी खोलने के लिए प्रमाणित करें</string>
+
+    <!-- Settings -->
+    <string name="settings_title">सेटिंग्स</string>
+    <string name="section_about">परिचय</string>
+    <string name="version">संस्करण</string>
+    <string name="action_settings">सेटिंग्स</string>
+    <string name="section_appearance">रूप</string>
+    <string name="section_downloads">डाउनलोड</string>
+    <string name="section_security">सुरक्षा</string>
+    <string name="section_storage">संग्रहण &amp; बैकअप</string>
+    <string name="theme">थीम</string>
+    <string name="theme_system">सिस्टम का अनुसरण करें</string>
+    <string name="theme_light">हल्की</string>
+    <string name="theme_dark">गहरी</string>
+    <string name="wifi_only">केवल Wi-Fi डाउनलोड</string>
+    <string name="wifi_only_desc">केवल बिना-मीटर वाले नेटवर्क पर डाउनलोड करें</string>
+    <string name="max_concurrent">अधिकतम एक साथ डाउनलोड</string>
+    <string name="app_lock">ऐप लॉक</string>
+    <string name="app_lock_desc">ऐप खोलने के लिए PIN आवश्यक करें</string>
+    <string name="change_pin">PIN बदलें</string>
+    <string name="biometric">फ़िंगरप्रिंट अनलॉक</string>
+    <string name="prevent_screenshots">स्क्रीनशॉट रोकें</string>
+    <string name="hide_recents">हाल के ऐप्स में सामग्री छिपाएँ</string>
+    <string name="storage_used">उपयोग किया गया संग्रहण</string>
+    <string name="clear_cache">कैश साफ़ करें</string>
+    <string name="cache_cleared">कैश साफ़ किया गया</string>
+    <string name="backup">बैकअप</string>
+    <string name="backup_desc">एक एन्क्रिप्टेड बैकअप फ़ाइल निर्यात करें</string>
+    <string name="restore">पुनर्स्थापित करें</string>
+    <string name="set_pin">PIN सेट करें</string>
+    <string name="save">सहेजें</string>
+    <string name="pin_length_error">PIN 4–12 अंकों का होना चाहिए</string>
+    <string name="backup_encrypt_title">बैकअप एन्क्रिप्ट करें</string>
+    <string name="backup_encrypt_message">एक पासवर्ड चुनें। पुनर्स्थापित करने के लिए आपको इसकी आवश्यकता होगी।</string>
+    <string name="backup_password_hint">पासवर्ड</string>
+    <string name="export">निर्यात करें</string>
+    <string name="password_too_short">पासवर्ड कम से कम 6 अक्षरों का होना चाहिए</string>
+    <string name="restore_title">बैकअप पुनर्स्थापित करें</string>
+    <string name="restore_message">इस बैकअप को बनाने के लिए उपयोग किया गया पासवर्ड दर्ज करें।</string>
+    <string name="backup_exported">बैकअप सहेजा गया: %1$s</string>
+    <string name="backup_restored">%1$d वीडियो पुनर्स्थापित किए गए</string>
+    <string name="backup_restore_failed">पुनर्स्थापना विफल — गलत पासवर्ड या दूषित फ़ाइल</string>
+
+    <!-- Per-video actions -->
+    <string name="delete">हटाएँ</string>
+    <string name="play">चलाएँ</string>
+    <string name="action_share">साझा करें</string>
+    <string name="rename">नाम बदलें</string>
+    <string name="more_options">अधिक विकल्प</string>
+    <string name="open_source">स्रोत में खोलें</string>
+    <string name="favorite">पसंदीदा में जोड़ें</string>
+    <string name="unfavorite">पसंदीदा से हटाएँ</string>
+    <string name="lock_video">निजी</string>
+    <string name="unlock_video">निजी</string>
+
+    <!-- Activation -->
+    <string name="activation_title">ऐप सक्रिय करें</string>
+    <string name="activation_desc">सक्रियण कोड प्राप्त करने के लिए अपना डिवाइस नंबर डेवलपर को भेजें। ऑफ़लाइन काम करता है।</string>
+    <string name="activation_device_id">डिवाइस नंबर</string>
+    <string name="activation_copy_device">डिवाइस नंबर कॉपी करें</string>
+    <string name="activation_copied">कॉपी किया गया ✓</string>
+    <string name="activation_code_hint">सक्रियण कोड दर्ज करें</string>
+    <string name="activation_activate">सक्रिय करें</string>
+    <string name="activation_invalid">इस डिवाइस के लिए अमान्य कोड।</string>
+    <string name="activation_owner_recovery">स्वामी पुनर्प्राप्ति (गुप्त सीड)</string>
+    <string name="activation_seed_hint">स्वामी सीड (64 हेक्स)</string>
+    <string name="activation_seed_invalid">सीड मेल नहीं खाता।</string>
+    <string name="activation_activated">सक्रिय किया गया ✅</string>
+    <string name="activation_status">लाइसेंस</string>
+    <string name="activation_status_permanent">सक्रिय (स्थायी)</string>
+    <string name="activation_status_days">सक्रिय · %1$d दिन शेष</string>
+    <string name="activation_deactivate">निष्क्रिय करें (फिर से लॉक करें)</string>
+
+    <!-- Image editor -->
+    <string name="edit_image">छवि संपादित करें</string>
+    <string name="editor_hint">एक क्षेत्र चुनने के लिए छवि पर खींचें</string>
+    <string name="editor_crop">क्रॉप करें</string>
+    <string name="editor_hide">छिपाएँ</string>
+    <string name="editor_text">टेक्स्ट</string>
+    <string name="editor_add">जोड़ें</string>
+    <string name="editor_extract_text">टेक्स्ट निकालें</string>
+    <string name="editor_need_selection">पहले एक क्षेत्र चुनने के लिए खींचें</string>
+    <string name="editor_ocr_running">टेक्स्ट पढ़ रहा है…</string>
+    <string name="editor_ocr_empty">कोई टेक्स्ट नहीं मिला</string>
+    <string name="editor_ocr_copied">टेक्स्ट कॉपी किया गया</string>
+    <string name="editor_saved">लाइब्रेरी में सहेजा गया</string>
+    <string name="color_white">सफ़ेद</string>
+    <string name="color_yellow">पीला</string>
+    <string name="color_red">लाल</string>
+    <string name="color_black">काला</string>
+
+    <!-- File info -->
+    <string name="file_info">फ़ाइल जानकारी</string>
+    <string name="edit_info">जानकारी संपादित करें</string>
+    <string name="info_title_hint">शीर्षक</string>
+    <string name="info_desc_hint">विवरण / नोट्स</string>
+    <string name="info_description">नोट्स: %1$s</string>
+    <string name="info_format">प्रारूप: %1$s</string>
+    <string name="info_type">प्रकार: %1$s</string>
+    <string name="info_size">आकार: %1$s</string>
+    <string name="info_resolution">रिज़ॉल्यूशन: %1$d × %2$d</string>
+    <string name="info_duration">अवधि: %1$s</string>
+
+    <!-- Save location -->
+    <string name="save_location">सहेजने का स्थान</string>
+    <string name="save_location_default">ऐप संग्रहण (डिफ़ॉल्ट)</string>
+    <string name="choose_folder">फ़ोल्डर चुनें…</string>
+    <string name="video_locked">यह वीडियो लॉक है</string>
+    <string name="share_failed">यह वीडियो साझा नहीं कर सकते</string>
+
+    <!-- Streaming / saved links -->
+    <string name="save_link">लिंक सहेजें</string>
+    <string name="link_saved">लिंक लाइब्रेरी में सहेजा गया</string>
+    <string name="link_badge">सहेजा गया लिंक</string>
+
+    <!-- Protected videos -->
+    <string name="protected_videos">निजी वीडियो</string>
+    <string name="protected_set_pin_hint">निजी के रूप में चिह्नित। वास्तविक लॉक के लिए सेटिंग्स → सुरक्षा में एक PIN/फ़िंगरप्रिंट सेट करें।</string>
+    <string name="protected_moved_hint">निजी वीडियो में ले जाया गया (मेनू → निजी वीडियो)।</string>
+    <string name="protected_title">निजी · %1$d</string>
+    <string name="protected_need_lock">निजी वीडियो खोलने के लिए अपने फ़ोन पर एक फ़िंगरप्रिंट या स्क्रीन लॉक सेट करें।</string>
+
+    <!-- Categories -->
+    <string name="category">श्रेणी</string>
+    <string name="category_none">अवर्गीकृत</string>
+    <string name="category_all">सभी श्रेणियाँ</string>
+    <string name="set_category">श्रेणी सेट करें</string>
+    <string name="category_hint">श्रेणी का नाम</string>
+    <string name="category_general">सामान्य</string>
+    <string name="category_education">शिक्षा</string>
+    <string name="category_entertainment">मनोरंजन</string>
+    <string name="category_music">संगीत</string>
+    <string name="category_sports">खेल</string>
+    <string name="category_news">समाचार</string>
+    <string name="category_cooking">खाना पकाना</string>
+    <string name="category_tech">प्रौद्योगिकी</string>
+    <string name="category_religion">धर्म</string>
+    <string name="category_kids">बच्चे</string>
+    <string name="manage_categories">श्रेणियाँ प्रबंधित करें</string>
+    <string name="add_category">श्रेणी जोड़ें</string>
+    <string name="no_categories">अभी तक कोई श्रेणी नहीं। जोड़ने के लिए + पर टैप करें।</string>
+    <string name="reorder">पुनः क्रमित करें</string>
+    <string name="delete_category_message">श्रेणी \"%1$s\" हटाएँ? वीडियो रहेंगे, लेकिन अवर्गीकृत हो जाएँगे।</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_thumbnail">वीडियो थंबनेल</string>
+    <string name="cd_favorite">पसंदीदा</string>
+    <string name="cd_back">वापस</string>
+    <string name="cd_lock">नियंत्रण लॉक करें</string>
+    <string name="cd_rotate">घुमाएँ</string>
+    <string name="cd_pip">पिक्चर इन पिक्चर</string>
+    <string name="cd_background">बैकग्राउंड प्लेबैक</string>
+    <string name="cd_import">वीडियो आयात करें</string>
+    <string name="cd_resize">वीडियो का आकार बदलें</string>
+
+    <!-- Hide floating text on video (playback overlay) -->
+    <string name="hide_text">टेक्स्ट ढकें</string>
+    <string name="hide_text_hint">टेक्स्ट ढकने के लिए खींचें; आकार बदलने के लिए कोने को खींचें। मेनू खोलें और लॉक करने के लिए फिर से टेक्स्ट ढकें पर टैप करें।</string>
+    <string name="hide_text_cleared">आवरण हटाया गया</string>
+    <string name="hide_text_remove">आवरण हटाएँ</string>
+    <string name="background_play">बैकग्राउंड प्लेबैक (केवल ऑडियो)</string>
+
+    <!-- Player resize modes -->
+    <string name="resize_fit">फ़िट</string>
+    <string name="resize_zoom">ज़ूम (क्रॉप)</string>
+    <string name="resize_fill">फ़िल (स्ट्रेच)</string>
+</resources>
