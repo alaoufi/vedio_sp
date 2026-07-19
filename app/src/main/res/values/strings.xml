@@ -55,6 +55,9 @@
     <string name="create">Create</string>
     <string name="cancel">Cancel</string>
     <string name="apply">Apply</string>
+    <string name="play_next">Next</string>
+    <string name="play_previous">Previous</string>
+    <string name="autoplay">Autoplay next</string>
 
     <!-- Menu -->
     <string name="action_toggle_view">Toggle view</string>

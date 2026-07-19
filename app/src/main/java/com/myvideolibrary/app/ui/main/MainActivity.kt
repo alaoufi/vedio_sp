@@ -548,7 +548,19 @@ class MainActivity : AppCompatActivity() {
             video.mediaType == "image" -> openImage(video)
             // Private videos only appear in the already-unlocked private view, so
             // they play normally from there (no separate "locked" block).
-            else -> startActivity(PlayerActivity.intent(this, video.id))
+            else -> {
+                // Queue the videos currently in view (in order) so playback
+                // continues to the next clip automatically when this one ends.
+                val queue = adapter.snapshot().items
+                    .filter { it.mediaType != "image" }
+                    .map { it.id }
+                val index = queue.indexOf(video.id)
+                if (queue.size > 1 && index >= 0) {
+                    startActivity(PlayerActivity.playlistIntent(this, queue.toLongArray(), index))
+                } else {
+                    startActivity(PlayerActivity.intent(this, video.id))
+                }
+            }
         }
     }
 

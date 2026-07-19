@@ -55,6 +55,9 @@
     <string name="create">إنشاء</string>
     <string name="cancel">إلغاء</string>
     <string name="apply">تطبيق</string>
+    <string name="play_next">التالي</string>
+    <string name="play_previous">السابق</string>
+    <string name="autoplay">تشغيل التالي تلقائياً</string>
 
     <!-- Menu -->
     <string name="action_toggle_view">تبديل العرض</string>

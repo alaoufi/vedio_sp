@@ -51,6 +51,10 @@ class PlayerActivity : AppCompatActivity() {
     private var hideEditing = false
     private var isAudioTrack = false
 
+    // Autoplay queue (ids of the videos that were in view), and our position in it.
+    private var playlist: LongArray = LongArray(0)
+    private var playlistIndex = -1
+
     private val speeds = floatArrayOf(0.5f, 0.75f, 1f, 1.25f, 1.5f, 2f)
     private var speedIndex = 2
 
@@ -62,7 +66,14 @@ class PlayerActivity : AppCompatActivity() {
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val videoId = intent.getLongExtra(EXTRA_VIDEO_ID, -1)
+        // A playlist intent carries the whole queue; the single-video intent one id.
+        intent.getLongArrayExtra(EXTRA_PLAYLIST)?.takeIf { it.isNotEmpty() }?.let { queue ->
+            playlist = queue
+            playlistIndex = intent.getIntExtra(EXTRA_PLAYLIST_INDEX, 0)
+                .coerceIn(0, queue.size - 1)
+        }
+        val videoId = if (playlistIndex >= 0) playlist[playlistIndex]
+        else intent.getLongExtra(EXTRA_VIDEO_ID, -1)
         this.videoId = videoId
         val streamUrl = intent.getStringExtra(EXTRA_STREAM_URL)
 
@@ -123,6 +134,8 @@ class PlayerActivity : AppCompatActivity() {
     private fun showPlayerMenu(anchor: View) {
         val popup = android.widget.PopupMenu(this, anchor)
         val m = popup.menu
+        if (hasNext()) m.add(0, 7, 0, getString(R.string.play_next))
+        if (hasPrevious()) m.add(0, 8, 1, getString(R.string.play_previous))
         if (!isAudioTrack) {
             m.add(0, 1, 0, getString(R.string.cd_rotate))
             m.add(0, 2, 1, getString(R.string.cd_resize))
@@ -147,6 +160,8 @@ class PlayerActivity : AppCompatActivity() {
                     showGestureHint(getString(R.string.hide_text_cleared))
                     true
                 }
+                7 -> { playNext(); true }
+                8 -> { playPrevious(); true }
                 else -> false
             }
         }
@@ -248,6 +263,8 @@ class PlayerActivity : AppCompatActivity() {
             override fun onPlaybackStateChanged(playbackState: Int) {
                 // Show the spinner while buffering so it's clear playback is loading.
                 binding.loadingBar.isVisible = playbackState == Player.STATE_BUFFERING
+                // When a clip ends, roll on to the next one in the queue.
+                if (playbackState == Player.STATE_ENDED && hasNext()) playNext()
             }
             override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
                 binding.errorText.isVisible = true
@@ -293,6 +310,27 @@ class PlayerActivity : AppCompatActivity() {
         speedIndex = (speedIndex + 1) % speeds.size
         player?.setPlaybackSpeed(speeds[speedIndex])
         binding.speedButton.text = getString(R.string.speed_format, speeds[speedIndex])
+    }
+
+    // ---- Autoplay queue ----
+
+    private fun hasNext(): Boolean = playlistIndex in playlist.indices && playlistIndex < playlist.lastIndex
+    private fun hasPrevious(): Boolean = playlistIndex > 0
+
+    private fun playNext() = playAt(playlistIndex + 1)
+    private fun playPrevious() = playAt(playlistIndex - 1)
+
+    /** Restarts the player on another queue entry, replacing this screen. */
+    private fun playAt(index: Int) {
+        if (index !in playlist.indices) return
+        savePosition()
+        startActivity(
+            Intent(this, PlayerActivity::class.java)
+                .putExtra(EXTRA_PLAYLIST, playlist)
+                .putExtra(EXTRA_PLAYLIST_INDEX, index)
+        )
+        overridePendingTransition(0, 0)
+        finish()
     }
 
     // ---- Gestures: left half = brightness, right half = volume ----
@@ -412,16 +450,30 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun savePosition() {
-        player?.let { viewModel.savePosition(it.currentPosition) }
+        player?.let {
+            // A finished (or all-but-finished) clip should restart from the top
+            // next time — don't resume it a second from the end.
+            val ended = it.playbackState == Player.STATE_ENDED ||
+                (it.duration > 0 && it.currentPosition >= it.duration - 3000)
+            viewModel.savePosition(if (ended) 0L else it.currentPosition)
+        }
     }
 
     companion object {
         private const val EXTRA_VIDEO_ID = "extra_video_id"
         private const val EXTRA_STREAM_URL = "extra_stream_url"
         private const val EXTRA_STREAM_TITLE = "extra_stream_title"
+        private const val EXTRA_PLAYLIST = "extra_playlist"
+        private const val EXTRA_PLAYLIST_INDEX = "extra_playlist_index"
 
         fun intent(context: Context, videoId: Long): Intent =
             Intent(context, PlayerActivity::class.java).putExtra(EXTRA_VIDEO_ID, videoId)
+
+        /** Opens the player on a queue of videos, auto-advancing when each ends. */
+        fun playlistIntent(context: Context, ids: LongArray, index: Int): Intent =
+            Intent(context, PlayerActivity::class.java)
+                .putExtra(EXTRA_PLAYLIST, ids)
+                .putExtra(EXTRA_PLAYLIST_INDEX, index)
 
         /** Streams a video straight from its platform page URL, no download. */
         fun streamIntent(context: Context, sourceUrl: String, title: String): Intent =
