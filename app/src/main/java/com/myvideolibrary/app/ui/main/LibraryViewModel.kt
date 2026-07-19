@@ -37,8 +37,8 @@ data class LibraryUiState(
     val favoritesOnly: Boolean = false,
     val sourceFilter: SourceFilter = SourceFilter.ALL,
     val protectedMode: Boolean = false,
-    /** Selected category label, or null for "all categories". */
-    val categoryFilter: String? = null,
+    /** Selected category labels; empty means "all categories". */
+    val categoryFilters: Set<String> = emptySet(),
     val categories: List<String> = emptyList(),
     /** "video"/"audio"/"image", or null for all types. */
     val mediaTypeFilter: String? = null,
@@ -73,14 +73,14 @@ class LibraryViewModel @Inject constructor(
     private val _favoritesOnly = MutableStateFlow(false)
     private val _sourceFilter = MutableStateFlow(SourceFilter.ALL)
     private val _protectedMode = MutableStateFlow(false)
-    private val _categoryFilter = MutableStateFlow<String?>(null)
+    private val _categoryFilters = MutableStateFlow<Set<String>>(emptySet())
     private val _mediaTypeFilter = MutableStateFlow<String?>(null)
 
     /** Merged source + protected + category + type, kept as one flow for combine arity. */
     private val extraFilters = combine(
-        _sourceFilter, _protectedMode, _categoryFilter, _mediaTypeFilter
-    ) { source, protectedMode, category, mediaType ->
-        ExtraFilters(source, protectedMode, category, mediaType)
+        _sourceFilter, _protectedMode, _categoryFilters, _mediaTypeFilter
+    ) { source, protectedMode, categories, mediaType ->
+        ExtraFilters(source, protectedMode, categories, mediaType)
     }
 
     /** Paged videos, recomputed whenever the query changes. */
@@ -118,7 +118,7 @@ class LibraryViewModel @Inject constructor(
             favoritesOnly = f.favoritesOnly,
             sourceFilter = f.extra.sourceFilter,
             protectedMode = f.extra.protectedMode,
-            categoryFilter = f.extra.category,
+            categoryFilters = f.extra.categories,
             categories = m.categories,
             mediaTypeFilter = f.extra.mediaType,
             videoCount = m.count,
@@ -143,7 +143,7 @@ class LibraryViewModel @Inject constructor(
                     search = search,
                     folderId = folderId,
                     favoritesOnly = favoritesOnly,
-                    category = extra.category,
+                    categories = extra.categories,
                     sourceFilter = extra.sourceFilter,
                     protectedOnly = extra.protectedMode,
                     mediaType = extra.mediaType,
@@ -160,8 +160,9 @@ class LibraryViewModel @Inject constructor(
             ) { present, settings ->
                 com.myvideolibrary.app.util.CategoryOrder.apply(present, settings.categoryOrder)
             }.collect { known ->
-                val current = _categoryFilter.value
-                if (current != null && current !in known) _categoryFilter.value = null
+                val current = _categoryFilters.value
+                val stillPresent = current.filter { it in known }.toSet()
+                if (stillPresent.size != current.size) _categoryFilters.value = stillPresent
             }
         }
     }
@@ -178,7 +179,7 @@ class LibraryViewModel @Inject constructor(
 
     fun setProtectedMode(on: Boolean) { _protectedMode.value = on }
 
-    fun setCategoryFilter(category: String?) { _categoryFilter.value = category }
+    fun setCategoryFilters(categories: Set<String>) { _categoryFilters.value = categories }
 
     fun setMediaTypeFilter(type: String?) { _mediaTypeFilter.value = type }
 
@@ -300,7 +301,7 @@ class LibraryViewModel @Inject constructor(
     private data class ExtraFilters(
         val sourceFilter: SourceFilter,
         val protectedMode: Boolean,
-        val category: String?,
+        val categories: Set<String>,
         val mediaType: String?
     )
 

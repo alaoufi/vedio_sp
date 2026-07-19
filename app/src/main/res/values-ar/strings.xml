@@ -54,6 +54,7 @@
     <string name="folder_name_hint">اسم المجلد</string>
     <string name="create">إنشاء</string>
     <string name="cancel">إلغاء</string>
+    <string name="apply">تطبيق</string>
 
     <!-- Menu -->
     <string name="action_toggle_view">تبديل العرض</string>

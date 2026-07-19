@@ -14,7 +14,8 @@ data class LibraryQuery(
     val search: String? = null,
     val folderId: Long? = null,
     val favoritesOnly: Boolean = false,
-    val category: String? = null,
+    /** Show only videos in any of these categories; empty means all categories. */
+    val categories: Set<String> = emptySet(),
     val sourceFilter: SourceFilter = SourceFilter.ALL,
     /** When true show only locked (protected) videos; when false hide them. */
     val protectedOnly: Boolean = false,
@@ -42,9 +43,10 @@ data class LibraryQuery(
         }
         // Locked videos live in a separate protected view, hidden from the library.
         where.append(if (protectedOnly) " AND is_locked = 1" else " AND is_locked = 0")
-        category?.let {
-            where.append(" AND category = ?")
-            args.add(it)
+        if (categories.isNotEmpty()) {
+            val placeholders = categories.joinToString(", ") { "?" }
+            where.append(" AND category IN ($placeholders)")
+            categories.forEach { args.add(it) }
         }
         mediaType?.let {
             where.append(" AND media_type = ?")

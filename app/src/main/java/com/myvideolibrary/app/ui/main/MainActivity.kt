@@ -304,18 +304,15 @@ class MainActivity : AppCompatActivity() {
             }
         )?.isChecked = true
 
-        // --- Category (only when categories exist) ---
+        // --- Category (multi-select; only when categories exist) ---
         if (state.categories.isNotEmpty()) {
-            val cat = menu.addSubMenu(getString(R.string.category))
-            cat.add(GROUP_CATEGORY, ID_CAT_ALL, 0, R.string.category_all)
-            state.categories.forEachIndexed { i, c ->
-                cat.add(GROUP_CATEGORY, ID_CAT_BASE + i, i + 1, c)
+            val selected = state.categoryFilters.size
+            val label = if (selected > 0) {
+                getString(R.string.category) + " ($selected)"
+            } else {
+                getString(R.string.category)
             }
-            cat.setGroupCheckable(GROUP_CATEGORY, true, true)
-            val checkedId = state.categoryFilter
-                ?.let { c -> ID_CAT_BASE + state.categories.indexOf(c) }
-                ?: ID_CAT_ALL
-            cat.findItem(checkedId)?.isChecked = true
+            menu.add(GROUP_CATEGORY, ID_CAT_PICK, 100, label)
         }
 
         popup.setOnMenuItemClickListener { item ->
@@ -328,14 +325,35 @@ class MainActivity : AppCompatActivity() {
                 ID_TYPE_VIDEO -> viewModel.setMediaTypeFilter("video")
                 ID_TYPE_AUDIO -> viewModel.setMediaTypeFilter("audio")
                 ID_TYPE_IMAGE -> viewModel.setMediaTypeFilter("image")
-                ID_CAT_ALL -> viewModel.setCategoryFilter(null)
-                in ID_CAT_BASE..(ID_CAT_BASE + 9999) ->
-                    viewModel.setCategoryFilter(state.categories.getOrNull(item.itemId - ID_CAT_BASE))
+                ID_CAT_PICK -> showCategoryFilterDialog(state.categories, state.categoryFilters)
                 else -> return@setOnMenuItemClickListener false
             }
             true
         }
         popup.show()
+    }
+
+    /**
+     * Multi-select category filter: tick any number of categories to show only
+     * those; clearing all (or "Show all") returns the full library.
+     */
+    private fun showCategoryFilterDialog(categories: List<String>, selected: Set<String>) {
+        val items = categories.toTypedArray()
+        val checked = BooleanArray(items.size) { items[it] in selected }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.category)
+            .setMultiChoiceItems(items, checked) { _, which, isChecked ->
+                checked[which] = isChecked
+            }
+            .setPositiveButton(R.string.apply) { _, _ ->
+                val chosen = items.filterIndexed { i, _ -> checked[i] }.toSet()
+                viewModel.setCategoryFilters(chosen)
+            }
+            .setNeutralButton(R.string.category_all) { _, _ ->
+                viewModel.setCategoryFilters(emptySet())
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     private fun setupFab() {
@@ -884,8 +902,7 @@ class MainActivity : AppCompatActivity() {
         const val ID_TYPE_VIDEO = 151
         const val ID_TYPE_AUDIO = 152
         const val ID_TYPE_IMAGE = 153
-        const val ID_CAT_ALL = 200
-        const val ID_CAT_BASE = 201
+        const val ID_CAT_PICK = 200
     }
 
     override fun onBackPressed() {
@@ -895,7 +912,7 @@ class MainActivity : AppCompatActivity() {
             state.selectionMode -> viewModel.clearSelection()
             state.protectedMode -> viewModel.setProtectedMode(false)
             // Back first returns to the full, unfiltered library.
-            state.categoryFilter != null -> viewModel.setCategoryFilter(null)
+            state.categoryFilters.isNotEmpty() -> viewModel.setCategoryFilters(emptySet())
             state.search.isNotEmpty() -> viewModel.setSearch("")
             else -> {
                 @Suppress("DEPRECATION")
