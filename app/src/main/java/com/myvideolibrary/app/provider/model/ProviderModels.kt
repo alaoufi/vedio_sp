@@ -44,7 +44,9 @@ data class ProviderSearchItem(
     val author: String? = null,
     val durationMs: Long = 0,
     /** When set, the direct downloadable URL is already known (skip re-resolving). */
-    val directUrl: String? = null
+    val directUrl: String? = null,
+    /** True when the source flags this as short-form (e.g. a YouTube Short). */
+    val isShort: Boolean = false
 )
 
 /** Categorised, user-presentable failure reasons for provider operations. */

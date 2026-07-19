@@ -194,8 +194,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /** Heuristic: YouTube Shorts are /shorts/ URLs or clips of ≤ ~61 seconds. */
+    /**
+     * A YouTube Short: the extractor's own short-form flag, a /shorts/ URL, or —
+     * as a fallback for backends without the flag — a clip of ≤ ~61 seconds.
+     */
     private fun isShort(item: com.myvideolibrary.app.provider.model.ProviderSearchItem): Boolean {
+        if (item.isShort) return true
         val url = item.url.lowercase()
         return url.contains("/shorts/") || (item.durationMs in 1..61_000)
     }

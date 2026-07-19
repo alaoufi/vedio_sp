@@ -238,7 +238,8 @@ class YouTubeProvider @Inject constructor(
                             title = item.name ?: "",
                             thumbnailUrl = item.thumbnails.lastOrNull()?.url,
                             author = item.uploaderName,
-                            durationMs = (item.duration.takeIf { it > 0 } ?: 0) * 1000
+                            durationMs = (item.duration.takeIf { it > 0 } ?: 0) * 1000,
+                            isShort = runCatching { item.isShortFormContent }.getOrDefault(false)
                         )
                     }
             } catch (e: Exception) {
@@ -266,7 +267,8 @@ class YouTubeProvider @Inject constructor(
                             title = item.name ?: "",
                             thumbnailUrl = item.thumbnails.lastOrNull()?.url,
                             author = item.uploaderName,
-                            durationMs = (item.duration.takeIf { it > 0 } ?: 0) * 1000
+                            durationMs = (item.duration.takeIf { it > 0 } ?: 0) * 1000,
+                            isShort = runCatching { item.isShortFormContent }.getOrDefault(false)
                         )
                     }
             } catch (e: Exception) {
