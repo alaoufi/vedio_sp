@@ -265,6 +265,8 @@
     <string name="license_sub_days">Active · %d days left</string>
     <string name="license_permanent">Active · permanent</string>
     <string name="license_inactive">Inactive</string>
+    <string name="subscribe_play">Subscribe via Google Play</string>
+    <string name="subscribe_or_code">or enter an activation code</string>
     <string name="activation_owner_recovery">Owner recovery (secret seed)</string>
     <string name="activation_seed_hint">Owner seed (64 hex)</string>
     <string name="activation_seed_invalid">Seed does not match.</string>

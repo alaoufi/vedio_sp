@@ -38,10 +38,27 @@
             android:textColor="?android:attr/textColorSecondary"
             android:textSize="14sp" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/subscribeButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            app:icon="@drawable/ic_download"
+            android:text="@string/subscribe_play" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center"
+            android:text="@string/subscribe_or_code"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="12sp" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="18dp"
             android:text="@string/activation_device_id"
             android:textColor="?android:attr/textColorSecondary"
             android:textSize="13sp" />

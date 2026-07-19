@@ -167,6 +167,9 @@ dependencies {
     // BouncyCastle — Ed25519 signature verification for offline license activation
     implementation(libs.bouncycastle)
 
+    // Google Play Billing — automatic subscription activation in the store edition.
+    implementation(libs.billing.ktx)
+
     // Tesseract — offline OCR for the image editor's "extract text"
     implementation(libs.tesseract4android)
 

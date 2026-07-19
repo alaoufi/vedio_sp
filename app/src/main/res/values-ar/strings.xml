@@ -228,6 +228,8 @@
     <string name="license_sub_days">مُفعّل · بقي %d يوم</string>
     <string name="license_permanent">مُفعّل · دائم</string>
     <string name="license_inactive">غير مُفعّل</string>
+    <string name="subscribe_play">اشترك عبر Google Play</string>
+    <string name="subscribe_or_code">أو أدخل رمز تفعيل</string>
     <string name="activation_owner_recovery">استرجاع المالك (البذرة السرّية)</string>
     <string name="activation_seed_hint">بذرة المالك (٦٤ hex)</string>
     <string name="activation_seed_invalid">البذرة غير مطابقة.</string>

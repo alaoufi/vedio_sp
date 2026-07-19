@@ -27,6 +27,7 @@ class LockActivity : AppCompatActivity() {
     @Inject lateinit var securityManager: SecurityManager
     @Inject lateinit var appLockManager: AppLockManager
     @Inject lateinit var licenseManager: com.myvideolibrary.app.security.LicenseManager
+    @Inject lateinit var billingManager: com.myvideolibrary.app.security.BillingManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,9 +35,12 @@ class LockActivity : AppCompatActivity() {
 
         // Start the free trial automatically on first launch (offline).
         licenseManager.ensureTrial()
+        // Refresh the Play subscription in the background for next time.
+        billingManager.refresh()
 
-        // License gate first: an unactivated app must be activated before anything.
-        if (licenseManager.needsActivation()) {
+        // License gate: an active Play subscription unlocks automatically; otherwise
+        // the offline licence/trial decides. Store payment needs no manual step.
+        if (!billingManager.isEntitledCached() && licenseManager.needsActivation()) {
             startActivity(Intent(this, ActivationActivity::class.java))
             finish()
             return

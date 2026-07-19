@@ -8,6 +8,9 @@ import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.launch
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.myvideolibrary.app.R
 import com.myvideolibrary.app.databinding.ActivityActivationBinding
@@ -25,6 +28,7 @@ class ActivationActivity : AppCompatActivity() {
     private lateinit var binding: ActivityActivationBinding
 
     @Inject lateinit var licenseManager: LicenseManager
+    @Inject lateinit var billingManager: com.myvideolibrary.app.security.BillingManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +59,15 @@ class ActivationActivity : AppCompatActivity() {
 
         binding.activateButton.setOnClickListener { attemptActivation() }
         binding.ownerRecovery.setOnClickListener { promptOwnerRecovery() }
+        binding.subscribeButton.setOnClickListener { billingManager.launchSubscribe(this) }
+
+        // Auto-proceed the moment a Play subscription becomes active — no code needed.
+        billingManager.refresh()
+        lifecycleScope.launch {
+            repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
+                billingManager.entitled.collect { active -> if (active) proceed() }
+            }
+        }
     }
 
     private fun attemptActivation() {
