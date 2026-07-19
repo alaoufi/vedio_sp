@@ -54,10 +54,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
 
         setupRecycler()
-        setupSearch()
-        binding.filterButton.setOnClickListener { showFilterMenu(it) }
         setupFab()
-        setupTabs()
         setupYouTubeTab()
         observeState()
         observeVideos()
@@ -110,24 +107,25 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ---- Tabs: Library (home) + ad-free YouTube ----
+    // ---- Tabs: Library (home) + ad-free YouTube (switched from the ⋮ menu) ----
 
-    private fun setupTabs() {
-        binding.bottomNav.setOnItemSelectedListener { item ->
-            showYouTubeTab(item.itemId == R.id.nav_youtube)
-            true
-        }
-        binding.bottomNav.selectedItemId = R.id.nav_library
-    }
+    private var youtubeTab = false
 
     private fun showYouTubeTab(youtube: Boolean) {
+        youtubeTab = youtube
         binding.youtubePanel.isVisible = youtube
         binding.swipeRefresh.isVisible = !youtube
-        binding.librarySearchRow.isVisible = !youtube
         binding.fabImport.isVisible = !youtube
         if (youtube) binding.emptyState.isVisible = false
         supportActionBar?.title =
             getString(if (youtube) R.string.tab_youtube else R.string.app_name)
+        invalidateOptionsMenu()
+        // First time YouTube opens with no query: show trending (like the YT app).
+        if (youtube && youtubeViewModel.state.value.results.isEmpty() &&
+            binding.ytSearchInput.text.isNullOrBlank()
+        ) {
+            youtubeViewModel.loadTrending()
+        }
     }
 
     private fun setupYouTubeTab() {
@@ -230,9 +228,7 @@ class MainActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         // Privacy: don't keep the last search term around after leaving the screen.
-        if (binding.searchInput.text?.isNotEmpty() == true) {
-            binding.searchInput.text?.clear()
-        }
+        if (viewModel.uiState.value.search.isNotEmpty()) viewModel.setSearch("")
     }
 
     private fun applyLayoutManager(mode: LibraryViewMode) {
@@ -248,12 +244,14 @@ class MainActivity : AppCompatActivity() {
         return (widthDp / 180).coerceAtLeast(2)
     }
 
-    private fun setupSearch() {
-        binding.searchInput.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
-            override fun onTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                viewModel.setSearch(s?.toString().orEmpty())
+    /** Wires the collapsible toolbar SearchView to the library filter. */
+    private fun setupSearchView(searchView: androidx.appcompat.widget.SearchView) {
+        searchView.queryHint = getString(R.string.search_hint)
+        searchView.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean = false
+            override fun onQueryTextChange(newText: String?): Boolean {
+                viewModel.setSearch(newText?.toString().orEmpty())
+                return true
             }
         })
     }
@@ -436,8 +434,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun renderSelectionBar(state: LibraryUiState) {
         binding.selectionBar.isVisible = state.selectionMode
-        // The selection bar sits where the tab bar is, so swap them.
-        binding.bottomNav.isVisible = !state.selectionMode
         if (state.selectionMode) {
             binding.selectionCount.text = getString(
                 R.string.selected_count, state.selectedIds.size
@@ -779,6 +775,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
+        (menu.findItem(R.id.action_search)?.actionView as? androidx.appcompat.widget.SearchView)
+            ?.let { setupSearchView(it) }
         return true
     }
 
@@ -787,11 +785,27 @@ class MainActivity : AppCompatActivity() {
         menu.findItem(R.id.action_favorites)?.setIcon(
             if (favoritesOnly) R.drawable.ic_favorite else R.drawable.ic_favorite_border
         )
+        // Show the tab you can switch TO; library-only actions are hidden on YouTube.
+        menu.findItem(R.id.action_view_youtube)?.isVisible = !youtubeTab
+        menu.findItem(R.id.action_view_library)?.isVisible = youtubeTab
+        for (id in intArrayOf(
+            R.id.action_search, R.id.action_filter, R.id.action_favorites,
+            R.id.action_toggle_view, R.id.action_sort, R.id.action_protected,
+            R.id.action_manage_categories
+        )) menu.findItem(id)?.isVisible = !youtubeTab
         return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.action_view_youtube -> { showYouTubeTab(true); true }
+            R.id.action_view_library -> { showYouTubeTab(false); true }
+            R.id.action_filter -> {
+                val anchor = binding.toolbar.findViewById<android.view.View>(R.id.action_filter)
+                    ?: binding.toolbar
+                showFilterMenu(anchor)
+                true
+            }
             R.id.action_toggle_view -> { viewModel.toggleViewMode(); true }
             R.id.action_sort -> { showSortDialog(); true }
             R.id.action_favorites -> {
@@ -857,14 +871,12 @@ class MainActivity : AppCompatActivity() {
     override fun onBackPressed() {
         val state = viewModel.uiState.value
         when {
+            youtubeTab -> showYouTubeTab(false) // back returns to the library tab
             state.selectionMode -> viewModel.clearSelection()
             state.protectedMode -> viewModel.setProtectedMode(false)
             // Back first returns to the full, unfiltered library.
             state.categoryFilter != null -> viewModel.setCategoryFilter(null)
-            state.search.isNotEmpty() -> {
-                binding.searchInput.text?.clear()
-                viewModel.setSearch("")
-            }
+            state.search.isNotEmpty() -> viewModel.setSearch("")
             else -> {
                 @Suppress("DEPRECATION")
                 super.onBackPressed()

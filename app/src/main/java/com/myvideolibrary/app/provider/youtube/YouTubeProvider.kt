@@ -251,6 +251,62 @@ class YouTubeProvider @Inject constructor(
             }
         }
 
+    override suspend fun trending(): List<ProviderSearchItem> =
+        withContext(Dispatchers.IO) {
+            ensureInitialised()
+            try {
+                val kiosk = ServiceList.YouTube.kioskList.defaultKioskExtractor
+                kiosk.fetchPage()
+                kiosk.initialPage.items
+                    .filterIsInstance<org.schabi.newpipe.extractor.stream.StreamInfoItem>()
+                    .map { item ->
+                        ProviderSearchItem(
+                            source = VideoSource.YOUTUBE,
+                            url = item.url,
+                            title = item.name ?: "",
+                            thumbnailUrl = item.thumbnails.lastOrNull()?.url,
+                            author = item.uploaderName,
+                            durationMs = (item.duration.takeIf { it > 0 } ?: 0) * 1000
+                        )
+                    }
+            } catch (e: Exception) {
+                trendingViaPiped()
+            }
+        }
+
+    private fun trendingViaPiped(): List<ProviderSearchItem> {
+        for (base in PIPED_INSTANCES) {
+            val body = runCatching {
+                val req = Request.Builder()
+                    .url("$base/trending?region=US")
+                    .header("User-Agent", UA)
+                    .build()
+                client.newCall(req).execute().use { r ->
+                    if (!r.isSuccessful) return@use null
+                    r.body?.string()
+                }
+            }.getOrNull() ?: continue
+            val arr = runCatching { gson.fromJson(body, com.google.gson.JsonArray::class.java) }
+                .getOrNull() ?: continue
+            val mapped = arr.mapNotNull { el ->
+                val o = el.asJsonObject
+                val itemUrl = o.str("url") ?: return@mapNotNull null
+                if (!itemUrl.contains("/watch")) return@mapNotNull null
+                val id = itemUrl.substringAfter("v=", "").ifBlank { return@mapNotNull null }
+                ProviderSearchItem(
+                    source = VideoSource.YOUTUBE,
+                    url = "https://www.youtube.com/watch?v=$id",
+                    title = o.str("title") ?: "",
+                    thumbnailUrl = o.str("thumbnail"),
+                    author = o.str("uploaderName"),
+                    durationMs = (o.long("duration") ?: 0L) * 1000
+                )
+            }
+            if (mapped.isNotEmpty()) return mapped
+        }
+        return emptyList()
+    }
+
     private fun searchViaPiped(query: String): List<ProviderSearchItem> {
         val q = java.net.URLEncoder.encode(query, "UTF-8")
         for (base in PIPED_INSTANCES) {

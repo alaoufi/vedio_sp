@@ -28,6 +28,9 @@ interface VideoProvider {
     /** Optional keyword search. Providers that don't support it return empty. */
     suspend fun search(query: String): List<ProviderSearchItem> = emptyList()
 
+    /** Optional trending/popular feed. Providers that don't support it return empty. */
+    suspend fun trending(): List<ProviderSearchItem> = emptyList()
+
     /**
      * Resolves [url] into a single, directly-playable progressive stream for
      * preview-without-download. The default derives it from [resolve]; providers

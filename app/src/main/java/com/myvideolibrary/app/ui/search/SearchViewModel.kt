@@ -61,6 +61,20 @@ class SearchViewModel @Inject constructor(
         )
     }
 
+    /** Loads YouTube's trending feed (shown when the YouTube tab opens with no query). */
+    fun loadTrending() {
+        val provider = providerRegistry.providerForSource(VideoSource.YOUTUBE) ?: return
+        _state.value = _state.value.copy(loading = true, error = null, results = emptyList())
+        viewModelScope.launch {
+            try {
+                val results = provider.trending()
+                _state.value = _state.value.copy(loading = false, results = results)
+            } catch (e: Throwable) {
+                _state.value = _state.value.copy(loading = false, error = e.message)
+            }
+        }
+    }
+
     fun search(query: String) {
         val q = query.trim()
         if (q.isEmpty()) return

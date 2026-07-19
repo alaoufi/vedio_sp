@@ -2,6 +2,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- Collapsible search: a magnifier that expands into a field to save space. -->
+    <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/ic_search"
+        android:title="@string/search_hint"
+        app:showAsAction="always|collapseActionView"
+        app:actionViewClass="androidx.appcompat.widget.SearchView" />
+
+    <item
+        android:id="@+id/action_filter"
+        android:icon="@drawable/ic_filter_list"
+        android:title="@string/filter"
+        app:showAsAction="ifRoom" />
+
     <item
         android:id="@+id/action_favorites"
         android:icon="@drawable/ic_favorite_border"
@@ -12,13 +26,24 @@
         android:id="@+id/action_toggle_view"
         android:icon="@drawable/ic_grid_view"
         android:title="@string/action_toggle_view"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_sort"
         android:icon="@drawable/ic_sort"
         android:title="@string/action_sort"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
+
+    <!-- Tab switch lives in the overflow (not always used). -->
+    <item
+        android:id="@+id/action_view_youtube"
+        android:title="@string/tab_youtube"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_view_library"
+        android:title="@string/tab_library"
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_protected"
