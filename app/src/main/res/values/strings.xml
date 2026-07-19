@@ -47,6 +47,7 @@
     <string name="sort_duration_short">Duration (shortest)</string>
     <string name="sort_size_large">Size (largest)</string>
     <string name="sort_size_small">Size (smallest)</string>
+    <string name="sort_category">Category</string>
 
     <!-- Folders -->
     <string name="new_folder">New folder</string>

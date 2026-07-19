@@ -76,6 +76,10 @@ data class LibraryQuery(
             SortOrder.DURATION_ASC -> "ORDER BY duration ASC"
             SortOrder.SIZE_DESC -> "ORDER BY file_size DESC"
             SortOrder.SIZE_ASC -> "ORDER BY file_size ASC"
+            // Group by category (uncategorised last), then title within each group.
+            SortOrder.CATEGORY_ASC ->
+                "ORDER BY (category IS NULL OR TRIM(category) = '') ASC, " +
+                    "category COLLATE NOCASE ASC, title COLLATE NOCASE ASC"
         }
 
         val sql = "SELECT * FROM videos $where $orderBy"

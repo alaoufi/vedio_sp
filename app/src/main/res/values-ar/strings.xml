@@ -47,6 +47,7 @@
     <string name="sort_duration_short">المدة (الأقصر)</string>
     <string name="sort_size_large">الحجم (الأكبر)</string>
     <string name="sort_size_small">الحجم (الأصغر)</string>
+    <string name="sort_category">التصنيف</string>
 
     <!-- Folders -->
     <string name="new_folder">مجلد جديد</string>

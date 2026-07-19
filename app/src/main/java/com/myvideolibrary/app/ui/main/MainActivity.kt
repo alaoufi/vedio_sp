@@ -237,8 +237,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun gridSpanCount(): Int {
+        // Smaller cells: ~120dp per column gives 3 on a typical phone.
         val widthDp = resources.configuration.screenWidthDp
-        return (widthDp / 180).coerceAtLeast(2)
+        return (widthDp / 120).coerceAtLeast(3)
     }
 
     /** The collapsible toolbar search filters the library live, or searches YouTube on submit. */
@@ -847,13 +848,15 @@ class MainActivity : AppCompatActivity() {
             getString(R.string.sort_duration_long),
             getString(R.string.sort_duration_short),
             getString(R.string.sort_size_large),
-            getString(R.string.sort_size_small)
+            getString(R.string.sort_size_small),
+            getString(R.string.sort_category)
         )
         val orders = arrayOf(
             SortOrder.DATE_ADDED_DESC, SortOrder.DATE_ADDED_ASC,
             SortOrder.NAME_ASC, SortOrder.NAME_DESC,
             SortOrder.DURATION_DESC, SortOrder.DURATION_ASC,
-            SortOrder.SIZE_DESC, SortOrder.SIZE_ASC
+            SortOrder.SIZE_DESC, SortOrder.SIZE_ASC,
+            SortOrder.CATEGORY_ASC
         )
         val current = orders.indexOf(viewModel.uiState.value.sortOrder).coerceAtLeast(0)
         AlertDialog.Builder(this)
