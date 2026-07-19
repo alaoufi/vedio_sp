@@ -2,6 +2,13 @@
 <resources>
     <string name="app_name">مكتبة الفيديو</string>
 
+    <!-- Tabs / YouTube -->
+    <string name="tab_library">المكتبة</string>
+    <string name="tab_youtube">يوتيوب</string>
+    <string name="hide_shorts">إخفاء Shorts</string>
+    <string name="youtube_search_hint">ابحث في يوتيوب</string>
+    <string name="youtube_tab_hint">ابحث في يوتيوب — شغّل بلا إعلانات أو حمّل. مقاطع Shorts مخفية.</string>
+
     <!-- Library -->
     <string name="library_stats">%1$d فيديو · %2$s</string>
     <string name="filter_all">الكل</string>

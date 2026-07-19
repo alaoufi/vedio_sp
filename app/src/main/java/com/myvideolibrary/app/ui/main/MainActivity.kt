@@ -39,10 +39,12 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val viewModel: LibraryViewModel by viewModels()
+    private val youtubeViewModel: com.myvideolibrary.app.ui.search.SearchViewModel by viewModels()
 
     @javax.inject.Inject lateinit var securityManager: SecurityManager
 
     private lateinit var adapter: VideoPagingAdapter
+    private lateinit var youtubeAdapter: com.myvideolibrary.app.ui.search.SearchResultAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +57,8 @@ class MainActivity : AppCompatActivity() {
         setupSearch()
         binding.filterButton.setOnClickListener { showFilterMenu(it) }
         setupFab()
+        setupTabs()
+        setupYouTubeTab()
         observeState()
         observeVideos()
         observeDownloads()
@@ -104,6 +108,101 @@ class MainActivity : AppCompatActivity() {
                 notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
             }
         }
+    }
+
+    // ---- Tabs: Library (home) + ad-free YouTube ----
+
+    private fun setupTabs() {
+        binding.bottomNav.setOnItemSelectedListener { item ->
+            showYouTubeTab(item.itemId == R.id.nav_youtube)
+            true
+        }
+        binding.bottomNav.selectedItemId = R.id.nav_library
+    }
+
+    private fun showYouTubeTab(youtube: Boolean) {
+        binding.youtubePanel.isVisible = youtube
+        binding.swipeRefresh.isVisible = !youtube
+        binding.librarySearchRow.isVisible = !youtube
+        binding.fabImport.isVisible = !youtube
+        if (youtube) binding.emptyState.isVisible = false
+        supportActionBar?.title =
+            getString(if (youtube) R.string.tab_youtube else R.string.app_name)
+    }
+
+    private fun setupYouTubeTab() {
+        youtubeViewModel.setSource(com.myvideolibrary.app.data.model.VideoSource.YOUTUBE)
+        youtubeAdapter = com.myvideolibrary.app.ui.search.SearchResultAdapter(
+            onPlay = { item -> youtubeViewModel.play(item) },
+            onSaveLink = { item -> youtubeViewModel.saveLink(item) },
+            onDownload = { item, anchor ->
+                com.myvideolibrary.app.ui.provider.DownloadKindDialog.show(anchor) { kind ->
+                    youtubeViewModel.downloadItem(item, kind)
+                }
+            }
+        )
+        binding.ytRecyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
+        binding.ytRecyclerView.adapter = youtubeAdapter
+        binding.ytSearchButton.setOnClickListener { submitYouTubeSearch() }
+        binding.ytSearchInput.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH) {
+                submitYouTubeSearch(); true
+            } else false
+        }
+        binding.hideShortsSwitch.setOnCheckedChangeListener { _, _ ->
+            renderYouTube(youtubeViewModel.state.value)
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                youtubeViewModel.state.collectLatest { renderYouTube(it) }
+            }
+        }
+    }
+
+    private fun submitYouTubeSearch() {
+        youtubeViewModel.setSource(com.myvideolibrary.app.data.model.VideoSource.YOUTUBE)
+        youtubeViewModel.search(binding.ytSearchInput.text?.toString().orEmpty())
+    }
+
+    private fun renderYouTube(state: com.myvideolibrary.app.ui.search.SearchUiState) {
+        binding.ytProgress.isVisible = state.loading
+        val items = if (binding.hideShortsSwitch.isChecked) {
+            state.results.filterNot(::isShort)
+        } else {
+            state.results
+        }
+        youtubeAdapter.submitList(items)
+        when {
+            state.error != null -> {
+                binding.ytHint.isVisible = true
+                binding.ytHint.text = state.error
+            }
+            items.isEmpty() && !state.loading -> {
+                binding.ytHint.isVisible = true
+                binding.ytHint.setText(R.string.youtube_tab_hint)
+            }
+            else -> binding.ytHint.isVisible = false
+        }
+        state.message?.let {
+            android.widget.Toast.makeText(this, R.string.download_started, android.widget.Toast.LENGTH_LONG).show()
+            youtubeViewModel.consumeMessage()
+        }
+        if (state.savedLink) {
+            android.widget.Toast.makeText(this, R.string.link_saved, android.widget.Toast.LENGTH_SHORT).show()
+            youtubeViewModel.consumeSavedLink()
+        }
+        state.streamRequest?.let { req ->
+            startActivity(
+                com.myvideolibrary.app.ui.player.PlayerActivity.streamIntent(this, req.sourceUrl, req.title)
+            )
+            youtubeViewModel.consumeStreamRequest()
+        }
+    }
+
+    /** Heuristic: YouTube Shorts are /shorts/ URLs or clips of ≤ ~61 seconds. */
+    private fun isShort(item: com.myvideolibrary.app.provider.model.ProviderSearchItem): Boolean {
+        val url = item.url.lowercase()
+        return url.contains("/shorts/") || (item.durationMs in 1..61_000)
     }
 
     private fun setupRecycler() {
@@ -337,6 +436,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun renderSelectionBar(state: LibraryUiState) {
         binding.selectionBar.isVisible = state.selectionMode
+        // The selection bar sits where the tab bar is, so swap them.
+        binding.bottomNav.isVisible = !state.selectionMode
         if (state.selectionMode) {
             binding.selectionCount.text = getString(
                 R.string.selected_count, state.selectedIds.size
