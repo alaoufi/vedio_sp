@@ -158,6 +158,14 @@
             <!-- About -->
             <TextView style="@style/SettingsHeader" android:text="@string/section_about" />
 
+            <LinearLayout style="@style/SettingsRow">
+                <LinearLayout style="@style/SettingsRowText">
+                    <TextView style="@style/SettingsTitle" android:text="@string/license_status" />
+                    <TextView android:id="@+id/licenseValue" style="@style/SettingsSubtitle"
+                        tools:text="Trial · 8 days left" />
+                </LinearLayout>
+            </LinearLayout>
+
             <LinearLayout android:id="@+id/guideRow" style="@style/SettingsRow">
                 <LinearLayout style="@style/SettingsRowText">
                     <TextView style="@style/SettingsTitle" android:text="@string/user_guide" />

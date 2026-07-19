@@ -222,6 +222,12 @@
     <string name="activation_code_hint">أدخل رمز التفعيل</string>
     <string name="activation_activate">تفعيل</string>
     <string name="activation_invalid">رمز غير صالح لهذا الجهاز.</string>
+    <string name="activation_expired_keep">انتهت فترتك. محتواك محفوظ — جدّد الاشتراك للمتابعة.</string>
+    <string name="license_status">الاشتراك</string>
+    <string name="license_trial_days">تجربة · بقي %d يوم</string>
+    <string name="license_sub_days">مُفعّل · بقي %d يوم</string>
+    <string name="license_permanent">مُفعّل · دائم</string>
+    <string name="license_inactive">غير مُفعّل</string>
     <string name="activation_owner_recovery">استرجاع المالك (البذرة السرّية)</string>
     <string name="activation_seed_hint">بذرة المالك (٦٤ hex)</string>
     <string name="activation_seed_invalid">البذرة غير مطابقة.</string>

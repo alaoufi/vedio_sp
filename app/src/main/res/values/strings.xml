@@ -259,6 +259,12 @@
     <string name="activation_code_hint">Enter activation code</string>
     <string name="activation_activate">Activate</string>
     <string name="activation_invalid">Invalid code for this device.</string>
+    <string name="activation_expired_keep">Your period has ended. Your downloads are kept — renew to continue.</string>
+    <string name="license_status">Subscription</string>
+    <string name="license_trial_days">Trial · %d days left</string>
+    <string name="license_sub_days">Active · %d days left</string>
+    <string name="license_permanent">Active · permanent</string>
+    <string name="license_inactive">Inactive</string>
     <string name="activation_owner_recovery">Owner recovery (secret seed)</string>
     <string name="activation_seed_hint">Owner seed (64 hex)</string>
     <string name="activation_seed_invalid">Seed does not match.</string>

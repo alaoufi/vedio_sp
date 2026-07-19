@@ -32,6 +32,9 @@ class LockActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         applySecureFlags()
 
+        // Start the free trial automatically on first launch (offline).
+        licenseManager.ensureTrial()
+
         // License gate first: an unactivated app must be activated before anything.
         if (licenseManager.needsActivation()) {
             startActivity(Intent(this, ActivationActivity::class.java))

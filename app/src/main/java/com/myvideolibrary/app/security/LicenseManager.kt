@@ -90,9 +90,26 @@ class LicenseManager @Inject constructor(
     /** Validates an activation code and, on success, stores the licence. */
     fun tryActivate(code: String): Boolean {
         val days = verify(code) ?: return false
-        writeRecord(Record(days, System.currentTimeMillis(), System.currentTimeMillis()))
+        writeRecord(Record(days, System.currentTimeMillis(), System.currentTimeMillis(), trial = false))
         return true
     }
+
+    /**
+     * Starts the one-time free trial on first launch, offline. After it ends the
+     * app locks (needs a code) but every downloaded file and setting is kept.
+     * A trial can only run once per install; clearing app data also clears the
+     * library, so there's nothing to gain by resetting it.
+     */
+    fun ensureTrial() {
+        if (protectionDisabled()) return
+        if (readRecord() != null) return
+        if (prefs.getBoolean(KEY_TRIAL_USED, false)) return
+        prefs.edit().putBoolean(KEY_TRIAL_USED, true).apply()
+        writeRecord(Record(TRIAL_DAYS, System.currentTimeMillis(), System.currentTimeMillis(), trial = true))
+    }
+
+    /** True while the active licence is the free trial (not a paid code). */
+    fun isTrial(): Boolean = readRecord()?.trial == true
 
     /** Owner recovery: the secret seed (64 hex) unlocks permanently on any device. */
     fun recoverWithSeed(seedHex: String): Boolean {
@@ -146,7 +163,12 @@ class LicenseManager @Inject constructor(
 
     // ---- Licence record persistence ----
 
-    private data class Record(val days: Int, val activatedAt: Long, val lastSeen: Long)
+    private data class Record(
+        val days: Int,
+        val activatedAt: Long,
+        val lastSeen: Long,
+        val trial: Boolean = false
+    )
 
     private data class Scheme(val prefix: String, val keyB64: String)
 
@@ -157,7 +179,7 @@ class LicenseManager @Inject constructor(
         val json = prefs.getString(KEY_LICENSE, null) ?: return null
         return try {
             val o = JSONObject(json)
-            Record(o.getInt("d"), o.getLong("a"), o.getLong("s"))
+            Record(o.getInt("d"), o.getLong("a"), o.getLong("s"), o.optBoolean("t", false))
         } catch (e: Exception) {
             null
         }
@@ -168,6 +190,7 @@ class LicenseManager @Inject constructor(
             .put("d", rec.days)
             .put("a", rec.activatedAt)
             .put("s", rec.lastSeen)
+            .put("t", rec.trial)
             .toString()
         prefs.edit().putString(KEY_LICENSE, json).apply()
     }
@@ -228,5 +251,8 @@ class LicenseManager @Inject constructor(
         private const val B32 = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
         private const val DAY_MS = 86_400_000L
         private const val KEY_LICENSE = "license_rec"
+        private const val KEY_TRIAL_USED = "trial_used"
+        /** Length of the one-time free trial, in days. */
+        private const val TRIAL_DAYS = 10
     }
 }

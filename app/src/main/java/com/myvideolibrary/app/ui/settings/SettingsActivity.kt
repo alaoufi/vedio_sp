@@ -15,6 +15,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.myvideolibrary.app.R
 import com.myvideolibrary.app.data.model.AppTheme
 import com.myvideolibrary.app.databinding.ActivitySettingsBinding
+import com.myvideolibrary.app.security.LicenseManager
 import com.myvideolibrary.app.util.Formatters
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -25,6 +26,8 @@ class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
     private val viewModel: SettingsViewModel by viewModels()
+
+    @javax.inject.Inject lateinit var licenseManager: com.myvideolibrary.app.security.LicenseManager
 
     private val restorePicker = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
@@ -55,6 +58,7 @@ class SettingsActivity : AppCompatActivity() {
         binding.toolbar.setNavigationOnClickListener { finish() }
 
         binding.versionValue.text = com.myvideolibrary.app.BuildConfig.VERSION_NAME
+        binding.licenseValue.text = licenseStatusText()
 
         bindActions()
         observe()
@@ -167,6 +171,17 @@ class SettingsActivity : AppCompatActivity() {
     private fun folderLabel(uri: Uri): String {
         val doc = androidx.documentfile.provider.DocumentFile.fromTreeUri(this, uri)
         return doc?.name ?: uri.lastPathSegment ?: uri.toString()
+    }
+
+    /** Human-readable trial / subscription state for the About section. */
+    private fun licenseStatusText(): String {
+        val days = licenseManager.daysLeft()
+        return when {
+            licenseManager.state() != LicenseManager.State.ACTIVE -> getString(R.string.license_inactive)
+            days == null -> getString(R.string.license_permanent)
+            licenseManager.isTrial() -> getString(R.string.license_trial_days, days)
+            else -> getString(R.string.license_sub_days, days)
+        }
     }
 
     // ---- Language ----

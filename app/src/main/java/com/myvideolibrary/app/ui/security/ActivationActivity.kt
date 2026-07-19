@@ -33,6 +33,12 @@ class ActivationActivity : AppCompatActivity() {
 
         binding.deviceId.text = licenseManager.deviceIdPretty()
 
+        // If we're here because the trial/subscription ended, reassure the user
+        // their downloads are untouched — they only need to renew to continue.
+        if (licenseManager.state() == LicenseManager.State.EXPIRED) {
+            showMessage(getString(R.string.activation_expired_keep), success = false)
+        }
+
         // Diagnostics line: which build + which activation schemes it accepts.
         val version = try {
             packageManager.getPackageInfo(packageName, 0).versionName
