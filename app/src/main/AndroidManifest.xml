@@ -115,6 +115,13 @@
             android:exported="false"
             android:parentActivityName=".ui.main.MainActivity" />
 
+        <!-- In-app browser with media detection (generic downloader). -->
+        <activity
+            android:name=".ui.browser.BrowserActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:parentActivityName=".ui.main.MainActivity" />
+
         <!-- Player: supports PiP, rotation, and keeps screen on. -->
         <activity
             android:name=".ui.player.PlayerActivity"

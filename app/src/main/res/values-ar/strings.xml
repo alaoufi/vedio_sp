@@ -74,6 +74,13 @@
     <string name="by_category">حسب التصنيف</string>
     <string name="by_source">حسب المصدر</string>
     <string name="source_device">الجهاز</string>
+    <string name="browser_title">المتصفّح</string>
+    <string name="browser_hint">ابحث أو اكتب رابطاً</string>
+    <string name="browser_reload">تحديث</string>
+    <string name="browser_download_found">تحميل</string>
+    <string name="browser_download_count">تحميل (%d)</string>
+    <string name="browser_found_title">وسائط موجودة في هذه الصفحة</string>
+    <string name="browser_no_media">لم يُكتشف أي محتوى قابل للتحميل بعد</string>
 
     <!-- Menu -->
     <string name="action_toggle_view">تبديل العرض</string>

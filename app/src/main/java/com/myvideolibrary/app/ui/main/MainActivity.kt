@@ -363,12 +363,14 @@ class MainActivity : AppCompatActivity() {
     /** The bottom "+" opens the download/import actions, within easy thumb reach. */
     private fun showAddMenu(anchor: android.view.View) {
         val popup = android.widget.PopupMenu(this, anchor)
-        popup.menu.add(0, 1, 0, getString(R.string.search_title))
-        popup.menu.add(0, 2, 1, getString(R.string.action_add_download))
-        popup.menu.add(0, 3, 2, getString(R.string.action_downloads))
-        popup.menu.add(0, 4, 3, getString(R.string.import_title))
+        popup.menu.add(0, 5, 0, getString(R.string.browser_title))
+        popup.menu.add(0, 1, 1, getString(R.string.search_title))
+        popup.menu.add(0, 2, 2, getString(R.string.action_add_download))
+        popup.menu.add(0, 3, 3, getString(R.string.action_downloads))
+        popup.menu.add(0, 4, 4, getString(R.string.import_title))
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
+                5 -> startActivity(Intent(this, com.myvideolibrary.app.ui.browser.BrowserActivity::class.java))
                 1 -> startActivity(Intent(this, com.myvideolibrary.app.ui.search.SearchActivity::class.java))
                 2 -> startActivity(AddDownloadActivity.intent(this))
                 3 -> startActivity(Intent(this, DownloadsActivity::class.java))

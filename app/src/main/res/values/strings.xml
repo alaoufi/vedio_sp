@@ -74,6 +74,13 @@
     <string name="by_category">By category</string>
     <string name="by_source">By source</string>
     <string name="source_device">Device</string>
+    <string name="browser_title">Browser</string>
+    <string name="browser_hint">Search or type a link</string>
+    <string name="browser_reload">Reload</string>
+    <string name="browser_download_found">Download</string>
+    <string name="browser_download_count">Download (%d)</string>
+    <string name="browser_found_title">Media found on this page</string>
+    <string name="browser_no_media">No downloadable media detected yet</string>
 
     <!-- Native language names, shown the same in every locale. Order must match
          language_tags below. The first entry follows the system language. -->
