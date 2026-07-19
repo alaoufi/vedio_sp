@@ -35,6 +35,20 @@
 <h1>مولّد رموز التفعيل</h1>
 <p class="sub">أداة للمالك فقط — تعمل بلا إنترنت داخل متصفّح جهازك. البذرة السرّية لا تُحفظ ولا تُرسل.</p>
 
+<details style="margin-bottom:16px;border:1px solid #8884;border-radius:12px;padding:10px 12px">
+  <summary style="cursor:pointer;font-weight:600">توليد مفتاح جديد (أول مرة فقط)</summary>
+  <p style="font-size:.85rem;opacity:.8">ينشئ زوج مفاتيح جديداً على جهازك. احتفظ بالبذرة السرّية لنفسك، وأعطِ المطوّر المفتاح العام لوضعه في التطبيق.</p>
+  <button class="copy" id="genkey" style="width:100%;padding:11px">توليد مفتاح جديد</button>
+  <div id="kpOut" style="display:none;margin-top:10px">
+    <label>البذرة السرّية (احتفظ بها سرّاً!)</label>
+    <div class="code" id="kpSeed" style="font-size:14px"></div>
+    <button class="copy" id="copySeed">نسخ البذرة</button>
+    <label style="margin-top:12px">المفتاح العام (أعطه للمطوّر)</label>
+    <div class="code" id="kpPub" style="font-size:14px"></div>
+    <button class="copy" id="copyPub">نسخ المفتاح العام</button>
+  </div>
+</details>
+
 <label>البذرة السرّية (64 حرفاً hex)</label>
 <input id="seed" type="text" autocomplete="off" spellcheck="false" placeholder="ألصق بذرتك السرّية هنا">
 <div id="seedState" class="err"></div>
@@ -114,6 +128,21 @@
     navigator.clipboard&&navigator.clipboard.writeText(t);
     this.textContent="تم النسخ ✓";var self=this;setTimeout(function(){self.textContent="نسخ الرمز";},1500);
   });
+
+  function bytesToHex(b){var s="";for(var i=0;i<b.length;i++){s+=("0"+b[i].toString(16)).slice(-2);}return s;}
+  function copyText(btn,text,done){navigator.clipboard&&navigator.clipboard.writeText(text);var o=btn.textContent;btn.textContent=done;setTimeout(function(){btn.textContent=o;},1500);}
+
+  document.getElementById("genkey").addEventListener("click",function(){
+    var kp=nacl.sign.keyPair();               // fresh Ed25519 keypair
+    var seedHex=bytesToHex(kp.secretKey.subarray(0,32));
+    var pubB64=b64(kp.publicKey);
+    document.getElementById("kpSeed").textContent=seedHex;
+    document.getElementById("kpPub").textContent=pubB64;
+    document.getElementById("kpOut").style.display="block";
+    seedEl.value=seedHex; checkSeed();        // load it so you can start immediately
+  });
+  document.getElementById("copySeed").addEventListener("click",function(){copyText(this,document.getElementById("kpSeed").textContent,"تم النسخ ✓");});
+  document.getElementById("copyPub").addEventListener("click",function(){copyText(this,document.getElementById("kpPub").textContent,"تم النسخ ✓");});
 })();
 </script>
 </body>
