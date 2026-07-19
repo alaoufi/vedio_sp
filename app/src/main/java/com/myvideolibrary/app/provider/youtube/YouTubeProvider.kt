@@ -278,7 +278,7 @@ class YouTubeProvider @Inject constructor(
         for (base in PIPED_INSTANCES) {
             val body = runCatching {
                 val req = Request.Builder()
-                    .url("$base/trending?region=US")
+                    .url("$base/trending?region=SA")
                     .header("User-Agent", UA)
                     .build()
                 client.newCall(req).execute().use { r ->
@@ -380,7 +380,12 @@ class YouTubeProvider @Inject constructor(
     private fun ensureInitialised() {
         synchronized(lock) {
             if (!initialised) {
-                NewPipe.init(NewPipeDownloader(client), Localization.DEFAULT)
+                // Arabic region so trending/search reflect the Arab world, not the US.
+                NewPipe.init(
+                    NewPipeDownloader(client),
+                    Localization("ar", "SA"),
+                    org.schabi.newpipe.extractor.localization.ContentCountry("SA")
+                )
                 initialised = true
             }
         }

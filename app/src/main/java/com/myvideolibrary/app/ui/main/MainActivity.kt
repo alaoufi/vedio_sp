@@ -110,6 +110,7 @@ class MainActivity : AppCompatActivity() {
     // ---- Tabs: Library (home) + ad-free YouTube (switched from the ⋮ menu) ----
 
     private var youtubeTab = false
+    private var youtubeGrid = false
 
     private fun showYouTubeTab(youtube: Boolean) {
         youtubeTab = youtube
@@ -120,10 +121,8 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.title =
             getString(if (youtube) R.string.tab_youtube else R.string.app_name)
         invalidateOptionsMenu()
-        // First time YouTube opens with no query: show trending (like the YT app).
-        if (youtube && youtubeViewModel.state.value.results.isEmpty() &&
-            binding.ytSearchInput.text.isNullOrBlank()
-        ) {
+        // First time YouTube opens with no results: show trending (like the YT app).
+        if (youtube && youtubeViewModel.state.value.results.isEmpty()) {
             youtubeViewModel.loadTrending()
         }
     }
@@ -139,14 +138,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         )
-        binding.ytRecyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         binding.ytRecyclerView.adapter = youtubeAdapter
-        binding.ytSearchButton.setOnClickListener { submitYouTubeSearch() }
-        binding.ytSearchInput.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH) {
-                submitYouTubeSearch(); true
-            } else false
-        }
+        applyYouTubeLayout()
         binding.hideShortsSwitch.setOnCheckedChangeListener { _, _ ->
             renderYouTube(youtubeViewModel.state.value)
         }
@@ -157,9 +150,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun submitYouTubeSearch() {
-        youtubeViewModel.setSource(com.myvideolibrary.app.data.model.VideoSource.YOUTUBE)
-        youtubeViewModel.search(binding.ytSearchInput.text?.toString().orEmpty())
+    private fun applyYouTubeLayout() {
+        binding.ytRecyclerView.layoutManager = if (youtubeGrid) {
+            GridLayoutManager(this, gridSpanCount())
+        } else {
+            androidx.recyclerview.widget.LinearLayoutManager(this)
+        }
     }
 
     private fun renderYouTube(state: com.myvideolibrary.app.ui.search.SearchUiState) {
@@ -244,14 +240,22 @@ class MainActivity : AppCompatActivity() {
         return (widthDp / 180).coerceAtLeast(2)
     }
 
-    /** Wires the collapsible toolbar SearchView to the library filter. */
+    /** The collapsible toolbar search filters the library live, or searches YouTube on submit. */
     private fun setupSearchView(searchView: androidx.appcompat.widget.SearchView) {
-        searchView.queryHint = getString(R.string.search_hint)
+        searchView.queryHint = getString(if (youtubeTab) R.string.youtube_search_hint else R.string.search_hint)
         searchView.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean = false
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                if (youtubeTab) {
+                    youtubeViewModel.setSource(com.myvideolibrary.app.data.model.VideoSource.YOUTUBE)
+                    youtubeViewModel.search(query.orEmpty())
+                    searchView.clearFocus()
+                }
+                return youtubeTab
+            }
             override fun onQueryTextChange(newText: String?): Boolean {
-                viewModel.setSearch(newText?.toString().orEmpty())
-                return true
+                // Library filters live; YouTube waits for submit (network call).
+                if (!youtubeTab) viewModel.setSearch(newText?.toString().orEmpty())
+                return false
             }
         })
     }
@@ -788,10 +792,10 @@ class MainActivity : AppCompatActivity() {
         // Show the tab you can switch TO; library-only actions are hidden on YouTube.
         menu.findItem(R.id.action_view_youtube)?.isVisible = !youtubeTab
         menu.findItem(R.id.action_view_library)?.isVisible = youtubeTab
+        // Search and view-toggle work on both tabs; the rest are library-only.
         for (id in intArrayOf(
-            R.id.action_search, R.id.action_filter, R.id.action_favorites,
-            R.id.action_toggle_view, R.id.action_sort, R.id.action_protected,
-            R.id.action_manage_categories
+            R.id.action_filter, R.id.action_favorites, R.id.action_sort,
+            R.id.action_protected, R.id.action_manage_categories
         )) menu.findItem(id)?.isVisible = !youtubeTab
         return super.onPrepareOptionsMenu(menu)
     }
@@ -806,7 +810,15 @@ class MainActivity : AppCompatActivity() {
                 showFilterMenu(anchor)
                 true
             }
-            R.id.action_toggle_view -> { viewModel.toggleViewMode(); true }
+            R.id.action_toggle_view -> {
+                if (youtubeTab) {
+                    youtubeGrid = !youtubeGrid
+                    applyYouTubeLayout()
+                } else {
+                    viewModel.toggleViewMode()
+                }
+                true
+            }
             R.id.action_sort -> { showSortDialog(); true }
             R.id.action_favorites -> {
                 viewModel.setFavoritesOnly(!viewModel.uiState.value.favoritesOnly)
