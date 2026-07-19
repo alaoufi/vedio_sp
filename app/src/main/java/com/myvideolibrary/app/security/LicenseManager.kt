@@ -243,8 +243,7 @@ class LicenseManager @Inject constructor(
          * only and no secret ever ships.
          */
         private val SCHEMES = listOf(
-            Scheme("UNI3", "W5Kc9hRB7lb9xSh/VqdR4T8GT6VaDznEwYQgXZpLZz0="),
-            Scheme("UNI2", "4gIH/wo/1T9Dq1yGXCED8ZpRk/QefaMq8qQFqKPKHmQ=")
+            Scheme("UNI3", "yQae4QorduR21mkEa/6Wmmin6drWfmsDjUPvkSrwbc0=")
         )
         /** Mandatory device-number salt for the unified UNI3 standard. */
         private const val DEVICE_SALT = "alaoufi:"
