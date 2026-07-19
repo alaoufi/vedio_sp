@@ -49,7 +49,8 @@ class DownloadWorker @AssistedInject constructor(
     private val settingsRepository: SettingsRepository,
     private val storageManager: StorageManager,
     private val thumbnailGenerator: ThumbnailGenerator,
-    private val notifier: DownloadNotifier
+    private val notifier: DownloadNotifier,
+    private val providerRegistry: com.myvideolibrary.app.provider.ProviderRegistry
 ) : CoroutineWorker(appContext, params) {
 
     override suspend fun doWork(): Result {
@@ -110,6 +111,10 @@ class DownloadWorker @AssistedInject constructor(
             coroutineContext.ensureActive()
             val attempts = runAttemptCount
             if (attempts < MAX_ATTEMPTS) {
+                // A very common failure is an expired CDN link (TikTok/YouTube URLs
+                // are short-lived). Re-resolve the source so the retry gets fresh
+                // URLs instead of hammering the dead one.
+                refreshUrls(downloadId)
                 downloadRepository.updateProgress(
                     downloadId, DownloadStatus.WAITING, download.progress,
                     download.downloadedBytes, download.totalBytes, 0
@@ -536,6 +541,30 @@ class DownloadWorker @AssistedInject constructor(
             val target = tree.createFile(mime, safeName) ?: return
             applicationContext.contentResolver.openOutputStream(target.uri)?.use { out ->
                 source.inputStream().use { it.copyTo(out) }
+            }
+        }
+    }
+
+    /**
+     * Best-effort refresh of a download's direct URLs by re-resolving its source
+     * page. Expired CDN tokens are the usual cause of mid-download 403/410 errors;
+     * a fresh resolve hands the next attempt working links. The partial file is
+     * kept — the same content resumes by byte range. Never throws.
+     */
+    private suspend fun refreshUrls(downloadId: Long) {
+        val current = downloadRepository.get(downloadId) ?: return
+        val src = current.sourceUrl.takeIf { it.isNotBlank() } ?: return
+        val provider = providerRegistry.providerForUrl(src) ?: return
+        runCatching {
+            val r = provider.resolve(src)
+            if (r.directUrl.isNotBlank()) {
+                downloadRepository.update(
+                    current.copy(
+                        downloadUrl = r.directUrl,
+                        audioUrl = r.audioUrl ?: current.audioUrl,
+                        thumbnailUrl = r.thumbnailUrl ?: current.thumbnailUrl
+                    )
+                )
             }
         }
     }
