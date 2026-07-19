@@ -243,6 +243,7 @@
     <string name="protected_set_pin_hint">أصبح خاصًا. عيّن رمزًا/بصمة من الإعدادات ← الأمان لقفل حقيقي.</string>
     <string name="protected_moved_hint">نُقل إلى الفيديوهات الخاصة (القائمة ← الفيديوهات الخاصة).</string>
     <string name="protected_title">خاص · %1$d</string>
+    <string name="protected_need_lock">فعّل بصمة أو قفل شاشة على هاتفك لفتح الفيديوهات الخاصة.</string>
 
     <!-- Categories -->
     <string name="category">التصنيف</string>

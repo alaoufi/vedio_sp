@@ -350,57 +350,69 @@ class MainActivity : AppCompatActivity() {
 
     private fun toggleProtected() {
         if (viewModel.uiState.value.protectedMode) {
-            viewModel.setProtectedMode(false)
+            viewModel.setProtectedMode(false) // leaving the private view is free
             return
         }
-        if (securityManager.isLockConfigured) {
-            authenticate { viewModel.setProtectedMode(true) }
+        authenticateForPrivate { viewModel.setProtectedMode(true) }
+    }
+
+    /**
+     * Always require the device fingerprint (with screen-lock fallback) before
+     * revealing the private view — so private videos never show without it.
+     */
+    private fun authenticateForPrivate(onSuccess: () -> Unit) {
+        val authenticators = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK or
+                androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
         } else {
-            viewModel.setProtectedMode(true)
-            android.widget.Toast.makeText(
-                this, R.string.protected_set_pin_hint, android.widget.Toast.LENGTH_LONG
+            androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK
+        }
+        val canAuth = androidx.biometric.BiometricManager.from(this)
+            .canAuthenticate(authenticators) == androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
+
+        when {
+            canAuth -> {
+                val info = androidx.biometric.BiometricPrompt.PromptInfo.Builder()
+                    .setTitle(getString(R.string.protected_videos))
+                    .setSubtitle(getString(R.string.unlock_biometric_subtitle))
+                    .setAllowedAuthenticators(authenticators)
+                if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.R) {
+                    info.setNegativeButtonText(getString(R.string.cancel))
+                }
+                androidx.biometric.BiometricPrompt(
+                    this, androidx.core.content.ContextCompat.getMainExecutor(this),
+                    object : androidx.biometric.BiometricPrompt.AuthenticationCallback() {
+                        override fun onAuthenticationSucceeded(
+                            result: androidx.biometric.BiometricPrompt.AuthenticationResult
+                        ) { onSuccess() }
+                    }
+                ).authenticate(info.build())
+            }
+            // No device biometric/lock available, but an app PIN exists → use it.
+            securityManager.isLockConfigured -> promptAppPin(onSuccess)
+            // Nothing to authenticate with — keep the private view locked and guide
+            // the user to set up a fingerprint / screen lock first.
+            else -> android.widget.Toast.makeText(
+                this, R.string.protected_need_lock, android.widget.Toast.LENGTH_LONG
             ).show()
         }
     }
 
-    /** Requires biometric (if enabled) or the PIN before running [onSuccess]. */
-    private fun authenticate(onSuccess: () -> Unit) {
-        val canBiometric = androidx.biometric.BiometricManager.from(this).canAuthenticate(
-            androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK
-        ) == androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
-
-        if (securityManager.biometricEnabled && canBiometric) {
-            val prompt = androidx.biometric.BiometricPrompt(
-                this, androidx.core.content.ContextCompat.getMainExecutor(this),
-                object : androidx.biometric.BiometricPrompt.AuthenticationCallback() {
-                    override fun onAuthenticationSucceeded(
-                        result: androidx.biometric.BiometricPrompt.AuthenticationResult
-                    ) { onSuccess() }
-                }
-            )
-            prompt.authenticate(
-                androidx.biometric.BiometricPrompt.PromptInfo.Builder()
-                    .setTitle(getString(R.string.protected_videos))
-                    .setNegativeButtonText(getString(R.string.use_pin))
-                    .setAllowedAuthenticators(androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK)
-                    .build()
-            )
-        } else {
-            val input = EditText(this).apply {
-                inputType = android.text.InputType.TYPE_CLASS_NUMBER or
-                    android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD
-                hint = getString(R.string.pin_hint)
-            }
-            AlertDialog.Builder(this)
-                .setTitle(R.string.protected_videos)
-                .setView(input)
-                .setPositiveButton(R.string.unlock) { _, _ ->
-                    if (securityManager.verifyPin(input.text.toString())) onSuccess()
-                    else android.widget.Toast.makeText(this, R.string.wrong_pin, android.widget.Toast.LENGTH_SHORT).show()
-                }
-                .setNegativeButton(R.string.cancel, null)
-                .show()
+    private fun promptAppPin(onSuccess: () -> Unit) {
+        val input = EditText(this).apply {
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER or
+                android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD
+            hint = getString(R.string.pin_hint)
         }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.protected_videos)
+            .setView(input)
+            .setPositiveButton(R.string.unlock) { _, _ ->
+                if (securityManager.verifyPin(input.text.toString())) onSuccess()
+                else android.widget.Toast.makeText(this, R.string.wrong_pin, android.widget.Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     private fun onVideoClick(video: VideoEntity) {
