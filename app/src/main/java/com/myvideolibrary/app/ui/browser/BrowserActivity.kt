@@ -31,8 +31,17 @@ class BrowserActivity : AppCompatActivity() {
 
     @Inject lateinit var downloadManager: DownloadManager
 
-    /** Detected media, newest last; value is a short human label. */
+    /** Detected media: dedup key (URL without query) -> freshest full URL. */
     private val found = LinkedHashMap<String, String>()
+
+    private val rescanHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private val rescan = object : Runnable {
+        override fun run() {
+            binding.webView.evaluateJavascript(SCAN_JS) { onScanResult(it) }
+            // Keep re-scanning: many players attach the <video> src seconds later.
+            rescanHandler.postDelayed(this, RESCAN_MS)
+        }
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,8 +107,10 @@ class BrowserActivity : AppCompatActivity() {
         }
 
         override fun onPageFinished(view: WebView?, url: String?) {
-            // Also read <video>/<source> and og:video that never hit the network.
-            view?.evaluateJavascript(SCAN_JS) { result -> onScanResult(result) }
+            // Read <video>/<source>/og:video now, then keep re-scanning for a while
+            // to catch players that attach their source only after user interaction.
+            rescanHandler.removeCallbacks(rescan)
+            rescanHandler.post(rescan)
         }
     }
 
@@ -112,9 +123,13 @@ class BrowserActivity : AppCompatActivity() {
             url.contains("mime=video", true) || url.contains("mime=audio", true) ||
             url.contains("videoplayback", true) || url.contains(".m3u8", true)
         if (!isMedia) return
-        val label = lower.substringAfterLast('/').ifBlank { url.take(40) }
+        // Dedup by the URL without its query, so the same file seen with a rotating
+        // token isn't listed many times; keep the freshest full URL for downloading.
+        val key = url.substringBefore('?')
         synchronized(found) {
-            if (found.put(url, label) == null) runOnUiThread { updateFab() }
+            val isNew = !found.containsKey(key)
+            found[key] = url
+            if (isNew) runOnUiThread { updateFab() }
         }
     }
 
@@ -139,10 +154,11 @@ class BrowserActivity : AppCompatActivity() {
             android.widget.Toast.makeText(this, R.string.browser_no_media, android.widget.Toast.LENGTH_SHORT).show()
             return
         }
-        val labels = entries.map { it.value }.toTypedArray()
+        // Label each hit by its file name (from the dedup key); download the full URL.
+        val labels = entries.map { it.key.substringAfterLast('/').ifBlank { it.key.take(40) } }.toTypedArray()
         AlertDialog.Builder(this)
             .setTitle(R.string.browser_found_title)
-            .setItems(labels) { _, which -> download(entries[which].key) }
+            .setItems(labels) { _, which -> download(entries[which].value) }
             .setNegativeButton(R.string.cancel, null)
             .show()
     }
@@ -173,12 +189,14 @@ class BrowserActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        rescanHandler.removeCallbacks(rescan)
         binding.webView.destroy()
         super.onDestroy()
     }
 
     private companion object {
         const val START_URL = "https://www.google.com"
+        const val RESCAN_MS = 2500L
         val MEDIA_EXT = listOf(".mp4", ".webm", ".mkv", ".mov", ".m4v", ".m3u8",
             ".mp3", ".m4a", ".aac", ".ogg", ".opus", ".wav")
         val AUDIO_EXT = listOf(".mp3", ".m4a", ".aac", ".ogg", ".opus", ".wav")
