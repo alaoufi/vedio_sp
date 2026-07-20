@@ -139,6 +139,7 @@ class MainActivity : AppCompatActivity() {
             }
         )
         binding.ytRecyclerView.adapter = youtubeAdapter
+        binding.ytRecyclerView.setHasFixedSize(true)
         applyYouTubeLayout()
         binding.hideShortsSwitch.setOnCheckedChangeListener { _, _ ->
             renderYouTube(youtubeViewModel.state.value)
@@ -212,6 +213,7 @@ class MainActivity : AppCompatActivity() {
             onMenu = ::showVideoMenu
         )
         binding.recyclerView.adapter = adapter
+        binding.recyclerView.setHasFixedSize(true)
 
         binding.swipeRefresh.setOnRefreshListener {
             adapter.refresh()

@@ -44,3 +44,19 @@ val MIGRATION_6_7 = object : Migration(6, 7) {
         db.execSQL("ALTER TABLE videos ADD COLUMN media_type TEXT NOT NULL DEFAULT 'video'")
     }
 }
+
+/**
+ * Indexes the columns the library query filters and sorts on, so large
+ * libraries stay fast. is_locked is applied to every query; category/source/
+ * media_type are common filters; play_count/last_played_date back the stats.
+ */
+val MIGRATION_7_8 = object : Migration(7, 8) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_videos_is_locked ON videos(is_locked)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_videos_category ON videos(category)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_videos_source ON videos(source)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_videos_media_type ON videos(media_type)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_videos_play_count ON videos(play_count)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_videos_last_played_date ON videos(last_played_date)")
+    }
+}

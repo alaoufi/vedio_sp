@@ -27,7 +27,14 @@ import androidx.room.PrimaryKey
         Index(value = ["folder_id"]),
         Index(value = ["is_favorite"]),
         Index(value = ["created_date"]),
-        Index(value = ["content_hash"])
+        Index(value = ["content_hash"]),
+        // Hot columns for the library query filters, sorts and the stats screen.
+        Index(value = ["is_locked"]),
+        Index(value = ["category"]),
+        Index(value = ["source"]),
+        Index(value = ["media_type"]),
+        Index(value = ["play_count"]),
+        Index(value = ["last_played_date"])
     ]
 )
 data class VideoEntity(
