@@ -6,88 +6,164 @@
 <style>
   :root { color-scheme: light dark; }
   body { font-family: -apple-system, Roboto, "Segoe UI", sans-serif; line-height: 1.7;
-         margin: 0; padding: 16px 18px 48px; color: #1a1a1a; background: #fafafa; }
+         margin: 0; padding: 16px 18px 56px; color: #1a1a1a; background: #fafafa; }
   @media (prefers-color-scheme: dark) { body { color: #eaeaea; background: #121212; } }
-  h1 { font-size: 1.5rem; margin: 0 0 4px; }
-  h2 { font-size: 1.2rem; margin: 26px 0 6px; border-bottom: 1px solid rgba(128,128,128,.3); padding-bottom: 4px; }
-  h3 { font-size: 1.02rem; margin: 16px 0 4px; }
+  h1 { font-size: 1.55rem; margin: 0 0 4px; }
+  h2 { font-size: 1.22rem; margin: 30px 0 8px; border-bottom: 2px solid rgba(128,128,128,.25); padding-bottom: 5px; }
+  h3 { font-size: 1.05rem; margin: 18px 0 4px; }
   p, li { font-size: 0.98rem; }
-  ul { padding-inline-start: 20px; margin: 6px 0; }
-  .lead { opacity: .8; }
-  .tip { background: rgba(120,140,255,.12); border-radius: 8px; padding: 8px 12px; margin: 10px 0; }
-  code { background: rgba(128,128,128,.18); padding: 1px 5px; border-radius: 4px; }
+  ul, ol { padding-inline-start: 22px; margin: 6px 0; }
+  li { margin: 4px 0; }
+  .lead { opacity: .85; font-size: 1.02rem; }
+  .toc { background: rgba(120,140,255,.10); border-radius: 10px; padding: 12px 16px; margin: 16px 0; }
+  .toc a { text-decoration: none; }
+  .tip { background: rgba(60,180,120,.14); border-radius: 8px; padding: 9px 13px; margin: 10px 0; }
+  .warn { background: rgba(240,170,60,.16); border-radius: 8px; padding: 9px 13px; margin: 10px 0; }
+  code { background: rgba(128,128,128,.18); padding: 1px 6px; border-radius: 4px; }
+  .step { counter-reset: none; }
 </style>
 </head>
 <body>
 
-<h1>Ang Aking Video Library — Gabay sa Gumagamit</h1>
-<p class="lead">Isang pribado at offline-first na library para sa pag-download at panonood ng mga video mula sa TikTok, YouTube, Instagram at Snapchat. Walang lumalabas sa iyong device.</p>
+<h1>Aking Library ng Video — Buong Gabay ng Gumagamit</h1>
+<p class="lead">Isang pribado at offline-first na library para sa pag-download, pag-organisa at panonood ng iyong mga video. Ang iyong library, mga download, database at lisensya ay nasa iyong device lamang — walang inia-upload sa anumang server.</p>
 
-<h2>1. Aktibasyon</h2>
-<p>Sa unang paggamit, hihingi ang app ng activation code. Nagpapakita ang iyong device ng device number; ipadala ito sa developer at ilagay ang code na matatanggap mo. Ganap na offline ang aktibasyon — walang account at walang internet na kailangan pagkatapos noon.</p>
+<div class="toc">
+<b>Nilalaman</b>
+<ol>
+  <li><a href="#activation">Pag-activate at libreng pagsubok</a></li>
+  <li><a href="#privacy">Privacy at app lock</a></li>
+  <li><a href="#download">Pag-download ng mga video</a></li>
+  <li><a href="#browser">Ang built-in na browser</a></li>
+  <li><a href="#manage">Pamamahala ng mga download</a></li>
+  <li><a href="#library">Ang library</a></li>
+  <li><a href="#player">Ang player</a></li>
+  <li><a href="#editing">Pag-edit ng mga clip</a></li>
+  <li><a href="#image">Editor ng larawan</a></li>
+  <li><a href="#youtube">Tab ng YouTube na walang ad</a></li>
+  <li><a href="#stats">Estadistika</a></li>
+  <li><a href="#settings">Wika, tema at mga setting</a></li>
+  <li><a href="#backup">Backup at pag-restore</a></li>
+  <li><a href="#faq">Pag-troubleshoot at FAQ</a></li>
+</ol>
+</div>
 
-<h2>2. Privacy at app lock</h2>
-<p>Buksan ang <b>Mga Setting</b> para protektahan ang app:</p>
+<h2 id="activation">1. Pag-activate at libreng pagsubok</h2>
+<p>Gumagana ang app nang offline — walang account, walang pag-sign in sa internet.</p>
 <ul>
-  <li><b>App lock</b>: magtakda ng PIN para hilingin ng app na i-unlock sa bawat pagbukas.</li>
-  <li><b>Fingerprint / biometric</b>: mag-unlock gamit ang iyong fingerprint sa halip na PIN.</li>
-  <li><b>Harangan ang mga screenshot</b>: pinipigilan ang mga screenshot at screen recording sa loob ng app.</li>
-  <li><b>Itago mula sa recents</b>: itinatago ang preview ng app sa recent-apps switcher.</li>
+  <li><b>Libreng pagsubok:</b> awtomatikong nagsisimula ang <b>10-araw na libreng pagsubok</b> sa unang paglulunsad. Magagamit mo ang bawat feature sa panahong ito.</li>
+  <li><b>Pagkatapos ng pagsubok:</b> hihingi ang app ng activation code. Ang iyong mga download at setting ay <b>naitatago</b> — ang access lamang ang naka-pause hanggang mag-renew ka.</li>
+  <li><b>Pag-activate:</b> ipinapakita ng activation screen ang iyong <b>numero ng device</b>. Ipadala ito sa nagbebenta at ilagay ang code na matatanggap mo, pagkatapos ay i-tap ang <i>Activate</i>.</li>
+  <li><b>Katayuan:</b> buksan ang <b>Settings → Subscription</b> upang makita ang “Pagsubok · N araw na natitira”, “Aktibo · N araw na natitira”, o permanente.</li>
 </ul>
-<p><b>Mga pribadong video</b>: i-lock ang anumang clip para ilipat ito sa nakatagong pribadong seksyon. Mawawala ito sa pangunahing library at babalik lang pagkatapos ng fingerprint check.</p>
+<div class="tip">Sa Google Play, maaaring awtomatikong mag-activate ang app sa sandaling maging aktibo ang iyong subscription — hindi na kailangan ng code.</div>
 
-<h2>3. Pag-download ng mga video</h2>
+<h2 id="privacy">2. Privacy at app lock</h2>
+<p>Lahat ay nasa ilalim ng <b>Settings → Security</b>:</p>
+<ul>
+  <li><b>App lock:</b> magtakda ng PIN upang humingi ang app ng pag-unlock sa bawat pagbukas.</li>
+  <li><b>Fingerprint / biometric:</b> mag-unlock gamit ang iyong fingerprint sa halip na mag-type ng PIN.</li>
+  <li><b>Harangan ang mga screenshot:</b> pinipigilan ang mga screenshot at screen recording sa loob ng app.</li>
+  <li><b>Itago mula sa recents:</b> itinatago ang preview ng app sa recent-apps switcher.</li>
+</ul>
+<h3>Mga pribadong video</h3>
+<p>I-lock ang anumang clip (mula sa <code>⋮</code> menu nito) upang ilipat ito sa nakatagong <b>pribadong</b> seksyon. Mawawala ito mula sa pangunahing library at babalik lamang pagkatapos ng pagsusuri ng fingerprint (buksan ang pribadong view mula sa <code>⋮</code> menu).</p>
+
+<h2 id="download">3. Pag-download ng mga video</h2>
 <h3>Mula sa isang link</h3>
-<p>Kopyahin ang link ng video mula sa TikTok, YouTube, Instagram o Snapchat, pagkatapos ay i-tap ang <b>+</b> na button at piliin ang <b>I-download mula sa link</b> — o direktang ibahagi ang link sa app na ito mula sa share menu ng ibang app.</p>
+<ol>
+  <li>Kopyahin ang link ng video.</li>
+  <li>I-tap ang <b>+</b> na button → <b>Download from link</b> (o i-share ang link sa app na ito mula sa ibang app).</li>
+  <li>I-tap ang <b>Paste</b>, pagkatapos ay <b>Get info</b>.</li>
+  <li>Piliin ang <b>buong video</b>, <b>video lamang</b>, o <b>audio lamang</b>, pagkatapos ay i-download.</li>
+</ol>
 <h3>Sa pamamagitan ng paghahanap</h3>
-<p>I-tap ang search icon at mag-type ng mga keyword para maghanap sa YouTube (at TikTok). I-tap ang isang resulta para i-preview ito, o gamitin ang download button nito.</p>
-<h3>Video o audio</h3>
-<p>Kapag nag-download ka, maaari mong piliin ang buong video o audio lamang. Ang mga audio download ay naka-save bilang totoong audio file at pinapatugtog na may cover art, hindi itim na screen.</p>
-<div class="tip">Ang Instagram at Snapchat ay nagbabahagi lamang ng mga pampublikong post. Ang mga pribado o login-only na post ay hindi maaaring i-extract.</div>
+<p>I-tap ang search icon, i-type ang mga keyword, i-tap ang isang resulta upang i-preview ito, o gamitin ang download button nito.</p>
+<h3>Audio kumpara sa video</h3>
+<p>Ang mga audio download ay nase-save bilang totoong audio file at nagpe-play na may cover art (hindi itim na screen). Maaari ka ring pumili ng kalidad kapag nag-aalok ang pinagmulan ng ilang opsyon.</p>
+<h3>Kung saan napupunta ang mga file</h3>
+<p>Ang mga download ay pribadong iniimbak sa app. Sa <b>Settings → Save location</b> maaari mo ring ilagay ang isang kopya sa folder na pinili mo upang lumitaw ito sa iyong gallery/file manager.</p>
 
-<h2>4. Ang library</h2>
+<h2 id="browser">4. Ang built-in na browser</h2>
+<p>Buksan ang <b>+ → Browser</b> para sa isang pangkalahatang web browser na tumutukoy sa nada-download na media sa anumang page.</p>
+<ol>
+  <li>I-type ang isang site o maghanap sa address bar.</li>
+  <li>I-play o buksan ang video sa page.</li>
+  <li>Kapag natukoy ang media, lilitaw ang isang <b>Download (N)</b> na button — i-tap ito, piliin ang item, at ito ay nada-download sa iyong library.</li>
+</ol>
+<div class="tip">Patuloy na ini-scan ng browser ang page sa loob ng ilang segundo, kaya kung hindi agad lumitaw ang button, simulan ang video at maghintay saglit.</div>
+
+<h2 id="manage">5. Pamamahala ng mga download</h2>
+<p>Buksan ang <b>+ → Downloads</b> (o i-tap ang download banner sa library) upang makita ang aktibo at tapos na mga trabaho. Maaari mong <b>i-pause</b>, <b>i-resume</b> at <b>i-retry</b>. Ang naka-pause o naantalang mga download ay nagpapatuloy mula sa kung saan sila tumigil, at ang nabigong download ay awtomatikong nagre-refresh ng link nito at nagre-retry.</p>
+
+<h2 id="library">6. Ang library</h2>
 <ul>
-  <li><b>Grid / list view</b>: palitan ang layout mula sa <code>⋮</code> menu → <i>I-toggle ang view</i>.</li>
-  <li><b>Ayusin</b>: ayon sa petsa, pangalan, tagal, laki, o <b>kategorya</b>.</li>
-  <li><b>I-filter</b>: ayon sa pinagmulan, uri ng media, at <b>maraming kategorya nang sabay-sabay</b> — piliin ang ilang kategorya para ipakita lang ang mga iyon at itago ang iba.</li>
-  <li><b>Mga paborito</b>: markahan ang mga clip bilang paborito at i-filter papunta sa mga ito.</li>
-  <li><b>Mga kategorya</b>: ayusin ang mga clip sa mga kategorya; ipinapakita ng bawat clip ang kategorya nito bilang chip. Pumili ng ilang clip para itakda ang kategorya ng mga ito nang sabay-sabay.</li>
+  <li><b>Grid / list view:</b> lumipat mula sa <code>⋮ → Toggle view</code>.</li>
+  <li><b>Paghahanap:</b> i-tap ang magnifier; nagsa-filter ito ng library nang live.</li>
+  <li><b>Pag-sort:</b> ayon sa petsa, pangalan, tagal, laki, o <b>kategorya</b> (pinagpapangkat ang mga clip ayon sa kategorya).</li>
+  <li><b>Filter:</b> ayon sa pinagmulan, uri ng media, at <b>ilang kategorya nang sabay-sabay</b> — lagyan ng tsek ang mga kategoryang ipapakita at ang iba ay itinatago. Ipinapakita ng entry na Kategorya kung ilan ang aktibo.</li>
+  <li><b>Mga paborito:</b> markahan ang mga clip bilang paborito at i-filter sila.</li>
+  <li><b>Mga kategorya:</b> ipinapakita ng bawat clip ang kategorya nito bilang isang chip. Pamahalaan ang mga kategorya mula sa <code>⋮ → Manage categories</code>.</li>
+  <li><b>Pumili ng marami:</b> pindutin nang matagal ang isang clip upang simulan ang pagpili, pagkatapos ay magtakda ng kategorya, paborito, o mag-delete nang maramihan.</li>
 </ul>
 
-<h2>5. Ang player</h2>
+<h2 id="player">7. Ang player</h2>
 <ul>
-  <li><b>Tuloy-tuloy na pagtugtog</b>: kapag natapos ang isang clip, awtomatikong pinapatugtog ang susunod sa kasalukuyang listahan. Gamitin ang <b>Susunod / Nakaraan</b> mula sa <code>⋮</code> menu.</li>
-  <li><b>Ituloy</b>: nagpapatuloy ang pagtugtog mula sa huling tinigilan mo.</li>
-  <li><b>Mga galaw</b>: mag-swipe pataas/pababa sa kaliwang bahagi para sa liwanag, sa kanang bahagi para sa lakas ng tunog.</li>
-  <li><b>Bilis</b>: i-tap ang speed button para umikot sa 0.5×–2×.</li>
-  <li><b>I-lock ang mga kontrol</b>: itago ang mga kontrol para maiwasan ang aksidenteng pag-tap.</li>
-  <li><b>Picture-in-Picture at background play</b>: magpatuloy sa panonood o pakikinig habang gumagamit ng ibang app.</li>
-  <li><b>I-resize</b>: i-fit, i-zoom o i-stretch ang video.</li>
-  <li><b>Takpan ang lumulutang na teksto</b>: gumuhit ng kahon sa ibabaw ng teksto sa screen o watermark para itago ito habang nagpapatugtog.</li>
+  <li><b>Tuloy-tuloy na playback:</b> kapag natapos ang isang clip, awtomatikong nagpe-play ang susunod sa kasalukuyang listahan.</li>
+  <li><b>Susunod / Nakaraan:</b> mula sa <code>⋮</code> menu ng player.</li>
+  <li><b>Ituloy:</b> nagpapatuloy ang playback mula sa kung saan ka huminto.</li>
+  <li><b>Mga galaw:</b> mag-swipe pataas/pababa sa <b>kaliwang bahagi</b> para sa liwanag, sa <b>kanang bahagi</b> para sa lakas ng tunog.</li>
+  <li><b>Bilis:</b> i-tap ang speed button upang mag-cycle mula 0.5×–2×.</li>
+  <li><b>I-lock ang mga kontrol:</b> itago ang mga kontrol upang maiwasan ang aksidenteng pag-tap.</li>
+  <li><b>Baguhin ang laki:</b> i-fit, i-zoom o i-stretch ang video.</li>
+  <li><b>Picture-in-Picture at background play:</b> patuloy na manood o makinig habang gumagamit ng ibang app.</li>
+  <li><b>Takpan ang lumulutang na teksto:</b> gumuhit ng kahon sa ibabaw ng tekstong nasa screen o isang watermark upang itago ito habang nagpe-play (<code>⋮ → Cover text</code>).</li>
 </ul>
 
-<h2>6. Walang-ad na YouTube tab</h2>
-<p>Mula sa <code>⋮</code> menu buksan ang <b>YouTube</b> tab: isang malinis na viewer na walang ad. Ang Trending ay ipinapakita para sa rehiyong Arabic bilang default, maaaring itago ang Shorts sa isang switch, at maaari kang maghanap at mag-toggle ng grid/list. Isa itong hiwalay na tab at hindi kailanman pumapalit sa iyong library.</p>
+<h2 id="editing">8. Pag-edit ng mga clip</h2>
+<p>Mula sa <code>⋮</code> menu ng isang clip maaari mong <b>palitan ang pangalan</b> nito, <b>i-edit ang paglalarawan nito</b>, <b>itakda ang kategorya nito</b>, idagdag ito sa <b>mga paborito</b>, ilipat ito sa <b>pribadong</b> seksyon, o <b>i-delete</b> ito (opsyonal kasama ang file nito).</p>
 
-<h2>7. Image editor</h2>
-<p>Para sa mga naka-save na larawan maaari mong <b>i-crop</b>, <b>itago</b> ang isang pangalan/watermark gamit ang solidong kahon, <b>magdagdag ng teksto</b> kahit saan, at i-extract ang teksto mula sa larawan gamit ang <b>OCR</b> (kinopya sa clipboard). Ang mga larawan ay nasa-save nang malinis nang walang re-encoding na artefacts.</p>
+<h2 id="image">9. Editor ng larawan</h2>
+<p>Para sa mga naka-save na larawan maaari mong <b>i-crop</b>, <b>itago</b> ang isang pangalan o watermark gamit ang solidong kahon, <b>magdagdag ng teksto</b> saanman, at kunin ang teksto mula sa larawan gamit ang <b>OCR</b> (kinopya sa clipboard). Nase-save ang mga larawan nang malinis nang walang re-encoding artefacts.</p>
 
-<h2>8. Pag-edit ng mga clip</h2>
-<p>Mula sa <code>⋮</code> menu ng isang clip maaari mong palitan ang pangalan nito, i-edit ang paglalarawan nito, itakda ang kategorya nito, idagdag ito sa mga paborito, ilipat ito sa pribadong seksyon, o burahin ito.</p>
-
-<h2>9. Backup at pag-restore</h2>
-<p>Sa <b>Mga Setting</b>, mag-export ng isang <b>naka-encrypt na backup</b> ng iyong library na protektado ng password, at i-restore ito mamaya gamit ang parehong password. Ingatan ang password — kung wala ito, hindi mabubuksan ang backup.</p>
-
-<h2>10. Mga Setting</h2>
+<h2 id="youtube">10. Tab ng YouTube na walang ad</h2>
+<p>Mula sa <code>⋮ → YouTube</code> buksan ang isang malinis na viewer na walang ad:</p>
 <ul>
-  <li><b>Wika</b>: piliin ang wika ng app.</li>
-  <li><b>Tema</b>: system, light o dark.</li>
-  <li><b>Wi-Fi lamang</b>: mag-download lang sa Wi-Fi.</li>
-  <li><b>Sabay-sabay na mga download</b>: kung ilan ang magda-download nang sabay.</li>
-  <li><b>Lokasyon ng pag-save</b>: kung saan iniimbak ang mga download.</li>
+  <li>Ipinapakita ang Trending para sa rehiyon ng Arabo bilang default.</li>
+  <li>Isang switch ang nagtatago ng Shorts.</li>
+  <li>Maghanap gamit ang magnifier at i-toggle ang grid/list.</li>
+</ul>
+<p>Ito ay isang hiwalay na tab at hindi kailanman pinapalitan ang iyong library. Bumalik gamit ang back button o <code>⋮ → Library</code>.</p>
+
+<h2 id="stats">11. Estadistika</h2>
+<p>Buksan ang <code>⋮ → Statistics</code> para sa isang dashboard: kabuuang video, kabuuang laki, kabuuang haba at kabuuang play, kasama ang iyong pinaka-nape-play at kamakailang nape-play na mga clip at bilang ayon sa kategorya at ayon sa pinagmulan.</p>
+
+<h2 id="settings">12. Wika, tema at mga setting</h2>
+<ul>
+  <li><b>Wika:</b> Settings → Language — pumili mula sa 14 na wika; agad na lumilipat ang app.</li>
+  <li><b>Tema:</b> system, light o dark.</li>
+  <li><b>Wi-Fi lamang:</b> mag-download lamang sa Wi-Fi.</li>
+  <li><b>Sabay-sabay na mga download:</b> kung ilan ang nada-download nang sabay.</li>
+  <li><b>Save location:</b> kung saan iniimbak ang kopya ng mga download.</li>
+  <li><b>Gabay ng gumagamit:</b> palaging bumubukas ang gabay na ito sa kasalukuyang wika ng app.</li>
 </ul>
 
-<p class="lead">Iyon na ang lahat. Mag-enjoy sa iyong pribadong video library.</p>
+<h2 id="backup">13. Backup at pag-restore</h2>
+<p>Sa <b>Settings</b>, i-export ang isang <b>naka-encrypt na backup</b> ng iyong library na protektado ng password, at i-restore ito mamaya gamit ang parehong password. Ingatan ang password — kung wala ito ay hindi mabubuksan ang backup.</p>
+
+<h2 id="faq">14. Pag-troubleshoot at FAQ</h2>
+<h3>Nabigo ang isang download</h3>
+<p>Mabilis mag-expire ang mga link mula sa ilang site. Buksan ang <b>Downloads</b> at i-tap ang retry — kumukuha ang app ng bagong link at nagpapatuloy. Suriin ang iyong koneksyon at na ang post ay pampubliko.</p>
+<h3>Hindi nada-download ang isang post</h3>
+<p>Ang Instagram at Snapchat ay naglalantad lamang ng mga <b>pampublikong</b> post; ang mga pribado o login-only na post ay hindi makukuha. Ang pagkuha ay nakadepende sa platform at paminsan ay maaaring mabigo — subukan muli mamaya.</p>
+<h3>Nagpe-play ang audio bilang itim na screen</h3>
+<p>Siguraduhing pinili mo ang <b>audio lamang</b> noong nag-download; ang mga audio file ay nagpapakita ng cover art sa halip na isang video frame.</p>
+<h3>Nag-lock ang app sa sarili nito</h3>
+<p>Natapos ang iyong pagsubok o subscription. Ligtas ang iyong mga download — mag-renew (maglagay ng code, o mag-subscribe sa Google Play) upang magpatuloy.</p>
+<h3>May ipinapadala ba sa isang server?</h3>
+<p>Wala. Walang backend ang app. Kinokontak lamang nito ang sariling site ng video upang kunin ang hiniling mong i-download.</p>
+
+<p class="lead" style="margin-top:28px">Iyan ang buong app. Mag-enjoy sa iyong pribadong library ng video.</p>
 
 </body>
 </html>

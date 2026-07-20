@@ -6,88 +6,164 @@
 <style>
   :root { color-scheme: light dark; }
   body { font-family: -apple-system, Roboto, "Segoe UI", sans-serif; line-height: 1.7;
-         margin: 0; padding: 16px 18px 48px; color: #1a1a1a; background: #fafafa; }
+         margin: 0; padding: 16px 18px 56px; color: #1a1a1a; background: #fafafa; }
   @media (prefers-color-scheme: dark) { body { color: #eaeaea; background: #121212; } }
-  h1 { font-size: 1.5rem; margin: 0 0 4px; }
-  h2 { font-size: 1.2rem; margin: 26px 0 6px; border-bottom: 1px solid rgba(128,128,128,.3); padding-bottom: 4px; }
-  h3 { font-size: 1.02rem; margin: 16px 0 4px; }
+  h1 { font-size: 1.55rem; margin: 0 0 4px; }
+  h2 { font-size: 1.22rem; margin: 30px 0 8px; border-bottom: 2px solid rgba(128,128,128,.25); padding-bottom: 5px; }
+  h3 { font-size: 1.05rem; margin: 18px 0 4px; }
   p, li { font-size: 0.98rem; }
-  ul { padding-inline-start: 20px; margin: 6px 0; }
-  .lead { opacity: .8; }
-  .tip { background: rgba(120,140,255,.12); border-radius: 8px; padding: 8px 12px; margin: 10px 0; }
-  code { background: rgba(128,128,128,.18); padding: 1px 5px; border-radius: 4px; }
+  ul, ol { padding-inline-start: 22px; margin: 6px 0; }
+  li { margin: 4px 0; }
+  .lead { opacity: .85; font-size: 1.02rem; }
+  .toc { background: rgba(120,140,255,.10); border-radius: 10px; padding: 12px 16px; margin: 16px 0; }
+  .toc a { text-decoration: none; }
+  .tip { background: rgba(60,180,120,.14); border-radius: 8px; padding: 9px 13px; margin: 10px 0; }
+  .warn { background: rgba(240,170,60,.16); border-radius: 8px; padding: 9px 13px; margin: 10px 0; }
+  code { background: rgba(128,128,128,.18); padding: 1px 6px; border-radius: 4px; }
+  .step { counter-reset: none; }
 </style>
 </head>
 <body>
 
-<h1>Pustaka Video Saya — Panduan Pengguna</h1>
-<p class="lead">Pustaka pribadi yang mengutamakan mode offline untuk mengunduh dan menonton video dari TikTok, YouTube, Instagram, dan Snapchat. Tidak ada apa pun yang keluar dari perangkat Anda.</p>
+<h1>Pustaka Video Saya — Panduan Pengguna Lengkap</h1>
+<p class="lead">Pustaka pribadi yang mengutamakan mode offline untuk mengunduh, menata, dan menonton video Anda. Pustaka, unduhan, basis data, dan lisensi Anda semuanya tersimpan di perangkat Anda — tidak ada yang diunggah ke server mana pun.</p>
 
-<h2>1. Aktivasi</h2>
-<p>Saat pertama kali dibuka, aplikasi meminta kode aktivasi. Perangkat Anda menampilkan nomor perangkat; kirimkan ke pengembang dan masukkan kode yang Anda terima. Aktivasi sepenuhnya offline — tidak diperlukan akun maupun internet setelahnya.</p>
+<div class="toc">
+<b>Daftar Isi</b>
+<ol>
+  <li><a href="#activation">Aktivasi &amp; uji coba gratis</a></li>
+  <li><a href="#privacy">Privasi &amp; kunci aplikasi</a></li>
+  <li><a href="#download">Mengunduh video</a></li>
+  <li><a href="#browser">Peramban bawaan</a></li>
+  <li><a href="#manage">Mengelola unduhan</a></li>
+  <li><a href="#library">Pustaka</a></li>
+  <li><a href="#player">Pemutar</a></li>
+  <li><a href="#editing">Menyunting klip</a></li>
+  <li><a href="#image">Penyunting gambar</a></li>
+  <li><a href="#youtube">Tab YouTube bebas iklan</a></li>
+  <li><a href="#stats">Statistik</a></li>
+  <li><a href="#settings">Bahasa, tema &amp; pengaturan</a></li>
+  <li><a href="#backup">Cadangkan &amp; pulihkan</a></li>
+  <li><a href="#faq">Pemecahan masalah &amp; Tanya Jawab</a></li>
+</ol>
+</div>
 
-<h2>2. Privasi &amp; kunci aplikasi</h2>
-<p>Buka <b>Pengaturan</b> untuk melindungi aplikasi:</p>
+<h2 id="activation">1. Aktivasi &amp; uji coba gratis</h2>
+<p>Aplikasi ini bekerja secara offline — tanpa akun, tanpa masuk lewat internet.</p>
 <ul>
-  <li><b>Kunci aplikasi</b>: atur PIN agar aplikasi meminta buka kunci setiap kali dibuka.</li>
-  <li><b>Sidik jari / biometrik</b>: buka kunci dengan sidik jari Anda alih-alih PIN.</li>
-  <li><b>Blokir tangkapan layar</b>: mencegah tangkapan layar dan perekaman layar di dalam aplikasi.</li>
-  <li><b>Sembunyikan dari aplikasi terkini</b>: menyembunyikan pratinjau aplikasi di pengalih aplikasi terkini.</li>
+  <li><b>Uji coba gratis:</b> peluncuran pertama otomatis memulai <b>uji coba gratis 10 hari</b>. Anda dapat menggunakan setiap fitur selama masa itu.</li>
+  <li><b>Setelah uji coba:</b> aplikasi meminta kode aktivasi. Unduhan dan pengaturan Anda <b>tetap tersimpan</b> — hanya akses yang dijeda hingga Anda memperpanjang.</li>
+  <li><b>Mengaktifkan:</b> layar aktivasi menampilkan <b>nomor perangkat</b> Anda. Kirimkan ke penjual dan masukkan kode yang Anda terima, lalu ketuk <i>Aktifkan</i>.</li>
+  <li><b>Status:</b> buka <b>Pengaturan → Langganan</b> untuk melihat “Uji coba · sisa N hari”, “Aktif · sisa N hari”, atau permanen.</li>
 </ul>
-<p><b>Video pribadi</b>: kunci klip mana pun untuk memindahkannya ke bagian pribadi tersembunyi. Klip hilang dari pustaka utama dan hanya kembali setelah pemeriksaan sidik jari.</p>
+<div class="tip">Di Google Play, aplikasi dapat aktif secara otomatis begitu langganan Anda aktif — tanpa perlu kode.</div>
 
-<h2>3. Mengunduh video</h2>
-<h3>Dari tautan</h3>
-<p>Salin tautan video dari TikTok, YouTube, Instagram, atau Snapchat, lalu ketuk tombol <b>+</b> dan pilih <b>Unduh dari tautan</b> — atau bagikan tautan langsung ke aplikasi ini dari menu bagikan aplikasi lain.</p>
-<h3>Melalui pencarian</h3>
-<p>Ketuk ikon pencarian dan ketik kata kunci untuk mencari YouTube (dan TikTok). Ketuk hasil untuk melihat pratinjaunya, atau gunakan tombol unduhnya.</p>
-<h3>Video atau audio</h3>
-<p>Saat mengunduh, Anda dapat memilih video lengkap atau hanya audio. Unduhan audio disimpan sebagai berkas audio asli dan diputar dengan sampul, bukan layar hitam.</p>
-<div class="tip">Instagram dan Snapchat hanya menampilkan postingan publik. Postingan pribadi atau yang memerlukan login tidak dapat diekstrak.</div>
-
-<h2>4. Pustaka</h2>
+<h2 id="privacy">2. Privasi &amp; kunci aplikasi</h2>
+<p>Semuanya ada di bawah <b>Pengaturan → Keamanan</b>:</p>
 <ul>
-  <li><b>Tampilan kisi / daftar</b>: ubah tata letak dari menu <code>⋮</code> → <i>Alihkan tampilan</i>.</li>
-  <li><b>Urutkan</b>: berdasarkan tanggal, nama, durasi, ukuran, atau <b>kategori</b>.</li>
-  <li><b>Filter</b>: berdasarkan sumber, jenis media, dan <b>beberapa kategori sekaligus</b> — centang beberapa kategori untuk hanya menampilkannya dan menyembunyikan sisanya.</li>
-  <li><b>Favorit</b>: tandai klip sebagai favorit dan filter ke klip tersebut.</li>
-  <li><b>Kategori</b>: atur klip ke dalam kategori; setiap klip menampilkan kategorinya sebagai chip. Pilih beberapa klip untuk mengatur kategorinya sekaligus.</li>
+  <li><b>Kunci aplikasi:</b> atur PIN agar aplikasi meminta buka kunci setiap kali dibuka.</li>
+  <li><b>Sidik jari / biometrik:</b> buka kunci dengan sidik jari alih-alih mengetik PIN.</li>
+  <li><b>Blokir tangkapan layar:</b> mencegah tangkapan layar dan perekaman layar di dalam aplikasi.</li>
+  <li><b>Sembunyikan dari aplikasi terkini:</b> menyembunyikan pratinjau aplikasi di pengalih aplikasi terkini.</li>
 </ul>
+<h3>Video pribadi</h3>
+<p>Kunci klip apa pun (dari menu <code>⋮</code>-nya) untuk memindahkannya ke bagian <b>pribadi</b> yang tersembunyi. Klip itu menghilang dari pustaka utama dan hanya kembali setelah pemeriksaan sidik jari (buka tampilan pribadi dari menu <code>⋮</code>).</p>
 
-<h2>5. Pemutar</h2>
+<h2 id="download">3. Mengunduh video</h2>
+<h3>Dari sebuah tautan</h3>
+<ol>
+  <li>Salin tautan video.</li>
+  <li>Ketuk tombol <b>+</b> → <b>Unduh dari tautan</b> (atau bagikan tautan ke aplikasi ini dari aplikasi lain).</li>
+  <li>Ketuk <b>Tempel</b>, lalu <b>Ambil info</b>.</li>
+  <li>Pilih <b>video penuh</b>, <b>video saja</b>, atau <b>audio saja</b>, lalu unduh.</li>
+</ol>
+<h3>Dengan pencarian</h3>
+<p>Ketuk ikon pencarian, ketik kata kunci, ketuk hasil untuk mempratinjaunya, atau gunakan tombol unduhnya.</p>
+<h3>Audio vs video</h3>
+<p>Unduhan audio disimpan sebagai berkas audio asli dan diputar dengan sampul (bukan layar hitam). Anda juga dapat memilih kualitas ketika sumbernya menawarkan beberapa pilihan.</p>
+<h3>Ke mana berkas disimpan</h3>
+<p>Unduhan disimpan secara pribadi di dalam aplikasi. Di <b>Pengaturan → Lokasi penyimpanan</b> Anda juga dapat menempatkan salinan di folder pilihan Anda agar muncul di galeri/pengelola berkas Anda.</p>
+
+<h2 id="browser">4. Peramban bawaan</h2>
+<p>Buka <b>+ → Peramban</b> untuk peramban web umum yang mendeteksi media yang dapat diunduh di halaman mana pun.</p>
+<ol>
+  <li>Ketik sebuah situs atau lakukan pencarian di bilah alamat.</li>
+  <li>Putar atau buka video di halaman tersebut.</li>
+  <li>Ketika media terdeteksi, tombol <b>Unduh (N)</b> akan muncul — ketuk, pilih item, dan itu akan diunduh ke pustaka Anda.</li>
+</ol>
+<div class="tip">Peramban terus memindai halaman selama beberapa detik, jadi jika tombol tidak segera muncul, mulai video dan tunggu sebentar.</div>
+
+<h2 id="manage">5. Mengelola unduhan</h2>
+<p>Buka <b>+ → Unduhan</b> (atau ketuk banner unduhan di pustaka) untuk melihat tugas yang aktif dan yang selesai. Anda dapat <b>menjeda</b>, <b>melanjutkan</b>, dan <b>mencoba lagi</b>. Unduhan yang dijeda atau terputus dilanjutkan dari titik terhentinya, dan unduhan yang gagal otomatis menyegarkan tautannya lalu mencoba lagi.</p>
+
+<h2 id="library">6. Pustaka</h2>
 <ul>
-  <li><b>Pemutaran berkelanjutan</b>: saat sebuah klip berakhir, klip berikutnya dalam daftar saat ini diputar otomatis. Gunakan <b>Berikutnya / Sebelumnya</b> dari menu <code>⋮</code>.</li>
-  <li><b>Lanjutkan</b>: pemutaran berlanjut dari posisi terakhir Anda berhenti.</li>
-  <li><b>Gerakan</b>: geser ke atas/bawah pada bagian kiri untuk kecerahan, pada bagian kanan untuk volume.</li>
-  <li><b>Kecepatan</b>: ketuk tombol kecepatan untuk beralih 0.5×–2×.</li>
-  <li><b>Kunci kontrol</b>: sembunyikan kontrol untuk menghindari ketukan tidak sengaja.</li>
-  <li><b>Picture-in-Picture &amp; putar di latar belakang</b>: terus menonton atau mendengarkan sambil menggunakan aplikasi lain.</li>
-  <li><b>Ubah ukuran</b>: sesuaikan, perbesar, atau regangkan video.</li>
-  <li><b>Tutup teks mengambang</b>: gambar kotak di atas teks pada layar atau tanda air untuk menyembunyikannya selama pemutaran.</li>
+  <li><b>Tampilan kisi / daftar:</b> beralih dari <code>⋮ → Toggle view</code>.</li>
+  <li><b>Pencarian:</b> ketuk kaca pembesar; ini memfilter pustaka secara langsung.</li>
+  <li><b>Urutkan:</b> berdasarkan tanggal, nama, durasi, ukuran, atau <b>kategori</b> (mengelompokkan klip berdasarkan kategori).</li>
+  <li><b>Filter:</b> berdasarkan sumber, jenis media, dan <b>beberapa kategori sekaligus</b> — centang kategori yang ingin ditampilkan dan sisanya disembunyikan. Entri Kategori menampilkan berapa banyak yang aktif.</li>
+  <li><b>Favorit:</b> tandai klip sebagai favorit dan filter untuk menampilkannya.</li>
+  <li><b>Kategori:</b> setiap klip menampilkan kategorinya sebagai chip. Kelola kategori dari <code>⋮ → Manage categories</code>.</li>
+  <li><b>Pilih banyak:</b> tekan lama sebuah klip untuk memulai pemilihan, lalu atur kategori, favorit, atau hapus secara massal.</li>
 </ul>
 
-<h2>6. Tab YouTube bebas iklan</h2>
-<p>Dari menu <code>⋮</code> buka tab <b>YouTube</b>: penampil bersih tanpa iklan. Tren ditampilkan untuk wilayah Arab secara bawaan, Shorts dapat disembunyikan dengan satu sakelar, dan Anda dapat mencari serta mengalihkan kisi/daftar. Ini adalah tab terpisah dan tidak pernah menggantikan pustaka Anda.</p>
-
-<h2>7. Editor gambar</h2>
-<p>Untuk gambar tersimpan, Anda dapat <b>memotong</b>, <b>menyembunyikan</b> nama/tanda air dengan kotak solid, <b>menambahkan teks</b> di mana saja, dan mengekstrak teks dari gambar dengan <b>OCR</b> (disalin ke papan klip). Foto disimpan dengan bersih tanpa artefak pengodean ulang.</p>
-
-<h2>8. Mengedit klip</h2>
-<p>Dari menu <code>⋮</code> sebuah klip, Anda dapat mengganti namanya, mengedit deskripsinya, mengatur kategorinya, menambahkannya ke favorit, memindahkannya ke bagian pribadi, atau menghapusnya.</p>
-
-<h2>9. Cadangkan &amp; pulihkan</h2>
-<p>Di <b>Pengaturan</b>, ekspor <b>cadangan terenkripsi</b> dari pustaka Anda yang dilindungi kata sandi, dan pulihkan nanti dengan kata sandi yang sama. Simpan kata sandi dengan aman — tanpanya cadangan tidak dapat dibuka.</p>
-
-<h2>10. Pengaturan</h2>
+<h2 id="player">7. Pemutar</h2>
 <ul>
-  <li><b>Bahasa</b>: pilih bahasa aplikasi.</li>
-  <li><b>Tema</b>: sistem, terang, atau gelap.</li>
-  <li><b>Hanya Wi-Fi</b>: unduh hanya saat Wi-Fi.</li>
-  <li><b>Unduhan bersamaan</b>: berapa banyak yang diunduh sekaligus.</li>
-  <li><b>Lokasi penyimpanan</b>: tempat unduhan disimpan.</li>
+  <li><b>Pemutaran berkelanjutan:</b> ketika sebuah klip berakhir, klip berikutnya dalam daftar saat ini diputar otomatis.</li>
+  <li><b>Berikutnya / Sebelumnya:</b> dari menu <code>⋮</code> pemutar.</li>
+  <li><b>Lanjutkan:</b> pemutaran berlanjut dari titik terakhir Anda berhenti.</li>
+  <li><b>Gerakan:</b> geser ke atas/bawah pada <b>separuh kiri</b> untuk kecerahan, pada <b>separuh kanan</b> untuk volume.</li>
+  <li><b>Kecepatan:</b> ketuk tombol kecepatan untuk berputar antara 0,5×–2×.</li>
+  <li><b>Kunci kontrol:</b> sembunyikan kontrol untuk menghindari sentuhan tak sengaja.</li>
+  <li><b>Ubah ukuran:</b> paskan, perbesar, atau regangkan video.</li>
+  <li><b>Picture-in-Picture &amp; pemutaran latar belakang:</b> tetap menonton atau mendengarkan sambil menggunakan aplikasi lain.</li>
+  <li><b>Tutupi teks mengambang:</b> gambar kotak di atas teks pada layar atau tanda air untuk menyembunyikannya saat memutar (<code>⋮ → Cover text</code>).</li>
 </ul>
 
-<p class="lead">Itu saja. Nikmati pustaka video pribadi Anda.</p>
+<h2 id="editing">8. Menyunting klip</h2>
+<p>Dari menu <code>⋮</code> sebuah klip, Anda dapat <b>mengganti nama</b>, <b>menyunting deskripsinya</b>, <b>mengatur kategorinya</b>, menambahkannya ke <b>favorit</b>, memindahkannya ke bagian <b>pribadi</b>, atau <b>menghapusnya</b> (opsional beserta berkasnya).</p>
+
+<h2 id="image">9. Penyunting gambar</h2>
+<p>Untuk gambar yang tersimpan, Anda dapat <b>memangkas</b>, <b>menyembunyikan</b> sebuah nama atau tanda air dengan kotak solid, <b>menambahkan teks</b> di mana saja, dan mengekstrak teks dari gambar dengan <b>OCR</b> (disalin ke papan klip). Gambar disimpan dengan bersih tanpa artefak pengodean ulang.</p>
+
+<h2 id="youtube">10. Tab YouTube bebas iklan</h2>
+<p>Dari <code>⋮ → YouTube</code> buka penampil bersih tanpa iklan:</p>
+<ul>
+  <li>Tren ditampilkan untuk wilayah Arab secara bawaan.</li>
+  <li>Satu sakelar menyembunyikan Shorts.</li>
+  <li>Cari dengan kaca pembesar dan beralih tampilan kisi/daftar.</li>
+</ul>
+<p>Ini adalah tab terpisah dan tidak pernah menggantikan pustaka Anda. Kembali dengan tombol kembali atau <code>⋮ → Library</code>.</p>
+
+<h2 id="stats">11. Statistik</h2>
+<p>Buka <code>⋮ → Statistics</code> untuk sebuah dasbor: total video, total ukuran, total durasi, dan total pemutaran, ditambah klip yang paling sering diputar dan baru-baru ini diputar serta jumlah menurut kategori dan menurut sumber.</p>
+
+<h2 id="settings">12. Bahasa, tema &amp; pengaturan</h2>
+<ul>
+  <li><b>Bahasa:</b> Pengaturan → Bahasa — pilih dari 14 bahasa; aplikasi beralih seketika.</li>
+  <li><b>Tema:</b> sistem, terang, atau gelap.</li>
+  <li><b>Hanya Wi-Fi:</b> unduh hanya di Wi-Fi.</li>
+  <li><b>Unduhan bersamaan:</b> berapa banyak yang diunduh sekaligus.</li>
+  <li><b>Lokasi penyimpanan:</b> tempat salinan unduhan disimpan.</li>
+  <li><b>Panduan pengguna:</b> panduan ini selalu terbuka dalam bahasa aplikasi saat ini.</li>
+</ul>
+
+<h2 id="backup">13. Cadangkan &amp; pulihkan</h2>
+<p>Di <b>Pengaturan</b>, ekspor <b>cadangan terenkripsi</b> dari pustaka Anda yang dilindungi kata sandi, dan pulihkan nanti dengan kata sandi yang sama. Simpan kata sandi dengan aman — tanpa itu, cadangan tidak dapat dibuka.</p>
+
+<h2 id="faq">14. Pemecahan masalah &amp; Tanya Jawab</h2>
+<h3>Sebuah unduhan gagal</h3>
+<p>Tautan dari beberapa situs cepat kedaluwarsa. Buka <b>Unduhan</b> dan ketuk coba lagi — aplikasi mengambil tautan baru dan melanjutkan. Periksa koneksi Anda dan pastikan kirimannya bersifat publik.</p>
+<h3>Sebuah kiriman tidak mau diunduh</h3>
+<p>Instagram dan Snapchat hanya menampilkan kiriman <b>publik</b>; kiriman pribadi atau yang hanya bisa dilihat setelah masuk tidak dapat diekstrak. Ekstraksi bergantung pada platform dan sesekali dapat gagal — coba lagi nanti.</p>
+<h3>Audio diputar sebagai layar hitam</h3>
+<p>Pastikan Anda memilih <b>audio saja</b> saat mengunduh; berkas audio menampilkan sampul alih-alih bingkai video.</p>
+<h3>Aplikasi mengunci dirinya sendiri</h3>
+<p>Uji coba atau langganan Anda berakhir. Unduhan Anda aman — perpanjang (masukkan kode, atau berlangganan di Google Play) untuk melanjutkan.</p>
+<h3>Apakah ada sesuatu yang dikirim ke server?</h3>
+<p>Tidak. Aplikasi ini tidak punya backend. Ia hanya menghubungi situs asal video untuk mengambil apa yang Anda minta untuk diunduh.</p>
+
+<p class="lead" style="margin-top:28px">Itulah keseluruhan aplikasi. Nikmati pustaka video pribadi Anda.</p>
 
 </body>
 </html>

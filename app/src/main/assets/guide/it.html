@@ -6,88 +6,164 @@
 <style>
   :root { color-scheme: light dark; }
   body { font-family: -apple-system, Roboto, "Segoe UI", sans-serif; line-height: 1.7;
-         margin: 0; padding: 16px 18px 48px; color: #1a1a1a; background: #fafafa; }
+         margin: 0; padding: 16px 18px 56px; color: #1a1a1a; background: #fafafa; }
   @media (prefers-color-scheme: dark) { body { color: #eaeaea; background: #121212; } }
-  h1 { font-size: 1.5rem; margin: 0 0 4px; }
-  h2 { font-size: 1.2rem; margin: 26px 0 6px; border-bottom: 1px solid rgba(128,128,128,.3); padding-bottom: 4px; }
-  h3 { font-size: 1.02rem; margin: 16px 0 4px; }
+  h1 { font-size: 1.55rem; margin: 0 0 4px; }
+  h2 { font-size: 1.22rem; margin: 30px 0 8px; border-bottom: 2px solid rgba(128,128,128,.25); padding-bottom: 5px; }
+  h3 { font-size: 1.05rem; margin: 18px 0 4px; }
   p, li { font-size: 0.98rem; }
-  ul { padding-inline-start: 20px; margin: 6px 0; }
-  .lead { opacity: .8; }
-  .tip { background: rgba(120,140,255,.12); border-radius: 8px; padding: 8px 12px; margin: 10px 0; }
-  code { background: rgba(128,128,128,.18); padding: 1px 5px; border-radius: 4px; }
+  ul, ol { padding-inline-start: 22px; margin: 6px 0; }
+  li { margin: 4px 0; }
+  .lead { opacity: .85; font-size: 1.02rem; }
+  .toc { background: rgba(120,140,255,.10); border-radius: 10px; padding: 12px 16px; margin: 16px 0; }
+  .toc a { text-decoration: none; }
+  .tip { background: rgba(60,180,120,.14); border-radius: 8px; padding: 9px 13px; margin: 10px 0; }
+  .warn { background: rgba(240,170,60,.16); border-radius: 8px; padding: 9px 13px; margin: 10px 0; }
+  code { background: rgba(128,128,128,.18); padding: 1px 6px; border-radius: 4px; }
+  .step { counter-reset: none; }
 </style>
 </head>
 <body>
 
-<h1>La mia videoteca — Guida utente</h1>
-<p class="lead">Una libreria privata, pensata prima di tutto per l'uso offline, per scaricare e guardare video da TikTok, YouTube, Instagram e Snapchat. Nulla lascia il tuo dispositivo.</p>
+<h1>La mia libreria video — Guida utente completa</h1>
+<p class="lead">Una libreria privata, pensata prima di tutto per l'uso offline, per scaricare, organizzare e guardare i tuoi video. La tua libreria, i download, il database e la licenza risiedono tutti sul tuo dispositivo — nulla viene caricato su alcun server.</p>
 
-<h2>1. Attivazione</h2>
-<p>Al primo avvio l'app richiede un codice di attivazione. Il tuo dispositivo mostra un numero di dispositivo; invialo allo sviluppatore e inserisci il codice che ricevi. L'attivazione è completamente offline — dopodiché non servono né un account né una connessione a internet.</p>
+<div class="toc">
+<b>Contenuti</b>
+<ol>
+  <li><a href="#activation">Attivazione e prova gratuita</a></li>
+  <li><a href="#privacy">Privacy e blocco dell'app</a></li>
+  <li><a href="#download">Scaricare video</a></li>
+  <li><a href="#browser">Il browser integrato</a></li>
+  <li><a href="#manage">Gestire i download</a></li>
+  <li><a href="#library">La libreria</a></li>
+  <li><a href="#player">Il lettore</a></li>
+  <li><a href="#editing">Modificare i clip</a></li>
+  <li><a href="#image">Editor di immagini</a></li>
+  <li><a href="#youtube">Scheda YouTube senza pubblicità</a></li>
+  <li><a href="#stats">Statistiche</a></li>
+  <li><a href="#settings">Lingua, tema e impostazioni</a></li>
+  <li><a href="#backup">Backup e ripristino</a></li>
+  <li><a href="#faq">Risoluzione dei problemi e FAQ</a></li>
+</ol>
+</div>
 
-<h2>2. Privacy e blocco dell'app</h2>
-<p>Apri le <b>Impostazioni</b> per proteggere l'app:</p>
+<h2 id="activation">1. Attivazione e prova gratuita</h2>
+<p>L'app funziona offline — nessun account, nessun accesso a internet.</p>
 <ul>
-  <li><b>Blocco dell'app</b>: imposta un PIN in modo che l'app chieda di sbloccarsi a ogni apertura.</li>
-  <li><b>Impronta digitale / biometria</b>: sblocca con la tua impronta digitale invece del PIN.</li>
-  <li><b>Blocca gli screenshot</b>: impedisce screenshot e registrazione dello schermo all'interno dell'app.</li>
-  <li><b>Nascondi dai recenti</b>: nasconde l'anteprima dell'app nel selettore delle app recenti.</li>
+  <li><b>Prova gratuita:</b> al primo avvio parte automaticamente una <b>prova gratuita di 10 giorni</b>. Durante questo periodo puoi usare tutte le funzioni.</li>
+  <li><b>Dopo la prova:</b> l'app richiede un codice di attivazione. I tuoi download e le impostazioni vengono <b>conservati</b> — viene sospeso solo l'accesso finché non rinnovi.</li>
+  <li><b>Attivazione:</b> la schermata di attivazione mostra il tuo <b>numero del dispositivo</b>. Invialo al venditore e inserisci il codice che ricevi, poi tocca <i>Attiva</i>.</li>
+  <li><b>Stato:</b> apri <b>Impostazioni → Abbonamento</b> per vedere "Prova · N giorni rimanenti", "Attivo · N giorni rimanenti", o permanente.</li>
 </ul>
-<p><b>Video privati</b>: blocca qualsiasi clip per spostarla nella sezione privata nascosta. Scompare dalla libreria principale e ritorna solo dopo una verifica con l'impronta digitale.</p>
+<div class="tip">Su Google Play l'app può attivarsi automaticamente nel momento in cui il tuo abbonamento è attivo — nessun codice necessario.</div>
 
-<h2>3. Scaricare i video</h2>
+<h2 id="privacy">2. Privacy e blocco dell'app</h2>
+<p>Tutto si trova in <b>Impostazioni → Sicurezza</b>:</p>
+<ul>
+  <li><b>Blocco dell'app:</b> imposta un PIN così l'app richiede lo sblocco a ogni apertura.</li>
+  <li><b>Impronta / biometria:</b> sblocca con la tua impronta digitale invece di digitare il PIN.</li>
+  <li><b>Blocca screenshot:</b> impedisce screenshot e registrazione dello schermo all'interno dell'app.</li>
+  <li><b>Nascondi dai recenti:</b> nasconde l'anteprima dell'app nel selettore delle app recenti.</li>
+</ul>
+<h3>Video privati</h3>
+<p>Blocca qualsiasi clip (dal suo menu <code>⋮</code>) per spostarlo nella sezione <b>privata</b> nascosta. Scompare dalla libreria principale e ritorna solo dopo una verifica dell'impronta digitale (apri la vista privata dal menu <code>⋮</code>).</p>
+
+<h2 id="download">3. Scaricare video</h2>
 <h3>Da un link</h3>
-<p>Copia il link di un video da TikTok, YouTube, Instagram o Snapchat, poi tocca il pulsante <b>+</b> e scegli <b>Scarica dal link</b> — oppure condividi il link direttamente con questa app dal menu di condivisione dell'altra app.</p>
+<ol>
+  <li>Copia un link a un video.</li>
+  <li>Tocca il pulsante <b>+</b> → <b>Scarica da link</b> (oppure condividi il link a questa app da un'altra app).</li>
+  <li>Tocca <b>Incolla</b>, poi <b>Ottieni info</b>.</li>
+  <li>Scegli <b>video completo</b>, <b>solo video</b>, o <b>solo audio</b>, poi scarica.</li>
+</ol>
 <h3>Tramite ricerca</h3>
-<p>Tocca l'icona di ricerca e digita le parole chiave per cercare su YouTube (e TikTok). Tocca un risultato per vederne l'anteprima, oppure usa il suo pulsante di download.</p>
-<h3>Video o audio</h3>
-<p>Quando scarichi, puoi scegliere il video completo o solo l'audio. I download audio vengono salvati come veri file audio e si riproducono con la copertina, non con uno schermo nero.</p>
-<div class="tip">Instagram e Snapchat mostrano solo i post pubblici. I post privati o accessibili solo dopo l'accesso non possono essere estratti.</div>
+<p>Tocca l'icona di ricerca, digita le parole chiave, tocca un risultato per vederne l'anteprima, oppure usa il suo pulsante di download.</p>
+<h3>Audio o video</h3>
+<p>I download audio vengono salvati come veri file audio e vengono riprodotti con la copertina (non uno schermo nero). Puoi anche scegliere una qualità quando la sorgente ne offre diverse.</p>
+<h3>Dove finiscono i file</h3>
+<p>I download sono archiviati in modo privato nell'app. In <b>Impostazioni → Percorso di salvataggio</b> puoi anche far collocare una copia in una cartella a tua scelta così che appaia nella galleria o nel gestore file.</p>
 
-<h2>4. La libreria</h2>
+<h2 id="browser">4. Il browser integrato</h2>
+<p>Apri <b>+ → Browser</b> per un browser web generico che rileva i contenuti multimediali scaricabili su qualsiasi pagina.</p>
+<ol>
+  <li>Digita un sito o una ricerca nella barra degli indirizzi.</li>
+  <li>Riproduci o apri il video nella pagina.</li>
+  <li>Quando viene rilevato un contenuto multimediale appare un pulsante <b>Scarica (N)</b> — toccalo, scegli l'elemento e viene scaricato nella tua libreria.</li>
+</ol>
+<div class="tip">Il browser continua a scansionare la pagina per alcuni secondi, quindi se il pulsante non appare subito, avvia il video e attendi un momento.</div>
+
+<h2 id="manage">5. Gestire i download</h2>
+<p>Apri <b>+ → Download</b> (oppure tocca il banner dei download nella libreria) per vedere i processi attivi e completati. Puoi <b>mettere in pausa</b>, <b>riprendere</b> e <b>ritentare</b>. I download in pausa o interrotti riprendono dal punto in cui si erano fermati, e un download fallito aggiorna automaticamente il suo link e riprova.</p>
+
+<h2 id="library">6. La libreria</h2>
 <ul>
-  <li><b>Vista a griglia / elenco</b>: cambia il layout dal menu <code>⋮</code> → <i>Cambia vista</i>.</li>
-  <li><b>Ordina</b>: per data, nome, durata, dimensione o <b>categoria</b>.</li>
-  <li><b>Filtra</b>: per fonte, tipo di file e <b>più categorie contemporaneamente</b> — seleziona più categorie per mostrare solo quelle e nascondere le altre.</li>
-  <li><b>Preferiti</b>: contrassegna le clip come preferite e filtra per visualizzarle.</li>
-  <li><b>Categorie</b>: organizza le clip in categorie; ogni clip mostra la sua categoria come etichetta. Seleziona più clip per impostarne la categoria in blocco.</li>
+  <li><b>Vista a griglia / elenco:</b> passa da <code>⋮ → Cambia vista</code>.</li>
+  <li><b>Ricerca:</b> tocca la lente d'ingrandimento; filtra la libreria in tempo reale.</li>
+  <li><b>Ordina:</b> per data, nome, durata, dimensione o <b>categoria</b> (raggruppa i clip per categoria).</li>
+  <li><b>Filtra:</b> per sorgente, tipo di contenuto e <b>più categorie contemporaneamente</b> — spunta le categorie da mostrare e le altre vengono nascoste. La voce Categoria mostra quante sono attive.</li>
+  <li><b>Preferiti:</b> contrassegna i clip come preferiti e filtrali.</li>
+  <li><b>Categorie:</b> ogni clip mostra la sua categoria come chip. Gestisci le categorie da <code>⋮ → Gestisci categorie</code>.</li>
+  <li><b>Selezione multipla:</b> tieni premuto un clip per avviare la selezione, poi imposta una categoria, aggiungi ai preferiti o elimina in blocco.</li>
 </ul>
 
-<h2>5. Il lettore</h2>
+<h2 id="player">7. Il lettore</h2>
 <ul>
-  <li><b>Riproduzione continua</b>: quando una clip termina, la successiva nell'elenco corrente viene riprodotta automaticamente. Usa <b>Successivo / Precedente</b> dal menu <code>⋮</code>.</li>
-  <li><b>Riprendi</b>: la riproduzione continua dal punto in cui l'avevi interrotta.</li>
-  <li><b>Gesti</b>: scorri su/giù sulla metà sinistra per la luminosità, sulla metà destra per il volume.</li>
-  <li><b>Velocità</b>: tocca il pulsante della velocità per passare tra 0.5×–2×.</li>
-  <li><b>Blocca i comandi</b>: nascondi i comandi per evitare tocchi accidentali.</li>
-  <li><b>Picture-in-Picture e riproduzione in background</b>: continua a guardare o ascoltare mentre usi altre app.</li>
-  <li><b>Ridimensiona</b>: adatta, ingrandisci o allunga il video.</li>
-  <li><b>Copri il testo mobile</b>: disegna un riquadro sopra il testo o una filigrana sullo schermo per nasconderli durante la riproduzione.</li>
+  <li><b>Riproduzione continua:</b> quando un clip finisce, viene riprodotto automaticamente il successivo nell'elenco corrente.</li>
+  <li><b>Successivo / Precedente:</b> dal menu <code>⋮</code> del lettore.</li>
+  <li><b>Riprendi:</b> la riproduzione continua dal punto in cui l'avevi lasciata.</li>
+  <li><b>Gesti:</b> scorri su/giù sulla <b>metà sinistra</b> per la luminosità, sulla <b>metà destra</b> per il volume.</li>
+  <li><b>Velocità:</b> tocca il pulsante della velocità per scorrere tra 0,5× e 2×.</li>
+  <li><b>Blocca i controlli:</b> nascondi i controlli per evitare tocchi accidentali.</li>
+  <li><b>Ridimensiona:</b> adatta, ingrandisci o allunga il video.</li>
+  <li><b>Picture-in-Picture e riproduzione in background:</b> continua a guardare o ascoltare mentre usi altre app.</li>
+  <li><b>Copri testo sovrapposto:</b> disegna un riquadro sopra il testo a schermo o una filigrana per nasconderla durante la riproduzione (<code>⋮ → Copri testo</code>).</li>
 </ul>
 
-<h2>6. Scheda YouTube senza pubblicità</h2>
-<p>Dal menu <code>⋮</code> apri la scheda <b>YouTube</b>: un visualizzatore pulito senza pubblicità. Le tendenze sono mostrate per impostazione predefinita per la regione araba, gli Shorts possono essere nascosti con un solo interruttore e puoi cercare e alternare griglia/elenco. È una scheda separata e non sostituisce mai la tua libreria.</p>
+<h2 id="editing">8. Modificare i clip</h2>
+<p>Dal menu <code>⋮</code> di un clip puoi <b>rinominarlo</b>, <b>modificarne la descrizione</b>, <b>impostarne la categoria</b>, aggiungerlo ai <b>preferiti</b>, spostarlo nella sezione <b>privata</b>, oppure <b>eliminarlo</b> (facoltativamente insieme al suo file).</p>
 
-<h2>7. Editor di immagini</h2>
-<p>Per le immagini salvate puoi <b>ritagliare</b>, <b>nascondere</b> un nome/una filigrana con un riquadro pieno, <b>aggiungere testo</b> ovunque ed estrarre il testo dall'immagine con l'<b>OCR</b> (copiato negli appunti). Le foto vengono salvate in modo pulito, senza artefatti di ricodifica.</p>
+<h2 id="image">9. Editor di immagini</h2>
+<p>Per le immagini salvate puoi <b>ritagliare</b>, <b>nascondere</b> un nome o una filigrana con un riquadro pieno, <b>aggiungere testo</b> ovunque ed estrarre il testo dall'immagine con l'<b>OCR</b> (copiato negli appunti). Le immagini vengono salvate in modo pulito senza artefatti di ricodifica.</p>
 
-<h2>8. Modificare le clip</h2>
-<p>Dal menu <code>⋮</code> di una clip puoi rinominarla, modificarne la descrizione, impostarne la categoria, aggiungerla ai preferiti, spostarla nella sezione privata o eliminarla.</p>
-
-<h2>9. Backup e ripristino</h2>
-<p>Nelle <b>Impostazioni</b>, esporta un <b>backup crittografato</b> della tua libreria protetto da una password e ripristinalo in seguito con la stessa password. Conserva la password in un luogo sicuro — senza di essa il backup non può essere aperto.</p>
-
-<h2>10. Impostazioni</h2>
+<h2 id="youtube">10. Scheda YouTube senza pubblicità</h2>
+<p>Da <code>⋮ → YouTube</code> apri un visualizzatore pulito senza pubblicità:</p>
 <ul>
-  <li><b>Lingua</b>: scegli la lingua dell'app.</li>
-  <li><b>Tema</b>: di sistema, chiaro o scuro.</li>
-  <li><b>Solo Wi-Fi</b>: scarica solo tramite Wi-Fi.</li>
-  <li><b>Download simultanei</b>: quanti scaricarne contemporaneamente.</li>
-  <li><b>Posizione di salvataggio</b>: dove vengono archiviati i download.</li>
+  <li>Le tendenze vengono mostrate per la regione araba per impostazione predefinita.</li>
+  <li>Un interruttore nasconde gli Shorts.</li>
+  <li>Cerca con la lente d'ingrandimento e alterna griglia/elenco.</li>
+</ul>
+<p>È una scheda separata e non sostituisce mai la tua libreria. Torna indietro con il pulsante indietro o con <code>⋮ → Libreria</code>.</p>
+
+<h2 id="stats">11. Statistiche</h2>
+<p>Apri <code>⋮ → Statistiche</code> per una dashboard: numero totale di video, dimensione totale, durata totale e numero totale di riproduzioni, oltre ai tuoi clip più riprodotti e riprodotti di recente e i conteggi per categoria e per sorgente.</p>
+
+<h2 id="settings">12. Lingua, tema e impostazioni</h2>
+<ul>
+  <li><b>Lingua:</b> Impostazioni → Lingua — scegli tra 14 lingue; l'app cambia istantaneamente.</li>
+  <li><b>Tema:</b> sistema, chiaro o scuro.</li>
+  <li><b>Solo Wi-Fi:</b> scarica solo tramite Wi-Fi.</li>
+  <li><b>Download simultanei:</b> quanti scaricare contemporaneamente.</li>
+  <li><b>Percorso di salvataggio:</b> dove viene archiviata una copia dei download.</li>
+  <li><b>Guida utente:</b> questa guida si apre sempre nella lingua corrente dell'app.</li>
 </ul>
 
-<p class="lead">Questo è tutto. Goditi la tua videoteca privata.</p>
+<h2 id="backup">13. Backup e ripristino</h2>
+<p>In <b>Impostazioni</b>, esporta un <b>backup crittografato</b> della tua libreria protetto da una password, e ripristinalo in seguito con la stessa password. Conserva la password al sicuro — senza di essa il backup non può essere aperto.</p>
+
+<h2 id="faq">14. Risoluzione dei problemi e FAQ</h2>
+<h3>Un download è fallito</h3>
+<p>I link di alcuni siti scadono rapidamente. Apri <b>Download</b> e tocca ritenta — l'app recupera un link aggiornato e continua. Controlla la connessione e che il post sia pubblico.</p>
+<h3>Un post non si scarica</h3>
+<p>Instagram e Snapchat espongono solo i post <b>pubblici</b>; i post privati o accessibili solo con login non possono essere estratti. L'estrazione dipende dalla piattaforma e può occasionalmente fallire — riprova più tardi.</p>
+<h3>L'audio viene riprodotto come schermo nero</h3>
+<p>Assicurati di aver scelto <b>solo audio</b> durante il download; i file audio mostrano la copertina invece di un fotogramma video.</p>
+<h3>L'app si è bloccata da sola</h3>
+<p>La tua prova o il tuo abbonamento è terminato. I tuoi download sono al sicuro — rinnova (inserisci un codice, o abbonati su Google Play) per continuare.</p>
+<h3>Viene inviato qualcosa a un server?</h3>
+<p>No. L'app non ha alcun backend. Contatta solo il sito del video stesso per recuperare ciò che hai chiesto di scaricare.</p>
+
+<p class="lead" style="margin-top:28px">Questa è tutta l'app. Buon divertimento con la tua libreria video privata.</p>
 
 </body>
 </html>

@@ -872,6 +872,10 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent(this, com.myvideolibrary.app.ui.stats.StatsActivity::class.java))
                 true
             }
+            R.id.action_guide -> {
+                startActivity(Intent(this, com.myvideolibrary.app.ui.help.HelpActivity::class.java))
+                true
+            }
             R.id.action_protected -> { toggleProtected(); true }
             R.id.action_settings -> {
                 startActivity(Intent(this, com.myvideolibrary.app.ui.settings.SettingsActivity::class.java))

@@ -6,88 +6,164 @@
 <style>
   :root { color-scheme: light dark; }
   body { font-family: -apple-system, Roboto, "Segoe UI", sans-serif; line-height: 1.7;
-         margin: 0; padding: 16px 18px 48px; color: #1a1a1a; background: #fafafa; }
+         margin: 0; padding: 16px 18px 56px; color: #1a1a1a; background: #fafafa; }
   @media (prefers-color-scheme: dark) { body { color: #eaeaea; background: #121212; } }
-  h1 { font-size: 1.5rem; margin: 0 0 4px; }
-  h2 { font-size: 1.2rem; margin: 26px 0 6px; border-bottom: 1px solid rgba(128,128,128,.3); padding-bottom: 4px; }
-  h3 { font-size: 1.02rem; margin: 16px 0 4px; }
+  h1 { font-size: 1.55rem; margin: 0 0 4px; }
+  h2 { font-size: 1.22rem; margin: 30px 0 8px; border-bottom: 2px solid rgba(128,128,128,.25); padding-bottom: 5px; }
+  h3 { font-size: 1.05rem; margin: 18px 0 4px; }
   p, li { font-size: 0.98rem; }
-  ul { padding-inline-start: 20px; margin: 6px 0; }
-  .lead { opacity: .8; }
-  .tip { background: rgba(120,140,255,.12); border-radius: 8px; padding: 8px 12px; margin: 10px 0; }
-  code { background: rgba(128,128,128,.18); padding: 1px 5px; border-radius: 4px; }
+  ul, ol { padding-inline-start: 22px; margin: 6px 0; }
+  li { margin: 4px 0; }
+  .lead { opacity: .85; font-size: 1.02rem; }
+  .toc { background: rgba(120,140,255,.10); border-radius: 10px; padding: 12px 16px; margin: 16px 0; }
+  .toc a { text-decoration: none; }
+  .tip { background: rgba(60,180,120,.14); border-radius: 8px; padding: 9px 13px; margin: 10px 0; }
+  .warn { background: rgba(240,170,60,.16); border-radius: 8px; padding: 9px 13px; margin: 10px 0; }
+  code { background: rgba(128,128,128,.18); padding: 1px 6px; border-radius: 4px; }
+  .step { counter-reset: none; }
 </style>
 </head>
 <body>
 
-<h1>My Video Library — User Guide</h1>
-<p class="lead">A private, offline-first library for downloading and watching videos from TikTok, YouTube, Instagram and Snapchat. Nothing leaves your device.</p>
+<h1>My Video Library — Full User Guide</h1>
+<p class="lead">A private, offline-first library for downloading, organising and watching your videos. Your library, downloads, database and licence all live on your device — nothing is uploaded to any server.</p>
 
-<h2>1. Activation</h2>
-<p>On first launch the app asks for an activation code. Your device shows a device number; send it to the developer and enter the code you receive. Activation is fully offline — no account and no internet are required after that.</p>
+<div class="toc">
+<b>Contents</b>
+<ol>
+  <li><a href="#activation">Activation &amp; free trial</a></li>
+  <li><a href="#privacy">Privacy &amp; app lock</a></li>
+  <li><a href="#download">Downloading videos</a></li>
+  <li><a href="#browser">The built-in browser</a></li>
+  <li><a href="#manage">Managing downloads</a></li>
+  <li><a href="#library">The library</a></li>
+  <li><a href="#player">The player</a></li>
+  <li><a href="#editing">Editing clips</a></li>
+  <li><a href="#image">Image editor</a></li>
+  <li><a href="#youtube">Ad-free YouTube tab</a></li>
+  <li><a href="#stats">Statistics</a></li>
+  <li><a href="#settings">Language, theme &amp; settings</a></li>
+  <li><a href="#backup">Backup &amp; restore</a></li>
+  <li><a href="#faq">Troubleshooting &amp; FAQ</a></li>
+</ol>
+</div>
 
-<h2>2. Privacy &amp; app lock</h2>
-<p>Open <b>Settings</b> to protect the app:</p>
+<h2 id="activation">1. Activation &amp; free trial</h2>
+<p>The app works offline — no account, no internet sign-in.</p>
 <ul>
-  <li><b>App lock</b>: set a PIN so the app asks to unlock on every open.</li>
-  <li><b>Fingerprint / biometric</b>: unlock with your fingerprint instead of the PIN.</li>
-  <li><b>Block screenshots</b>: stops screenshots and screen recording inside the app.</li>
-  <li><b>Hide from recents</b>: hides the app preview in the recent-apps switcher.</li>
+  <li><b>Free trial:</b> the first launch starts a <b>10-day free trial</b> automatically. You can use every feature during it.</li>
+  <li><b>After the trial:</b> the app asks for an activation code. Your downloads and settings are <b>kept</b> — only access is paused until you renew.</li>
+  <li><b>Activating:</b> the activation screen shows your <b>device number</b>. Send it to the seller and enter the code you receive, then tap <i>Activate</i>.</li>
+  <li><b>Status:</b> open <b>Settings → Subscription</b> to see “Trial · N days left”, “Active · N days left”, or permanent.</li>
 </ul>
-<p><b>Private videos</b>: lock any clip to move it into the hidden private section. It disappears from the main library and only returns after a fingerprint check.</p>
+<div class="tip">On Google Play the app can activate automatically the moment your subscription is active — no code needed.</div>
 
-<h2>3. Downloading videos</h2>
+<h2 id="privacy">2. Privacy &amp; app lock</h2>
+<p>Everything is under <b>Settings → Security</b>:</p>
+<ul>
+  <li><b>App lock:</b> set a PIN so the app asks to unlock on every open.</li>
+  <li><b>Fingerprint / biometric:</b> unlock with your fingerprint instead of typing the PIN.</li>
+  <li><b>Block screenshots:</b> stops screenshots and screen recording inside the app.</li>
+  <li><b>Hide from recents:</b> hides the app’s preview in the recent-apps switcher.</li>
+</ul>
+<h3>Private videos</h3>
+<p>Lock any clip (from its <code>⋮</code> menu) to move it into the hidden <b>private</b> section. It disappears from the main library and only returns after a fingerprint check (open the private view from the <code>⋮</code> menu).</p>
+
+<h2 id="download">3. Downloading videos</h2>
 <h3>From a link</h3>
-<p>Copy a video link from TikTok, YouTube, Instagram or Snapchat, then tap the <b>+</b> button and choose <b>Download from link</b> — or share the link directly to this app from the other app's share menu.</p>
+<ol>
+  <li>Copy a video link.</li>
+  <li>Tap the <b>+</b> button → <b>Download from link</b> (or share the link to this app from another app).</li>
+  <li>Tap <b>Paste</b>, then <b>Get info</b>.</li>
+  <li>Choose <b>full video</b>, <b>video only</b>, or <b>audio only</b>, then download.</li>
+</ol>
 <h3>By search</h3>
-<p>Tap the search icon and type keywords to search YouTube (and TikTok). Tap a result to preview it, or use its download button.</p>
-<h3>Video or audio</h3>
-<p>When you download, you can choose the full video or audio only. Audio downloads are saved as real audio files and play with cover art, not a black screen.</p>
-<div class="tip">Instagram and Snapchat only expose public posts. Private or login-only posts cannot be extracted.</div>
+<p>Tap the search icon, type keywords, tap a result to preview it, or use its download button.</p>
+<h3>Audio vs video</h3>
+<p>Audio downloads are saved as real audio files and play with cover art (not a black screen). You can also pick a quality when the source offers several.</p>
+<h3>Where files go</h3>
+<p>Downloads are stored privately in the app. In <b>Settings → Save location</b> you can also have a copy placed in a folder of your choice so it appears in your gallery/file manager.</p>
 
-<h2>4. The library</h2>
+<h2 id="browser">4. The built-in browser</h2>
+<p>Open <b>+ → Browser</b> for a general web browser that detects downloadable media on any page.</p>
+<ol>
+  <li>Type a site or search in the address bar.</li>
+  <li>Play or open the video on the page.</li>
+  <li>When media is detected a <b>Download (N)</b> button appears — tap it, pick the item, and it downloads to your library.</li>
+</ol>
+<div class="tip">The browser keeps scanning the page for a few seconds, so if the button doesn’t appear immediately, start the video and wait a moment.</div>
+
+<h2 id="manage">5. Managing downloads</h2>
+<p>Open <b>+ → Downloads</b> (or tap the download banner on the library) to see active and finished jobs. You can <b>pause</b>, <b>resume</b> and <b>retry</b>. Paused or interrupted downloads resume from where they stopped, and a failed download automatically refreshes its link and retries.</p>
+
+<h2 id="library">6. The library</h2>
 <ul>
-  <li><b>Grid / list view</b>: switch layout from the <code>⋮</code> menu → <i>Toggle view</i>.</li>
-  <li><b>Sort</b>: by date, name, duration, size, or <b>category</b>.</li>
-  <li><b>Filter</b>: by source, media type, and <b>multiple categories at once</b> — tick several categories to show only those and hide the rest.</li>
-  <li><b>Favorites</b>: mark clips as favorites and filter to them.</li>
-  <li><b>Categories</b>: organise clips into categories; each clip shows its category as a chip. Select several clips to set their category in bulk.</li>
+  <li><b>Grid / list view:</b> switch from <code>⋮ → Toggle view</code>.</li>
+  <li><b>Search:</b> tap the magnifier; it filters the library live.</li>
+  <li><b>Sort:</b> by date, name, duration, size, or <b>category</b> (groups clips by category).</li>
+  <li><b>Filter:</b> by source, media type, and <b>several categories at once</b> — tick the categories to show and the rest are hidden. The Category entry shows how many are active.</li>
+  <li><b>Favorites:</b> mark clips as favorites and filter to them.</li>
+  <li><b>Categories:</b> each clip shows its category as a chip. Manage categories from <code>⋮ → Manage categories</code>.</li>
+  <li><b>Select many:</b> long-press a clip to start selection, then set a category, favorite, or delete in bulk.</li>
 </ul>
 
-<h2>5. The player</h2>
+<h2 id="player">7. The player</h2>
 <ul>
-  <li><b>Continuous playback</b>: when a clip ends the next one in the current list plays automatically. Use <b>Next / Previous</b> from the <code>⋮</code> menu.</li>
-  <li><b>Resume</b>: playback continues from where you left off.</li>
-  <li><b>Gestures</b>: swipe up/down on the left half for brightness, on the right half for volume.</li>
-  <li><b>Speed</b>: tap the speed button to cycle 0.5×–2×.</li>
-  <li><b>Lock controls</b>: hide the controls to avoid accidental taps.</li>
-  <li><b>Picture-in-Picture &amp; background play</b>: keep watching or listening while using other apps.</li>
-  <li><b>Resize</b>: fit, zoom or stretch the video.</li>
-  <li><b>Cover floating text</b>: draw a box over on-screen text or a watermark to hide it during playback.</li>
+  <li><b>Continuous playback:</b> when a clip ends, the next one in the current list plays automatically.</li>
+  <li><b>Next / Previous:</b> from the player’s <code>⋮</code> menu.</li>
+  <li><b>Resume:</b> playback continues from where you left off.</li>
+  <li><b>Gestures:</b> swipe up/down on the <b>left half</b> for brightness, on the <b>right half</b> for volume.</li>
+  <li><b>Speed:</b> tap the speed button to cycle 0.5×–2×.</li>
+  <li><b>Lock controls:</b> hide the controls to avoid accidental taps.</li>
+  <li><b>Resize:</b> fit, zoom or stretch the video.</li>
+  <li><b>Picture-in-Picture &amp; background play:</b> keep watching or listening while using other apps.</li>
+  <li><b>Cover floating text:</b> draw a box over on-screen text or a watermark to hide it while playing (<code>⋮ → Cover text</code>).</li>
 </ul>
 
-<h2>6. Ad-free YouTube tab</h2>
-<p>From the <code>⋮</code> menu open the <b>YouTube</b> tab: a clean viewer with no ads. Trending is shown for the Arabic region by default, Shorts can be hidden with one switch, and you can search and toggle grid/list. It is a separate tab and never replaces your library.</p>
+<h2 id="editing">8. Editing clips</h2>
+<p>From a clip’s <code>⋮</code> menu you can <b>rename</b> it, <b>edit its description</b>, <b>set its category</b>, add it to <b>favorites</b>, move it to the <b>private</b> section, or <b>delete</b> it (optionally with its file).</p>
 
-<h2>7. Image editor</h2>
-<p>For saved images you can <b>crop</b>, <b>hide</b> a name/watermark with a solid box, <b>add text</b> anywhere, and extract text from the image with <b>OCR</b> (copied to the clipboard). Photos are saved cleanly without re-encoding artefacts.</p>
+<h2 id="image">9. Image editor</h2>
+<p>For saved images you can <b>crop</b>, <b>hide</b> a name or watermark with a solid box, <b>add text</b> anywhere, and extract text from the image with <b>OCR</b> (copied to the clipboard). Images are saved cleanly without re-encoding artefacts.</p>
 
-<h2>8. Editing clips</h2>
-<p>From a clip's <code>⋮</code> menu you can rename it, edit its description, set its category, add it to favorites, move it to the private section, or delete it.</p>
+<h2 id="youtube">10. Ad-free YouTube tab</h2>
+<p>From <code>⋮ → YouTube</code> open a clean viewer with no ads:</p>
+<ul>
+  <li>Trending is shown for the Arabic region by default.</li>
+  <li>One switch hides Shorts.</li>
+  <li>Search with the magnifier and toggle grid/list.</li>
+</ul>
+<p>It is a separate tab and never replaces your library. Return with the back button or <code>⋮ → Library</code>.</p>
 
-<h2>9. Backup &amp; restore</h2>
+<h2 id="stats">11. Statistics</h2>
+<p>Open <code>⋮ → Statistics</code> for a dashboard: total videos, total size, total length and total plays, plus your most-played and recently-played clips and counts by category and by source.</p>
+
+<h2 id="settings">12. Language, theme &amp; settings</h2>
+<ul>
+  <li><b>Language:</b> Settings → Language — choose from 14 languages; the app switches instantly.</li>
+  <li><b>Theme:</b> system, light or dark.</li>
+  <li><b>Wi-Fi only:</b> download only on Wi-Fi.</li>
+  <li><b>Simultaneous downloads:</b> how many download at once.</li>
+  <li><b>Save location:</b> where a copy of downloads is stored.</li>
+  <li><b>User guide:</b> this guide always opens in the app’s current language.</li>
+</ul>
+
+<h2 id="backup">13. Backup &amp; restore</h2>
 <p>In <b>Settings</b>, export an <b>encrypted backup</b> of your library protected by a password, and restore it later with the same password. Keep the password safe — without it the backup cannot be opened.</p>
 
-<h2>10. Settings</h2>
-<ul>
-  <li><b>Language</b>: choose the app language.</li>
-  <li><b>Theme</b>: system, light or dark.</li>
-  <li><b>Wi-Fi only</b>: download only on Wi-Fi.</li>
-  <li><b>Simultaneous downloads</b>: how many download at once.</li>
-  <li><b>Save location</b>: where downloads are stored.</li>
-</ul>
+<h2 id="faq">14. Troubleshooting &amp; FAQ</h2>
+<h3>A download failed</h3>
+<p>Links from some sites expire quickly. Open <b>Downloads</b> and tap retry — the app fetches a fresh link and continues. Check your connection and that the post is public.</p>
+<h3>A post won’t download</h3>
+<p>Instagram and Snapchat only expose <b>public</b> posts; private or login-only posts cannot be extracted. Extraction depends on the platform and can occasionally fail — try again later.</p>
+<h3>Audio plays as a black screen</h3>
+<p>Make sure you chose <b>audio only</b> when downloading; audio files show cover art instead of a video frame.</p>
+<h3>The app locked itself</h3>
+<p>Your trial or subscription ended. Your downloads are safe — renew (enter a code, or subscribe on Google Play) to continue.</p>
+<h3>Is anything sent to a server?</h3>
+<p>No. The app has no backend. It only contacts the video’s own site to fetch what you asked to download.</p>
 
-<p class="lead">That's everything. Enjoy your private video library.</p>
+<p class="lead" style="margin-top:28px">That’s the whole app. Enjoy your private video library.</p>
 
 </body>
 </html>

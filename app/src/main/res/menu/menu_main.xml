@@ -63,6 +63,11 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/action_guide"
+        android:title="@string/user_guide"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_settings"
         android:icon="@drawable/ic_settings"
         android:title="@string/action_settings"

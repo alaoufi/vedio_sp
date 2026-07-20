@@ -6,88 +6,164 @@
 <style>
   :root { color-scheme: light dark; }
   body { font-family: -apple-system, Roboto, "Segoe UI", sans-serif; line-height: 1.7;
-         margin: 0; padding: 16px 18px 48px; color: #1a1a1a; background: #fafafa; }
+         margin: 0; padding: 16px 18px 56px; color: #1a1a1a; background: #fafafa; }
   @media (prefers-color-scheme: dark) { body { color: #eaeaea; background: #121212; } }
-  h1 { font-size: 1.5rem; margin: 0 0 4px; }
-  h2 { font-size: 1.2rem; margin: 26px 0 6px; border-bottom: 1px solid rgba(128,128,128,.3); padding-bottom: 4px; }
-  h3 { font-size: 1.02rem; margin: 16px 0 4px; }
+  h1 { font-size: 1.55rem; margin: 0 0 4px; }
+  h2 { font-size: 1.22rem; margin: 30px 0 8px; border-bottom: 2px solid rgba(128,128,128,.25); padding-bottom: 5px; }
+  h3 { font-size: 1.05rem; margin: 18px 0 4px; }
   p, li { font-size: 0.98rem; }
-  ul { padding-inline-start: 20px; margin: 6px 0; }
-  .lead { opacity: .8; }
-  .tip { background: rgba(120,140,255,.12); border-radius: 8px; padding: 8px 12px; margin: 10px 0; }
-  code { background: rgba(128,128,128,.18); padding: 1px 5px; border-radius: 4px; }
+  ul, ol { padding-inline-start: 22px; margin: 6px 0; }
+  li { margin: 4px 0; }
+  .lead { opacity: .85; font-size: 1.02rem; }
+  .toc { background: rgba(120,140,255,.10); border-radius: 10px; padding: 12px 16px; margin: 16px 0; }
+  .toc a { text-decoration: none; }
+  .tip { background: rgba(60,180,120,.14); border-radius: 8px; padding: 9px 13px; margin: 10px 0; }
+  .warn { background: rgba(240,170,60,.16); border-radius: 8px; padding: 9px 13px; margin: 10px 0; }
+  code { background: rgba(128,128,128,.18); padding: 1px 6px; border-radius: 4px; }
+  .step { counter-reset: none; }
 </style>
 </head>
 <body>
 
-<h1>Video Kitaplığım — Kullanım Kılavuzu</h1>
-<p class="lead">TikTok, YouTube, Instagram ve Snapchat'ten video indirip izlemek için özel, çevrimdışı öncelikli bir kitaplık. Hiçbir şey cihazınızdan dışarı çıkmaz.</p>
+<h1>Video Kitaplığım — Tam Kullanıcı Kılavuzu</h1>
+<p class="lead">Videolarınızı indirmek, düzenlemek ve izlemek için özel, önce çevrimdışı çalışan bir kitaplık. Kitaplığınız, indirmeleriniz, veritabanınız ve lisansınız tamamen cihazınızda kalır — hiçbir şey herhangi bir sunucuya yüklenmez.</p>
 
-<h2>1. Etkinleştirme</h2>
-<p>İlk açılışta uygulama bir etkinleştirme kodu ister. Cihazınız bir cihaz numarası gösterir; bunu geliştiriciye gönderin ve aldığınız kodu girin. Etkinleştirme tamamen çevrimdışıdır — bundan sonra hesap ve internet gerekmez.</p>
+<div class="toc">
+<b>İçindekiler</b>
+<ol>
+  <li><a href="#activation">Etkinleştirme ve ücretsiz deneme</a></li>
+  <li><a href="#privacy">Gizlilik ve uygulama kilidi</a></li>
+  <li><a href="#download">Video indirme</a></li>
+  <li><a href="#browser">Yerleşik tarayıcı</a></li>
+  <li><a href="#manage">İndirmeleri yönetme</a></li>
+  <li><a href="#library">Kitaplık</a></li>
+  <li><a href="#player">Oynatıcı</a></li>
+  <li><a href="#editing">Klipleri düzenleme</a></li>
+  <li><a href="#image">Görüntü düzenleyici</a></li>
+  <li><a href="#youtube">Reklamsız YouTube sekmesi</a></li>
+  <li><a href="#stats">İstatistikler</a></li>
+  <li><a href="#settings">Dil, tema ve ayarlar</a></li>
+  <li><a href="#backup">Yedekleme ve geri yükleme</a></li>
+  <li><a href="#faq">Sorun giderme ve SSS</a></li>
+</ol>
+</div>
 
-<h2>2. Gizlilik ve uygulama kilidi</h2>
-<p>Uygulamayı korumak için <b>Ayarlar</b>'ı açın:</p>
+<h2 id="activation">1. Etkinleştirme ve ücretsiz deneme</h2>
+<p>Uygulama çevrimdışı çalışır — hesap yok, internet üzerinden oturum açma yok.</p>
 <ul>
-  <li><b>Uygulama kilidi</b>: her açılışta uygulamanın kilit açmayı istemesi için bir PIN belirleyin.</li>
-  <li><b>Parmak izi / biyometrik</b>: PIN yerine parmak izinizle kilidi açın.</li>
-  <li><b>Ekran görüntülerini engelle</b>: uygulama içinde ekran görüntüsü ve ekran kaydını durdurur.</li>
-  <li><b>Son uygulamalarda gizle</b>: son uygulamalar geçiş ekranında uygulama önizlemesini gizler.</li>
+  <li><b>Ücretsiz deneme:</b> ilk açılış otomatik olarak <b>10 günlük ücretsiz deneme</b> başlatır. Bu süre boyunca her özelliği kullanabilirsiniz.</li>
+  <li><b>Deneme sonrası:</b> uygulama bir etkinleştirme kodu ister. İndirmeleriniz ve ayarlarınız <b>korunur</b> — yalnızca yenileyene kadar erişim duraklatılır.</li>
+  <li><b>Etkinleştirme:</b> etkinleştirme ekranı <b>cihaz numaranızı</b> gösterir. Bunu satıcıya gönderin ve aldığınız kodu girin, ardından <i>Etkinleştir</i>'e dokunun.</li>
+  <li><b>Durum:</b> “Deneme · N gün kaldı”, “Etkin · N gün kaldı” veya kalıcı bilgisini görmek için <b>Ayarlar → Abonelik</b>'i açın.</li>
 </ul>
-<p><b>Özel videolar</b>: herhangi bir klibi gizli özel bölüme taşımak için kilitleyin. Ana kitaplıktan kaybolur ve yalnızca parmak izi kontrolünden sonra geri döner.</p>
+<div class="tip">Google Play'de uygulama, aboneliğiniz etkin olduğu anda otomatik olarak etkinleşebilir — koda gerek yoktur.</div>
 
-<h2>3. Video indirme</h2>
+<h2 id="privacy">2. Gizlilik ve uygulama kilidi</h2>
+<p>Her şey <b>Ayarlar → Güvenlik</b> altındadır:</p>
+<ul>
+  <li><b>Uygulama kilidi:</b> her açılışta uygulamanın kilit açmayı istemesi için bir PIN belirleyin.</li>
+  <li><b>Parmak izi / biyometrik:</b> PIN yazmak yerine parmak izinizle kilidi açın.</li>
+  <li><b>Ekran görüntülerini engelle:</b> uygulama içinde ekran görüntüsü almayı ve ekran kaydını durdurur.</li>
+  <li><b>Son kullanılanlardan gizle:</b> uygulamanın önizlemesini son kullanılan uygulamalar geçiş ekranında gizler.</li>
+</ul>
+<h3>Özel videolar</h3>
+<p>Herhangi bir klibi (<code>⋮</code> menüsünden) kilitleyerek gizli <b>özel</b> bölüme taşıyın. Ana kitaplıktan kaybolur ve yalnızca bir parmak izi kontrolünden sonra geri döner (özel görünümü <code>⋮</code> menüsünden açın).</p>
+
+<h2 id="download">3. Video indirme</h2>
 <h3>Bir bağlantıdan</h3>
-<p>TikTok, YouTube, Instagram veya Snapchat'ten bir video bağlantısı kopyalayın, ardından <b>+</b> düğmesine dokunup <b>Bağlantıdan indir</b>'i seçin — ya da diğer uygulamanın paylaşım menüsünden bağlantıyı doğrudan bu uygulamaya paylaşın.</p>
-<h3>Aramayla</h3>
-<p>Arama simgesine dokunun ve YouTube'da (ve TikTok'ta) aramak için anahtar kelimeler yazın. Önizlemek için bir sonuca dokunun ya da indirme düğmesini kullanın.</p>
-<h3>Video veya ses</h3>
-<p>İndirirken tam videoyu veya yalnızca sesi seçebilirsiniz. Ses indirmeleri gerçek ses dosyaları olarak kaydedilir ve siyah ekran yerine kapak resmiyle çalınır.</p>
-<div class="tip">Instagram ve Snapchat yalnızca herkese açık gönderileri gösterir. Özel veya yalnızca girişle erişilen gönderiler çıkarılamaz.</div>
+<ol>
+  <li>Bir video bağlantısını kopyalayın.</li>
+  <li><b>+</b> düğmesine dokunun → <b>Bağlantıdan indir</b> (veya bağlantıyı başka bir uygulamadan bu uygulamaya paylaşın).</li>
+  <li><b>Yapıştır</b>'a, ardından <b>Bilgi al</b>'a dokunun.</li>
+  <li><b>tam video</b>, <b>yalnızca video</b> veya <b>yalnızca ses</b> seçin, ardından indirin.</li>
+</ol>
+<h3>Arama ile</h3>
+<p>Arama simgesine dokunun, anahtar kelimeler yazın, önizlemek için bir sonuca dokunun veya indirme düğmesini kullanın.</p>
+<h3>Ses ve video karşılaştırması</h3>
+<p>Ses indirmeleri gerçek ses dosyaları olarak kaydedilir ve kapak resmiyle oynatılır (siyah ekranla değil). Kaynak birden fazla seçenek sunduğunda bir kalite de seçebilirsiniz.</p>
+<h3>Dosyaların gittiği yer</h3>
+<p>İndirmeler uygulama içinde özel olarak saklanır. <b>Ayarlar → Kaydetme konumu</b>'nda ayrıca bir kopyanın seçtiğiniz bir klasöre yerleştirilmesini sağlayabilirsiniz, böylece galerinizde/dosya yöneticinizde görünür.</p>
 
-<h2>4. Kitaplık</h2>
+<h2 id="browser">4. Yerleşik tarayıcı</h2>
+<p>Herhangi bir sayfada indirilebilir medyayı algılayan genel bir web tarayıcısı için <b>+ → Tarayıcı</b>'yı açın.</p>
+<ol>
+  <li>Adres çubuğuna bir site veya arama yazın.</li>
+  <li>Sayfadaki videoyu oynatın veya açın.</li>
+  <li>Medya algılandığında bir <b>İndir (N)</b> düğmesi görünür — dokunun, öğeyi seçin, kitaplığınıza indirilir.</li>
+</ol>
+<div class="tip">Tarayıcı sayfayı birkaç saniye boyunca taramaya devam eder; bu yüzden düğme hemen görünmezse videoyu başlatın ve biraz bekleyin.</div>
+
+<h2 id="manage">5. İndirmeleri yönetme</h2>
+<p>Etkin ve tamamlanmış işleri görmek için <b>+ → İndirmeler</b>'i açın (veya kitaplıktaki indirme afişine dokunun). <b>Duraklatabilir</b>, <b>devam ettirebilir</b> ve <b>yeniden deneyebilirsiniz</b>. Duraklatılan veya kesilen indirmeler durdukları yerden devam eder ve başarısız olan bir indirme, bağlantısını otomatik olarak yeniler ve yeniden dener.</p>
+
+<h2 id="library">6. Kitaplık</h2>
 <ul>
-  <li><b>Izgara / liste görünümü</b>: düzeni <code>⋮</code> menüsünden değiştirin → <i>Görünümü değiştir</i>.</li>
-  <li><b>Sıralama</b>: tarihe, ada, süreye, boyuta veya <b>kategoriye</b> göre.</li>
-  <li><b>Filtreleme</b>: kaynağa, medya türüne ve <b>aynı anda birden çok kategoriye</b> göre — yalnızca seçtiklerinizi göstermek ve gerisini gizlemek için birkaç kategoriyi işaretleyin.</li>
-  <li><b>Favoriler</b>: klipleri favori olarak işaretleyin ve onlara göre filtreleyin.</li>
-  <li><b>Kategoriler</b>: klipleri kategorilere göre düzenleyin; her klip kategorisini bir çip olarak gösterir. Kategorilerini toplu ayarlamak için birkaç klip seçin.</li>
+  <li><b>Izgara / liste görünümü:</b> <code>⋮ → Toggle view</code>'dan geçiş yapın.</li>
+  <li><b>Arama:</b> büyütece dokunun; kitaplığı canlı olarak filtreler.</li>
+  <li><b>Sıralama:</b> tarihe, ada, süreye, boyuta veya <b>kategoriye</b> göre (klipleri kategoriye göre gruplar).</li>
+  <li><b>Filtreleme:</b> kaynağa, medya türüne ve <b>aynı anda birkaç kategoriye</b> göre — gösterilecek kategorileri işaretleyin, geri kalanı gizlenir. Kategori girişi kaç tanesinin etkin olduğunu gösterir.</li>
+  <li><b>Favoriler:</b> klipleri favori olarak işaretleyin ve bunlara göre filtreleyin.</li>
+  <li><b>Kategoriler:</b> her klip kategorisini bir çip olarak gösterir. Kategorileri <code>⋮ → Manage categories</code>'den yönetin.</li>
+  <li><b>Çoklu seçim:</b> seçimi başlatmak için bir klibe uzun basın, ardından toplu olarak kategori atayın, favorileyin veya silin.</li>
 </ul>
 
-<h2>5. Oynatıcı</h2>
+<h2 id="player">7. Oynatıcı</h2>
 <ul>
-  <li><b>Sürekli oynatma</b>: bir klip bittiğinde geçerli listedeki bir sonraki otomatik olarak oynatılır. <code>⋮</code> menüsünden <b>Sonraki / Önceki</b>'yi kullanın.</li>
-  <li><b>Kaldığın yerden devam</b>: oynatma kaldığınız yerden devam eder.</li>
-  <li><b>Hareketler</b>: parlaklık için sol yarıda, ses için sağ yarıda yukarı/aşağı kaydırın.</li>
-  <li><b>Hız</b>: 0,5×–2× arasında geçiş yapmak için hız düğmesine dokunun.</li>
-  <li><b>Kontrolleri kilitle</b>: yanlışlıkla dokunmaları önlemek için kontrolleri gizleyin.</li>
-  <li><b>Görüntü içinde görüntü ve arka planda oynatma</b>: diğer uygulamaları kullanırken izlemeye veya dinlemeye devam edin.</li>
-  <li><b>Yeniden boyutlandır</b>: videoyu sığdırın, yakınlaştırın veya uzatın.</li>
-  <li><b>Kayan metni örtme</b>: oynatma sırasında gizlemek için ekrandaki bir metnin veya filigranın üzerine bir kutu çizin.</li>
+  <li><b>Sürekli oynatma:</b> bir klip bittiğinde, geçerli listedeki sonraki klip otomatik olarak oynatılır.</li>
+  <li><b>Sonraki / Önceki:</b> oynatıcının <code>⋮</code> menüsünden.</li>
+  <li><b>Devam ettirme:</b> oynatma kaldığınız yerden devam eder.</li>
+  <li><b>Hareketler:</b> parlaklık için <b>sol yarıda</b>, ses seviyesi için <b>sağ yarıda</b> yukarı/aşağı kaydırın.</li>
+  <li><b>Hız:</b> 0,5×–2× arasında geçiş yapmak için hız düğmesine dokunun.</li>
+  <li><b>Kontrolleri kilitle:</b> yanlışlıkla dokunmaları önlemek için kontrolleri gizleyin.</li>
+  <li><b>Yeniden boyutlandırma:</b> videoyu sığdırın, yakınlaştırın veya esnetin.</li>
+  <li><b>Resim içinde resim ve arka planda oynatma:</b> diğer uygulamaları kullanırken izlemeye veya dinlemeye devam edin.</li>
+  <li><b>Ekrandaki metni örtme:</b> oynatırken ekrandaki metni veya bir filigranı gizlemek için üzerine bir kutu çizin (<code>⋮ → Cover text</code>).</li>
 </ul>
 
-<h2>6. Reklamsız YouTube sekmesi</h2>
-<p><code>⋮</code> menüsünden <b>YouTube</b> sekmesini açın: reklamsız, temiz bir görüntüleyici. Trendler varsayılan olarak Arapça bölgesi için gösterilir, Shorts tek bir düğmeyle gizlenebilir ve arama yapıp ızgara/liste arasında geçiş yapabilirsiniz. Bu ayrı bir sekmedir ve kitaplığınızın yerini asla almaz.</p>
+<h2 id="editing">8. Klipleri düzenleme</h2>
+<p>Bir klibin <code>⋮</code> menüsünden onu <b>yeniden adlandırabilir</b>, <b>açıklamasını düzenleyebilir</b>, <b>kategorisini ayarlayabilir</b>, <b>favorilere</b> ekleyebilir, <b>özel</b> bölüme taşıyabilir veya <b>silebilirsiniz</b> (isteğe bağlı olarak dosyasıyla birlikte).</p>
 
-<h2>7. Görsel düzenleyici</h2>
-<p>Kaydedilmiş görseller için <b>kırpabilir</b>, dolu bir kutuyla bir adı/filigranı <b>gizleyebilir</b>, herhangi bir yere <b>metin ekleyebilir</b> ve <b>OCR</b> ile görselden metin çıkarabilirsiniz (panoya kopyalanır). Fotoğraflar yeniden kodlama bozulmaları olmadan temiz bir şekilde kaydedilir.</p>
+<h2 id="image">9. Görüntü düzenleyici</h2>
+<p>Kaydedilen görüntüler için <b>kırpabilir</b>, bir adı veya filigranı düz bir kutuyla <b>gizleyebilir</b>, herhangi bir yere <b>metin ekleyebilir</b> ve görüntüden <b>OCR</b> ile metin çıkarabilirsiniz (panoya kopyalanır). Görüntüler, yeniden kodlama kusurları olmadan temiz bir şekilde kaydedilir.</p>
 
-<h2>8. Klipleri düzenleme</h2>
-<p>Bir klibin <code>⋮</code> menüsünden onu yeniden adlandırabilir, açıklamasını düzenleyebilir, kategorisini ayarlayabilir, favorilere ekleyebilir, özel bölüme taşıyabilir veya silebilirsiniz.</p>
-
-<h2>9. Yedekleme ve geri yükleme</h2>
-<p><b>Ayarlar</b>'da, kitaplığınızın bir parolayla korunan <b>şifreli bir yedeğini</b> dışa aktarın ve daha sonra aynı parolayla geri yükleyin. Parolayı güvende tutun — o olmadan yedek açılamaz.</p>
-
-<h2>10. Ayarlar</h2>
+<h2 id="youtube">10. Reklamsız YouTube sekmesi</h2>
+<p><code>⋮ → YouTube</code>'dan reklamsız temiz bir görüntüleyici açın:</p>
 <ul>
-  <li><b>Dil</b>: uygulama dilini seçin.</li>
-  <li><b>Tema</b>: sistem, açık veya koyu.</li>
-  <li><b>Yalnızca Wi-Fi</b>: yalnızca Wi-Fi'de indir.</li>
-  <li><b>Eşzamanlı indirmeler</b>: aynı anda kaç tanesinin indirileceği.</li>
-  <li><b>Kaydetme konumu</b>: indirmelerin depolandığı yer.</li>
+  <li>Popüler içerikler varsayılan olarak Arapça bölge için gösterilir.</li>
+  <li>Tek bir anahtar Shorts'u gizler.</li>
+  <li>Büyüteçle arama yapın ve ızgara/liste arasında geçiş yapın.</li>
+</ul>
+<p>Bu ayrı bir sekmedir ve kitaplığınızın yerini asla almaz. Geri düğmesiyle veya <code>⋮ → Library</code> ile geri dönün.</p>
+
+<h2 id="stats">11. İstatistikler</h2>
+<p><code>⋮ → Statistics</code>'i bir pano için açın: toplam video, toplam boyut, toplam uzunluk ve toplam oynatma sayısı, ayrıca en çok oynatılan ve son oynatılan klipleriniz ve kategoriye ve kaynağa göre sayımlar.</p>
+
+<h2 id="settings">12. Dil, tema ve ayarlar</h2>
+<ul>
+  <li><b>Dil:</b> Ayarlar → Dil — 14 dil arasından seçin; uygulama anında değişir.</li>
+  <li><b>Tema:</b> sistem, açık veya koyu.</li>
+  <li><b>Yalnızca Wi-Fi:</b> yalnızca Wi-Fi ile indirin.</li>
+  <li><b>Eşzamanlı indirmeler:</b> aynı anda kaç tanesinin indirileceği.</li>
+  <li><b>Kaydetme konumu:</b> indirmelerin bir kopyasının saklanacağı yer.</li>
+  <li><b>Kullanıcı kılavuzu:</b> bu kılavuz her zaman uygulamanın geçerli dilinde açılır.</li>
 </ul>
 
-<p class="lead">Hepsi bu kadar. Özel video kitaplığınızın keyfini çıkarın.</p>
+<h2 id="backup">13. Yedekleme ve geri yükleme</h2>
+<p><b>Ayarlar</b>'da, kitaplığınızın bir parolayla korunan <b>şifreli bir yedeğini</b> dışa aktarın ve daha sonra aynı parolayla geri yükleyin. Parolayı güvende tutun — parola olmadan yedek açılamaz.</p>
+
+<h2 id="faq">14. Sorun giderme ve SSS</h2>
+<h3>Bir indirme başarısız oldu</h3>
+<p>Bazı sitelerden gelen bağlantılar hızlıca sona erer. <b>İndirmeler</b>'i açın ve yeniden deneye dokunun — uygulama yeni bir bağlantı alır ve devam eder. Bağlantınızı ve gönderinin herkese açık olduğunu kontrol edin.</p>
+<h3>Bir gönderi indirilmiyor</h3>
+<p>Instagram ve Snapchat yalnızca <b>herkese açık</b> gönderileri gösterir; özel veya yalnızca oturum açmayı gerektiren gönderiler çıkarılamaz. Çıkarma platforma bağlıdır ve zaman zaman başarısız olabilir — daha sonra tekrar deneyin.</p>
+<h3>Ses siyah ekran olarak oynatılıyor</h3>
+<p>İndirirken <b>yalnızca ses</b> seçtiğinizden emin olun; ses dosyaları video karesi yerine kapak resmi gösterir.</p>
+<h3>Uygulama kendini kilitledi</h3>
+<p>Denemeniz veya aboneliğiniz sona erdi. İndirmeleriniz güvende — devam etmek için yenileyin (bir kod girin veya Google Play'de abone olun).</p>
+<h3>Bir sunucuya bir şey gönderiliyor mu?</h3>
+<p>Hayır. Uygulamanın arka ucu yoktur. Yalnızca indirmesini istediğiniz şeyi almak için videonun kendi sitesiyle iletişim kurar.</p>
+
+<p class="lead" style="margin-top:28px">Uygulamanın tamamı bu kadar. Özel video kitaplığınızın keyfini çıkarın.</p>
 
 </body>
 </html>
