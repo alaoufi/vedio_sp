@@ -75,7 +75,10 @@ class BrowserActivity : AppCompatActivity() {
             } else false
         }
 
-        binding.webView.loadUrl(START_URL)
+        // Open a specific page when asked (e.g. an Instagram/Snapchat post to sniff),
+        // otherwise the default start page.
+        val start = intent.getStringExtra(EXTRA_URL)?.takeIf { it.isNotBlank() } ?: START_URL
+        binding.webView.loadUrl(start)
     }
 
     /** Loads a typed address, or searches for it if it isn't a URL. */
@@ -194,9 +197,15 @@ class BrowserActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    private companion object {
-        const val START_URL = "https://www.google.com"
-        const val RESCAN_MS = 2500L
+    companion object {
+        private const val EXTRA_URL = "extra_url"
+        private const val START_URL = "https://www.google.com"
+        private const val RESCAN_MS = 2500L
+
+        /** Opens the sniffing browser directly on [url] (used for IG/Snap links). */
+        fun intent(context: android.content.Context, url: String): android.content.Intent =
+            android.content.Intent(context, BrowserActivity::class.java).putExtra(EXTRA_URL, url)
+
         val MEDIA_EXT = listOf(".mp4", ".webm", ".mkv", ".mov", ".m4v", ".m3u8",
             ".mp3", ".m4a", ".aac", ".ogg", ".opus", ".wav")
         val AUDIO_EXT = listOf(".mp3", ".m4a", ".aac", ".ogg", ".opus", ".wav")

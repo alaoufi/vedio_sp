@@ -148,6 +148,7 @@
     <string name="error_unsupported">هذا الرابط غير مدعوم.</string>
     <string name="error_network">خطأ في الشبكة. تحقّق من اتصالك.</string>
     <string name="error_extraction">تعذّر استخراج الفيديو. قد يكون المصدر تغيّر.</string>
+    <string name="open_in_browser">افتح في المتصفّح لالتقاطه</string>
     <string name="error_unknown">حدث خطأ ما.</string>
 
     <!-- Security / lock -->

@@ -36,6 +36,12 @@ class AddDownloadActivity : AppCompatActivity() {
             viewModel.resolve(binding.urlInput.text?.toString().orEmpty())
         }
         binding.pasteButton.setOnClickListener { pasteFromClipboard() }
+        binding.openBrowserButton.setOnClickListener {
+            val url = binding.urlInput.text?.toString()?.trim().orEmpty()
+            if (url.startsWith("http")) {
+                startActivity(com.myvideolibrary.app.ui.browser.BrowserActivity.intent(this, url))
+            }
+        }
         binding.downloadButton.setOnClickListener { anchor ->
             DownloadKindDialog.show(anchor) { kind -> viewModel.download(kind) }
         }
@@ -71,7 +77,9 @@ class AddDownloadActivity : AppCompatActivity() {
             val c = candidate.lowercase()
             (c.startsWith("http")) && (
                 c.contains("tiktok.com") || c.contains("vm.tiktok") || c.contains("vt.tiktok") ||
-                    c.contains("youtube.com") || c.contains("youtu.be")
+                    c.contains("youtube.com") || c.contains("youtu.be") ||
+                    c.contains("instagram.com") || c.contains("instagr.am") ||
+                    c.contains("snapchat.com")
                 )
         }
         return token
@@ -106,6 +114,14 @@ class AddDownloadActivity : AppCompatActivity() {
 
         binding.errorText.isVisible = state.errorMessage != null && state.resolved == null
         binding.errorText.text = state.errorType?.let { messageFor(it, state.errorMessage) }
+
+        // Offer the browser fallback for Instagram/Snapchat (login-walled), and for
+        // any link whose extraction failed — the sniffing browser often still gets it.
+        val url = binding.urlInput.text?.toString()?.lowercase().orEmpty()
+        val socialLink = url.contains("instagram.com") || url.contains("instagr.am") ||
+            url.contains("snapchat.com")
+        binding.openBrowserButton.isVisible =
+            state.resolved == null && (socialLink || state.errorMessage != null)
 
         if (state.enqueued) {
             Toast.makeText(this, R.string.download_started, Toast.LENGTH_LONG).show()

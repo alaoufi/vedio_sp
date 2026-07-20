@@ -90,6 +90,18 @@
                 android:visibility="gone"
                 tools:text="Extraction failed" />
 
+            <!-- Reliable fallback for Instagram/Snapchat: open the post in the
+                 in-app browser, which captures the video while you view it. -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/openBrowserButton"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:icon="@drawable/ic_link"
+                android:text="@string/open_in_browser"
+                android:visibility="gone" />
+
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/previewCard"
                 android:layout_width="match_parent"
