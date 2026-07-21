@@ -101,6 +101,8 @@
     <string name="speed_format">%.2f×</string>
     <string name="playback_error">تعذّر تشغيل هذا الفيديو</string>
     <string name="brightness_label">السطوع %1$d%%</string>
+    <string name="seek_forward">⏩ +10 ثانية</string>
+    <string name="seek_back">⏪ −10 ثانية</string>
     <string name="volume_label">الصوت %1$d%%</string>
 
     <!-- Downloads -->

@@ -333,11 +333,45 @@ class PlayerActivity : AppCompatActivity() {
         finish()
     }
 
-    // ---- Gestures: left half = brightness, right half = volume ----
+    // ---- Gestures ----
+    // Double-tap right/left = seek ±10s. Vertical fling = next/previous clip.
+    // Slow vertical drag: left half = brightness, right half = volume.
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupGestures() {
         gestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onDown(e: MotionEvent): Boolean = true
+
+            override fun onDoubleTap(e: MotionEvent): Boolean {
+                if (controlsLocked) return false
+                val p = player ?: return false
+                if (e.x < binding.root.width / 2f) {
+                    p.seekTo((p.currentPosition - SEEK_STEP_MS).coerceAtLeast(0))
+                    showGestureHint(getString(R.string.seek_back))
+                } else {
+                    val dur = p.duration
+                    val target = p.currentPosition + SEEK_STEP_MS
+                    p.seekTo(if (dur > 0) target.coerceAtMost(dur) else target)
+                    showGestureHint(getString(R.string.seek_forward))
+                }
+                return true
+            }
+
+            override fun onFling(
+                e1: MotionEvent?,
+                e2: MotionEvent,
+                velocityX: Float,
+                velocityY: Float
+            ): Boolean {
+                if (controlsLocked || e1 == null) return false
+                // A fast vertical swipe moves between clips (up = next, down = previous).
+                if (abs(velocityY) > abs(velocityX) && abs(velocityY) > FLING_MIN_VELOCITY) {
+                    if (velocityY < 0 && hasNext()) { playNext(); return true }
+                    if (velocityY > 0 && hasPrevious()) { playPrevious(); return true }
+                }
+                return false
+            }
+
             override fun onScroll(
                 e1: MotionEvent?,
                 e2: MotionEvent,
@@ -460,6 +494,8 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     companion object {
+        private const val SEEK_STEP_MS = 10_000L
+        private const val FLING_MIN_VELOCITY = 1800f
         private const val EXTRA_VIDEO_ID = "extra_video_id"
         private const val EXTRA_STREAM_URL = "extra_stream_url"
         private const val EXTRA_STREAM_TITLE = "extra_stream_title"

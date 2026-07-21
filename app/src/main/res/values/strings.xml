@@ -138,6 +138,8 @@
     <string name="speed_format">%.2f×</string>
     <string name="playback_error">Unable to play this video</string>
     <string name="brightness_label">Brightness %1$d%%</string>
+    <string name="seek_forward">⏩ +10s</string>
+    <string name="seek_back">⏪ −10s</string>
     <string name="volume_label">Volume %1$d%%</string>
 
     <!-- Downloads -->
