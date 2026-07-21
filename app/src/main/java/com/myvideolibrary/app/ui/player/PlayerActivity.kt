@@ -305,6 +305,9 @@ class PlayerActivity : AppCompatActivity() {
             if (controlsLocked) R.drawable.ic_lock else R.drawable.ic_lock_open
         )
         binding.playerView.useController = !controlsLocked
+        // Clear feedback so it's obvious the lock did something: while locked,
+        // taps and swipes are ignored so the video isn't disturbed by accident.
+        showGestureHint(getString(if (controlsLocked) R.string.player_locked else R.string.player_unlocked))
     }
 
     /** Cycles the video scaling: fit (letterbox) → zoom (crop) → fill (stretch). */

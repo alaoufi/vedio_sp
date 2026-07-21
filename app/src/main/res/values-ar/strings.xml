@@ -106,6 +106,8 @@
     <string name="rotation_lock">قفل الاتجاه</string>
     <string name="rotation_auto">تدوير تلقائي</string>
     <string name="rotation_locked">الاتجاه مقفل</string>
+    <string name="player_locked">🔒 مقفل — تجاهُل اللمس والسحب</string>
+    <string name="player_unlocked">🔓 غير مقفل</string>
     <string name="volume_label">الصوت %1$d%%</string>
 
     <!-- Downloads -->

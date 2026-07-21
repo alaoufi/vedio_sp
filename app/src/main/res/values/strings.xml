@@ -143,6 +143,8 @@
     <string name="rotation_lock">Lock orientation</string>
     <string name="rotation_auto">Auto-rotate</string>
     <string name="rotation_locked">Orientation locked</string>
+    <string name="player_locked">🔒 Locked — taps &amp; swipes ignored</string>
+    <string name="player_unlocked">🔓 Unlocked</string>
     <string name="volume_label">Volume %1$d%%</string>
 
     <!-- Downloads -->

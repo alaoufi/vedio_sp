@@ -128,7 +128,6 @@
             android:exported="false"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden|uiMode"
             android:supportsPictureInPicture="true"
-            android:launchMode="singleTask"
             android:theme="@style/Theme.MyVideoLibrary.Player" />
 
         <!-- FileProvider for sharing exported backups. -->
