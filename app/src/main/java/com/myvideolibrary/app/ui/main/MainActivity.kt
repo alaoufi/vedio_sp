@@ -593,9 +593,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openImage(video: VideoEntity) {
+        val path = video.localPath
+        // Open private images inside the app — the external gallery would expose
+        // them and adds its own gestures (swipe-up shows EXIF info). File-backed
+        // images go to the in-app viewer/editor; content-URI imports fall back.
+        if (path.isNotBlank() && !path.startsWith("content://")) {
+            startActivity(com.myvideolibrary.app.ui.imageeditor.ImageEditorActivity.intent(this, path))
+            return
+        }
         try {
             val uri = androidx.core.content.FileProvider.getUriForFile(
-                this, "$packageName.fileprovider", java.io.File(video.localPath)
+                this, "$packageName.fileprovider", java.io.File(path)
             )
             startActivity(Intent(Intent.ACTION_VIEW).apply {
                 setDataAndType(uri, "image/*")
