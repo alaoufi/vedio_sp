@@ -548,8 +548,12 @@ class DownloadWorker @AssistedInject constructor(
     /**
      * Best-effort refresh of a download's direct URLs by re-resolving its source
      * page. Expired CDN tokens are the usual cause of mid-download 403/410 errors;
-     * a fresh resolve hands the next attempt working links. The partial file is
-     * kept — the same content resumes by byte range. Never throws.
+     * a fresh resolve hands the next attempt working links. Never throws.
+     *
+     * Crucially, when the stream URL changes we DISCARD any partial file: a fresh
+     * link may serve different bytes (a different quality/encoding), and resuming
+     * by byte offset across two streams produces a corrupt file that can play as
+     * audio with no picture. Restarting clean guarantees a correct download.
      */
     private suspend fun refreshUrls(downloadId: Long) {
         val current = downloadRepository.get(downloadId) ?: return
@@ -557,16 +561,31 @@ class DownloadWorker @AssistedInject constructor(
         val provider = providerRegistry.providerForUrl(src) ?: return
         runCatching {
             val r = provider.resolve(src)
-            if (r.directUrl.isNotBlank()) {
+            if (r.directUrl.isNotBlank() && r.directUrl != current.downloadUrl) {
+                current.destPath?.let { discardPartials(File(it)) }
                 downloadRepository.update(
                     current.copy(
                         downloadUrl = r.directUrl,
                         audioUrl = r.audioUrl ?: current.audioUrl,
-                        thumbnailUrl = r.thumbnailUrl ?: current.thumbnailUrl
+                        thumbnailUrl = r.thumbnailUrl ?: current.thumbnailUrl,
+                        downloadedBytes = 0,
+                        progress = 0
                     )
                 )
             }
         }
+    }
+
+    /** Removes the destination and every sidecar part so a retry starts clean. */
+    private fun discardPartials(destFile: File) {
+        val parent = destFile.parentFile
+        val name = destFile.name
+        listOf(
+            name, "$name$PARTS_SUFFIX",
+            "$name.video.part", "$name.video.part$PARTS_SUFFIX",
+            "$name.audio.part", "$name.audio.part$PARTS_SUFFIX",
+            "$name.src"
+        ).forEach { runCatching { File(parent, it).delete() } }
     }
 
     private fun isTikTokCdn(url: String): Boolean {
