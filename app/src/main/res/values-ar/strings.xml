@@ -103,6 +103,9 @@
     <string name="brightness_label">السطوع %1$d%%</string>
     <string name="seek_forward">⏩ +10 ثانية</string>
     <string name="seek_back">⏪ −10 ثانية</string>
+    <string name="rotation_lock">قفل الاتجاه</string>
+    <string name="rotation_auto">تدوير تلقائي</string>
+    <string name="rotation_locked">الاتجاه مقفل</string>
     <string name="volume_label">الصوت %1$d%%</string>
 
     <!-- Downloads -->

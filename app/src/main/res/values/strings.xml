@@ -140,6 +140,9 @@
     <string name="brightness_label">Brightness %1$d%%</string>
     <string name="seek_forward">⏩ +10s</string>
     <string name="seek_back">⏪ −10s</string>
+    <string name="rotation_lock">Lock orientation</string>
+    <string name="rotation_auto">Auto-rotate</string>
+    <string name="rotation_locked">Orientation locked</string>
     <string name="volume_label">Volume %1$d%%</string>
 
     <!-- Downloads -->

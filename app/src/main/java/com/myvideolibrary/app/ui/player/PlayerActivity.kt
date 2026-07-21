@@ -54,6 +54,7 @@ class PlayerActivity : AppCompatActivity() {
     // Autoplay queue (ids of the videos that were in view), and our position in it.
     private var playlist: LongArray = LongArray(0)
     private var playlistIndex = -1
+    private var rotationLocked = false
 
     private val speeds = floatArrayOf(0.5f, 0.75f, 1f, 1.25f, 1.5f, 2f)
     private var speedIndex = 2
@@ -63,6 +64,8 @@ class PlayerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyScreenshotPolicy(securityManager)
+        // Follow the device orientation by default — rotate with the phone.
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -137,7 +140,7 @@ class PlayerActivity : AppCompatActivity() {
         if (hasNext()) m.add(0, 7, 0, getString(R.string.play_next))
         if (hasPrevious()) m.add(0, 8, 1, getString(R.string.play_previous))
         if (!isAudioTrack) {
-            m.add(0, 1, 0, getString(R.string.cd_rotate))
+            m.add(0, 1, 0, getString(if (rotationLocked) R.string.rotation_auto else R.string.rotation_lock))
             m.add(0, 2, 1, getString(R.string.cd_resize))
             m.add(0, 5, 2, getString(R.string.hide_text))
             if (binding.hideBox.hasBox) m.add(0, 6, 3, getString(R.string.hide_text_remove))
@@ -149,7 +152,7 @@ class PlayerActivity : AppCompatActivity() {
         if (supportsPip() && !isAudioTrack) m.add(0, 4, 5, getString(R.string.cd_pip))
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
-                1 -> { toggleOrientation(); true }
+                1 -> { toggleRotationLock(); true }
                 2 -> { cycleResizeMode(); true }
                 3 -> { backgroundPlayback = !backgroundPlayback; true }
                 4 -> { enterPipIfPossible(); true }
@@ -297,13 +300,19 @@ class PlayerActivity : AppCompatActivity() {
         showGestureHint(getString(label))
     }
 
-    private fun toggleOrientation() {
-        requestedOrientation =
-            if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            } else {
-                ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-            }
+    /**
+     * By default the player follows the device orientation (rotates when you tilt
+     * the phone). This toggles between that automatic mode and locking to the
+     * orientation you're currently in.
+     */
+    private fun toggleRotationLock() {
+        rotationLocked = !rotationLocked
+        requestedOrientation = if (rotationLocked) {
+            ActivityInfo.SCREEN_ORIENTATION_LOCKED
+        } else {
+            ActivityInfo.SCREEN_ORIENTATION_SENSOR
+        }
+        showGestureHint(getString(if (rotationLocked) R.string.rotation_locked else R.string.rotation_auto))
     }
 
     private fun cycleSpeed() {
