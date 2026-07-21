@@ -46,6 +46,29 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: VideoPagingAdapter
     private lateinit var youtubeAdapter: com.myvideolibrary.app.ui.search.SearchResultAdapter
 
+    /** The YouTube results currently on screen, used to build a swipe-able queue. */
+    private var youtubeItems: List<com.myvideolibrary.app.provider.model.ProviderSearchItem> = emptyList()
+
+    /** Opens a search result as a stream, with the whole result list as a queue. */
+    private fun playStreamQueue(
+        list: List<com.myvideolibrary.app.provider.model.ProviderSearchItem>,
+        item: com.myvideolibrary.app.provider.model.ProviderSearchItem
+    ) {
+        if (list.size > 1) {
+            val index = list.indexOfFirst { it.url == item.url }.coerceAtLeast(0)
+            startActivity(
+                PlayerActivity.streamPlaylistIntent(
+                    this,
+                    list.map { it.url }.toTypedArray(),
+                    list.map { it.title }.toTypedArray(),
+                    index
+                )
+            )
+        } else {
+            startActivity(PlayerActivity.streamIntent(this, item.url, item.title))
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyScreenshotPolicy(securityManager)
@@ -130,7 +153,7 @@ class MainActivity : AppCompatActivity() {
     private fun setupYouTubeTab() {
         youtubeViewModel.setSource(com.myvideolibrary.app.data.model.VideoSource.YOUTUBE)
         youtubeAdapter = com.myvideolibrary.app.ui.search.SearchResultAdapter(
-            onPlay = { item -> youtubeViewModel.play(item) },
+            onPlay = { item -> playStreamQueue(youtubeItems, item) },
             onSaveLink = { item -> youtubeViewModel.saveLink(item) },
             onDownload = { item, anchor ->
                 com.myvideolibrary.app.ui.provider.DownloadKindDialog.show(anchor) { kind ->
@@ -167,6 +190,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             state.results
         }
+        youtubeItems = items
         youtubeAdapter.submitList(items)
         when {
             state.error != null -> {

@@ -24,6 +24,9 @@ class SearchActivity : AppCompatActivity() {
     private val viewModel: SearchViewModel by viewModels()
     private lateinit var adapter: SearchResultAdapter
 
+    /** Results currently on screen, used to build a swipe-able player queue. */
+    private var currentItems: List<com.myvideolibrary.app.provider.model.ProviderSearchItem> = emptyList()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
@@ -33,7 +36,7 @@ class SearchActivity : AppCompatActivity() {
         binding.toolbar.setNavigationOnClickListener { finish() }
 
         adapter = SearchResultAdapter(
-            onPlay = viewModel::play,
+            onPlay = ::playStreamQueue,
             onSaveLink = viewModel::saveLink,
             onDownload = ::chooseDownloadKind
         )
@@ -103,6 +106,26 @@ class SearchActivity : AppCompatActivity() {
         viewModel.search(binding.searchInput.text?.toString().orEmpty())
     }
 
+    /** Plays a result as a stream, with the whole result list as a swipe-able queue. */
+    private fun playStreamQueue(item: com.myvideolibrary.app.provider.model.ProviderSearchItem) {
+        val list = currentItems
+        if (list.size > 1) {
+            val index = list.indexOfFirst { it.url == item.url }.coerceAtLeast(0)
+            startActivity(
+                com.myvideolibrary.app.ui.player.PlayerActivity.streamPlaylistIntent(
+                    this,
+                    list.map { it.url }.toTypedArray(),
+                    list.map { it.title }.toTypedArray(),
+                    index
+                )
+            )
+        } else {
+            startActivity(
+                com.myvideolibrary.app.ui.player.PlayerActivity.streamIntent(this, item.url, item.title)
+            )
+        }
+    }
+
     private fun chooseDownloadKind(
         item: com.myvideolibrary.app.provider.model.ProviderSearchItem,
         anchor: android.view.View
@@ -117,6 +140,7 @@ class SearchActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.state.collectLatest { state ->
                     binding.progressBar.isVisible = state.loading
+                    currentItems = state.results
                     adapter.submitList(state.results)
 
                     // Link-based sources (TikTok/Instagram/Snapchat): hint the user

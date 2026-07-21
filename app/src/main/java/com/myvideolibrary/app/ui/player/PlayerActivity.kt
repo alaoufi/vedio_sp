@@ -53,6 +53,8 @@ class PlayerActivity : AppCompatActivity() {
 
     // Autoplay queue (ids of the videos that were in view), and our position in it.
     private var playlist: LongArray = LongArray(0)
+    private var streamUrls: Array<String> = emptyArray()
+    private var streamTitles: Array<String> = emptyArray()
     private var playlistIndex = -1
     private var rotationLocked = false
 
@@ -69,13 +71,18 @@ class PlayerActivity : AppCompatActivity() {
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // A playlist intent carries the whole queue; the single-video intent one id.
+        // Three queue shapes: a library id queue, a stream URL queue (search
+        // results), or a single item. All share playlistIndex for the position.
         intent.getLongArrayExtra(EXTRA_PLAYLIST)?.takeIf { it.isNotEmpty() }?.let { queue ->
             playlist = queue
-            playlistIndex = intent.getIntExtra(EXTRA_PLAYLIST_INDEX, 0)
-                .coerceIn(0, queue.size - 1)
+            playlistIndex = intent.getIntExtra(EXTRA_PLAYLIST_INDEX, 0).coerceIn(0, queue.size - 1)
         }
-        val videoId = if (playlistIndex >= 0) playlist[playlistIndex]
+        intent.getStringArrayExtra(EXTRA_STREAM_URLS)?.takeIf { it.isNotEmpty() }?.let { urls ->
+            streamUrls = urls
+            streamTitles = intent.getStringArrayExtra(EXTRA_STREAM_TITLES) ?: Array(urls.size) { "" }
+            playlistIndex = intent.getIntExtra(EXTRA_STREAM_INDEX, 0).coerceIn(0, urls.size - 1)
+        }
+        val videoId = if (playlist.isNotEmpty() && playlistIndex >= 0) playlist[playlistIndex]
         else intent.getLongExtra(EXTRA_VIDEO_ID, -1)
         this.videoId = videoId
         val streamUrl = intent.getStringExtra(EXTRA_STREAM_URL)
@@ -85,6 +92,9 @@ class PlayerActivity : AppCompatActivity() {
         loadHideBox()
 
         when {
+            streamUrls.isNotEmpty() -> viewModel.loadStream(
+                streamUrls[playlistIndex], streamTitles.getOrElse(playlistIndex) { "" }
+            )
             videoId > 0 -> viewModel.loadVideo(videoId)
             streamUrl != null -> viewModel.loadStream(
                 streamUrl, intent.getStringExtra(EXTRA_STREAM_TITLE).orEmpty()
@@ -330,9 +340,11 @@ class PlayerActivity : AppCompatActivity() {
         binding.speedButton.text = getString(R.string.speed_format, speeds[speedIndex])
     }
 
-    // ---- Autoplay queue ----
+    // ---- Autoplay queue (library ids or stream URLs) ----
 
-    private fun hasNext(): Boolean = playlistIndex in playlist.indices && playlistIndex < playlist.lastIndex
+    private fun queueSize(): Int = if (streamUrls.isNotEmpty()) streamUrls.size else playlist.size
+
+    private fun hasNext(): Boolean = playlistIndex in 0 until (queueSize() - 1)
     private fun hasPrevious(): Boolean = playlistIndex > 0
 
     private fun playNext() = playAt(playlistIndex + 1)
@@ -340,13 +352,19 @@ class PlayerActivity : AppCompatActivity() {
 
     /** Restarts the player on another queue entry, replacing this screen. */
     private fun playAt(index: Int) {
-        if (index !in playlist.indices) return
+        if (index < 0 || index >= queueSize()) return
         savePosition()
-        startActivity(
+        val next = if (streamUrls.isNotEmpty()) {
+            Intent(this, PlayerActivity::class.java)
+                .putExtra(EXTRA_STREAM_URLS, streamUrls)
+                .putExtra(EXTRA_STREAM_TITLES, streamTitles)
+                .putExtra(EXTRA_STREAM_INDEX, index)
+        } else {
             Intent(this, PlayerActivity::class.java)
                 .putExtra(EXTRA_PLAYLIST, playlist)
                 .putExtra(EXTRA_PLAYLIST_INDEX, index)
-        )
+        }
+        startActivity(next)
         overridePendingTransition(0, 0)
         finish()
     }
@@ -359,8 +377,8 @@ class PlayerActivity : AppCompatActivity() {
     private var downX = 0f
     private var downY = 0f
 
-    /** A queue exists when the player was opened on a list of clips. */
-    private fun hasQueue(): Boolean = playlist.size > 1
+    /** A queue exists when the player was opened on a list of clips or streams. */
+    private fun hasQueue(): Boolean = queueSize() > 1
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupGestures() {
@@ -531,9 +549,23 @@ class PlayerActivity : AppCompatActivity() {
         private const val EXTRA_STREAM_TITLE = "extra_stream_title"
         private const val EXTRA_PLAYLIST = "extra_playlist"
         private const val EXTRA_PLAYLIST_INDEX = "extra_playlist_index"
+        private const val EXTRA_STREAM_URLS = "extra_stream_urls"
+        private const val EXTRA_STREAM_TITLES = "extra_stream_titles"
+        private const val EXTRA_STREAM_INDEX = "extra_stream_index"
 
         fun intent(context: Context, videoId: Long): Intent =
             Intent(context, PlayerActivity::class.java).putExtra(EXTRA_VIDEO_ID, videoId)
+
+        /** Streams a queue of results, so a vertical swipe moves between them. */
+        fun streamPlaylistIntent(
+            context: Context,
+            urls: Array<String>,
+            titles: Array<String>,
+            index: Int
+        ): Intent = Intent(context, PlayerActivity::class.java)
+            .putExtra(EXTRA_STREAM_URLS, urls)
+            .putExtra(EXTRA_STREAM_TITLES, titles)
+            .putExtra(EXTRA_STREAM_INDEX, index)
 
         /** Opens the player on a queue of videos, auto-advancing when each ends. */
         fun playlistIntent(context: Context, ids: LongArray, index: Int): Intent =
