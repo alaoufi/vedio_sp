@@ -131,6 +131,15 @@ class PlayerActivity : AppCompatActivity() {
         binding.speedButton.setOnClickListener { cycleSpeed() }
         binding.backButton.setOnClickListener { finish() }
         binding.moreButton.setOnClickListener { showPlayerMenu(it) }
+
+        // Declutter the center overlay: the skip buttons are redundant now that a
+        // double-tap seeks, and the controls auto-hide quickly so the video is clean.
+        binding.playerView.setShowRewindButton(false)
+        binding.playerView.setShowFastForwardButton(false)
+        binding.playerView.setShowPreviousButton(false)
+        binding.playerView.setShowNextButton(false)
+        binding.playerView.controllerShowTimeoutMs = 2000
+        binding.playerView.controllerHideOnTouch = true
     }
 
     /** Overflow menu grouping the less-frequent player actions, each clearly named. */
@@ -448,7 +457,9 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
-        if (player?.isPlaying == true) enterPipIfPossible()
+        // Only keep playing (via PiP) when the user explicitly enabled background
+        // play; otherwise leaving the player stops playback (see onStop).
+        if (backgroundPlayback && player?.isPlaying == true) enterPipIfPossible()
     }
 
     override fun onPictureInPictureModeChanged(
@@ -504,7 +515,7 @@ class PlayerActivity : AppCompatActivity() {
 
     companion object {
         private const val SEEK_STEP_MS = 10_000L
-        private const val FLING_MIN_VELOCITY = 1800f
+        private const val FLING_MIN_VELOCITY = 1000f
         private const val EXTRA_VIDEO_ID = "extra_video_id"
         private const val EXTRA_STREAM_URL = "extra_stream_url"
         private const val EXTRA_STREAM_TITLE = "extra_stream_title"
