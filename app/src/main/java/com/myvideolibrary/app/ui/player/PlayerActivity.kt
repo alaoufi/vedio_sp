@@ -370,9 +370,8 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     // ---- Gestures ----
-    // Double-tap right/left = seek ±10s. With a play queue, a vertical swipe moves
-    // to the next/previous clip. Without a queue, a vertical drag adjusts
-    // brightness (left half) or volume (right half).
+    // TikTok-style: a vertical swipe always moves between clips (up = next,
+    // down = previous) — never volume. Double-tap right/left = seek ±10s.
 
     private var downX = 0f
     private var downY = 0f
@@ -399,28 +398,10 @@ class PlayerActivity : AppCompatActivity() {
                 }
                 return true
             }
-
-            override fun onScroll(
-                e1: MotionEvent?,
-                e2: MotionEvent,
-                distanceX: Float,
-                distanceY: Float
-            ): Boolean {
-                if (controlsLocked || e1 == null) return false
-                if (abs(distanceX) > abs(distanceY)) return false
-                // With a queue, vertical swipes are reserved for clip navigation
-                // (handled on finger-up) — don't hijack them for volume/brightness.
-                if (hasQueue()) return false
-                val onLeft = e1.x < binding.root.width / 2f
-                val delta = distanceY / binding.root.height
-                if (onLeft) adjustBrightness(delta) else adjustVolume(delta)
-                return true
-            }
         })
 
-        // Feed touches to the gesture detector, and detect a whole vertical swipe
-        // (by displacement, which is far more reliable than fling velocity) to move
-        // between queued clips. Return false so PlayerView keeps its own controller.
+        // Detect a whole vertical swipe by finger displacement (reliable) to move
+        // between clips. Return false so PlayerView keeps its own controller.
         binding.playerView.setOnTouchListener { _, event ->
             gestureDetector.onTouchEvent(event)
             when (event.actionMasked) {
@@ -431,30 +412,13 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-    /** Moves to the next/previous queued clip when the finger travelled far enough. */
+    /** Moves to the next/previous clip when the finger travelled far enough vertically. */
     private fun maybeSwipeNavigate(dx: Float, dy: Float) {
         if (controlsLocked || !hasQueue()) return
         val minPx = binding.root.height * SWIPE_NAV_FRACTION
         if (abs(dy) < minPx || abs(dy) < abs(dx)) return
         if (dy < 0 && hasNext()) playNext()          // swipe up → next
         else if (dy > 0 && hasPrevious()) playPrevious()  // swipe down → previous
-    }
-
-    private fun adjustBrightness(delta: Float) {
-        val lp = window.attributes
-        val current = if (lp.screenBrightness < 0) 0.5f else lp.screenBrightness
-        lp.screenBrightness = (current + delta).coerceIn(0.01f, 1f)
-        window.attributes = lp
-        showGestureHint(getString(R.string.brightness_label, (lp.screenBrightness * 100).toInt()))
-    }
-
-    private fun adjustVolume(delta: Float) {
-        val audio = getSystemService(AUDIO_SERVICE) as android.media.AudioManager
-        val max = audio.getStreamMaxVolume(android.media.AudioManager.STREAM_MUSIC)
-        val current = audio.getStreamVolume(android.media.AudioManager.STREAM_MUSIC)
-        val target = (current + (delta * max)).toInt().coerceIn(0, max)
-        audio.setStreamVolume(android.media.AudioManager.STREAM_MUSIC, target, 0)
-        showGestureHint(getString(R.string.volume_label, (target * 100 / max)))
     }
 
     private fun showGestureHint(text: String) {
