@@ -352,8 +352,15 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     // ---- Gestures ----
-    // Double-tap right/left = seek ±10s. Vertical fling = next/previous clip.
-    // Slow vertical drag: left half = brightness, right half = volume.
+    // Double-tap right/left = seek ±10s. With a play queue, a vertical swipe moves
+    // to the next/previous clip. Without a queue, a vertical drag adjusts
+    // brightness (left half) or volume (right half).
+
+    private var downX = 0f
+    private var downY = 0f
+
+    /** A queue exists when the player was opened on a list of clips. */
+    private fun hasQueue(): Boolean = playlist.size > 1
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupGestures() {
@@ -375,21 +382,6 @@ class PlayerActivity : AppCompatActivity() {
                 return true
             }
 
-            override fun onFling(
-                e1: MotionEvent?,
-                e2: MotionEvent,
-                velocityX: Float,
-                velocityY: Float
-            ): Boolean {
-                if (controlsLocked || e1 == null) return false
-                // A fast vertical swipe moves between clips (up = next, down = previous).
-                if (abs(velocityY) > abs(velocityX) && abs(velocityY) > FLING_MIN_VELOCITY) {
-                    if (velocityY < 0 && hasNext()) { playNext(); return true }
-                    if (velocityY > 0 && hasPrevious()) { playPrevious(); return true }
-                }
-                return false
-            }
-
             override fun onScroll(
                 e1: MotionEvent?,
                 e2: MotionEvent,
@@ -398,6 +390,9 @@ class PlayerActivity : AppCompatActivity() {
             ): Boolean {
                 if (controlsLocked || e1 == null) return false
                 if (abs(distanceX) > abs(distanceY)) return false
+                // With a queue, vertical swipes are reserved for clip navigation
+                // (handled on finger-up) — don't hijack them for volume/brightness.
+                if (hasQueue()) return false
                 val onLeft = e1.x < binding.root.width / 2f
                 val delta = distanceY / binding.root.height
                 if (onLeft) adjustBrightness(delta) else adjustVolume(delta)
@@ -405,12 +400,26 @@ class PlayerActivity : AppCompatActivity() {
             }
         })
 
-        // Feed touches to the gesture detector but let PlayerView keep handling its
-        // own controller (tap to show/hide, seek bar), so both coexist.
+        // Feed touches to the gesture detector, and detect a whole vertical swipe
+        // (by displacement, which is far more reliable than fling velocity) to move
+        // between queued clips. Return false so PlayerView keeps its own controller.
         binding.playerView.setOnTouchListener { _, event ->
             gestureDetector.onTouchEvent(event)
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> { downX = event.x; downY = event.y }
+                MotionEvent.ACTION_UP -> maybeSwipeNavigate(event.x - downX, event.y - downY)
+            }
             false
         }
+    }
+
+    /** Moves to the next/previous queued clip when the finger travelled far enough. */
+    private fun maybeSwipeNavigate(dx: Float, dy: Float) {
+        if (controlsLocked || !hasQueue()) return
+        val minPx = binding.root.height * SWIPE_NAV_FRACTION
+        if (abs(dy) < minPx || abs(dy) < abs(dx)) return
+        if (dy < 0 && hasNext()) playNext()          // swipe up → next
+        else if (dy > 0 && hasPrevious()) playPrevious()  // swipe down → previous
     }
 
     private fun adjustBrightness(delta: Float) {
@@ -515,7 +524,8 @@ class PlayerActivity : AppCompatActivity() {
 
     companion object {
         private const val SEEK_STEP_MS = 10_000L
-        private const val FLING_MIN_VELOCITY = 1000f
+        /** A vertical swipe past this fraction of the screen height changes clips. */
+        private const val SWIPE_NAV_FRACTION = 0.10f
         private const val EXTRA_VIDEO_ID = "extra_video_id"
         private const val EXTRA_STREAM_URL = "extra_stream_url"
         private const val EXTRA_STREAM_TITLE = "extra_stream_title"
