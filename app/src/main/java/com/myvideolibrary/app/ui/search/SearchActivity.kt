@@ -119,8 +119,10 @@ class SearchActivity : AppCompatActivity() {
                     androidx.recyclerview.widget.GridLayoutManager(this, 3)
             }
             else -> {
-                adapter.style = SearchResultAdapter.Style.LIST
-                binding.recyclerView.layoutManager = LinearLayoutManager(this)
+                // YouTube: a 2-column grid of 16:9 cards, mirroring the YouTube app.
+                adapter.style = SearchResultAdapter.Style.GRID
+                binding.recyclerView.layoutManager =
+                    androidx.recyclerview.widget.GridLayoutManager(this, 2)
             }
         }
     }

@@ -133,7 +133,7 @@ class MainActivity : AppCompatActivity() {
     // ---- Tabs: Library (home) + ad-free YouTube (switched from the ⋮ menu) ----
 
     private var youtubeTab = false
-    private var youtubeGrid = false
+    private var youtubeGrid = true
 
     private fun showYouTubeTab(youtube: Boolean) {
         youtubeTab = youtube
@@ -175,13 +175,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun applyYouTubeLayout() {
-        youtubeAdapter.style = if (youtubeGrid) {
-            com.myvideolibrary.app.ui.search.SearchResultAdapter.Style.GRID
-        } else {
-            com.myvideolibrary.app.ui.search.SearchResultAdapter.Style.LIST
-        }
+        // Always use YouTube-style 16:9 cards; the toggle only changes column count
+        // (multi-column grid vs. a single full-width column), never the card style.
+        youtubeAdapter.style = com.myvideolibrary.app.ui.search.SearchResultAdapter.Style.GRID
         binding.ytRecyclerView.layoutManager = if (youtubeGrid) {
-            GridLayoutManager(this, gridSpanCount())
+            GridLayoutManager(this, 2)
         } else {
             androidx.recyclerview.widget.LinearLayoutManager(this)
         }

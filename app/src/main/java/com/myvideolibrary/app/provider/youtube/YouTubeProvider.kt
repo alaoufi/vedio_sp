@@ -223,25 +223,40 @@ class YouTubeProvider @Inject constructor(
         )
     }
 
+    private fun mapStreamItem(item: org.schabi.newpipe.extractor.stream.StreamInfoItem) =
+        ProviderSearchItem(
+            source = VideoSource.YOUTUBE,
+            url = item.url,
+            title = item.name ?: "",
+            thumbnailUrl = item.thumbnails.lastOrNull()?.url,
+            author = item.uploaderName,
+            durationMs = (item.duration.takeIf { it > 0 } ?: 0) * 1000,
+            isShort = runCatching { item.isShortFormContent }.getOrDefault(false)
+        )
+
+    /** Pulls several pages from a NewPipe extractor so the user sees many results. */
+    private fun collectPages(
+        extractor: org.schabi.newpipe.extractor.ListExtractor<out org.schabi.newpipe.extractor.InfoItem>
+    ): List<ProviderSearchItem> {
+        extractor.fetchPage()
+        val out = ArrayList<ProviderSearchItem>()
+        var page = extractor.initialPage
+        var pages = 0
+        while (true) {
+            out += page.items.filterIsInstance<org.schabi.newpipe.extractor.stream.StreamInfoItem>()
+                .map(::mapStreamItem)
+            pages++
+            if (out.size >= MAX_RESULTS || pages >= MAX_PAGES || !page.hasNextPage()) break
+            page = runCatching { extractor.getPage(page.nextPage) }.getOrNull() ?: break
+        }
+        return out
+    }
+
     override suspend fun search(query: String): List<ProviderSearchItem> =
         withContext(Dispatchers.IO) {
             ensureInitialised()
             try {
-                val extractor = ServiceList.YouTube.getSearchExtractor(query, emptyList(), "")
-                extractor.fetchPage()
-                extractor.initialPage.items
-                    .filterIsInstance<org.schabi.newpipe.extractor.stream.StreamInfoItem>()
-                    .map { item ->
-                        ProviderSearchItem(
-                            source = VideoSource.YOUTUBE,
-                            url = item.url,
-                            title = item.name ?: "",
-                            thumbnailUrl = item.thumbnails.lastOrNull()?.url,
-                            author = item.uploaderName,
-                            durationMs = (item.duration.takeIf { it > 0 } ?: 0) * 1000,
-                            isShort = runCatching { item.isShortFormContent }.getOrDefault(false)
-                        )
-                    }
+                collectPages(ServiceList.YouTube.getSearchExtractor(query, emptyList(), ""))
             } catch (e: Exception) {
                 // Fall back to Piped search so keyword search still works if NewPipe breaks.
                 searchViaPiped(query).ifEmpty {
@@ -256,21 +271,7 @@ class YouTubeProvider @Inject constructor(
         withContext(Dispatchers.IO) {
             ensureInitialised()
             try {
-                val kiosk = ServiceList.YouTube.kioskList.defaultKioskExtractor
-                kiosk.fetchPage()
-                kiosk.initialPage.items
-                    .filterIsInstance<org.schabi.newpipe.extractor.stream.StreamInfoItem>()
-                    .map { item ->
-                        ProviderSearchItem(
-                            source = VideoSource.YOUTUBE,
-                            url = item.url,
-                            title = item.name ?: "",
-                            thumbnailUrl = item.thumbnails.lastOrNull()?.url,
-                            author = item.uploaderName,
-                            durationMs = (item.duration.takeIf { it > 0 } ?: 0) * 1000,
-                            isShort = runCatching { item.isShortFormContent }.getOrDefault(false)
-                        )
-                    }
+                collectPages(ServiceList.YouTube.kioskList.defaultKioskExtractor)
             } catch (e: Exception) {
                 trendingViaPiped()
             }
@@ -415,6 +416,10 @@ class YouTubeProvider @Inject constructor(
         private val lock = Any()
         @Volatile
         private var initialised = false
+
+        /** Upper bounds for multi-page fetching so search/trending feel full. */
+        private const val MAX_RESULTS = 60
+        private const val MAX_PAGES = 3
 
         private const val UA =
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
