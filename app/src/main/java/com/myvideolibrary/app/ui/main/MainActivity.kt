@@ -175,7 +175,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun applyYouTubeLayout() {
-        youtubeAdapter.grid = youtubeGrid
+        youtubeAdapter.style = if (youtubeGrid) {
+            com.myvideolibrary.app.ui.search.SearchResultAdapter.Style.GRID
+        } else {
+            com.myvideolibrary.app.ui.search.SearchResultAdapter.Style.LIST
+        }
         binding.ytRecyclerView.layoutManager = if (youtubeGrid) {
             GridLayoutManager(this, gridSpanCount())
         } else {

@@ -106,6 +106,25 @@ class SearchActivity : AppCompatActivity() {
         viewModel.search(binding.searchInput.text?.toString().orEmpty())
     }
 
+    private var styledSource: VideoSource? = null
+
+    /** Mimics each platform's look: YouTube = landscape list, TikTok = 9:16 grid. */
+    private fun applyStyle(source: VideoSource) {
+        if (styledSource == source) return
+        styledSource = source
+        when (source) {
+            VideoSource.TIKTOK, VideoSource.INSTAGRAM, VideoSource.SNAPCHAT -> {
+                adapter.style = SearchResultAdapter.Style.PORTRAIT
+                binding.recyclerView.layoutManager =
+                    androidx.recyclerview.widget.GridLayoutManager(this, 3)
+            }
+            else -> {
+                adapter.style = SearchResultAdapter.Style.LIST
+                binding.recyclerView.layoutManager = LinearLayoutManager(this)
+            }
+        }
+    }
+
     /** Plays a result as a stream, with the whole result list as a swipe-able queue. */
     private fun playStreamQueue(item: com.myvideolibrary.app.provider.model.ProviderSearchItem) {
         val list = currentItems
@@ -140,6 +159,7 @@ class SearchActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.state.collectLatest { state ->
                     binding.progressBar.isVisible = state.loading
+                    applyStyle(state.source)
                     currentItems = state.results
                     adapter.submitList(state.results)
 
