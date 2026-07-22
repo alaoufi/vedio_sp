@@ -185,6 +185,7 @@
     <string name="action_search">Search</string>
     <string name="tiktok_link_hint">TikTok has no keyword search — paste a TikTok link, then press Search to download it.</string>
     <string name="link_only_hint">No keyword search here — paste a public post link, then press Search to download it. Instagram/Snapchat work for public posts only.</string>
+    <string name="browse_in_app">Browse inside the app to find and download</string>
     <string name="add_download_title">Download from link</string>
     <string name="add_download_hint">Paste a TikTok, YouTube, Instagram or Snapchat link. TikTok videos are saved without watermark. Instagram and Snapchat work only for public posts. Extraction depends on the platform and may occasionally fail.</string>
     <string name="paste_url_hint">Video URL</string>

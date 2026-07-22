@@ -69,6 +69,7 @@ class SearchActivity : AppCompatActivity() {
                 )
             )
         }
+        binding.browseButton.setOnClickListener { openInAppBrowser() }
 
         observe()
         observeDownloads()
@@ -104,6 +105,22 @@ class SearchActivity : AppCompatActivity() {
 
     private fun submit() {
         viewModel.search(binding.searchInput.text?.toString().orEmpty())
+    }
+
+    /**
+     * Opens the in-app browser — the reliable offline path for Instagram/Snapchat,
+     * which have no public keyword search. If the field holds a link we open it
+     * directly; otherwise we land on the platform's home so the user can browse
+     * and the media sniffer captures whatever plays.
+     */
+    private fun openInAppBrowser() {
+        val typed = binding.searchInput.text?.toString()?.trim().orEmpty()
+        val url = when {
+            typed.startsWith("http") -> typed
+            styledSource == VideoSource.SNAPCHAT -> "https://www.snapchat.com/explore"
+            else -> "https://www.instagram.com/"
+        }
+        startActivity(com.myvideolibrary.app.ui.browser.BrowserActivity.intent(this, url))
     }
 
     private var styledSource: VideoSource? = null
@@ -172,6 +189,11 @@ class SearchActivity : AppCompatActivity() {
                     binding.searchInput.hint = getString(
                         if (state.searchSupported) R.string.search_hint else R.string.paste_url_hint
                     )
+
+                    // Instagram/Snapchat have no public keyword search: surface the
+                    // in-app browser so the user can browse and download via the sniffer.
+                    binding.browseButton.isVisible =
+                        state.source == VideoSource.INSTAGRAM || state.source == VideoSource.SNAPCHAT
 
                     binding.errorText.isVisible = state.error != null
                     binding.errorText.text = state.error

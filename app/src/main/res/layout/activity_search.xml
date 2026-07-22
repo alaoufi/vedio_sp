@@ -105,6 +105,20 @@
         android:textSize="13sp"
         android:visibility="gone" />
 
+    <!-- Instagram/Snapchat have no public keyword search, so we offer the in-app
+         browser: the user browses the platform there and the media sniffer
+         captures the video for download. Shown only for those sources. -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/browseButton"
+        style="@style/Widget.Material3.Button.TonalButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginBottom="4dp"
+        app:icon="@drawable/ic_search"
+        android:text="@string/browse_in_app"
+        android:visibility="gone" />
+
     <!-- Live download indicator; tap to open the Downloads screen. -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/downloadBanner"
