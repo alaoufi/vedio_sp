@@ -148,7 +148,10 @@ class PlayerActivity : AppCompatActivity() {
         binding.playerView.setShowPreviousButton(false)
         binding.playerView.setShowNextButton(false)
         binding.playerView.controllerShowTimeoutMs = 2000
-        binding.playerView.controllerHideOnTouch = true
+        // A single tap toggles play/pause (handled in the gesture detector), so the
+        // tap must NOT also toggle the controller overlay. The seek bar still shows
+        // automatically while paused.
+        binding.playerView.controllerHideOnTouch = false
     }
 
     /** Overflow menu grouping the less-frequent player actions, each clearly named. */
@@ -382,6 +385,14 @@ class PlayerActivity : AppCompatActivity() {
     private fun setupGestures() {
         gestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
             override fun onDown(e: MotionEvent): Boolean = true
+
+            override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                if (controlsLocked) return false
+                val p = player ?: return false
+                if (p.isPlaying) { p.pause(); showGestureHint("⏸") }
+                else { p.play(); showGestureHint("▶") }
+                return true
+            }
 
             override fun onDoubleTap(e: MotionEvent): Boolean {
                 if (controlsLocked) return false
