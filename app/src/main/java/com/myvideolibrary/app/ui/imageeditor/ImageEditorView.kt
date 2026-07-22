@@ -32,8 +32,33 @@ class ImageEditorView @JvmOverloads constructor(
     private var selection: RectF? = null
 
     private val matrix = Matrix()
+    private val baseMatrix = Matrix()
     private val inverse = Matrix()
     private var scale = 1f
+
+    // Pinch-to-zoom on top of the fit-center base (two-finger gesture).
+    private var viewScale = 1f
+    private var viewTransX = 0f
+    private var viewTransY = 0f
+    private var lastFocusX = 0f
+    private var lastFocusY = 0f
+    private val scaleDetector = android.view.ScaleGestureDetector(
+        context,
+        object : android.view.ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            override fun onScaleBegin(d: android.view.ScaleGestureDetector): Boolean {
+                lastFocusX = d.focusX; lastFocusY = d.focusY; return true
+            }
+            override fun onScale(d: android.view.ScaleGestureDetector): Boolean {
+                viewScale = (viewScale * d.scaleFactor).coerceIn(1f, 5f)
+                viewTransX += d.focusX - lastFocusX
+                viewTransY += d.focusY - lastFocusY
+                lastFocusX = d.focusX; lastFocusY = d.focusY
+                if (viewScale <= 1.01f) { viewScale = 1f; viewTransX = 0f; viewTransY = 0f }
+                updateMatrix()
+                return true
+            }
+        }
+    )
 
     private var draggingText: TextItem? = null
     private var selStartX = 0f
@@ -142,10 +167,23 @@ class ImageEditorView @JvmOverloads constructor(
         scale = min(width.toFloat() / b.width, height.toFloat() / b.height)
         val dx = (width - b.width * scale) / 2f
         val dy = (height - b.height * scale) / 2f
-        matrix.reset()
-        matrix.postScale(scale, scale)
-        matrix.postTranslate(dx, dy)
+        baseMatrix.reset()
+        baseMatrix.postScale(scale, scale)
+        baseMatrix.postTranslate(dx, dy)
+        updateMatrix()
+    }
+
+    /** Combines the fit-center base with the current pinch zoom/pan. */
+    private fun updateMatrix() {
+        val maxTx = width * (viewScale - 1f) / 2f
+        val maxTy = height * (viewScale - 1f) / 2f
+        viewTransX = viewTransX.coerceIn(-maxTx, maxTx)
+        viewTransY = viewTransY.coerceIn(-maxTy, maxTy)
+        matrix.set(baseMatrix)
+        matrix.postScale(viewScale, viewScale, width / 2f, height / 2f)
+        matrix.postTranslate(viewTransX, viewTransY)
         matrix.invert(inverse)
+        invalidate()
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -175,11 +213,17 @@ class ImageEditorView @JvmOverloads constructor(
     // ---- Touch ----
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        // Two-finger gestures pinch-zoom/pan; one finger selects or moves text.
+        scaleDetector.onTouchEvent(event)
+        if (scaleDetector.isInProgress || event.pointerCount > 1) {
+            draggingText = null
+            return true
+        }
         val p = floatArrayOf(event.x, event.y)
         inverse.mapPoints(p)
         val bx = p[0]
         val by = p[1]
-        when (event.action) {
+        when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 val hit = textAt(bx, by)
                 if (hit != null) {

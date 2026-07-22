@@ -373,14 +373,23 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     // ---- Gestures ----
-    // TikTok-style: a vertical swipe always moves between clips (up = next,
-    // down = previous) — never volume. Double-tap right/left = seek ±10s.
+    // TikTok-style: a vertical swipe moves between clips (up = next, down =
+    // previous). Double-tap right/left = seek ±10s. Pinch = zoom the video; when
+    // zoomed, a one-finger drag pans and double-tap resets the zoom.
 
     private var downX = 0f
     private var downY = 0f
+    private var lastPanX = 0f
+    private var lastPanY = 0f
+    private var videoScale = 1f
+    private var videoTransX = 0f
+    private var videoTransY = 0f
+    private lateinit var scaleDetector: android.view.ScaleGestureDetector
 
     /** A queue exists when the player was opened on a list of clips or streams. */
     private fun hasQueue(): Boolean = queueSize() > 1
+
+    private fun isZoomed(): Boolean = videoScale > 1.02f
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupGestures() {
@@ -389,6 +398,8 @@ class PlayerActivity : AppCompatActivity() {
 
             override fun onDoubleTap(e: MotionEvent): Boolean {
                 if (controlsLocked) return false
+                // Double-tap resets the zoom first, otherwise seeks.
+                if (isZoomed()) { resetZoom(); return true }
                 val p = player ?: return false
                 if (e.x < binding.root.width / 2f) {
                     p.seekTo((p.currentPosition - SEEK_STEP_MS).coerceAtLeast(0))
@@ -403,16 +414,56 @@ class PlayerActivity : AppCompatActivity() {
             }
         })
 
-        // Detect a whole vertical swipe by finger displacement (reliable) to move
-        // between clips. Return false so PlayerView keeps its own controller.
+        scaleDetector = android.view.ScaleGestureDetector(
+            this,
+            object : android.view.ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                override fun onScale(d: android.view.ScaleGestureDetector): Boolean {
+                    if (controlsLocked) return false
+                    videoScale = (videoScale * d.scaleFactor).coerceIn(1f, 4f)
+                    if (!isZoomed()) { videoTransX = 0f; videoTransY = 0f }
+                    applyVideoTransform()
+                    return true
+                }
+            }
+        )
+
         binding.playerView.setOnTouchListener { _, event ->
+            scaleDetector.onTouchEvent(event)
             gestureDetector.onTouchEvent(event)
             when (event.actionMasked) {
-                MotionEvent.ACTION_DOWN -> { downX = event.x; downY = event.y }
-                MotionEvent.ACTION_UP -> maybeSwipeNavigate(event.x - downX, event.y - downY)
+                MotionEvent.ACTION_DOWN -> {
+                    downX = event.x; downY = event.y; lastPanX = event.x; lastPanY = event.y
+                }
+                MotionEvent.ACTION_MOVE ->
+                    // While zoomed, a single finger pans the video.
+                    if (isZoomed() && event.pointerCount == 1 && !scaleDetector.isInProgress) {
+                        videoTransX += event.x - lastPanX
+                        videoTransY += event.y - lastPanY
+                        lastPanX = event.x; lastPanY = event.y
+                        applyVideoTransform()
+                    }
+                MotionEvent.ACTION_UP ->
+                    // Swipe-to-navigate only when not zoomed (zoom uses the drag to pan).
+                    if (!isZoomed()) maybeSwipeNavigate(event.x - downX, event.y - downY)
             }
             false
         }
+    }
+
+    private fun applyVideoTransform() {
+        val maxTx = binding.playerView.width * (videoScale - 1f) / 2f
+        val maxTy = binding.playerView.height * (videoScale - 1f) / 2f
+        videoTransX = videoTransX.coerceIn(-maxTx, maxTx)
+        videoTransY = videoTransY.coerceIn(-maxTy, maxTy)
+        binding.playerView.scaleX = videoScale
+        binding.playerView.scaleY = videoScale
+        binding.playerView.translationX = videoTransX
+        binding.playerView.translationY = videoTransY
+    }
+
+    private fun resetZoom() {
+        videoScale = 1f; videoTransX = 0f; videoTransY = 0f
+        applyVideoTransform()
     }
 
     /** Moves to the next/previous clip when the finger travelled far enough vertically. */
