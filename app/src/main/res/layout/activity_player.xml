@@ -75,17 +75,6 @@
             android:contentDescription="@string/more_options" />
     </LinearLayout>
 
-    <!-- Always-visible lock toggle so the user can unlock again. -->
-    <ImageButton
-        android:id="@+id/lockButton"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_gravity="center_vertical|start"
-        android:layout_marginStart="8dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/ic_lock_open"
-        android:contentDescription="@string/cd_lock" />
-
     <TextView
         android:id="@+id/gestureHint"
         android:layout_width="wrap_content"

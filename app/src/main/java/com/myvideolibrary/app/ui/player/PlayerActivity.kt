@@ -136,7 +136,6 @@ class PlayerActivity : AppCompatActivity() {
     private var resizeIndex = 0
 
     private fun setupControls() {
-        binding.lockButton.setOnClickListener { toggleLock() }
         binding.speedButton.text = getString(R.string.speed_format, speeds[speedIndex])
         binding.speedButton.setOnClickListener { cycleSpeed() }
         binding.backButton.setOnClickListener { finish() }
@@ -297,18 +296,6 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     // ---- Controls behaviour ----
-
-    private fun toggleLock() {
-        controlsLocked = !controlsLocked
-        binding.controlsGroup.isVisible = !controlsLocked
-        binding.lockButton.setImageResource(
-            if (controlsLocked) R.drawable.ic_lock else R.drawable.ic_lock_open
-        )
-        binding.playerView.useController = !controlsLocked
-        // Clear feedback so it's obvious the lock did something: while locked,
-        // taps and swipes are ignored so the video isn't disturbed by accident.
-        showGestureHint(getString(if (controlsLocked) R.string.player_locked else R.string.player_unlocked))
-    }
 
     /** Cycles the video scaling: fit (letterbox) → zoom (crop) → fill (stretch). */
     private fun cycleResizeMode() {
