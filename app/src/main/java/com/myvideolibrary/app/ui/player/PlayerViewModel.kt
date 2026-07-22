@@ -9,6 +9,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,11 +36,22 @@ sealed interface PlayerUiState {
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
     private val videoRepository: VideoRepository,
-    private val providerRegistry: ProviderRegistry
+    private val providerRegistry: ProviderRegistry,
+    settingsRepository: com.myvideolibrary.app.data.repository.SettingsRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<PlayerUiState>(PlayerUiState.Loading)
     val state: StateFlow<PlayerUiState> = _state.asStateFlow()
+
+    /** What to do when the current clip finishes (stop / repeat / next). */
+    val endAction: StateFlow<com.myvideolibrary.app.data.model.EndOfClipAction> =
+        settingsRepository.observeSettings()
+            .map { com.myvideolibrary.app.data.model.EndOfClipAction.fromId(it.endOfClipAction) }
+            .stateIn(
+                viewModelScope,
+                kotlinx.coroutines.flow.SharingStarted.Eagerly,
+                com.myvideolibrary.app.data.model.EndOfClipAction.NEXT
+            )
 
     private var loaded = false
     private var countedPlay = false

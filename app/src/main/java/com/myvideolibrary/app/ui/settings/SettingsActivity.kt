@@ -67,6 +67,7 @@ class SettingsActivity : AppCompatActivity() {
     private fun bindActions() {
         binding.themeRow.setOnClickListener { showThemeDialog() }
         binding.languageRow.setOnClickListener { showLanguageDialog() }
+        binding.endActionRow.setOnClickListener { showEndActionDialog() }
         binding.languageValue.text = currentLanguageLabel()
         binding.guideRow.setOnClickListener {
             startActivity(android.content.Intent(this, com.myvideolibrary.app.ui.help.HelpActivity::class.java))
@@ -114,6 +115,7 @@ class SettingsActivity : AppCompatActivity() {
         }
         binding.wifiOnlySwitch.isChecked = state.wifiOnly
         binding.maxConcurrentValue.text = state.maxConcurrent.toString()
+        binding.endActionValue.text = getString(endActionLabel(state.endOfClipAction))
         binding.appLockSwitch.isChecked = state.appLockEnabled && state.hasPin
         binding.changePinRow.isEnabled = state.hasPin
         binding.biometricSwitch.isChecked = state.biometricEnabled
@@ -215,6 +217,26 @@ class SettingsActivity : AppCompatActivity() {
                 }
                 // AppCompat recreates the activity to apply the new locale.
                 androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(locales)
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun endActionLabel(action: com.myvideolibrary.app.data.model.EndOfClipAction): Int =
+        when (action) {
+            com.myvideolibrary.app.data.model.EndOfClipAction.STOP -> R.string.end_stop
+            com.myvideolibrary.app.data.model.EndOfClipAction.REPEAT -> R.string.end_repeat
+            com.myvideolibrary.app.data.model.EndOfClipAction.NEXT -> R.string.end_next
+        }
+
+    private fun showEndActionDialog() {
+        val actions = com.myvideolibrary.app.data.model.EndOfClipAction.entries.toTypedArray()
+        val labels = actions.map { getString(endActionLabel(it)) }.toTypedArray()
+        val current = actions.indexOf(viewModel.state.value.endOfClipAction).coerceAtLeast(0)
+        AlertDialog.Builder(this)
+            .setTitle(R.string.end_of_clip)
+            .setSingleChoiceItems(labels, current) { dialog, which ->
+                viewModel.setEndOfClipAction(actions[which])
                 dialog.dismiss()
             }
             .show()

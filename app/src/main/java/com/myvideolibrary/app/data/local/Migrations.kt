@@ -60,3 +60,10 @@ val MIGRATION_7_8 = object : Migration(7, 8) {
         db.execSQL("CREATE INDEX IF NOT EXISTS index_videos_last_played_date ON videos(last_played_date)")
     }
 }
+
+/** Adds the end-of-clip action (stop / repeat / next) player preference. */
+val MIGRATION_8_9 = object : Migration(8, 9) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE settings ADD COLUMN end_of_clip_action TEXT NOT NULL DEFAULT 'next'")
+    }
+}

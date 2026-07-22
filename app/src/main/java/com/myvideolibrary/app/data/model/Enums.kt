@@ -75,6 +75,18 @@ enum class SourceFilter(val id: String) {
     }
 }
 
+/** What the player does when a clip finishes. */
+enum class EndOfClipAction(val id: String) {
+    STOP("stop"),
+    REPEAT("repeat"),
+    NEXT("next");
+
+    companion object {
+        fun fromId(id: String?): EndOfClipAction =
+            entries.firstOrNull { it.id == id } ?: NEXT
+    }
+}
+
 /** UI theme preference. */
 enum class AppTheme(val id: String) {
     SYSTEM("system"),

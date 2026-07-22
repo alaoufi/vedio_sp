@@ -64,7 +64,11 @@ data class SettingsEntity(
 
     /** User-defined category display order, newline-separated names. */
     @ColumnInfo(name = "category_order")
-    val categoryOrder: String? = null
+    val categoryOrder: String? = null,
+
+    /** [com.myvideolibrary.app.data.model.EndOfClipAction.id] — stop/repeat/next. */
+    @ColumnInfo(name = "end_of_clip_action")
+    val endOfClipAction: String = "next"
 ) {
     companion object {
         const val SINGLETON_ID = 1

@@ -45,6 +45,14 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <LinearLayout android:id="@+id/endActionRow" style="@style/SettingsRow">
+                <LinearLayout style="@style/SettingsRowText">
+                    <TextView style="@style/SettingsTitle" android:text="@string/end_of_clip" />
+                    <TextView android:id="@+id/endActionValue" style="@style/SettingsSubtitle"
+                        tools:text="Play next" />
+                </LinearLayout>
+            </LinearLayout>
+
             <!-- Downloads -->
             <TextView style="@style/SettingsHeader" android:text="@string/section_downloads" />
 

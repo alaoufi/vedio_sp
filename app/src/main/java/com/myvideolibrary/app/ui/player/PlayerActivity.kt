@@ -149,9 +149,11 @@ class PlayerActivity : AppCompatActivity() {
         binding.playerView.setShowNextButton(false)
         binding.playerView.controllerShowTimeoutMs = 2000
         // A single tap toggles play/pause (handled in the gesture detector), so the
-        // tap must NOT also toggle the controller overlay. The seek bar still shows
-        // automatically while paused.
+        // tap must NOT also toggle the controller overlay.
         binding.playerView.controllerHideOnTouch = false
+        // Don't keep the big pause/play button on screen when paused — it covers
+        // the video. A brief ▶/⏸ hint on tap is enough.
+        binding.playerView.controllerAutoShow = false
     }
 
     /** Overflow menu grouping the less-frequent player actions, each clearly named. */
@@ -287,8 +289,7 @@ class PlayerActivity : AppCompatActivity() {
             override fun onPlaybackStateChanged(playbackState: Int) {
                 // Show the spinner while buffering so it's clear playback is loading.
                 binding.loadingBar.isVisible = playbackState == Player.STATE_BUFFERING
-                // When a clip ends, roll on to the next one in the queue.
-                if (playbackState == Player.STATE_ENDED && hasNext()) playNext()
+                if (playbackState == Player.STATE_ENDED) onClipEnded()
             }
             override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
                 binding.errorText.isVisible = true
@@ -296,6 +297,20 @@ class PlayerActivity : AppCompatActivity() {
             }
         })
         player = exo
+    }
+
+    /** Applies the user's end-of-clip preference: stop, repeat, or play next. */
+    private fun onClipEnded() {
+        when (viewModel.endAction.value) {
+            com.myvideolibrary.app.data.model.EndOfClipAction.REPEAT -> {
+                player?.seekTo(0)
+                player?.play()
+            }
+            com.myvideolibrary.app.data.model.EndOfClipAction.NEXT -> {
+                if (hasNext()) playNext()
+            }
+            com.myvideolibrary.app.data.model.EndOfClipAction.STOP -> Unit // stay on the ended frame
+        }
     }
 
     // ---- Controls behaviour ----

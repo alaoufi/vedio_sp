@@ -145,6 +145,10 @@
     <string name="rotation_locked">Orientation locked</string>
     <string name="player_locked">🔒 Locked — taps &amp; swipes ignored</string>
     <string name="player_unlocked">🔓 Unlocked</string>
+    <string name="end_of_clip">When a clip ends</string>
+    <string name="end_stop">Stop</string>
+    <string name="end_repeat">Repeat</string>
+    <string name="end_next">Play next</string>
     <string name="volume_label">Volume %1$d%%</string>
 
     <!-- Downloads -->

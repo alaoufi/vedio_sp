@@ -31,6 +31,8 @@ data class SettingsUiState(
     val storageUsed: Long = 0,
     /** User-chosen SAF tree URI for a copy of finished downloads; null = app storage only. */
     val saveLocation: String? = null,
+    val endOfClipAction: com.myvideolibrary.app.data.model.EndOfClipAction =
+        com.myvideolibrary.app.data.model.EndOfClipAction.NEXT,
     val message: String? = null,
     val exportedFile: java.io.File? = null
 )
@@ -64,9 +66,18 @@ class SettingsViewModel @Inject constructor(
                 preventScreenshots = securityManager.preventScreenshots,
                 hideInRecents = securityManager.hideInRecents,
                 storageUsed = used,
-                saveLocation = settings.storagePath
+                saveLocation = settings.storagePath,
+                endOfClipAction = com.myvideolibrary.app.data.model.EndOfClipAction
+                    .fromId(settings.endOfClipAction)
             )
         }
+    }
+
+    fun setEndOfClipAction(action: com.myvideolibrary.app.data.model.EndOfClipAction) {
+        viewModelScope.launch {
+            settingsRepository.update { it.copy(endOfClipAction = action.id) }
+        }
+        _state.value = _state.value.copy(endOfClipAction = action)
     }
 
     fun setSaveLocation(treeUri: String?) {
