@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Initial handles for the trim RangeSlider; overridden with the real
+         duration at runtime. -->
+    <array name="trim_default_values">
+        <item>0.0</item>
+        <item>100.0</item>
+    </array>
+</resources>

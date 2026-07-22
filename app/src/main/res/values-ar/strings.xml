@@ -112,6 +112,14 @@
     <string name="end_stop">يتوقف</string>
     <string name="end_repeat">يُعاد تشغيله</string>
     <string name="end_next">ينتقل للتالي</string>
+    <string name="trim_menu">قص المقطع</string>
+    <string name="trim_title">قص المقطع</string>
+    <string name="trim_hint">حرّك المقبضين لإبقاء الجزء المطلوب فقط (مثلاً لحذف المقدمة).</string>
+    <string name="trim_save">قص وحفظ</string>
+    <string name="trim_too_short">التحديد قصير جداً</string>
+    <string name="trim_done">تم حفظ المقطع المقصوص</string>
+    <string name="trim_failed">تعذّر قص هذا المقطع</string>
+    <string name="trim_result_title">%1$s (مقصوص)</string>
     <string name="volume_label">الصوت %1$d%%</string>
 
     <!-- Downloads -->

@@ -149,6 +149,14 @@
     <string name="end_stop">Stop</string>
     <string name="end_repeat">Repeat</string>
     <string name="end_next">Play next</string>
+    <string name="trim_menu">Trim clip</string>
+    <string name="trim_title">Trim</string>
+    <string name="trim_hint">Drag the handles to keep only the part you want (e.g. drop an intro).</string>
+    <string name="trim_save">Trim &amp; save</string>
+    <string name="trim_too_short">Selection is too short</string>
+    <string name="trim_done">Trimmed clip saved</string>
+    <string name="trim_failed">Couldn\'t trim this clip</string>
+    <string name="trim_result_title">%1$s (trimmed)</string>
     <string name="volume_label">Volume %1$d%%</string>
 
     <!-- Downloads -->

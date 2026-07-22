@@ -632,6 +632,11 @@ class MainActivity : AppCompatActivity() {
         }
         popup.menu.add(0, 4, 5, getString(R.string.set_category))
         popup.menu.add(0, 5, 6, getString(R.string.edit_info))
+        // Trim (lossless) only for downloaded video files.
+        val isVideoFile = video.mediaType == com.myvideolibrary.app.data.model.MediaType.VIDEO.id &&
+            !video.isLinkOnly && video.localPath.isNotBlank() &&
+            !video.localPath.startsWith("content://")
+        if (isVideoFile) popup.menu.add(0, 12, 7, getString(R.string.trim_menu))
         // Open the original TikTok/YouTube page in its app or the browser.
         if (!video.sourceUrl.isNullOrBlank()) popup.menu.add(0, 8, 7, getString(R.string.open_source))
         // Image editor (crop / hide / text / OCR) only for image items.
@@ -651,6 +656,14 @@ class MainActivity : AppCompatActivity() {
                 8 -> { openSource(video); true }
                 9 -> { viewModel.toggleFavorite(video); true }
                 10 -> { showFileInfo(video); true }
+                12 -> {
+                    startActivity(
+                        com.myvideolibrary.app.ui.trim.TrimActivity.intent(
+                            this, video.localPath, video.title
+                        )
+                    )
+                    true
+                }
                 11 -> {
                     startActivity(
                         com.myvideolibrary.app.ui.imageeditor.ImageEditorActivity.intent(
