@@ -61,6 +61,9 @@ object SlideshowBuilder {
                 .setImageDurationMs(perImageMs)
                 .build()
             EditedMediaItem.Builder(mediaItem)
+                // Images have no intrinsic duration: media3 1.4.x needs it set here
+                // too, or Transformer.start() fails immediately.
+                .setDurationUs(perImageMs * 1000)
                 .setFrameRate(FPS)
                 .build()
         }
@@ -94,7 +97,8 @@ object SlideshowBuilder {
                     if (!cont.isActive) return
                     output.delete()
                     val name = exception.errorCode.let(ExportException::getErrorCodeName)
-                    cont.resume("$name: ${exception.message ?: exception.cause?.message ?: "error"}")
+                    val cause = exception.cause?.let { "${it.javaClass.simpleName}:${it.message}" }
+                    cont.resume("$name ${exception.message ?: ""} ${cause ?: ""}".trim())
                 }
             })
             .build()
@@ -117,7 +121,11 @@ object SlideshowBuilder {
 
         runCatching { transformer.start(composition, output.absolutePath) }
             .onFailure {
-                if (cont.isActive) { output.delete(); cont.resume("start: ${it.message}") }
+                if (cont.isActive) {
+                    output.delete()
+                    val cause = it.cause?.let { c -> " <- ${c.javaClass.simpleName}:${c.message}" } ?: ""
+                    cont.resume("start ${it.javaClass.simpleName}: ${it.message ?: "-"}$cause")
+                }
                 return@suspendCancellableCoroutine
             }
         handler.postDelayed(poll, 500)
