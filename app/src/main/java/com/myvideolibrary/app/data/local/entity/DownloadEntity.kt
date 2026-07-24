@@ -45,7 +45,11 @@ data class DownloadEntity(
     @ColumnInfo(name = "thumbnail_url")
     val thumbnailUrl: String? = null,
 
-    /** [com.myvideolibrary.app.data.model.DownloadKind.id]: full/video/audio/image. */
+    /** Newline-joined picture URLs for a slideshow build (kind = slideshow). */
+    @ColumnInfo(name = "image_urls")
+    val imageUrls: String? = null,
+
+    /** [com.myvideolibrary.app.data.model.DownloadKind.id]: full/video/audio/image/slideshow. */
     @ColumnInfo(name = "kind")
     val kind: String = "full",
 

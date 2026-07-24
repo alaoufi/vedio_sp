@@ -41,7 +41,8 @@ class DownloadManager @Inject constructor(
         audioUrl: String? = null,
         thumbnailUrl: String? = null,
         kind: com.myvideolibrary.app.data.model.DownloadKind =
-            com.myvideolibrary.app.data.model.DownloadKind.FULL
+            com.myvideolibrary.app.data.model.DownloadKind.FULL,
+        imageUrls: List<String> = emptyList()
     ): Long {
         val ext = when (kind) {
             com.myvideolibrary.app.data.model.DownloadKind.AUDIO_ONLY -> "m4a"
@@ -57,6 +58,7 @@ class DownloadManager @Inject constructor(
                 downloadUrl = directUrl,
                 audioUrl = audioUrl,
                 thumbnailUrl = thumbnailUrl,
+                imageUrls = imageUrls.takeIf { it.isNotEmpty() }?.joinToString("\n"),
                 kind = kind.id,
                 destPath = dest,
                 status = DownloadStatus.WAITING.id,
@@ -78,6 +80,19 @@ class DownloadManager @Inject constructor(
             com.myvideolibrary.app.data.model.DownloadKind.FULL
     ): Long {
         val imageKind = com.myvideolibrary.app.data.model.DownloadKind.IMAGE_ONLY
+        // A photo/slideshow post: rebuild it into a single video (images + music).
+        if (resolved.isSlideshow && resolved.imageUrls.isNotEmpty()) {
+            return enqueue(
+                title = resolved.title,
+                source = resolved.source.id,
+                sourceUrl = resolved.sourceUrl,
+                directUrl = resolved.imageUrls.first(),
+                audioUrl = resolved.audioUrl,
+                thumbnailUrl = resolved.thumbnailUrl,
+                kind = com.myvideolibrary.app.data.model.DownloadKind.SLIDESHOW,
+                imageUrls = resolved.imageUrls
+            )
+        }
         if (resolved.isImage && resolved.imageUrls.size > 1) {
             var lastId = 0L
             resolved.imageUrls.forEachIndexed { index, img ->

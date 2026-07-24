@@ -9,7 +9,9 @@ enum class DownloadKind(val id: String) {
     /** Audio track only (saved as .m4a). */
     AUDIO_ONLY("audio"),
     /** Just the cover/thumbnail image. */
-    IMAGE_ONLY("image");
+    IMAGE_ONLY("image"),
+    /** A photo/slideshow post: build a video from its images + music. */
+    SLIDESHOW("slideshow");
 
     companion object {
         fun fromId(id: String?): DownloadKind = entries.firstOrNull { it.id == id } ?: FULL

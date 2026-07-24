@@ -75,6 +75,8 @@ class DownloadWorker @AssistedInject constructor(
             downloadRepository.setStatus(downloadId, DownloadStatus.DOWNLOADING)
 
             val finished = when (kind) {
+                com.myvideolibrary.app.data.model.DownloadKind.SLIDESHOW ->
+                    buildSlideshow(download, destFile, downloadId)
                 com.myvideolibrary.app.data.model.DownloadKind.IMAGE_ONLY ->
                     downloadSmart(primaryUrl, destFile, downloadId, download.title)
                 com.myvideolibrary.app.data.model.DownloadKind.AUDIO_ONLY ->
@@ -460,6 +462,71 @@ class DownloadWorker @AssistedInject constructor(
         return true
     }
 
+    /**
+     * Slideshow: fetch every picture (and the music) of a TikTok photo post, then
+     * compose them into a single video on the device so it plays like the original.
+     */
+    private suspend fun buildSlideshow(
+        download: com.myvideolibrary.app.data.local.entity.DownloadEntity,
+        destFile: File,
+        downloadId: Long
+    ): Boolean {
+        val urls = download.imageUrls
+            ?.split("\n")?.map { it.trim() }?.filter { it.isNotEmpty() }
+            ?: emptyList()
+        if (urls.isEmpty()) throw IllegalStateException("No images for this post")
+
+        val dir = destFile.parentFile
+        val imageFiles = ArrayList<File>()
+        try {
+            withContext(Dispatchers.IO) {
+                urls.forEachIndexed { i, u ->
+                    coroutineContext.ensureActive()
+                    val f = File(dir, "${destFile.name}.img$i")
+                    if (!fetchToFile(u, f)) {
+                        throw IllegalStateException("Couldn't fetch image ${i + 1}")
+                    }
+                    imageFiles.add(f)
+                }
+            }
+            var audioFile: File? = null
+            download.audioUrl?.takeIf { it.isNotBlank() }?.let { a ->
+                val f = File(dir, "${destFile.name}.audio")
+                if (withContext(Dispatchers.IO) { fetchToFile(a, f) }) audioFile = f
+            }
+
+            downloadRepository.updateProgress(
+                downloadId, DownloadStatus.DOWNLOADING, 50, 0, 0, 0
+            )
+
+            // Transformer must be driven from a Looper thread → run on Main.
+            val built = withContext(Dispatchers.Main) {
+                com.myvideolibrary.app.util.SlideshowBuilder.build(
+                    context = applicationContext,
+                    images = imageFiles,
+                    audio = audioFile,
+                    output = destFile
+                ) { /* progress: best-effort, left coarse */ }
+            }
+            audioFile?.let { runCatching { it.delete() } }
+            if (!built) throw IllegalStateException("Couldn't build the slideshow video")
+            return true
+        } finally {
+            imageFiles.forEach { runCatching { it.delete() } }
+        }
+    }
+
+    /** Simple, non-resumable fetch of a whole URL into [dest]. */
+    private fun fetchToFile(url: String, dest: File): Boolean = runCatching {
+        val req = Request.Builder().url(url).header("User-Agent", BROWSER_UA).build()
+        okHttpClient.newCall(req).execute().use { resp ->
+            if (!resp.isSuccessful) return false
+            val body = resp.body ?: return false
+            dest.outputStream().use { out -> body.byteStream().copyTo(out) }
+        }
+        dest.length() > 0
+    }.getOrDefault(false)
+
     private suspend fun finalize(
         downloadId: Long,
         title: String,
@@ -562,6 +629,25 @@ class DownloadWorker @AssistedInject constructor(
         if (current.kind == com.myvideolibrary.app.data.model.DownloadKind.IMAGE_ONLY.id) return
         val src = current.sourceUrl.takeIf { it.isNotBlank() } ?: return
         val provider = providerRegistry.providerForUrl(src) ?: return
+
+        // A slideshow re-resolves its whole picture list + music for the retry.
+        if (current.kind == com.myvideolibrary.app.data.model.DownloadKind.SLIDESHOW.id) {
+            runCatching {
+                val r = provider.resolve(src)
+                if (r.isSlideshow && r.imageUrls.isNotEmpty()) {
+                    downloadRepository.update(
+                        current.copy(
+                            imageUrls = r.imageUrls.joinToString("\n"),
+                            audioUrl = r.audioUrl ?: current.audioUrl,
+                            downloadUrl = r.imageUrls.first(),
+                            downloadedBytes = 0,
+                            progress = 0
+                        )
+                    )
+                }
+            }
+            return
+        }
         runCatching {
             val r = provider.resolve(src)
             if (r.directUrl.isNotBlank() && r.directUrl != current.downloadUrl) {

@@ -18,7 +18,7 @@ import com.myvideolibrary.app.data.local.entity.VideoEntity
         DownloadEntity::class,
         SettingsEntity::class
     ],
-    version = 11,
+    version = 12,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {

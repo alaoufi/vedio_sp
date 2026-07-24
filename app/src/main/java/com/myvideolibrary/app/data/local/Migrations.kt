@@ -82,3 +82,10 @@ val MIGRATION_10_11 = object : Migration(10, 11) {
         db.execSQL("ALTER TABLE settings ADD COLUMN manage_categories_password TEXT")
     }
 }
+
+/** Adds image_urls for building a video from a TikTok slideshow post. */
+val MIGRATION_11_12 = object : Migration(11, 12) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE downloads ADD COLUMN image_urls TEXT")
+    }
+}

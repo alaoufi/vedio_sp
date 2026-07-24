@@ -30,7 +30,13 @@ data class ResolvedVideo(
      * For a multi-image post (a TikTok slideshow), every picture in the post so
      * the whole thing can be saved — not just [directUrl] (the first one).
      */
-    val imageUrls: List<String> = emptyList()
+    val imageUrls: List<String> = emptyList(),
+    /**
+     * True for a TikTok photo/slideshow post that should be rebuilt into a video
+     * on the device from [imageUrls] + [audioUrl] (its music), matching how the
+     * original plays. Takes precedence over [isImage].
+     */
+    val isSlideshow: Boolean = false
 )
 
 /**

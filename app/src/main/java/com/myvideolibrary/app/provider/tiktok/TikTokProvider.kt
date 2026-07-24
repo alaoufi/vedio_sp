@@ -85,15 +85,20 @@ class TikTokProvider @Inject constructor(
                 ?: throw ProviderException(
                     ProviderErrorType.EXTRACTION_FAILED, "No image found in this post"
                 )
+            // Rebuild the original slideshow on-device: pictures + background music
+            // (the "play"/"music" field is the audio track for a photo post).
+            val music = data.str("music")?.takeIf { it.isNotBlank() }
+                ?: data.str("play")?.takeIf { it.isNotBlank() }
             return@withContext ResolvedVideo(
                 source = VideoSource.TIKTOK,
                 sourceUrl = url,
                 title = data.str("title")?.takeIf { it.isNotBlank() } ?: "TikTok photo",
                 directUrl = first,
+                audioUrl = music?.let { absolutize(it) },
                 thumbnailUrl = cleanImage ?: first,
                 author = data.obj("author")?.str("nickname"),
-                isImage = true,
-                imageUrls = images
+                imageUrls = images,
+                isSlideshow = true
             )
         }
 

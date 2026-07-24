@@ -148,6 +148,7 @@ dependencies {
     implementation(libs.media3.session)
     implementation(libs.media3.common)
     implementation(libs.media3.transformer)
+    implementation(libs.media3.effect)
 
     // Paging
     implementation(libs.androidx.paging.runtime.ktx)
