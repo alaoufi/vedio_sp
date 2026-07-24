@@ -188,7 +188,12 @@ class SearchViewModel @Inject constructor(
                     directUrl = resolved.directUrl,
                     audioUrl = resolved.audioUrl,
                     thumbnailUrl = resolved.thumbnailUrl,
-                    kind = kind
+                    // A photo post is a still image, never a video/audio download.
+                    kind = if (resolved.isImage) {
+                        com.myvideolibrary.app.data.model.DownloadKind.IMAGE_ONLY
+                    } else {
+                        kind
+                    }
                 )
                 _state.value = _state.value.copy(loading = false, message = "queued")
             } catch (e: ProviderException) {

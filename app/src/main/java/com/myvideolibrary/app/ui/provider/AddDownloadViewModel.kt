@@ -79,7 +79,12 @@ class AddDownloadViewModel @Inject constructor(
                     directUrl = resolved.directUrl,
                     audioUrl = resolved.audioUrl,
                     thumbnailUrl = resolved.thumbnailUrl,
-                    kind = kind
+                    // Photo posts are still images regardless of the chosen kind.
+                    kind = if (resolved.isImage) {
+                        com.myvideolibrary.app.data.model.DownloadKind.IMAGE_ONLY
+                    } else {
+                        kind
+                    }
                 )
                 _state.value = _state.value.copy(enqueued = true)
             } catch (e: Throwable) {

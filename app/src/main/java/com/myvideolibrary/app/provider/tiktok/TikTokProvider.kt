@@ -76,9 +76,26 @@ class TikTokProvider @Inject constructor(
         // The clean still image (photo-post picture, else full-res poster).
         val cleanImage = data.cleanImage()
 
-        // hdplay / play are both watermark-free; prefer HD. Photo/slideshow
-        // posts have no video — fall back to the still image so an image-only
-        // save still works instead of failing outright.
+        // Photo / slideshow posts have no video: tikwm returns the background
+        // music in the "play"/"hdplay" fields, which is why they used to download
+        // as audio only. Detect them by the images array and save the picture.
+        if (data.isPhotoPost()) {
+            val image = data.firstImage()?.let { absolutize(it) } ?: cleanImage
+                ?: throw ProviderException(
+                    ProviderErrorType.EXTRACTION_FAILED, "No image found in this post"
+                )
+            return@withContext ResolvedVideo(
+                source = VideoSource.TIKTOK,
+                sourceUrl = url,
+                title = data.str("title")?.takeIf { it.isNotBlank() } ?: "TikTok photo",
+                directUrl = image,
+                thumbnailUrl = cleanImage ?: image,
+                author = data.obj("author")?.str("nickname"),
+                isImage = true
+            )
+        }
+
+        // hdplay / play are both watermark-free; prefer HD.
         val play = data.str("hdplay")?.takeIf { it.isNotBlank() }
             ?: data.str("play")?.takeIf { it.isNotBlank() }
             ?: cleanImage
@@ -138,8 +155,11 @@ class TikTokProvider @Inject constructor(
                     thumbnailUrl = v.cleanImage(),
                     author = author?.str("nickname"),
                     durationMs = (v.num("duration") ?: 0) * 1000,
-                    // tikwm already gives the watermark-free URL in search results.
-                    directUrl = v.str("play")?.let { absolutize(it) }
+                    // tikwm already gives the watermark-free URL in search results,
+                    // but for a photo post "play" is only the music — leave it null
+                    // so the download path re-resolves and saves the picture.
+                    directUrl = if (v.isPhotoPost()) null
+                    else v.str("play")?.let { absolutize(it) }
                 )
             }
         }
@@ -174,6 +194,10 @@ class TikTokProvider @Inject constructor(
 
     private fun JsonObject.num(name: String): Long? =
         get(name)?.let { if (it.isJsonNull) null else runCatching { it.asLong }.getOrNull() }
+
+    /** A TikTok photo/slideshow post: has an images array, so no real video. */
+    private fun JsonObject.isPhotoPost(): Boolean =
+        get("images")?.takeIf { it.isJsonArray }?.asJsonArray?.size()?.let { it > 0 } == true
 
     /** First image of a TikTok photo/slideshow post, if this is one. */
     private fun JsonObject.firstImage(): String? =

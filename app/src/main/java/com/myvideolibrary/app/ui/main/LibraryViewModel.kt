@@ -282,7 +282,12 @@ class LibraryViewModel @Inject constructor(
                 sourceUrl = r.sourceUrl,
                 directUrl = r.directUrl,
                 audioUrl = r.audioUrl,
-                thumbnailUrl = r.thumbnailUrl
+                thumbnailUrl = r.thumbnailUrl,
+                kind = if (r.isImage) {
+                    com.myvideolibrary.app.data.model.DownloadKind.IMAGE_ONLY
+                } else {
+                    com.myvideolibrary.app.data.model.DownloadKind.FULL
+                }
             )
         }
     }

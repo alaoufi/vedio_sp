@@ -19,7 +19,13 @@ data class ResolvedVideo(
     val thumbnailUrl: String? = null,
     val author: String? = null,
     val durationMs: Long = 0,
-    val quality: String? = null
+    val quality: String? = null,
+    /**
+     * True when [directUrl] is a still image, not a video — e.g. a TikTok photo
+     * post, whose only "video" stream is actually its background music. The
+     * download is then saved as an image instead of an audio-only file.
+     */
+    val isImage: Boolean = false
 )
 
 /**
