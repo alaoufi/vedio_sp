@@ -33,9 +33,11 @@ import kotlin.coroutines.resume
 @OptIn(UnstableApi::class)
 object SlideshowBuilder {
 
-    private const val OUT_W = 1080
-    private const val OUT_H = 1920
-    private const val FPS = 30
+    // Static pictures don't need 1080p/30fps; a lighter canvas encodes far
+    // faster on-device (the whole point is speed, not cinematic quality).
+    private const val OUT_W = 720
+    private const val OUT_H = 1280
+    private const val FPS = 24
 
     /**
      * @param images the slideshow pictures, in order

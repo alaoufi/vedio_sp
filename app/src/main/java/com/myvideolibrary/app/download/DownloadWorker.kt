@@ -495,18 +495,32 @@ class DownloadWorker @AssistedInject constructor(
                 if (withContext(Dispatchers.IO) { fetchToFile(a, f) }) audioFile = f
             }
 
-            downloadRepository.updateProgress(
-                downloadId, DownloadStatus.DOWNLOADING, 50, 0, 0, 0
-            )
-
-            // Transformer must be driven from a Looper thread → run on Main.
-            val built = withContext(Dispatchers.Main) {
-                com.myvideolibrary.app.util.SlideshowBuilder.build(
-                    context = applicationContext,
-                    images = imageFiles,
-                    audio = audioFile,
-                    output = destFile
-                ) { /* progress: best-effort, left coarse */ }
+            // Report real build progress (0..100 maps to 40..100% of the job) so
+            // the bar keeps moving during the encode instead of looking frozen.
+            val encodePercent = java.util.concurrent.atomic.AtomicInteger(0)
+            val built = coroutineScope {
+                val reporter = launch {
+                    while (isActive) {
+                        val p = 40 + encodePercent.get() * 60 / 100
+                        downloadRepository.updateProgress(
+                            downloadId, DownloadStatus.DOWNLOADING, p, 0, 0, 0
+                        )
+                        delay(700)
+                    }
+                }
+                // Transformer must run on a Looper thread; bound it so it can't hang.
+                val ok = kotlinx.coroutines.withTimeoutOrNull(4 * 60 * 1000L) {
+                    withContext(Dispatchers.Main) {
+                        com.myvideolibrary.app.util.SlideshowBuilder.build(
+                            context = applicationContext,
+                            images = imageFiles,
+                            audio = audioFile,
+                            output = destFile
+                        ) { p -> encodePercent.set(p) }
+                    }
+                } ?: false
+                reporter.cancel()
+                ok
             }
             audioFile?.let { runCatching { it.delete() } }
             if (!built) throw IllegalStateException("Couldn't build the slideshow video")
