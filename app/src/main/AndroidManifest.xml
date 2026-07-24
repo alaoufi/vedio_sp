@@ -128,6 +128,12 @@
             android:exported="false"
             android:parentActivityName=".ui.main.MainActivity" />
 
+        <!-- On-device HEVC compression to reclaim storage. -->
+        <activity
+            android:name=".ui.compress.CompressActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.main.MainActivity" />
+
         <!-- Player: supports PiP, rotation, and keeps screen on. -->
         <activity
             android:name=".ui.player.PlayerActivity"

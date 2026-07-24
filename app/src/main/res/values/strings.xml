@@ -157,6 +157,22 @@
     <string name="trim_done">Trimmed clip saved</string>
     <string name="trim_failed">Couldn\'t trim this clip</string>
     <string name="trim_result_title">%1$s (trimmed)</string>
+
+    <!-- On-device video compression -->
+    <string name="compress_menu">Compress to save space</string>
+    <string name="compress_title">Compress</string>
+    <string name="compressing">Compressing…</string>
+    <string name="compress_hint">Re-encoding to HEVC on your device — high quality, much smaller. This can take a while for long videos.</string>
+    <string name="compress_done">Compression complete</string>
+    <string name="compress_result">Size: %1$s → %2$s (saved %3$d%%)</string>
+    <string name="compress_failed">Couldn\'t compress this video on this device</string>
+    <string name="compress_no_gain">This video is already at its smallest — no space to save</string>
+    <string name="compress_replaced">Original replaced with the compressed copy</string>
+    <string name="compress_saved">Compressed copy added</string>
+    <string name="compress_result_title">%1$s (compressed)</string>
+    <string name="replace_original">Replace original</string>
+    <string name="keep_both">Keep both</string>
+
     <string name="volume_label">Volume %1$d%%</string>
 
     <!-- Downloads -->

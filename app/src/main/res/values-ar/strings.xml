@@ -120,6 +120,22 @@
     <string name="trim_done">تم حفظ المقطع المقصوص</string>
     <string name="trim_failed">تعذّر قص هذا المقطع</string>
     <string name="trim_result_title">%1$s (مقصوص)</string>
+
+    <!-- ضغط الفيديو على الجهاز -->
+    <string name="compress_menu">ضغط لتوفير المساحة</string>
+    <string name="compress_title">ضغط</string>
+    <string name="compressing">جارٍ الضغط…</string>
+    <string name="compress_hint">إعادة ترميز إلى HEVC على جهازك — جودة عالية وحجم أصغر بكثير. قد يستغرق وقتاً للمقاطع الطويلة.</string>
+    <string name="compress_done">اكتمل الضغط</string>
+    <string name="compress_result">الحجم: %1$s ← %2$s (وفّرت %3$d%%)</string>
+    <string name="compress_failed">تعذّر ضغط هذا الفيديو على هذا الجهاز</string>
+    <string name="compress_no_gain">هذا الفيديو مضغوط لأقصى حد — لا مساحة إضافية للتوفير</string>
+    <string name="compress_replaced">تم استبدال الأصل بالنسخة المضغوطة</string>
+    <string name="compress_saved">تمت إضافة النسخة المضغوطة</string>
+    <string name="compress_result_title">%1$s (مضغوط)</string>
+    <string name="replace_original">استبدال الأصل</string>
+    <string name="keep_both">الاحتفاظ بالاثنين</string>
+
     <string name="volume_label">الصوت %1$d%%</string>
 
     <!-- Downloads -->

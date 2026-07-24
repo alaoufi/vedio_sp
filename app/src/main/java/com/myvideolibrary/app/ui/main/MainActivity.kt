@@ -652,6 +652,8 @@ class MainActivity : AppCompatActivity() {
             !video.isLinkOnly && video.localPath.isNotBlank() &&
             !video.localPath.startsWith("content://")
         if (isVideoFile) popup.menu.add(0, 12, 7, getString(R.string.trim_menu))
+        // Compress (HEVC) to reclaim space — downloaded video files only.
+        if (isVideoFile) popup.menu.add(0, 13, 7, getString(R.string.compress_menu))
         // Open the original TikTok/YouTube page in its app or the browser.
         if (!video.sourceUrl.isNullOrBlank()) popup.menu.add(0, 8, 7, getString(R.string.open_source))
         // Image editor (crop / hide / text / OCR) only for image items.
@@ -675,6 +677,14 @@ class MainActivity : AppCompatActivity() {
                     startActivity(
                         com.myvideolibrary.app.ui.trim.TrimActivity.intent(
                             this, video.localPath, video.title
+                        )
+                    )
+                    true
+                }
+                13 -> {
+                    startActivity(
+                        com.myvideolibrary.app.ui.compress.CompressActivity.intent(
+                            this, video.id, video.localPath
                         )
                     )
                     true
