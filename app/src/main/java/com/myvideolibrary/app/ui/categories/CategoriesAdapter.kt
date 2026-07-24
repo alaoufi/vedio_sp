@@ -18,7 +18,7 @@ import java.util.Collections
 class CategoriesAdapter(
     private val onOpen: (CategoryItem) -> Unit,
     private val onEdit: (CategoryItem) -> Unit,
-    private val onDelete: (String) -> Unit,
+    private val onDelete: (CategoryItem) -> Unit,
     private val onStartDrag: (RecyclerView.ViewHolder) -> Unit
 ) : RecyclerView.Adapter<CategoriesAdapter.VH>() {
 
@@ -72,7 +72,7 @@ class CategoriesAdapter(
 
             binding.openArea.setOnClickListener { onOpen(item) }
             binding.editButton.setOnClickListener { onEdit(item) }
-            binding.deleteButton.setOnClickListener { onDelete(item.name) }
+            binding.deleteButton.setOnClickListener { onDelete(item) }
             binding.dragHandle.setOnTouchListener { _, event ->
                 if (event.actionMasked == MotionEvent.ACTION_DOWN) onStartDrag(this)
                 false

@@ -356,6 +356,7 @@
     <string name="manage_password">كلمة مرور الإدارة</string>
     <string name="manage_password_hint">كلمة المرور (اتركها فارغة لإزالة الحماية)</string>
     <string name="manage_locked_title">إدارة التصنيفات محمية</string>
+    <string name="locked_section_title">قسم محمي — أدخل كلمة مروره</string>
     <string name="toggle_visibility">إظهار / إخفاء</string>
     <string name="category_password">كلمة المرور</string>
     <string name="state_hidden">مخفي</string>

@@ -112,10 +112,14 @@ class CategoriesViewModel @Inject constructor(
         }
     }
 
-    /** Verifies a password before opening a protected category's contents. */
+    /**
+     * Verifies access to a protected category: its own password, OR the general
+     * management password (the master key that opens everything).
+     */
     suspend fun verifyPassword(name: String, password: String): Boolean {
         val settings = settingsRepository.getSettings()
-        return CategorySecurity.verify(settings.categoryPasswords, name, password)
+        return CategorySecurity.verify(settings.categoryPasswords, name, password) ||
+            CategorySecurity.verifyHash(settings.manageCategoriesPassword, password)
     }
 
     // ---- Management-screen lock ----

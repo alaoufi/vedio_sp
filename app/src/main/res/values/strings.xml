@@ -393,6 +393,7 @@
     <string name="manage_password">Management password</string>
     <string name="manage_password_hint">Password (leave blank to remove protection)</string>
     <string name="manage_locked_title">Category management is locked</string>
+    <string name="locked_section_title">Protected section — enter its password</string>
     <string name="toggle_visibility">Show / hide</string>
     <string name="category_password">Password</string>
     <string name="state_hidden">Hidden</string>

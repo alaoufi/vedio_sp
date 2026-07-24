@@ -36,6 +36,9 @@ class CategoriesActivity : AppCompatActivity() {
     private lateinit var touchHelper: ItemTouchHelper
     private var unlocked = false
 
+    /** True once the general (master) password was entered — it opens everything. */
+    private var masterUnlocked = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityCategoriesBinding.inflate(layoutInflater)
@@ -44,9 +47,9 @@ class CategoriesActivity : AppCompatActivity() {
         binding.toolbar.setNavigationOnClickListener { finish() }
 
         adapter = CategoriesAdapter(
-            onOpen = ::openCategory,
-            onEdit = ::promptEdit,
-            onDelete = ::confirmDelete,
+            onOpen = { item -> withSectionAccess(item) { returnOpen(item.name) } },
+            onEdit = { item -> withSectionAccess(item) { showEditDialog(item) } },
+            onDelete = { item -> withSectionAccess(item) { confirmDelete(item.name) } },
             onStartDrag = { touchHelper.startDrag(it) }
         )
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
@@ -63,8 +66,10 @@ class CategoriesActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menu.add(0, MENU_MANAGE_PW, 0, getString(R.string.manage_password))
-            .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
+        menu.add(0, MENU_MANAGE_PW, 0, getString(R.string.manage_password)).apply {
+            setIcon(R.drawable.ic_lock)
+            setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+        }
         return true
     }
 
@@ -98,11 +103,27 @@ class CategoriesActivity : AppCompatActivity() {
         promptPassword(R.string.manage_locked_title, R.string.enter_password, dismissable = false) { entered ->
             lifecycleScope.launch {
                 if (viewModel.verifyManagePassword(entered)) {
+                    masterUnlocked = true // the master key opens every section
                     reveal()
                 } else {
                     toast(R.string.wrong_password)
                     unlockThenShow() // ask again
                 }
+            }
+        }
+    }
+
+    /**
+     * Runs [action] only after the section is unlocked. A protected section needs
+     * its own password (or the master password) every time it is edited, deleted,
+     * or opened — unless the master key was already used to enter this screen.
+     */
+    private fun withSectionAccess(item: CategoryItem, action: () -> Unit) {
+        if (!item.hasPassword || masterUnlocked) { action(); return }
+        promptPassword(R.string.locked_section_title, R.string.enter_password) { entered ->
+            lifecycleScope.launch {
+                if (viewModel.verifyPassword(item.name, entered)) action()
+                else toast(R.string.wrong_password)
             }
         }
     }
@@ -162,7 +183,7 @@ class CategoriesActivity : AppCompatActivity() {
     }
 
     /** The single edit dialog: rename + hide + protect, all in one place. */
-    private fun promptEdit(item: CategoryItem) {
+    private fun showEditDialog(item: CategoryItem) {
         val dialogBinding = DialogEditCategoryBinding.inflate(layoutInflater)
         dialogBinding.nameInput.setText(item.name)
         dialogBinding.nameInput.setSelection(item.name.length)
@@ -203,23 +224,6 @@ class CategoriesActivity : AppCompatActivity() {
             .setPositiveButton(R.string.delete) { _, _ -> viewModel.delete(name) }
             .setNegativeButton(R.string.cancel, null)
             .show()
-    }
-
-    /** Opens a category's contents; password-protected ones ask for the password. */
-    private fun openCategory(item: CategoryItem) {
-        if (item.hasPassword) {
-            promptPassword(R.string.open_locked_title, R.string.enter_password) { entered ->
-                lifecycleScope.launch {
-                    if (viewModel.verifyPassword(item.name, entered)) {
-                        returnOpen(item.name)
-                    } else {
-                        toast(R.string.wrong_password)
-                    }
-                }
-            }
-        } else {
-            returnOpen(item.name)
-        }
     }
 
     private fun returnOpen(name: String) {
