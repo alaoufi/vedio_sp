@@ -477,26 +477,32 @@ class DownloadWorker @AssistedInject constructor(
         if (urls.isEmpty()) throw IllegalStateException("No images for this post")
 
         val dir = destFile.parentFile
-        val imageFiles = ArrayList<File>()
+        val rawFiles = ArrayList<File>()
+        val frameFiles = ArrayList<File>()
+        var audioFile: File? = null
         try {
+            // Fetch every picture, then re-encode each to an identical JPEG canvas
+            // so the encoder gets uniform frames (mixed sizes/WEBP break some
+            // device encoders — the cause of the build failing at ~40%).
             withContext(Dispatchers.IO) {
                 urls.forEachIndexed { i, u ->
                     coroutineContext.ensureActive()
-                    val f = File(dir, "${destFile.name}.img$i")
-                    if (!fetchToFile(u, f)) {
+                    val raw = File(dir, "${destFile.name}.raw$i")
+                    if (!fetchToFile(u, raw)) {
                         throw IllegalStateException("Couldn't fetch image ${i + 1}")
                     }
-                    imageFiles.add(f)
+                    rawFiles.add(raw)
+                    val frame = File(dir, "${destFile.name}.f$i.jpg")
+                    if (normalizeFrame(raw, frame)) frameFiles.add(frame)
                 }
             }
-            var audioFile: File? = null
+            if (frameFiles.isEmpty()) throw IllegalStateException("Couldn't read the images")
+
             download.audioUrl?.takeIf { it.isNotBlank() }?.let { a ->
                 val f = File(dir, "${destFile.name}.audio")
                 if (withContext(Dispatchers.IO) { fetchToFile(a, f) }) audioFile = f
             }
 
-            // Report real build progress (0..100 maps to 40..100% of the job) so
-            // the bar keeps moving during the encode instead of looking frozen.
             val encodePercent = java.util.concurrent.atomic.AtomicInteger(0)
             val built = coroutineScope {
                 val reporter = launch {
@@ -508,27 +514,79 @@ class DownloadWorker @AssistedInject constructor(
                         delay(700)
                     }
                 }
-                // Transformer must run on a Looper thread; bound it so it can't hang.
-                val ok = kotlinx.coroutines.withTimeoutOrNull(4 * 60 * 1000L) {
-                    withContext(Dispatchers.Main) {
-                        com.myvideolibrary.app.util.SlideshowBuilder.build(
-                            context = applicationContext,
-                            images = imageFiles,
-                            audio = audioFile,
-                            output = destFile
-                        ) { p -> encodePercent.set(p) }
-                    }
-                } ?: false
+                val ok = runSlideshow(frameFiles, audioFile, destFile, encodePercent)
                 reporter.cancel()
                 ok
             }
-            audioFile?.let { runCatching { it.delete() } }
             if (!built) throw IllegalStateException("Couldn't build the slideshow video")
             return true
         } finally {
-            imageFiles.forEach { runCatching { it.delete() } }
+            rawFiles.forEach { runCatching { it.delete() } }
+            frameFiles.forEach { runCatching { it.delete() } }
+            audioFile?.let { runCatching { it.delete() } }
         }
     }
+
+    /**
+     * Runs the on-device compose with the music; if that fails (some encoders
+     * choke on the TikTok audio track) retries once without it so the user still
+     * gets the moving video instead of nothing. Each attempt is time-bounded.
+     */
+    private suspend fun runSlideshow(
+        frames: List<File>,
+        audio: File?,
+        output: File,
+        progress: java.util.concurrent.atomic.AtomicInteger
+    ): Boolean {
+        suspend fun attempt(withAudio: File?): Boolean =
+            kotlinx.coroutines.withTimeoutOrNull(4 * 60 * 1000L) {
+                withContext(Dispatchers.Main) {
+                    com.myvideolibrary.app.util.SlideshowBuilder.build(
+                        context = applicationContext,
+                        images = frames,
+                        audio = withAudio,
+                        output = output
+                    ) { p -> progress.set(p) }
+                }
+            } ?: false
+
+        if (attempt(audio)) return true
+        if (audio != null) {
+            progress.set(0)
+            output.delete()
+            if (attempt(null)) return true
+        }
+        return false
+    }
+
+    /**
+     * Decodes [src] (JPEG/PNG/WEBP, any size) and paints it letterboxed onto a
+     * fixed 720x1280 black canvas saved as a plain JPEG — a uniform frame every
+     * encoder accepts.
+     */
+    private fun normalizeFrame(src: File, dst: File): Boolean = runCatching {
+        val bmp = android.graphics.BitmapFactory.decodeFile(src.absolutePath) ?: return false
+        val w = 720
+        val h = 1280
+        val canvasBmp = android.graphics.Bitmap.createBitmap(
+            w, h, android.graphics.Bitmap.Config.ARGB_8888
+        )
+        val canvas = android.graphics.Canvas(canvasBmp)
+        canvas.drawColor(android.graphics.Color.BLACK)
+        val scale = minOf(w.toFloat() / bmp.width, h.toFloat() / bmp.height)
+        val dw = bmp.width * scale
+        val dh = bmp.height * scale
+        val left = (w - dw) / 2f
+        val top = (h - dh) / 2f
+        val rect = android.graphics.RectF(left, top, left + dw, top + dh)
+        canvas.drawBitmap(bmp, null, rect, android.graphics.Paint(android.graphics.Paint.FILTER_BITMAP_FLAG))
+        dst.outputStream().use { out ->
+            canvasBmp.compress(android.graphics.Bitmap.CompressFormat.JPEG, 90, out)
+        }
+        bmp.recycle()
+        canvasBmp.recycle()
+        dst.length() > 0
+    }.getOrDefault(false)
 
     /** Simple, non-resumable fetch of a whole URL into [dest]. */
     private fun fetchToFile(url: String, dest: File): Boolean = runCatching {

@@ -8,11 +8,9 @@ import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.effect.Presentation
 import androidx.media3.transformer.Composition
 import androidx.media3.transformer.EditedMediaItem
 import androidx.media3.transformer.EditedMediaItemSequence
-import androidx.media3.transformer.Effects
 import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.ProgressHolder
@@ -33,10 +31,7 @@ import kotlin.coroutines.resume
 @OptIn(UnstableApi::class)
 object SlideshowBuilder {
 
-    // Static pictures don't need 1080p/30fps; a lighter canvas encodes far
-    // faster on-device (the whole point is speed, not cinematic quality).
-    private const val OUT_W = 720
-    private const val OUT_H = 1280
+    // Static pictures don't need 30fps; a low frame rate encodes far faster.
     private const val FPS = 24
 
     /**
@@ -56,11 +51,9 @@ object SlideshowBuilder {
         if (images.isEmpty()) { cont.resume(false); return@suspendCancellableCoroutine }
         val handler = Handler(Looper.getMainLooper())
 
-        // Each picture, normalised to a common portrait canvas so a mix of sizes
-        // exports cleanly (letterboxed, nothing cropped away).
-        val fit = Presentation.createForWidthAndHeight(
-            OUT_W, OUT_H, Presentation.LAYOUT_SCALE_TO_FIT
-        )
+        // Images arrive already decoded to identical JPEGs, so no resize effect is
+        // needed — feeding uniform frames straight through is the most robust path
+        // across device encoders.
         val imageItems = images.map { file ->
             val mediaItem = MediaItem.Builder()
                 .setUri(Uri.fromFile(file))
@@ -68,7 +61,6 @@ object SlideshowBuilder {
                 .build()
             EditedMediaItem.Builder(mediaItem)
                 .setFrameRate(FPS)
-                .setEffects(Effects(emptyList(), listOf(fit)))
                 .build()
         }
         val videoSequence = EditedMediaItemSequence(imageItems)
