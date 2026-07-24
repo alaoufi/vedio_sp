@@ -550,10 +550,10 @@ class DownloadWorker @AssistedInject constructor(
     ): String? {
         suspend fun attempt(withAudio: File?): String? =
             kotlinx.coroutines.withTimeoutOrNull(4 * 60 * 1000L) {
-                withContext(Dispatchers.Main) {
-                    com.myvideolibrary.app.util.SlideshowBuilder.build(
-                        context = applicationContext,
-                        images = frames,
+                withContext(Dispatchers.IO) {
+                    // Low-level MediaCodec/MediaMuxer encoder — no Media3, no GL.
+                    com.myvideolibrary.app.util.SlideshowEncoder.encode(
+                        frames = frames,
                         audio = withAudio,
                         output = output
                     ) { p -> progress.set(p) }
