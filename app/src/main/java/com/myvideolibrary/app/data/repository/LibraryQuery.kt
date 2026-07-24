@@ -16,6 +16,12 @@ data class LibraryQuery(
     val favoritesOnly: Boolean = false,
     /** Show only videos in any of these categories; empty means all categories. */
     val categories: Set<String> = emptySet(),
+    /**
+     * Categories hidden or password-protected: their videos are excluded from the
+     * general view. Ignored when [categories] explicitly selects a category, so a
+     * hidden/locked category can still be opened deliberately.
+     */
+    val excludedCategories: Set<String> = emptySet(),
     val sourceFilter: SourceFilter = SourceFilter.ALL,
     /** When true show only locked (protected) videos; when false hide them. */
     val protectedOnly: Boolean = false,
@@ -47,6 +53,13 @@ data class LibraryQuery(
             val placeholders = categories.joinToString(", ") { "?" }
             where.append(" AND category IN ($placeholders)")
             categories.forEach { args.add(it) }
+        } else if (excludedCategories.isNotEmpty()) {
+            // General view: drop videos in hidden/locked categories (keep uncategorised).
+            val placeholders = excludedCategories.joinToString(", ") { "?" }
+            where.append(
+                " AND (category IS NULL OR TRIM(category) COLLATE NOCASE NOT IN ($placeholders))"
+            )
+            excludedCategories.forEach { args.add(it.trim()) }
         }
         mediaType?.let {
             where.append(" AND media_type = ?")

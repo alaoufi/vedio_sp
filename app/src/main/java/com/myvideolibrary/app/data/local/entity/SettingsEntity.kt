@@ -66,6 +66,17 @@ data class SettingsEntity(
     @ColumnInfo(name = "category_order")
     val categoryOrder: String? = null,
 
+    /** Hidden categories, newline-separated names — excluded from the library view. */
+    @ColumnInfo(name = "hidden_categories")
+    val hiddenCategories: String? = null,
+
+    /**
+     * Password-protected categories, one per line as "name\tsha256hex". Their
+     * contents are hidden from the library until opened with the password.
+     */
+    @ColumnInfo(name = "category_passwords")
+    val categoryPasswords: String? = null,
+
     /** [com.myvideolibrary.app.data.model.EndOfClipAction.id] — stop/repeat/next. */
     @ColumnInfo(name = "end_of_clip_action")
     val endOfClipAction: String = "next"

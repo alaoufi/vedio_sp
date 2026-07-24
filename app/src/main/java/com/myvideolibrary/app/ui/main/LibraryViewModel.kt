@@ -97,8 +97,19 @@ class LibraryViewModel @Inject constructor(
         videoRepository.observeCategories()
     ) { settings, folders, count, size, categories ->
         val ordered = com.myvideolibrary.app.util.CategoryOrder.apply(categories, settings.categoryOrder)
-        LibraryMeta(settings, folders, count, size, ordered)
+        // Hidden and password-protected categories are dropped from the browseable
+        // list so their contents never surface in the general library view.
+        val excluded = excludedCategories(settings)
+        val visible = ordered.filterNot { name ->
+            excluded.any { it.equals(name.trim(), ignoreCase = true) }
+        }
+        LibraryMeta(settings, folders, count, size, visible)
     }
+
+    /** Names of hidden ∪ password-protected categories, from the settings row. */
+    private fun excludedCategories(settings: SettingsEntity): Set<String> =
+        com.myvideolibrary.app.util.CategorySecurity.parseHidden(settings.hiddenCategories) +
+            com.myvideolibrary.app.util.CategorySecurity.protectedNames(settings.categoryPasswords)
 
     // Active filter selections.
     private val filters = combine(
@@ -144,6 +155,7 @@ class LibraryViewModel @Inject constructor(
                     folderId = folderId,
                     favoritesOnly = favoritesOnly,
                     categories = extra.categories,
+                    excludedCategories = excludedCategories(settings),
                     sourceFilter = extra.sourceFilter,
                     protectedOnly = extra.protectedMode,
                     mediaType = extra.mediaType,

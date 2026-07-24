@@ -67,3 +67,11 @@ val MIGRATION_8_9 = object : Migration(8, 9) {
         db.execSQL("ALTER TABLE settings ADD COLUMN end_of_clip_action TEXT NOT NULL DEFAULT 'next'")
     }
 }
+
+/** Adds per-category visibility (hidden) and password protection. */
+val MIGRATION_9_10 = object : Migration(9, 10) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE settings ADD COLUMN hidden_categories TEXT")
+        db.execSQL("ALTER TABLE settings ADD COLUMN category_passwords TEXT")
+    }
+}

@@ -17,16 +17,54 @@
         android:contentDescription="@string/reorder"
         android:alpha="0.6" />
 
-    <TextView
-        android:id="@+id/categoryName"
+    <LinearLayout
+        android:id="@+id/openArea"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:layout_marginStart="8dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:textAppearance="?attr/textAppearanceBodyLarge"
-        tools:text="Education" />
+        android:orientation="vertical"
+        android:background="?attr/selectableItemBackground"
+        android:paddingVertical="8dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <TextView
+            android:id="@+id/categoryName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
+            tools:text="Education" />
+
+        <TextView
+            android:id="@+id/categoryState"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="12sp"
+            android:visibility="gone"
+            tools:text="Hidden · Locked" />
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/visibilityButton"
+        style="@style/Widget.Material3.Button.IconButton"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:src="@drawable/ic_visibility"
+        android:contentDescription="@string/toggle_visibility" />
+
+    <ImageButton
+        android:id="@+id/lockButton"
+        style="@style/Widget.Material3.Button.IconButton"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:src="@drawable/ic_lock_open"
+        android:contentDescription="@string/category_password" />
 
     <ImageButton
         android:id="@+id/editButton"

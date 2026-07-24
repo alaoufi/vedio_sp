@@ -119,6 +119,19 @@ class MainActivity : AppCompatActivity() {
         androidx.activity.result.contract.ActivityResultContracts.RequestPermission()
     ) { /* progress notifications are best-effort; downloads run regardless */ }
 
+    /** Opening a (possibly hidden/locked) category from the management screen filters to it. */
+    private val manageCategoriesLauncher = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            result.data
+                ?.getStringExtra(
+                    com.myvideolibrary.app.ui.categories.CategoriesActivity.EXTRA_OPEN_CATEGORY
+                )
+                ?.let { viewModel.setCategoryFilters(setOf(it)) }
+        }
+    }
+
     private fun requestNotificationPermissionIfNeeded() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             val granted = androidx.core.content.ContextCompat.checkSelfPermission(
@@ -912,7 +925,9 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.action_manage_categories -> {
-                startActivity(com.myvideolibrary.app.ui.categories.CategoriesActivity.intent(this))
+                manageCategoriesLauncher.launch(
+                    com.myvideolibrary.app.ui.categories.CategoriesActivity.intent(this)
+                )
                 true
             }
             R.id.action_stats -> {

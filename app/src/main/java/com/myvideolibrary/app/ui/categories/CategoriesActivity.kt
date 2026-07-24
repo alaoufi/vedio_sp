@@ -1,9 +1,12 @@
 package com.myvideolibrary.app.ui.categories
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
 import android.widget.EditText
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -36,8 +39,11 @@ class CategoriesActivity : AppCompatActivity() {
         binding.toolbar.setNavigationOnClickListener { finish() }
 
         adapter = CategoriesAdapter(
+            onOpen = ::openCategory,
             onRename = ::promptRename,
             onDelete = ::confirmDelete,
+            onToggleVisibility = { viewModel.setHidden(it.name, !it.hidden) },
+            onTogglePassword = ::togglePassword,
             onStartDrag = { touchHelper.startDrag(it) }
         )
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
@@ -114,7 +120,68 @@ class CategoriesActivity : AppCompatActivity() {
             .show()
     }
 
+    /** Sets a new password, or (when one exists) removes it after verifying. */
+    private fun togglePassword(item: CategoryItem) {
+        if (item.hasPassword) {
+            promptPassword(R.string.remove_password_title, R.string.enter_current_password) { entered ->
+                lifecycleScope.launch {
+                    if (viewModel.verifyPassword(item.name, entered)) {
+                        viewModel.setPassword(item.name, null)
+                        toast(R.string.password_removed)
+                    } else {
+                        toast(R.string.wrong_password)
+                    }
+                }
+            }
+        } else {
+            promptPassword(R.string.set_password_title, R.string.enter_new_password) { entered ->
+                if (entered.isBlank()) return@promptPassword
+                viewModel.setPassword(item.name, entered)
+                toast(R.string.password_set)
+            }
+        }
+    }
+
+    /** Opens a category's contents; password-protected ones ask for the password. */
+    private fun openCategory(item: CategoryItem) {
+        if (item.hasPassword) {
+            promptPassword(R.string.open_locked_title, R.string.enter_password) { entered ->
+                lifecycleScope.launch {
+                    if (viewModel.verifyPassword(item.name, entered)) {
+                        returnOpen(item.name)
+                    } else {
+                        toast(R.string.wrong_password)
+                    }
+                }
+            }
+        } else {
+            returnOpen(item.name)
+        }
+    }
+
+    private fun returnOpen(name: String) {
+        setResult(Activity.RESULT_OK, Intent().putExtra(EXTRA_OPEN_CATEGORY, name))
+        finish()
+    }
+
+    private fun promptPassword(titleRes: Int, hintRes: Int, onEntered: (String) -> Unit) {
+        val input = EditText(this).apply {
+            hint = getString(hintRes)
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+        }
+        AlertDialog.Builder(this)
+            .setTitle(titleRes)
+            .setView(input)
+            .setPositiveButton(R.string.save) { _, _ -> onEntered(input.text.toString()) }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun toast(res: Int) = Toast.makeText(this, res, Toast.LENGTH_SHORT).show()
+
     companion object {
+        const val EXTRA_OPEN_CATEGORY = "open_category"
+
         fun intent(context: Context) = Intent(context, CategoriesActivity::class.java)
     }
 }

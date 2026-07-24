@@ -368,6 +368,21 @@
     <string name="reorder">Reorder</string>
     <string name="delete_category_message">Remove the category \"%1$s\"? Videos keep, but become uncategorized.</string>
 
+    <!-- Category visibility & password protection -->
+    <string name="toggle_visibility">Show / hide</string>
+    <string name="category_password">Password</string>
+    <string name="state_hidden">Hidden</string>
+    <string name="state_locked">Locked</string>
+    <string name="set_password_title">Protect with a password</string>
+    <string name="remove_password_title">Remove password</string>
+    <string name="open_locked_title">Locked category</string>
+    <string name="enter_password">Enter password</string>
+    <string name="enter_new_password">New password</string>
+    <string name="enter_current_password">Current password</string>
+    <string name="password_set">Category protected</string>
+    <string name="password_removed">Password removed</string>
+    <string name="wrong_password">Wrong password</string>
+
     <!-- Content descriptions -->
     <string name="cd_thumbnail">Video thumbnail</string>
     <string name="cd_favorite">Favorite</string>

@@ -94,10 +94,13 @@ interface VideoDao {
     @Query("UPDATE videos SET category = :category WHERE id IN (:ids)")
     suspend fun setCategory(ids: List<Long>, category: String?)
 
-    @Query("UPDATE videos SET category = :newName WHERE category = :oldName")
+    // Match tolerantly (trimmed, case-insensitive) so rename/delete still work
+    // when a video's stored label differs from the displayed name by case or
+    // surrounding whitespace — otherwise a non-empty category can't be removed.
+    @Query("UPDATE videos SET category = :newName WHERE TRIM(category) = TRIM(:oldName) COLLATE NOCASE")
     suspend fun renameCategory(oldName: String, newName: String)
 
-    @Query("UPDATE videos SET category = NULL WHERE category = :name")
+    @Query("UPDATE videos SET category = NULL WHERE TRIM(category) = TRIM(:name) COLLATE NOCASE")
     suspend fun clearCategory(name: String)
 
     /** Distinct non-empty category labels currently in use, alphabetised. */

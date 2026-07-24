@@ -331,6 +331,21 @@
     <string name="reorder">إعادة الترتيب</string>
     <string name="delete_category_message">حذف التصنيف \"%1$s\"؟ تبقى الفيديوهات لكن تصبح بدون تصنيف.</string>
 
+    <!-- إظهار/إخفاء التصنيف وحمايته بكلمة مرور -->
+    <string name="toggle_visibility">إظهار / إخفاء</string>
+    <string name="category_password">كلمة المرور</string>
+    <string name="state_hidden">مخفي</string>
+    <string name="state_locked">محمي</string>
+    <string name="set_password_title">حماية بكلمة مرور</string>
+    <string name="remove_password_title">إزالة كلمة المرور</string>
+    <string name="open_locked_title">تصنيف محمي</string>
+    <string name="enter_password">أدخل كلمة المرور</string>
+    <string name="enter_new_password">كلمة مرور جديدة</string>
+    <string name="enter_current_password">كلمة المرور الحالية</string>
+    <string name="password_set">تم حماية التصنيف</string>
+    <string name="password_removed">تمت إزالة كلمة المرور</string>
+    <string name="wrong_password">كلمة المرور غير صحيحة</string>
+
     <!-- Content descriptions -->
     <string name="cd_thumbnail">مصغّرة الفيديو</string>
     <string name="cd_favorite">مفضلة</string>
