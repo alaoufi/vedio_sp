@@ -61,9 +61,8 @@ object SlideshowBuilder {
                 .setImageDurationMs(perImageMs)
                 .build()
             EditedMediaItem.Builder(mediaItem)
-                // Images have no intrinsic duration: media3 1.4.x needs it set here
-                // too, or Transformer.start() fails immediately.
-                .setDurationUs(perImageMs * 1000)
+                // media3 1.5+ derives the image duration from setImageDurationMs
+                // above, so we must NOT also set it here.
                 .setFrameRate(FPS)
                 .build()
         }
