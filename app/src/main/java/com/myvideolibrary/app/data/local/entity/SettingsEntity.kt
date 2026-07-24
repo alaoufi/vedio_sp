@@ -77,6 +77,10 @@ data class SettingsEntity(
     @ColumnInfo(name = "category_passwords")
     val categoryPasswords: String? = null,
 
+    /** SHA-256 hash gating the category-management screen; null = no lock. */
+    @ColumnInfo(name = "manage_categories_password")
+    val manageCategoriesPassword: String? = null,
+
     /** [com.myvideolibrary.app.data.model.EndOfClipAction.id] — stop/repeat/next. */
     @ColumnInfo(name = "end_of_clip_action")
     val endOfClipAction: String = "next"

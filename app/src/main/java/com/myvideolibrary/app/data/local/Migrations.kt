@@ -75,3 +75,10 @@ val MIGRATION_9_10 = object : Migration(9, 10) {
         db.execSQL("ALTER TABLE settings ADD COLUMN category_passwords TEXT")
     }
 }
+
+/** Adds the password gating the category-management screen. */
+val MIGRATION_10_11 = object : Migration(10, 11) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE settings ADD COLUMN manage_categories_password TEXT")
+    }
+}

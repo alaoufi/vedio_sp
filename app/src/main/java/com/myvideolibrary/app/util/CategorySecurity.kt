@@ -106,6 +106,15 @@ object CategorySecurity {
         return serializeHidden(hidden) to serializePasswords(pw)
     }
 
+    // ---- Single-password helpers (used by the management-screen lock) ----
+
+    /** SHA-256 hex of [password], for storing a standalone password hash. */
+    fun hashPassword(password: String): String = hash(password)
+
+    /** True when [password] matches a stored standalone hash. */
+    fun verifyHash(storedHash: String?, password: String): Boolean =
+        !storedHash.isNullOrEmpty() && storedHash.equals(hash(password), ignoreCase = true)
+
     private fun hash(password: String): String {
         val digest = MessageDigest.getInstance("SHA-256")
         return digest.digest(password.toByteArray(Charsets.UTF_8))

@@ -53,23 +53,46 @@ class CategoriesViewModel @Inject constructor(
         }
     }
 
-    fun rename(oldName: String, newName: String) = viewModelScope.launch {
-        val clean = newName.trim()
-        if (clean.isEmpty() || clean == oldName) return@launch
-        videoRepository.renameCategory(oldName, clean)
+    /**
+     * Applies an edit from the single edit dialog in one atomic settings write:
+     * optional rename, the hidden flag, and the section password.
+     *
+     * @param newPassword non-null/blank sets or changes the section password
+     * @param clearPassword removes the section password (overrides [newPassword])
+     */
+    fun applyEdit(
+        oldName: String,
+        newName: String,
+        hidden: Boolean,
+        newPassword: String?,
+        clearPassword: Boolean
+    ) = viewModelScope.launch {
+        val finalName = newName.trim().ifEmpty { oldName }
+        if (finalName != oldName) videoRepository.renameCategory(oldName, finalName)
+
         val current = settingsRepository.getSettings()
         val parsed = CategoryOrder.parse(current.categoryOrder)
-        // Replace in place, or add if the category wasn't tracked in the order yet.
-        val order = if (parsed.contains(oldName)) {
-            parsed.map { if (it == oldName) clean else it }
-        } else {
-            parsed + clean
+        val order = when {
+            parsed.contains(oldName) -> parsed.map { if (it == oldName) finalName else it }
+            !parsed.contains(finalName) -> parsed + finalName
+            else -> parsed
         }.distinct()
+
+        // Carry any existing metadata over to the (possibly new) name first.
+        var hiddenStr = CategorySecurity.renameHidden(current.hiddenCategories, oldName, finalName)
+        var pwStr = CategorySecurity.renamePassword(current.categoryPasswords, oldName, finalName)
+        hiddenStr = CategorySecurity.toggleHidden(hiddenStr, finalName, hidden)
+        pwStr = when {
+            clearPassword -> CategorySecurity.setPassword(pwStr, finalName, null)
+            !newPassword.isNullOrEmpty() -> CategorySecurity.setPassword(pwStr, finalName, newPassword)
+            else -> pwStr // keep whatever password already exists
+        }
+
         settingsRepository.update {
             it.copy(
                 categoryOrder = CategoryOrder.serialize(order),
-                hiddenCategories = CategorySecurity.renameHidden(it.hiddenCategories, oldName, clean),
-                categoryPasswords = CategorySecurity.renamePassword(it.categoryPasswords, oldName, clean)
+                hiddenCategories = hiddenStr,
+                categoryPasswords = pwStr
             )
         }
     }
@@ -89,24 +112,27 @@ class CategoriesViewModel @Inject constructor(
         }
     }
 
-    /** Show/hide a category: hidden categories are kept out of the library view. */
-    fun setHidden(name: String, hidden: Boolean) = viewModelScope.launch {
-        settingsRepository.update {
-            it.copy(hiddenCategories = CategorySecurity.toggleHidden(it.hiddenCategories, name, hidden))
-        }
-    }
-
-    /** Sets ([password] != null) or clears a category's password protection. */
-    fun setPassword(name: String, password: String?) = viewModelScope.launch {
-        settingsRepository.update {
-            it.copy(categoryPasswords = CategorySecurity.setPassword(it.categoryPasswords, name, password))
-        }
-    }
-
     /** Verifies a password before opening a protected category's contents. */
     suspend fun verifyPassword(name: String, password: String): Boolean {
         val settings = settingsRepository.getSettings()
         return CategorySecurity.verify(settings.categoryPasswords, name, password)
+    }
+
+    // ---- Management-screen lock ----
+
+    /** Whether the whole management screen is password-protected. */
+    suspend fun hasManagePassword(): Boolean =
+        !settingsRepository.getSettings().manageCategoriesPassword.isNullOrEmpty()
+
+    suspend fun verifyManagePassword(password: String): Boolean =
+        CategorySecurity.verifyHash(
+            settingsRepository.getSettings().manageCategoriesPassword, password
+        )
+
+    /** Sets (non-blank) or removes (blank/null) the management-screen password. */
+    fun setManagePassword(password: String?) = viewModelScope.launch {
+        val hash = password?.takeIf { it.isNotBlank() }?.let { CategorySecurity.hashPassword(it) }
+        settingsRepository.update { it.copy(manageCategoriesPassword = hash) }
     }
 
     /** Persists a new display order after a drag-and-drop reorder. */

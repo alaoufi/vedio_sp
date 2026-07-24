@@ -17,10 +17,8 @@ import java.util.Collections
  */
 class CategoriesAdapter(
     private val onOpen: (CategoryItem) -> Unit,
-    private val onRename: (String) -> Unit,
+    private val onEdit: (CategoryItem) -> Unit,
     private val onDelete: (String) -> Unit,
-    private val onToggleVisibility: (CategoryItem) -> Unit,
-    private val onTogglePassword: (CategoryItem) -> Unit,
     private val onStartDrag: (RecyclerView.ViewHolder) -> Unit
 ) : RecyclerView.Adapter<CategoriesAdapter.VH>() {
 
@@ -72,17 +70,8 @@ class CategoriesAdapter(
             binding.categoryState.isVisible = states.isNotEmpty()
             binding.categoryState.text = states.joinToString(" · ")
 
-            binding.visibilityButton.setImageResource(
-                if (item.hidden) R.drawable.ic_visibility_off else R.drawable.ic_visibility
-            )
-            binding.lockButton.setImageResource(
-                if (item.hasPassword) R.drawable.ic_lock else R.drawable.ic_lock_open
-            )
-
             binding.openArea.setOnClickListener { onOpen(item) }
-            binding.visibilityButton.setOnClickListener { onToggleVisibility(item) }
-            binding.lockButton.setOnClickListener { onTogglePassword(item) }
-            binding.editButton.setOnClickListener { onRename(item.name) }
+            binding.editButton.setOnClickListener { onEdit(item) }
             binding.deleteButton.setOnClickListener { onDelete(item.name) }
             binding.dragHandle.setOnTouchListener { _, event ->
                 if (event.actionMasked == MotionEvent.ACTION_DOWN) onStartDrag(this)

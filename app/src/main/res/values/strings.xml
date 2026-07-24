@@ -385,6 +385,14 @@
     <string name="delete_category_message">Remove the category \"%1$s\"? Videos keep, but become uncategorized.</string>
 
     <!-- Category visibility & password protection -->
+    <string name="edit_category">Edit category</string>
+    <string name="hide_clips">Hide clips from the library</string>
+    <string name="protect_section">Protect this section</string>
+    <string name="section_password_hint">Section password</string>
+    <string name="section_password_change_hint">New password (leave blank to keep current)</string>
+    <string name="manage_password">Management password</string>
+    <string name="manage_password_hint">Password (leave blank to remove protection)</string>
+    <string name="manage_locked_title">Category management is locked</string>
     <string name="toggle_visibility">Show / hide</string>
     <string name="category_password">Password</string>
     <string name="state_hidden">Hidden</string>
