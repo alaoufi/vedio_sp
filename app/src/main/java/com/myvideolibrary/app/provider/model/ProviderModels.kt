@@ -25,7 +25,12 @@ data class ResolvedVideo(
      * post, whose only "video" stream is actually its background music. The
      * download is then saved as an image instead of an audio-only file.
      */
-    val isImage: Boolean = false
+    val isImage: Boolean = false,
+    /**
+     * For a multi-image post (a TikTok slideshow), every picture in the post so
+     * the whole thing can be saved — not just [directUrl] (the first one).
+     */
+    val imageUrls: List<String> = emptyList()
 )
 
 /**

@@ -181,20 +181,7 @@ class SearchViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val resolved = provider.resolve(url)
-                downloadManager.enqueue(
-                    title = resolved.title,
-                    source = resolved.source.id,
-                    sourceUrl = resolved.sourceUrl,
-                    directUrl = resolved.directUrl,
-                    audioUrl = resolved.audioUrl,
-                    thumbnailUrl = resolved.thumbnailUrl,
-                    // A photo post is a still image, never a video/audio download.
-                    kind = if (resolved.isImage) {
-                        com.myvideolibrary.app.data.model.DownloadKind.IMAGE_ONLY
-                    } else {
-                        kind
-                    }
-                )
+                downloadManager.enqueueResolved(resolved, kind)
                 _state.value = _state.value.copy(loading = false, message = "queued")
             } catch (e: ProviderException) {
                 _state.value = _state.value.copy(loading = false, error = e.message)

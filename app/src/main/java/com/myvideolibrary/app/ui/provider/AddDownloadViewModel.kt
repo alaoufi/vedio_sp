@@ -72,20 +72,7 @@ class AddDownloadViewModel @Inject constructor(
         val resolved = _state.value.resolved ?: return
         viewModelScope.launch {
             try {
-                downloadManager.enqueue(
-                    title = resolved.title,
-                    source = resolved.source.id,
-                    sourceUrl = resolved.sourceUrl,
-                    directUrl = resolved.directUrl,
-                    audioUrl = resolved.audioUrl,
-                    thumbnailUrl = resolved.thumbnailUrl,
-                    // Photo posts are still images regardless of the chosen kind.
-                    kind = if (resolved.isImage) {
-                        com.myvideolibrary.app.data.model.DownloadKind.IMAGE_ONLY
-                    } else {
-                        kind
-                    }
-                )
+                downloadManager.enqueueResolved(resolved, kind)
                 _state.value = _state.value.copy(enqueued = true)
             } catch (e: Throwable) {
                 _state.value = _state.value.copy(

@@ -557,6 +557,9 @@ class DownloadWorker @AssistedInject constructor(
      */
     private suspend fun refreshUrls(downloadId: Long) {
         val current = downloadRepository.get(downloadId) ?: return
+        // Never re-resolve an image download: a slideshow re-resolves to its FIRST
+        // picture, which would overwrite the URL of pages 2..N with the wrong image.
+        if (current.kind == com.myvideolibrary.app.data.model.DownloadKind.IMAGE_ONLY.id) return
         val src = current.sourceUrl.takeIf { it.isNotBlank() } ?: return
         val provider = providerRegistry.providerForUrl(src) ?: return
         runCatching {

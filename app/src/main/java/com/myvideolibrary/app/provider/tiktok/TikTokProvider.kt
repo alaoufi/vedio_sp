@@ -80,7 +80,8 @@ class TikTokProvider @Inject constructor(
         // music in the "play"/"hdplay" fields, which is why they used to download
         // as audio only. Detect them by the images array and save the picture.
         if (data.isPhotoPost()) {
-            val image = data.firstImage()?.let { absolutize(it) } ?: cleanImage
+            val images = data.allImages().ifEmpty { listOfNotNull(cleanImage) }
+            val first = images.firstOrNull()
                 ?: throw ProviderException(
                     ProviderErrorType.EXTRACTION_FAILED, "No image found in this post"
                 )
@@ -88,10 +89,11 @@ class TikTokProvider @Inject constructor(
                 source = VideoSource.TIKTOK,
                 sourceUrl = url,
                 title = data.str("title")?.takeIf { it.isNotBlank() } ?: "TikTok photo",
-                directUrl = image,
-                thumbnailUrl = cleanImage ?: image,
+                directUrl = first,
+                thumbnailUrl = cleanImage ?: first,
                 author = data.obj("author")?.str("nickname"),
-                isImage = true
+                isImage = true,
+                imageUrls = images
             )
         }
 
@@ -198,6 +200,14 @@ class TikTokProvider @Inject constructor(
     /** A TikTok photo/slideshow post: has an images array, so no real video. */
     private fun JsonObject.isPhotoPost(): Boolean =
         get("images")?.takeIf { it.isJsonArray }?.asJsonArray?.size()?.let { it > 0 } == true
+
+    /** Every picture URL in a photo/slideshow post, in order, made absolute. */
+    private fun JsonObject.allImages(): List<String> =
+        get("images")?.takeIf { it.isJsonArray }?.asJsonArray
+            ?.mapNotNull { el ->
+                el.takeIf { !it.isJsonNull }?.let { runCatching { it.asString }.getOrNull() }
+                    ?.takeIf { it.isNotBlank() }?.let { absolutize(it) }
+            } ?: emptyList()
 
     /** First image of a TikTok photo/slideshow post, if this is one. */
     private fun JsonObject.firstImage(): String? =

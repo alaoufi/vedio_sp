@@ -276,19 +276,7 @@ class LibraryViewModel @Inject constructor(
         val provider = providerRegistry.providerForUrl(url) ?: return@launch
         runCatching {
             val r = provider.resolve(url)
-            downloadManager.enqueue(
-                title = r.title,
-                source = r.source.id,
-                sourceUrl = r.sourceUrl,
-                directUrl = r.directUrl,
-                audioUrl = r.audioUrl,
-                thumbnailUrl = r.thumbnailUrl,
-                kind = if (r.isImage) {
-                    com.myvideolibrary.app.data.model.DownloadKind.IMAGE_ONLY
-                } else {
-                    com.myvideolibrary.app.data.model.DownloadKind.FULL
-                }
-            )
+            downloadManager.enqueueResolved(r)
         }
     }
 

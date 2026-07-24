@@ -67,6 +67,42 @@ class DownloadManager @Inject constructor(
         return id
     }
 
+    /**
+     * Enqueues a resolved item, handling the special cases centrally: a photo
+     * post is saved as an image, and a multi-image slideshow fans out into one
+     * image download per picture so the whole post is saved.
+     */
+    suspend fun enqueueResolved(
+        resolved: com.myvideolibrary.app.provider.model.ResolvedVideo,
+        kind: com.myvideolibrary.app.data.model.DownloadKind =
+            com.myvideolibrary.app.data.model.DownloadKind.FULL
+    ): Long {
+        val imageKind = com.myvideolibrary.app.data.model.DownloadKind.IMAGE_ONLY
+        if (resolved.isImage && resolved.imageUrls.size > 1) {
+            var lastId = 0L
+            resolved.imageUrls.forEachIndexed { index, img ->
+                lastId = enqueue(
+                    title = "${resolved.title} (${index + 1})",
+                    source = resolved.source.id,
+                    sourceUrl = resolved.sourceUrl,
+                    directUrl = img,
+                    thumbnailUrl = img,
+                    kind = imageKind
+                )
+            }
+            return lastId
+        }
+        return enqueue(
+            title = resolved.title,
+            source = resolved.source.id,
+            sourceUrl = resolved.sourceUrl,
+            directUrl = resolved.directUrl,
+            audioUrl = resolved.audioUrl,
+            thumbnailUrl = resolved.thumbnailUrl,
+            kind = if (resolved.isImage) imageKind else kind
+        )
+    }
+
     /** (Re)starts the worker for an existing download record. */
     suspend fun startWork(id: Long) {
         // Plain background worker, no constraints and no foreground service:
