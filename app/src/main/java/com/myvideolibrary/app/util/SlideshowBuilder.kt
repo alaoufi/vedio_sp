@@ -38,7 +38,8 @@ object SlideshowBuilder {
      * @param images the slideshow pictures, in order
      * @param audio background music, or null for a silent slideshow
      * @param perImageMs how long each picture is shown
-     * @return true on success (a video was written to [output])
+     * @return null on success; otherwise a short error message describing why the
+     *   on-device encode failed (surfaced to the user for diagnosis).
      */
     suspend fun build(
         context: Context,
@@ -47,8 +48,8 @@ object SlideshowBuilder {
         output: File,
         perImageMs: Long = 2500,
         onProgress: (Int) -> Unit
-    ): Boolean = suspendCancellableCoroutine { cont ->
-        if (images.isEmpty()) { cont.resume(false); return@suspendCancellableCoroutine }
+    ): String? = suspendCancellableCoroutine { cont ->
+        if (images.isEmpty()) { cont.resume("no images"); return@suspendCancellableCoroutine }
         val handler = Handler(Looper.getMainLooper())
 
         // Images arrive already decoded to identical JPEGs, so no resize effect is
@@ -80,7 +81,9 @@ object SlideshowBuilder {
             .setVideoMimeType(MimeTypes.VIDEO_H264)
             .addListener(object : Transformer.Listener {
                 override fun onCompleted(composition: Composition, result: ExportResult) {
-                    if (cont.isActive) cont.resume(output.exists() && output.length() > 0)
+                    if (!cont.isActive) return
+                    val ok = output.exists() && output.length() > 0
+                    cont.resume(if (ok) null else "empty output")
                 }
 
                 override fun onError(
@@ -88,7 +91,10 @@ object SlideshowBuilder {
                     result: ExportResult,
                     exception: ExportException
                 ) {
-                    if (cont.isActive) { output.delete(); cont.resume(false) }
+                    if (!cont.isActive) return
+                    output.delete()
+                    val name = exception.errorCode.let(ExportException::getErrorCodeName)
+                    cont.resume("$name: ${exception.message ?: exception.cause?.message ?: "error"}")
                 }
             })
             .build()
@@ -111,7 +117,7 @@ object SlideshowBuilder {
 
         runCatching { transformer.start(composition, output.absolutePath) }
             .onFailure {
-                if (cont.isActive) { output.delete(); cont.resume(false) }
+                if (cont.isActive) { output.delete(); cont.resume("start: ${it.message}") }
                 return@suspendCancellableCoroutine
             }
         handler.postDelayed(poll, 500)

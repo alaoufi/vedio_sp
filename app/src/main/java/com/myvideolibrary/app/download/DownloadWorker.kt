@@ -111,6 +111,15 @@ class DownloadWorker @AssistedInject constructor(
             Result.success(workDataOf(KEY_DOWNLOAD_ID to downloadId))
         } catch (e: Exception) {
             coroutineContext.ensureActive()
+            // A slideshow build can't be fixed by retrying the same device encoder,
+            // so surface the real reason immediately instead of looping.
+            if (kind == com.myvideolibrary.app.data.model.DownloadKind.SLIDESHOW) {
+                downloadRepository.setStatus(
+                    downloadId, DownloadStatus.FAILED, e.message ?: "Slideshow build failed"
+                )
+                notifier.showComplete(notificationId, download.title, false)
+                return Result.failure()
+            }
             val attempts = runAttemptCount
             if (attempts < MAX_ATTEMPTS) {
                 // A very common failure is an expired CDN link (TikTok/YouTube URLs
@@ -504,7 +513,7 @@ class DownloadWorker @AssistedInject constructor(
             }
 
             val encodePercent = java.util.concurrent.atomic.AtomicInteger(0)
-            val built = coroutineScope {
+            val error = coroutineScope {
                 val reporter = launch {
                     while (isActive) {
                         val p = 40 + encodePercent.get() * 60 / 100
@@ -514,11 +523,11 @@ class DownloadWorker @AssistedInject constructor(
                         delay(700)
                     }
                 }
-                val ok = runSlideshow(frameFiles, audioFile, destFile, encodePercent)
+                val e = runSlideshow(frameFiles, audioFile, destFile, encodePercent)
                 reporter.cancel()
-                ok
+                e
             }
-            if (!built) throw IllegalStateException("Couldn't build the slideshow video")
+            if (error != null) throw IllegalStateException("Video build failed — $error")
             return true
         } finally {
             rawFiles.forEach { runCatching { it.delete() } }
@@ -532,13 +541,14 @@ class DownloadWorker @AssistedInject constructor(
      * choke on the TikTok audio track) retries once without it so the user still
      * gets the moving video instead of nothing. Each attempt is time-bounded.
      */
+    /** @return null on success, else a short error describing the failure. */
     private suspend fun runSlideshow(
         frames: List<File>,
         audio: File?,
         output: File,
         progress: java.util.concurrent.atomic.AtomicInteger
-    ): Boolean {
-        suspend fun attempt(withAudio: File?): Boolean =
+    ): String? {
+        suspend fun attempt(withAudio: File?): String? =
             kotlinx.coroutines.withTimeoutOrNull(4 * 60 * 1000L) {
                 withContext(Dispatchers.Main) {
                     com.myvideolibrary.app.util.SlideshowBuilder.build(
@@ -548,15 +558,18 @@ class DownloadWorker @AssistedInject constructor(
                         output = output
                     ) { p -> progress.set(p) }
                 }
-            } ?: false
+            } ?: "timed out"
 
-        if (attempt(audio)) return true
+        val withMusic = attempt(audio)
+        if (withMusic == null) return null
         if (audio != null) {
             progress.set(0)
             output.delete()
-            if (attempt(null)) return true
+            val silent = attempt(null)
+            if (silent == null) return null
+            return "music[$withMusic] silent[$silent]"
         }
-        return false
+        return withMusic
     }
 
     /**
