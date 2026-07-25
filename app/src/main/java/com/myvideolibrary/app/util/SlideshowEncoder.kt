@@ -43,6 +43,7 @@ object SlideshowEncoder {
         audio: File?,
         output: File,
         perImageMs: Long = 2500,
+        stage: java.util.concurrent.atomic.AtomicReference<String>? = null,
         onProgress: (Int) -> Unit = {}
     ): String? {
         if (frames.isEmpty()) return "no images"
@@ -54,6 +55,7 @@ object SlideshowEncoder {
         var audioExtractor: MediaExtractor? = null
         var encoderName = "?"
         try {
+            stage?.set("configuring")
             val format = MediaFormat.createVideoFormat(MIME, W, H).apply {
                 setInteger(
                     MediaFormat.KEY_COLOR_FORMAT,
@@ -65,8 +67,11 @@ object SlideshowEncoder {
             }
             encoder = createAvcEncoder()
             encoderName = runCatching { encoder!!.name }.getOrDefault("?")
+            stage?.set("configure($encoderName)")
             encoder!!.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+            stage?.set("starting($encoderName)")
             encoder!!.start()
+            stage?.set("started($encoderName)")
 
             muxer = MediaMuxer(output.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
 
@@ -132,6 +137,7 @@ object SlideshowEncoder {
                             fillImage(image, yuv)
                             encoder!!.queueInputBuffer(inIndex, 0, W * H * 3 / 2, ptsUs(frameIndex), 0)
                             frameIndex++
+                            stage?.set("in $frameIndex/$totalFrames")
                             onProgress(frameIndex * 100 / totalFrames)
                             repeats++
                             if (repeats >= framesPerImage) {
@@ -149,6 +155,7 @@ object SlideshowEncoder {
                         audioFormat?.let { audioDstTrack = muxer.addTrack(it) }
                         muxer.start()
                         muxerStarted = true
+                        stage?.set("muxing")
                     }
                     outIndex >= 0 -> {
                         val outBuf = encoder!!.getOutputBuffer(outIndex)
@@ -169,8 +176,10 @@ object SlideshowEncoder {
             val videoDurationUs = frameIndex.toLong() * 1_000_000L / FPS
             val ex = audioExtractor
             if (muxerStarted && ex != null && audioDstTrack >= 0) {
+                stage?.set("audio")
                 writeAudioLooped(muxer, ex, audioSrcTrack, audioDstTrack, audioFormat, videoDurationUs)
             }
+            stage?.set("done")
             return null
         } catch (e: Throwable) {
             output.delete()
@@ -184,26 +193,33 @@ object SlideshowEncoder {
         }
     }
 
-    /** Finds a software AVC encoder that accepts flexible YUV; falls back to any. */
+    /**
+     * Picks an AVC encoder that accepts flexible YUV. Prefers the device's
+     * HARDWARE encoder — on many phones the bundled software AVC encoder
+     * (c2.android.avc.encoder) stalls and never produces output, which looked
+     * like a "timed out" hang. Falls back to a software one, then to the
+     * platform default.
+     */
     private fun createAvcEncoder(): MediaCodec {
         val flexible = MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible
         val infos = MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos
-        for (info in infos) {
-            if (!info.isEncoder) continue
-            if (info.supportedTypes.none { it.equals(MIME, ignoreCase = true) }) continue
-            val software = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                info.isSoftwareOnly
-            } else {
-                val n = info.name.lowercase()
-                n.startsWith("omx.google") || n.startsWith("c2.android")
-            }
-            if (!software) continue
-            val supportsFlexible = runCatching {
-                info.getCapabilitiesForType(MIME).colorFormats.any { it == flexible }
-            }.getOrDefault(false)
-            if (supportsFlexible) return MediaCodec.createByCodecName(info.name)
-        }
-        return MediaCodec.createEncoderByType(MIME)
+
+        fun isSoftware(info: MediaCodecInfo): Boolean =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) info.isSoftwareOnly
+            else info.name.lowercase().let { it.startsWith("omx.google") || it.startsWith("c2.android") }
+
+        fun candidate(wantSoftware: Boolean): String? = infos.firstOrNull { info ->
+            info.isEncoder &&
+                info.supportedTypes.any { it.equals(MIME, ignoreCase = true) } &&
+                isSoftware(info) == wantSoftware &&
+                runCatching {
+                    info.getCapabilitiesForType(MIME).colorFormats.any { it == flexible }
+                }.getOrDefault(false)
+        }?.name
+
+        val name = candidate(wantSoftware = false) ?: candidate(wantSoftware = true)
+        return if (name != null) MediaCodec.createByCodecName(name)
+        else MediaCodec.createEncoderByType(MIME)
     }
 
     private fun ptsUs(frameIndex: Int): Long = frameIndex.toLong() * 1_000_000L / FPS
