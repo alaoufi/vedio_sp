@@ -44,33 +44,36 @@ class TikTokProvider @Inject constructor(
             throw ProviderException(ProviderErrorType.INVALID_LINK, "Not a TikTok link")
         }
 
-        val api = "$RESOLVER_BASE/api/?hd=1&url=" + URLEncoder.encode(url, "UTF-8")
-        val request = Request.Builder()
-            .url(api)
-            .header("User-Agent", UA)
-            .build()
-
-        val bodyString = try {
-            client.newCall(request).execute().use { resp ->
-                if (!resp.isSuccessful) {
-                    throw ProviderException(ProviderErrorType.NETWORK, "HTTP ${resp.code}")
+        // Short links (vt./vm.tiktok.com) resolve more reliably once expanded to
+        // the canonical URL, and the resolver is flaky, so try the expanded form
+        // then the raw one, each up to twice, before giving up.
+        val candidates = listOf(expandShortLink(url), url).distinct()
+        var lastError: ProviderException? = null
+        var root: JsonObject? = null
+        for (target in candidates) {
+            var attempt = 0
+            while (attempt < 2 && root == null) {
+                attempt++
+                val result = runCatching { fetchResolve(target) }
+                val obj = result.getOrNull()
+                if (obj != null) {
+                    val code = obj.get("code")?.takeIf { !it.isJsonNull }?.asInt ?: -1
+                    if (code == 0) {
+                        root = obj
+                    } else {
+                        lastError = mapError(obj.str("msg").orEmpty())
+                    }
+                } else {
+                    lastError = (result.exceptionOrNull() as? ProviderException)
+                        ?: ProviderException(ProviderErrorType.EXTRACTION_FAILED, "Resolve failed")
                 }
-                resp.body?.string()
             }
-        } catch (e: IOException) {
-            throw ProviderException(ProviderErrorType.NETWORK, "Network error", e)
-        } ?: throw ProviderException(ProviderErrorType.EXTRACTION_FAILED, "Empty response")
-
-        val root = runCatching { gson.fromJson(bodyString, JsonObject::class.java) }.getOrNull()
-            ?: throw ProviderException(ProviderErrorType.EXTRACTION_FAILED, "Bad response")
-
-        val code = root.get("code")?.takeIf { !it.isJsonNull }?.asInt ?: -1
-        if (code != 0) {
-            val msg = root.str("msg").orEmpty()
-            throw mapError(msg)
+            if (root != null) break
         }
+        val resolved = root ?: throw (lastError
+            ?: ProviderException(ProviderErrorType.EXTRACTION_FAILED, "Could not extract the video"))
 
-        val data = root.obj("data")
+        val data = resolved.obj("data")
             ?: throw ProviderException(ProviderErrorType.EXTRACTION_FAILED, "No data")
 
         // The clean still image (photo-post picture, else full-res poster).
@@ -186,6 +189,34 @@ class TikTokProvider @Inject constructor(
         )
     }
 
+    /** Fetches and parses the tikwm resolve response, or throws a typed error. */
+    private fun fetchResolve(target: String): JsonObject {
+        val api = "$RESOLVER_BASE/api/?hd=1&url=" + URLEncoder.encode(target, "UTF-8")
+        val request = Request.Builder().url(api).header("User-Agent", UA).build()
+        val body = try {
+            client.newCall(request).execute().use { resp ->
+                if (!resp.isSuccessful) {
+                    throw ProviderException(ProviderErrorType.NETWORK, "HTTP ${resp.code}")
+                }
+                resp.body?.string()
+            }
+        } catch (e: IOException) {
+            throw ProviderException(ProviderErrorType.NETWORK, "Network error", e)
+        } ?: throw ProviderException(ProviderErrorType.EXTRACTION_FAILED, "Empty response")
+        return runCatching { gson.fromJson(body, JsonObject::class.java) }.getOrNull()
+            ?: throw ProviderException(ProviderErrorType.EXTRACTION_FAILED, "Bad response")
+    }
+
+    /** Expands a vt./vm.tiktok.com short link to its canonical URL via redirects. */
+    private fun expandShortLink(url: String): String {
+        val u = url.lowercase()
+        if (!u.contains("vt.tiktok") && !u.contains("vm.tiktok")) return url
+        return runCatching {
+            val req = Request.Builder().url(url).header("User-Agent", UA).build()
+            client.newCall(req).execute().use { resp -> resp.request.url.toString() }
+        }.getOrNull()?.takeIf { it.contains("tiktok.com") } ?: url
+    }
+
     private fun mapError(msg: String): ProviderException {
         val m = msg.lowercase()
         return when {
@@ -194,12 +225,13 @@ class TikTokProvider @Inject constructor(
             )
             m.contains("not found") || m.contains("deleted") || m.contains("does not exist") ->
                 ProviderException(ProviderErrorType.NOT_FOUND, "Video not found or deleted")
-            m.contains("url") -> ProviderException(
-                ProviderErrorType.INVALID_LINK, "Invalid TikTok link"
-            )
+            // Only flag a genuinely malformed link — NOT rate-limit / transient
+            // resolver errors, which were wrongly showing as "invalid link".
+            m.contains("parsing") || (m.contains("url") && m.contains("invalid")) ->
+                ProviderException(ProviderErrorType.INVALID_LINK, "Invalid TikTok link")
             else -> ProviderException(
                 ProviderErrorType.EXTRACTION_FAILED,
-                msg.ifBlank { "Could not extract the video" }
+                msg.ifBlank { "Could not extract the video (the resolver may be busy)" }
             )
         }
     }
