@@ -89,3 +89,27 @@ val MIGRATION_11_12 = object : Migration(11, 12) {
         db.execSQL("ALTER TABLE downloads ADD COLUMN image_urls TEXT")
     }
 }
+
+/** Adds playlists and their video membership table. */
+val MIGRATION_12_13 = object : Migration(12, 13) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS playlists (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "name TEXT NOT NULL, created_date INTEGER NOT NULL)"
+        )
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS playlist_videos (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "playlist_id INTEGER NOT NULL, video_id INTEGER NOT NULL, position INTEGER NOT NULL)"
+        )
+        db.execSQL(
+            "CREATE INDEX IF NOT EXISTS index_playlist_videos_playlist_id " +
+                "ON playlist_videos (playlist_id)"
+        )
+        db.execSQL(
+            "CREATE UNIQUE INDEX IF NOT EXISTS index_playlist_videos_playlist_id_video_id " +
+                "ON playlist_videos (playlist_id, video_id)"
+        )
+    }
+}
