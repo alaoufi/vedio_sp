@@ -31,10 +31,11 @@ object SlideshowEncoder {
     private const val MIME = "video/avc"
     private const val W = 720
     private const val H = 1280
-    // Static pictures just hold on screen, so a very low frame rate looks
-    // identical while cutting the frame count (and encode time) several-fold —
-    // a large slideshow at 6fps was hundreds of frames and overran the timeout.
-    private const val FPS = 2
+    // One encoded frame per picture, held on screen via its presentation
+    // timestamp — NOT one frame every 1/FPS. A slideshow is therefore only
+    // (images + 1) frames total instead of hundreds, so it encodes in seconds
+    // even on weak devices. FPS here is just the container's nominal rate hint.
+    private const val FPS = 1
     private const val BITRATE = 4_000_000
     private const val TIMEOUT_US = 10_000L
 
@@ -49,8 +50,9 @@ object SlideshowEncoder {
         onProgress: (Int) -> Unit = {}
     ): String? {
         if (frames.isEmpty()) return "no images"
-        val framesPerImage = maxOf(1, (perImageMs * FPS / 1000).toInt())
-        val totalFrames = (frames.size * framesPerImage).coerceAtLeast(1)
+        // Each picture is shown for this long, controlled purely by timestamps.
+        val perImageUs = perImageMs * 1000L
+        val imageCount = frames.size
 
         var encoder: MediaCodec? = null
         var muxer: MediaMuxer? = null
@@ -100,9 +102,10 @@ object SlideshowEncoder {
             var audioDstTrack = -1
             var muxerStarted = false
 
-            var frameIndex = 0
-            var repeats = 0
-            var imgIdx = 0
+            var imagesFed = 0        // pictures fed so far; also the next PTS index
+            var imgIdx = 0           // next source file to try to decode
+            var lastYuv: Yuv? = null // last decoded picture, reused for the hold frame
+            var holdSent = false     // one trailing frame gives the last picture its time
 
             fun loadNext(): Yuv? {
                 while (imgIdx < frames.size) {
@@ -128,24 +131,39 @@ object SlideshowEncoder {
                     if (inIndex >= 0) {
                         val yuv = current
                         if (yuv == null) {
-                            encoder!!.queueInputBuffer(
-                                inIndex, 0, 0, ptsUs(frameIndex),
-                                MediaCodec.BUFFER_FLAG_END_OF_STREAM
-                            )
-                            inputDone = true
+                            // All pictures fed. Emit one trailing copy of the last
+                            // picture so it stays on screen for its full turn, then
+                            // end the stream.
+                            val hold = lastYuv
+                            if (!holdSent && hold != null) {
+                                val image = encoder!!.getInputImage(inIndex)
+                                    ?: return "$encoderName: encoder gave no input image"
+                                fillImage(image, hold)
+                                encoder!!.queueInputBuffer(
+                                    inIndex, 0, W * H * 3 / 2, imagesFed * perImageUs, 0
+                                )
+                                holdSent = true
+                            } else {
+                                encoder!!.queueInputBuffer(
+                                    inIndex, 0, 0, (imagesFed + 1) * perImageUs,
+                                    MediaCodec.BUFFER_FLAG_END_OF_STREAM
+                                )
+                                inputDone = true
+                            }
                         } else {
                             val image = encoder!!.getInputImage(inIndex)
                                 ?: return "$encoderName: encoder gave no input image"
                             fillImage(image, yuv)
-                            encoder!!.queueInputBuffer(inIndex, 0, W * H * 3 / 2, ptsUs(frameIndex), 0)
-                            frameIndex++
-                            stage?.set("in $frameIndex/$totalFrames")
-                            onProgress(frameIndex * 100 / totalFrames)
-                            repeats++
-                            if (repeats >= framesPerImage) {
-                                current = loadNext()
-                                repeats = 0
-                            }
+                            // PTS = position * per-image duration → the picture holds
+                            // until the next frame's timestamp.
+                            encoder!!.queueInputBuffer(
+                                inIndex, 0, W * H * 3 / 2, imagesFed * perImageUs, 0
+                            )
+                            lastYuv = yuv
+                            imagesFed++
+                            stage?.set("in $imagesFed/$imageCount")
+                            onProgress(imagesFed * 100 / imageCount)
+                            current = loadNext()
                         }
                     }
                 }
@@ -173,9 +191,10 @@ object SlideshowEncoder {
                 }
             }
 
-            if (frameIndex == 0) return "$encoderName: no frames encoded"
+            if (imagesFed == 0) return "$encoderName: no frames encoded"
 
-            val videoDurationUs = frameIndex.toLong() * 1_000_000L / FPS
+            // Last picture (the trailing hold frame) also gets a full turn.
+            val videoDurationUs = (imagesFed + 1).toLong() * perImageUs
             val ex = audioExtractor
             if (muxerStarted && ex != null && audioDstTrack >= 0) {
                 stage?.set("audio")
@@ -223,8 +242,6 @@ object SlideshowEncoder {
         return if (name != null) MediaCodec.createByCodecName(name)
         else MediaCodec.createEncoderByType(MIME)
     }
-
-    private fun ptsUs(frameIndex: Int): Long = frameIndex.toLong() * 1_000_000L / FPS
 
     /** Converts an ARGB bitmap to packed I420 YUV once (BT.601), reused per frame. */
     private fun bitmapToYuv(bitmap: Bitmap): Yuv {
