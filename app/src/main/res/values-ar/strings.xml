@@ -416,4 +416,10 @@
     <string name="check_updates_desc">ابحث عن إصدار أحدث</string>
     <string name="checking_updates">جارٍ التحقق…</string>
     <string name="up_to_date">أنت على أحدث إصدار</string>
+
+    <!-- First-launch onboarding -->
+    <string name="choose_language">اختر لغتك</string>
+    <string name="guide_prompt_title">دليل الاستخدام</string>
+    <string name="guide_prompt_message">هل تريد إلقاء نظرة سريعة على الدليل التفاعلي لتتعرّف على إمكانات التطبيق؟</string>
+    <string name="view_guide">عرض الدليل</string>
 </resources>

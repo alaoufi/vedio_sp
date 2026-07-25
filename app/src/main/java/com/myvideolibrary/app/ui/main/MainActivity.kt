@@ -87,6 +87,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, DownloadsActivity::class.java))
         }
         requestNotificationPermissionIfNeeded()
+        maybeOnboard()
         maybeCheckForUpdate()
     }
 
@@ -466,11 +467,60 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
+     * First-launch onboarding: pick the language (Arabic / English), then offer
+     * to open the interactive guide. Runs once. Because changing the locale
+     * recreates the activity, the guide prompt is deferred via a pref flag so it
+     * survives the recreate (and still fires if the locale was unchanged).
+     */
+    private fun maybeOnboard() {
+        val prefs = getSharedPreferences("onboarding", MODE_PRIVATE)
+        if (prefs.getBoolean("guide_pending", false)) {
+            prefs.edit().putBoolean("guide_pending", false).apply()
+            showGuidePrompt()
+            return
+        }
+        if (prefs.getBoolean("done", false)) return
+        AlertDialog.Builder(this)
+            .setTitle(R.string.choose_language)
+            .setCancelable(false)
+            .setItems(arrayOf("العربية", "English")) { _, which ->
+                prefs.edit().putBoolean("done", true).putBoolean("guide_pending", true).apply()
+                val tag = if (which == 0) "ar" else "en"
+                androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(
+                    androidx.core.os.LocaleListCompat.forLanguageTags(tag)
+                )
+                // If the locale was unchanged there is no recreate, so trigger the
+                // deferred guide prompt here on the next frame.
+                binding.root.post {
+                    if (prefs.getBoolean("guide_pending", false)) {
+                        prefs.edit().putBoolean("guide_pending", false).apply()
+                        showGuidePrompt()
+                    }
+                }
+            }
+            .show()
+    }
+
+    private fun showGuidePrompt() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.guide_prompt_title)
+            .setMessage(R.string.guide_prompt_message)
+            .setPositiveButton(R.string.view_guide) { _, _ ->
+                startActivity(Intent(this, com.myvideolibrary.app.ui.help.HelpActivity::class.java))
+            }
+            .setNegativeButton(R.string.later, null)
+            .show()
+    }
+
+    /**
      * Once every few hours, quietly asks GitHub Releases whether a newer build
      * exists and, if so, offers to download it. Any failure is silent — this
      * never blocks or nags, and nothing about the library is sent.
      */
     private fun maybeCheckForUpdate() {
+        // Stay quiet until first-launch onboarding is finished.
+        val ob = getSharedPreferences("onboarding", MODE_PRIVATE)
+        if (!ob.getBoolean("done", false) || ob.getBoolean("guide_pending", false)) return
         val prefs = getSharedPreferences("updates", MODE_PRIVATE)
         val now = System.currentTimeMillis()
         if (now - prefs.getLong("last_check", 0L) < 6 * 60 * 60 * 1000L) return

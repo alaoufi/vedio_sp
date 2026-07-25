@@ -453,4 +453,10 @@
     <string name="check_updates_desc">Look for a newer version</string>
     <string name="checking_updates">Checking…</string>
     <string name="up_to_date">You\'re on the latest version</string>
+
+    <!-- First-launch onboarding -->
+    <string name="choose_language">Choose your language</string>
+    <string name="guide_prompt_title">User guide</string>
+    <string name="guide_prompt_message">Would you like a quick look at the interactive guide to learn what the app can do?</string>
+    <string name="view_guide">View guide</string>
 </resources>
