@@ -17,7 +17,10 @@ class HelpActivity : AppCompatActivity() {
         binding.toolbar.setNavigationOnClickListener { finish() }
 
         binding.webView.settings.apply {
-            javaScriptEnabled = false
+            // The guide is a bundled, offline asset (no network/remote content), and
+            // the 3D interactive guide uses JS for the card tilt/flip animations.
+            @android.annotation.SuppressLint("SetJavaScriptEnabled")
+            javaScriptEnabled = true
             builtInZoomControls = true
             displayZoomControls = false
         }

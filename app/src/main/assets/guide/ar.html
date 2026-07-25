@@ -2,168 +2,396 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>دليل الاستخدام</title>
 <style>
-  :root { color-scheme: light dark; }
-  body { font-family: -apple-system, Roboto, "Segoe UI", sans-serif; line-height: 1.7;
-         margin: 0; padding: 16px 18px 56px; color: #1a1a1a; background: #fafafa; }
-  @media (prefers-color-scheme: dark) { body { color: #eaeaea; background: #121212; } }
-  h1 { font-size: 1.55rem; margin: 0 0 4px; }
-  h2 { font-size: 1.22rem; margin: 30px 0 8px; border-bottom: 2px solid rgba(128,128,128,.25); padding-bottom: 5px; }
-  h3 { font-size: 1.05rem; margin: 18px 0 4px; }
-  p, li { font-size: 0.98rem; }
-  ul, ol { padding-inline-start: 22px; margin: 6px 0; }
-  li { margin: 4px 0; }
-  .lead { opacity: .85; font-size: 1.02rem; }
-  .toc { background: rgba(120,140,255,.10); border-radius: 10px; padding: 12px 16px; margin: 16px 0; }
-  .toc a { text-decoration: none; }
-  .tip { background: rgba(60,180,120,.14); border-radius: 8px; padding: 9px 13px; margin: 10px 0; }
-  .warn { background: rgba(240,170,60,.16); border-radius: 8px; padding: 9px 13px; margin: 10px 0; }
-  code { background: rgba(128,128,128,.18); padding: 1px 6px; border-radius: 4px; }
-  .step { counter-reset: none; }
+  :root{
+    color-scheme: light dark;
+    --bg:#0e1020; --bg2:#141733; --card:rgba(255,255,255,.06); --stroke:rgba(255,255,255,.14);
+    --txt:#f2f3ff; --muted:#b9bce0; --accent:#8b7bff; --accent2:#38e0c8;
+    --shadow:rgba(0,0,0,.5);
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#eef0ff; --bg2:#f7f8ff; --card:rgba(255,255,255,.7); --stroke:rgba(20,20,60,.10);
+           --txt:#151633; --muted:#4a4d78; --shadow:rgba(60,60,120,.20); }
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ margin:0; padding:0; }
+  body{
+    font-family:-apple-system,"SF Arabic",Roboto,"Segoe UI",Tahoma,sans-serif;
+    color:var(--txt); background:var(--bg);
+    overflow-x:hidden; line-height:1.7; -webkit-text-size-adjust:100%;
+  }
+  /* animated aurora backdrop */
+  .aurora{ position:fixed; inset:-30% -10% auto -10%; height:120%; z-index:-1; filter:blur(60px); opacity:.9; }
+  .aurora span{ position:absolute; border-radius:50%; mix-blend-mode:screen; animation:float 14s ease-in-out infinite; }
+  .aurora .a{ width:55vw;height:55vw; left:-10vw; top:-10vw; background:radial-gradient(circle,#7b5bff,transparent 60%); }
+  .aurora .b{ width:50vw;height:50vw; right:-8vw; top:8vw; background:radial-gradient(circle,#19d3c5,transparent 60%); animation-delay:-4s; }
+  .aurora .c{ width:48vw;height:48vw; left:12vw; top:38vw; background:radial-gradient(circle,#ff6ea9,transparent 60%); animation-delay:-8s; }
+  @keyframes float{ 0%,100%{ transform:translate3d(0,0,0) scale(1);} 33%{ transform:translate3d(6vw,4vw,0) scale(1.1);} 66%{ transform:translate3d(-5vw,2vw,0) scale(.95);} }
+
+  .wrap{ max-width:680px; margin:0 auto; padding:18px 16px 60px; }
+
+  /* HERO */
+  .hero{ text-align:center; padding:34px 8px 20px; perspective:900px; }
+  .emblem{
+    width:104px;height:104px;margin:0 auto 14px; border-radius:28px;
+    display:flex;align-items:center;justify-content:center; font-size:52px;
+    background:linear-gradient(145deg,#8b7bff,#38e0c8);
+    box-shadow:0 18px 40px rgba(90,70,255,.45), inset 0 2px 6px rgba(255,255,255,.5);
+    transform-style:preserve-3d; transition:transform .1s linear; will-change:transform;
+  }
+  .emblem b{ transform:translateZ(30px); filter:drop-shadow(0 6px 10px rgba(0,0,0,.35)); }
+  .hero h1{ font-size:1.7rem; margin:2px 0 6px; letter-spacing:.2px;
+    background:linear-gradient(90deg,var(--txt),var(--accent)); -webkit-background-clip:text; background-clip:text; }
+  .hero p{ color:var(--muted); font-size:1.02rem; margin:0 auto; max-width:34em; }
+  .badges{ display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:14px; }
+  .badge{ font-size:.8rem; color:var(--muted); background:var(--card); border:1px solid var(--stroke);
+    padding:5px 12px; border-radius:999px; backdrop-filter:blur(8px); }
+
+  .hint{ text-align:center; color:var(--muted); font-size:.85rem; margin:18px 0 8px; opacity:.9; }
+
+  /* 3D CARDS */
+  .card{
+    position:relative; margin:14px 0; border-radius:20px;
+    background:var(--card); border:1px solid var(--stroke);
+    box-shadow:0 10px 30px var(--shadow); backdrop-filter:blur(12px);
+    transform-style:preserve-3d; transition:transform .18s cubic-bezier(.2,.7,.3,1), box-shadow .2s;
+    will-change:transform; overflow:hidden;
+    opacity:0; translate:0 26px;
+  }
+  .card.in{ opacity:1; translate:0 0; transition:opacity .6s ease, translate .6s cubic-bezier(.2,.8,.2,1), transform .18s; }
+  .card:active{ box-shadow:0 6px 18px var(--shadow); }
+  .head{ display:flex; align-items:center; gap:14px; padding:16px 16px; cursor:pointer; transform:translateZ(28px); }
+  .ico{
+    flex:none; width:52px;height:52px;border-radius:16px; display:flex;align-items:center;justify-content:center;
+    font-size:26px; color:#fff; box-shadow:0 8px 18px rgba(0,0,0,.28), inset 0 1px 3px rgba(255,255,255,.4);
+  }
+  .num{ position:absolute; inset-inline-start:12px; top:10px; font-size:.72rem; font-weight:700;
+    color:var(--muted); opacity:.6; transform:translateZ(10px); }
+  .ttl{ flex:1; font-weight:700; font-size:1.06rem; }
+  .chev{ flex:none; color:var(--muted); transition:transform .3s; font-size:1.2rem; }
+  .card.open .chev{ transform:rotate(180deg); }
+  .body{ max-height:0; overflow:hidden; transition:max-height .45s cubic-bezier(.3,.7,.2,1);
+    padding:0 18px; transform:translateZ(14px); }
+  .card.open .body{ max-height:1400px; }
+  .body .inner{ padding:2px 0 18px; color:var(--txt); }
+  .body h4{ margin:14px 0 4px; font-size:1rem; color:var(--accent); }
+  .body ul,.body ol{ padding-inline-start:20px; margin:6px 0; }
+  .body li{ margin:5px 0; color:var(--muted); }
+  .body li b, .body p b{ color:var(--txt); }
+  .body p{ margin:6px 0; color:var(--muted); }
+  code{ background:rgba(139,123,255,.20); color:var(--txt); padding:1px 7px; border-radius:6px; font-size:.9em; }
+  .tip{ background:linear-gradient(135deg,rgba(56,224,200,.18),rgba(56,224,200,.06));
+    border:1px solid rgba(56,224,200,.3); border-radius:12px; padding:9px 13px; margin:10px 0; color:var(--txt); }
+  .warn{ background:linear-gradient(135deg,rgba(255,180,70,.18),rgba(255,180,70,.05));
+    border:1px solid rgba(255,180,70,.3); border-radius:12px; padding:9px 13px; margin:10px 0; color:var(--txt); }
+
+  .foot{ text-align:center; color:var(--muted); margin:30px 8px 0; font-size:.95rem; }
+  .progress{ position:fixed; top:0; inset-inline:0; height:3px; z-index:5;
+    background:linear-gradient(90deg,var(--accent),var(--accent2)); width:0; transition:width .1s; box-shadow:0 0 10px var(--accent); }
 </style>
 </head>
 <body>
+<div class="progress" id="prog"></div>
+<div class="aurora"><span class="a"></span><span class="b"></span><span class="c"></span></div>
 
-<h1>مكتبة الفيديو الخاصة بي — دليل المستخدم الكامل</h1>
-<p class="lead">مكتبة خاصة تعمل دون اتصال أولاً لتنزيل مقاطع الفيديو الخاصة بك وتنظيمها ومشاهدتها. مكتبتك وتنزيلاتك وقاعدة بياناتك والترخيص كلها موجودة على جهازك — لا يُرفع أي شيء إلى أي خادم.</p>
+<div class="wrap">
+  <header class="hero">
+    <div class="emblem" id="emblem"><b>🎬</b></div>
+    <h1>مكتبة الفيديو</h1>
+    <p>دليلك التفاعلي الكامل. كل شيء يعمل دون اتصال — مكتبتك وتنزيلاتك وبياناتك على جهازك وحده، لا يُرفع شيء لأي خادم.</p>
+    <div class="badges">
+      <span class="badge">🔒 خصوصية كاملة</span>
+      <span class="badge">📶 يعمل دون اتصال</span>
+      <span class="badge">🌍 14 لغة</span>
+    </div>
+  </header>
 
-<div class="toc">
-<b>المحتويات</b>
-<ol>
-  <li><a href="#activation">التفعيل والتجربة المجانية</a></li>
-  <li><a href="#privacy">الخصوصية وقفل التطبيق</a></li>
-  <li><a href="#download">تنزيل مقاطع الفيديو</a></li>
-  <li><a href="#browser">المتصفّح المدمج</a></li>
-  <li><a href="#manage">إدارة التنزيلات</a></li>
-  <li><a href="#library">المكتبة</a></li>
-  <li><a href="#player">المشغّل</a></li>
-  <li><a href="#editing">تحرير المقاطع</a></li>
-  <li><a href="#image">محرّر الصور</a></li>
-  <li><a href="#youtube">تبويب يوتيوب بلا إعلانات</a></li>
-  <li><a href="#stats">الإحصائيات</a></li>
-  <li><a href="#settings">اللغة والمظهر والإعدادات</a></li>
-  <li><a href="#backup">النسخ الاحتياطي والاستعادة</a></li>
-  <li><a href="#faq">استكشاف الأخطاء والأسئلة الشائعة</a></li>
-</ol>
+  <p class="hint">اضغط أي بطاقة لفتحها · حرّك إصبعك فوقها لترى العمق ثلاثي الأبعاد</p>
+
+  <!-- 1 -->
+  <article class="card" style="--g1:#8b7bff;--g2:#5b4bff">
+    <span class="num">01</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,var(--g1),var(--g2))">🔑</span>
+      <span class="ttl">التفعيل والتجربة المجانية</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <p>يعمل التطبيق دون اتصال — بلا حساب وبلا تسجيل دخول عبر الإنترنت.</p>
+      <ul>
+        <li><b>التجربة المجانية:</b> يبدأ التشغيل الأول <b>تجربة مجانية مدتها 10 أيام</b> تلقائيًا، وتستطيع استخدام كل الميزات خلالها.</li>
+        <li><b>بعد انتهاء التجربة:</b> يطلب التطبيق رمز تفعيل. تُحفظ تنزيلاتك وإعداداتك — يُوقَف الوصول مؤقتًا فقط حتى تجدّد.</li>
+        <li><b>التفعيل:</b> تعرض شاشة التفعيل <b>رقم جهازك</b>. أرسله إلى البائع وأدخِل الرمز، ثم اضغط <i>تفعيل</i>.</li>
+        <li><b>الحالة:</b> افتح <b>الإعدادات ← الاشتراك</b> لرؤية "تجربة · تبقّى N يومًا"، أو "نشط"، أو دائم.</li>
+      </ul>
+      <div class="tip">على Google Play يمكن أن يُفعَّل التطبيق تلقائيًا فور أن يصبح اشتراكك نشطًا — بلا حاجة إلى رمز.</div>
+    </div></div>
+  </article>
+
+  <!-- 2 -->
+  <article class="card" style="--g1:#3ad0b0;--g2:#1fa88f">
+    <span class="num">02</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,var(--g1),var(--g2))">🔒</span>
+      <span class="ttl">الخصوصية وقفل التطبيق</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <p>كل شيء ضمن <b>الإعدادات ← الأمان</b>:</p>
+      <ul>
+        <li><b>قفل التطبيق:</b> عيّن رمز PIN ليُطلَب عند كل فتح.</li>
+        <li><b>البصمة:</b> افتح القفل ببصمتك بدل كتابة الرمز.</li>
+        <li><b>منع لقطات الشاشة:</b> يمنع اللقطات وتسجيل الشاشة داخل التطبيق.</li>
+        <li><b>الإخفاء من التطبيقات الأخيرة:</b> يخفي معاينة التطبيق في مبدّل التطبيقات.</li>
+      </ul>
+      <h4>الفيديوهات الخاصة</h4>
+      <p>اقفل أي مقطع (من قائمة <code>⋮</code> الخاصة به) لنقله إلى القسم <b>الخاص</b> المخفي. يختفي من المكتبة الرئيسية ولا يعود إلا بعد التحقق بالبصمة.</p>
+    </div></div>
+  </article>
+
+  <!-- 3 -->
+  <article class="card" style="--g1:#ff7eb3;--g2:#ff5c8a">
+    <span class="num">03</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,var(--g1),var(--g2))">⬇️</span>
+      <span class="ttl">تنزيل مقاطع الفيديو</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <h4>من رابط</h4>
+      <ol>
+        <li>انسخ رابط فيديو.</li>
+        <li>اضغط <b>+</b> ← <b>تنزيل من رابط</b> (أو شارك الرابط إلى التطبيق من تطبيق آخر).</li>
+        <li>اضغط <b>لصق</b> ثم <b>جلب المعلومات</b>.</li>
+        <li>اختر <b>الفيديو الكامل</b> أو <b>الفيديو فقط</b> أو <b>الصوت فقط</b>، ثم نزّل.</li>
+      </ol>
+      <h4>عبر البحث</h4>
+      <p>اضغط أيقونة البحث، اكتب كلمات مفتاحية، واضغط نتيجة لمعاينتها أو استخدم زر التنزيل الخاص بها.</p>
+      <h4>الصوت مقابل الفيديو</h4>
+      <p>تُحفظ تنزيلات الصوت كملفات صوتية حقيقية وتُشغَّل مع صورة الغلاف (لا شاشة سوداء). ويمكنك اختيار الجودة عند توفّر عدة خيارات.</p>
+      <h4>أين تُحفظ الملفات</h4>
+      <p>تُخزَّن التنزيلات بشكل خاص داخل التطبيق. من <b>الإعدادات ← موقع الحفظ</b> يمكنك أيضًا وضع نسخة في مجلد يظهر في المعرض / مدير الملفات.</p>
+    </div></div>
+  </article>
+
+  <!-- 4 -->
+  <article class="card" style="--g1:#5b9dff;--g2:#3d6dff">
+    <span class="num">04</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,var(--g1),var(--g2))">🌐</span>
+      <span class="ttl">المتصفّح المدمج</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <p>افتح <b>+ ← المتصفّح</b> لمتصفّح ويب عام يكتشف الوسائط القابلة للتنزيل في أي صفحة.</p>
+      <ol>
+        <li>اكتب موقعًا أو ابحث في شريط العنوان.</li>
+        <li>شغّل الفيديو أو افتحه في الصفحة.</li>
+        <li>عند اكتشاف وسائط يظهر زر <b>تنزيل (N)</b> — اضغطه واختر العنصر ليُنزَّل إلى مكتبتك.</li>
+      </ol>
+      <div class="tip">يواصل المتصفّح فحص الصفحة لبضع ثوانٍ؛ فإن لم يظهر الزر فورًا، شغّل الفيديو وانتظر لحظة.</div>
+    </div></div>
+  </article>
+
+  <!-- 5 -->
+  <article class="card" style="--g1:#ffb057;--g2:#ff8a3d">
+    <span class="num">05</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,var(--g1),var(--g2))">📥</span>
+      <span class="ttl">إدارة التنزيلات</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <p>افتح <b>+ ← التنزيلات</b> (أو اضغط لافتة التنزيل في المكتبة) لرؤية المهام النشطة والمكتملة. يمكنك <b>الإيقاف المؤقت</b> و<b>الاستئناف</b> و<b>إعادة المحاولة</b>. تستأنف التنزيلات المتوقفة من حيث توقفت، ويُحدِّث التنزيل الفاشل رابطه تلقائيًا ويعيد المحاولة.</p>
+    </div></div>
+  </article>
+
+  <!-- 6 -->
+  <article class="card" style="--g1:#a978ff;--g2:#7d4bff">
+    <span class="num">06</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,var(--g1),var(--g2))">📚</span>
+      <span class="ttl">المكتبة</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <ul>
+        <li><b>عرض شبكي / قائمة:</b> بدّل من <code>⋮ ← تبديل العرض</code>.</li>
+        <li><b>البحث:</b> اضغط العدسة؛ تُرشَّح المكتبة مباشرةً.</li>
+        <li><b>الفرز:</b> حسب التاريخ أو الاسم أو المدة أو الحجم أو <b>الفئة</b>.</li>
+        <li><b>التصفية:</b> حسب المصدر ونوع الوسائط و<b>عدة فئات معًا</b> — تظهر شريحة الفئة النشطة أعلى المكتبة، اضغط × للعودة للكل.</li>
+        <li><b>المفضلة:</b> ضع علامة على المقاطع وصفِّ عليها.</li>
+        <li><b>الفئات:</b> يعرض كل مقطع فئته كشارة. أدِرها من <code>⋮ ← إدارة الفئات</code>.</li>
+        <li><b>تحديد متعدد:</b> اضغط مطولًا لبدء التحديد ثم عيّن فئة أو مفضلة أو احذف جماعيًا.</li>
+      </ul>
+    </div></div>
+  </article>
+
+  <!-- 7 -->
+  <article class="card" style="--g1:#ff6a6a;--g2:#e23c5a">
+    <span class="num">07</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,var(--g1),var(--g2))">▶️</span>
+      <span class="ttl">المشغّل</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <ul>
+        <li><b>تشغيل متواصل:</b> يُشغَّل المقطع التالي تلقائيًا عند الانتهاء.</li>
+        <li><b>التالي / السابق:</b> من قائمة <code>⋮</code> في المشغّل.</li>
+        <li><b>الاستئناف:</b> يتابع من حيث توقفت.</li>
+        <li><b>الإيماءات:</b> اسحب على <b>النصف الأيسر</b> للسطوع، وعلى <b>النصف الأيمن</b> للصوت.</li>
+        <li><b>السرعة:</b> تنقّل بين 0.5×–2×.</li>
+        <li><b>قفل عناصر التحكم / تغيير الحجم:</b> ملاءمة أو تكبير أو تمديد.</li>
+        <li><b>صورة داخل صورة والتشغيل بالخلفية:</b> واصل المشاهدة أثناء استخدام تطبيقات أخرى.</li>
+        <li><b>تغطية النص الطافي:</b> ارسم مربعًا فوق نص أو علامة مائية لإخفائها (<code>⋮ ← تغطية النص</code>).</li>
+      </ul>
+    </div></div>
+  </article>
+
+  <!-- 8 -->
+  <article class="card" style="--g1:#4fd1c5;--g2:#2fb3a8">
+    <span class="num">08</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,var(--g1),var(--g2))">✂️</span>
+      <span class="ttl">تحرير المقاطع</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <p>من قائمة <code>⋮</code> الخاصة بالمقطع يمكنك <b>إعادة تسميته</b>، و<b>تحرير وصفه</b>، و<b>تعيين فئته</b>، وإضافته إلى <b>المفضلة</b>، ونقله إلى القسم <b>الخاص</b>، أو <b>حذفه</b> (مع ملفه اختياريًا). يمكنك أيضًا <b>قصّ</b> المقطع و<b>ضغطه</b> بجودة عالية لتوفير المساحة.</p>
+    </div></div>
+  </article>
+
+  <!-- 9 -->
+  <article class="card" style="--g1:#f78cff;--g2:#c95cff">
+    <span class="num">09</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,var(--g1),var(--g2))">🖼️</span>
+      <span class="ttl">محرّر الصور</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <p>للصور المحفوظة: <b>القصّ</b>، و<b>إخفاء</b> اسم أو علامة مائية بمربع مصمت، و<b>إضافة نص</b> في أي مكان، واستخراج النص من الصورة عبر <b>التعرّف الضوئي (OCR)</b> (يُنسخ إلى الحافظة). تُحفظ الصور نظيفة دون آثار إعادة ترميز.</p>
+    </div></div>
+  </article>
+
+  <!-- 10 -->
+  <article class="card" style="--g1:#ff5c5c;--g2:#d62f2f">
+    <span class="num">10</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,var(--g1),var(--g2))">📺</span>
+      <span class="ttl">تبويب يوتيوب بلا إعلانات</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <p>من <code>⋮ ← يوتيوب</code> افتح عارضًا نظيفًا بلا إعلانات:</p>
+      <ul>
+        <li>يُعرَض المحتوى الرائج للمنطقة العربية افتراضيًا.</li>
+        <li>مفتاح واحد يخفي مقاطع Shorts.</li>
+        <li>ابحث بالعدسة وبدّل بين الشبكة والقائمة.</li>
+      </ul>
+      <p>إنه تبويب منفصل ولا يحل محل مكتبتك. عد بزر الرجوع أو <code>⋮ ← المكتبة</code>.</p>
+    </div></div>
+  </article>
+
+  <!-- 11 -->
+  <article class="card" style="--g1:#6ab0ff;--g2:#3f7dff">
+    <span class="num">11</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,var(--g1),var(--g2))">📊</span>
+      <span class="ttl">الإحصائيات</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <p>افتح <code>⋮ ← الإحصائيات</code> للوحة معلومات: إجمالي المقاطع، والحجم، والمدة، ومرات التشغيل، وأكثر مقاطعك تشغيلًا، والمُشغَّلة مؤخرًا، والأعداد حسب الفئة وحسب المصدر.</p>
+    </div></div>
+  </article>
+
+  <!-- 12 -->
+  <article class="card" style="--g1:#9aa0ff;--g2:#6a72e8">
+    <span class="num">12</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,var(--g1),var(--g2))">⚙️</span>
+      <span class="ttl">اللغة والمظهر والإعدادات</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <ul>
+        <li><b>اللغة:</b> الإعدادات ← اللغة — اختر من 14 لغة؛ يتبدّل التطبيق فورًا.</li>
+        <li><b>المظهر:</b> النظام أو فاتح أو داكن.</li>
+        <li><b>Wi-Fi فقط:</b> نزّل عبر Wi-Fi فقط.</li>
+        <li><b>التنزيلات المتزامنة:</b> كم مقطعًا يُنزَّل في آنٍ واحد.</li>
+        <li><b>موقع الحفظ:</b> أين تُخزَّن نسخة من التنزيلات.</li>
+        <li><b>دليل المستخدم:</b> يُفتح دائمًا بلغة التطبيق الحالية.</li>
+      </ul>
+    </div></div>
+  </article>
+
+  <!-- 13 -->
+  <article class="card" style="--g1:#3ad0b0;--g2:#159c86">
+    <span class="num">13</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,var(--g1),var(--g2))">💾</span>
+      <span class="ttl">النسخ الاحتياطي والاستعادة</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <p>من <b>الإعدادات</b>، صدّر <b>نسخة احتياطية مشفّرة</b> من مكتبتك محميّة بكلمة مرور، واستعِدها لاحقًا بالكلمة نفسها.</p>
+      <div class="warn">احتفظ بكلمة المرور بأمان — بدونها لا يمكن فتح النسخة الاحتياطية.</div>
+    </div></div>
+  </article>
+
+  <!-- 14 -->
+  <article class="card" style="--g1:#ffa057;--g2:#f0762f">
+    <span class="num">14</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,var(--g1),var(--g2))">❓</span>
+      <span class="ttl">استكشاف الأخطاء والأسئلة الشائعة</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <h4>فشل تنزيل</h4>
+      <p>تنتهي صلاحية بعض الروابط بسرعة. افتح <b>التنزيلات</b> واضغط إعادة المحاولة — يجلب التطبيق رابطًا جديدًا ويتابع. تحقّق من اتصالك ومن أن المنشور عام.</p>
+      <h4>منشور لا يُنزَّل</h4>
+      <p>يُتيح Instagram و Snapchat المنشورات <b>العامة</b> فقط؛ ولا يمكن استخراج الخاصة أو التي تتطلّب تسجيل الدخول. الاستخراج يعتمد على المنصّة وقد يفشل أحيانًا — حاول لاحقًا.</p>
+      <h4>يُشغَّل الصوت كشاشة سوداء</h4>
+      <p>تأكّد من اختيار <b>الصوت فقط</b> عند التنزيل؛ تُظهر الملفات الصوتية صورة الغلاف بدل إطار فيديو.</p>
+      <h4>قفل التطبيق نفسه</h4>
+      <p>انتهت تجربتك أو اشتراكك. تنزيلاتك آمنة — جدّد (أدخِل رمزًا أو اشترك عبر Google Play) للمتابعة.</p>
+      <h4>هل يُرسَل أي شيء إلى خادم؟</h4>
+      <p>لا. لا يملك التطبيق خادمًا خلفيًا. يتصل فقط بموقع الفيديو نفسه لجلب ما طلبت تنزيله.</p>
+    </div></div>
+  </article>
+
+  <p class="foot">✨ هذا هو التطبيق بأكمله. استمتع بمكتبة الفيديو الخاصة بك.</p>
 </div>
 
-<h2 id="activation">1. التفعيل والتجربة المجانية</h2>
-<p>يعمل التطبيق دون اتصال — بلا حساب وبلا تسجيل دخول عبر الإنترنت.</p>
-<ul>
-  <li><b>التجربة المجانية:</b> يبدأ التشغيل الأول <b>تجربة مجانية مدتها 10 أيام</b> تلقائيًا. يمكنك استخدام جميع الميزات خلالها.</li>
-  <li><b>بعد انتهاء التجربة:</b> يطلب التطبيق رمز تفعيل. تُحفظ تنزيلاتك وإعداداتك — يُوقَف الوصول فقط مؤقتًا حتى تجدّد.</li>
-  <li><b>التفعيل:</b> تعرض شاشة التفعيل <b>رقم جهازك</b>. أرسله إلى البائع وأدخِل الرمز الذي تستلمه، ثم اضغط <i>تفعيل</i>.</li>
-  <li><b>الحالة:</b> افتح <b>الإعدادات ← الاشتراك</b> لرؤية "تجربة · تبقّى N يومًا"، أو "نشط · تبقّى N يومًا"، أو دائم.</li>
-</ul>
-<div class="tip">على Google Play يمكن للتطبيق أن يُفعَّل تلقائيًا فور أن يصبح اشتراكك نشطًا — بلا حاجة إلى رمز.</div>
+<script>
+(function(){
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
 
-<h2 id="privacy">2. الخصوصية وقفل التطبيق</h2>
-<p>كل شيء موجود ضمن <b>الإعدادات ← الأمان</b>:</p>
-<ul>
-  <li><b>قفل التطبيق:</b> عيّن رمز PIN ليطلب التطبيق فتح القفل عند كل فتح.</li>
-  <li><b>البصمة / القياسات الحيوية:</b> افتح القفل ببصمتك بدلًا من كتابة رمز PIN.</li>
-  <li><b>منع لقطات الشاشة:</b> يمنع لقطات الشاشة وتسجيل الشاشة داخل التطبيق.</li>
-  <li><b>الإخفاء من التطبيقات الأخيرة:</b> يخفي معاينة التطبيق في مبدّل التطبيقات الأخيرة.</li>
-</ul>
-<h3>الفيديوهات الخاصة</h3>
-<p>اقفل أي مقطع (من قائمة <code>⋮</code> الخاصة به) لنقله إلى القسم <b>الخاص</b> المخفي. يختفي من المكتبة الرئيسية ولا يعود إلا بعد التحقق بالبصمة (افتح العرض الخاص من قائمة <code>⋮</code>).</p>
+  // Tap to expand / collapse
+  cards.forEach(function(card){
+    var head = card.querySelector('.head');
+    head.addEventListener('click', function(){ card.classList.toggle('open'); });
+  });
 
-<h2 id="download">3. تنزيل مقاطع الفيديو</h2>
-<h3>من رابط</h3>
-<ol>
-  <li>انسخ رابط فيديو.</li>
-  <li>اضغط زر <b>+</b> ← <b>تنزيل من رابط</b> (أو شارك الرابط إلى هذا التطبيق من تطبيق آخر).</li>
-  <li>اضغط <b>لصق</b>، ثم <b>جلب المعلومات</b>.</li>
-  <li>اختر <b>الفيديو الكامل</b>، أو <b>الفيديو فقط</b>، أو <b>الصوت فقط</b>، ثم نزّل.</li>
-</ol>
-<h3>عبر البحث</h3>
-<p>اضغط أيقونة البحث، واكتب كلمات مفتاحية، واضغط على نتيجة لمعاينتها، أو استخدم زر التنزيل الخاص بها.</p>
-<h3>الصوت مقابل الفيديو</h3>
-<p>تُحفظ تنزيلات الصوت كملفات صوتية حقيقية وتُشغَّل مع صورة الغلاف (وليس شاشة سوداء). يمكنك أيضًا اختيار جودة عندما يوفّر المصدر عدة خيارات.</p>
-<h3>أين تُحفظ الملفات</h3>
-<p>تُخزَّن التنزيلات بشكل خاص داخل التطبيق. في <b>الإعدادات ← موقع الحفظ</b> يمكنك أيضًا وضع نسخة في مجلد من اختيارك بحيث تظهر في معرض الصور / مدير الملفات.</p>
+  // 3D tilt following the finger/pointer on each card
+  function tilt(el, maxDeg){
+    var raf;
+    function move(x, y){
+      var r = el.getBoundingClientRect();
+      var px = (x - r.left) / r.width - .5;
+      var py = (y - r.top) / r.height - .5;
+      if(raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(function(){
+        el.style.transform = 'perspective(800px) rotateY(' + (px*maxDeg) + 'deg) rotateX(' + (-py*maxDeg) + 'deg)';
+      });
+    }
+    function reset(){ el.style.transform = 'perspective(800px) rotateY(0) rotateX(0)'; }
+    el.addEventListener('pointermove', function(e){ move(e.clientX, e.clientY); }, {passive:true});
+    el.addEventListener('pointerleave', reset);
+    el.addEventListener('pointercancel', reset);
+    el.addEventListener('pointerup', reset);
+  }
+  cards.forEach(function(c){ tilt(c, 7); });
 
-<h2 id="browser">4. المتصفّح المدمج</h2>
-<p>افتح <b>+ ← المتصفّح</b> للحصول على متصفّح ويب عام يكتشف الوسائط القابلة للتنزيل في أي صفحة.</p>
-<ol>
-  <li>اكتب موقعًا أو ابحث في شريط العنوان.</li>
-  <li>شغّل الفيديو أو افتحه في الصفحة.</li>
-  <li>عند اكتشاف وسائط يظهر زر <b>تنزيل (N)</b> — اضغطه، واختر العنصر، وسيُنزَّل إلى مكتبتك.</li>
-</ol>
-<div class="tip">يواصل المتصفّح فحص الصفحة لبضع ثوانٍ، فإذا لم يظهر الزر فورًا، شغّل الفيديو وانتظر لحظة.</div>
+  // Hero emblem parallax — from device tilt, else from touch
+  var emblem = document.getElementById('emblem');
+  function setEmblem(rx, ry){ emblem.style.transform = 'rotateX(' + rx + 'deg) rotateY(' + ry + 'deg)'; }
+  if(window.DeviceOrientationEvent){
+    window.addEventListener('deviceorientation', function(e){
+      var ry = Math.max(-18, Math.min(18, (e.gamma||0)/2.5));
+      var rx = Math.max(-18, Math.min(18, -(e.beta||0)/6));
+      setEmblem(rx, ry);
+    }, true);
+  }
+  document.addEventListener('pointermove', function(e){
+    var ry = (e.clientX/window.innerWidth - .5) * 26;
+    var rx = -(e.clientY/window.innerHeight - .5) * 20;
+    setEmblem(rx, ry);
+  }, {passive:true});
 
-<h2 id="manage">5. إدارة التنزيلات</h2>
-<p>افتح <b>+ ← التنزيلات</b> (أو اضغط لافتة التنزيل في المكتبة) لرؤية المهام النشطة والمكتملة. يمكنك <b>الإيقاف المؤقت</b> و<b>الاستئناف</b> و<b>إعادة المحاولة</b>. تستأنف التنزيلات المتوقفة أو المقطوعة من حيث توقفت، ويُحدِّث التنزيل الفاشل رابطه تلقائيًا ويعيد المحاولة.</p>
+  // Entrance reveal on scroll
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); } });
+    }, {threshold:.12});
+    cards.forEach(function(c){ io.observe(c); });
+  } else {
+    cards.forEach(function(c){ c.classList.add('in'); });
+  }
 
-<h2 id="library">6. المكتبة</h2>
-<ul>
-  <li><b>عرض شبكي / قائمة:</b> بدّل من <code>⋮ → Toggle view</code>.</li>
-  <li><b>البحث:</b> اضغط العدسة المكبّرة؛ فتُرشِّح المكتبة مباشرةً.</li>
-  <li><b>الفرز:</b> حسب التاريخ أو الاسم أو المدة أو الحجم أو <b>الفئة</b> (يجمّع المقاطع حسب الفئة).</li>
-  <li><b>التصفية:</b> حسب المصدر ونوع الوسائط و<b>عدة فئات في آنٍ واحد</b> — أشِّر على الفئات المراد عرضها ويُخفى الباقي. يُظهر مدخل الفئة كم فئة نشطة.</li>
-  <li><b>المفضلة:</b> ضع علامة على المقاطع كمفضلة وصفِّ عليها.</li>
-  <li><b>الفئات:</b> يعرض كل مقطع فئته على هيئة شارة. أدِر الفئات من <code>⋮ → Manage categories</code>.</li>
-  <li><b>تحديد متعدد:</b> اضغط مطولًا على مقطع لبدء التحديد، ثم عيّن فئة أو المفضلة أو احذف بشكل جماعي.</li>
-</ul>
+  // Reading progress bar
+  var prog = document.getElementById('prog');
+  document.addEventListener('scroll', function(){
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    prog.style.width = (h>0 ? (window.scrollY/h*100) : 0) + '%';
+  }, {passive:true});
 
-<h2 id="player">7. المشغّل</h2>
-<ul>
-  <li><b>تشغيل متواصل:</b> عندما ينتهي مقطع، يُشغَّل المقطع التالي في القائمة الحالية تلقائيًا.</li>
-  <li><b>التالي / السابق:</b> من قائمة <code>⋮</code> في المشغّل.</li>
-  <li><b>الاستئناف:</b> يتابع التشغيل من حيث توقفت.</li>
-  <li><b>الإيماءات:</b> اسحب لأعلى/لأسفل على <b>النصف الأيسر</b> للسطوع، وعلى <b>النصف الأيمن</b> للصوت.</li>
-  <li><b>السرعة:</b> اضغط زر السرعة للتنقّل بين 0.5×–2×.</li>
-  <li><b>قفل عناصر التحكم:</b> أخفِ عناصر التحكم لتجنّب اللمسات العرضية.</li>
-  <li><b>تغيير الحجم:</b> ملاءمة أو تكبير أو تمديد الفيديو.</li>
-  <li><b>صورة داخل صورة والتشغيل في الخلفية:</b> واصل المشاهدة أو الاستماع أثناء استخدام تطبيقات أخرى.</li>
-  <li><b>تغطية النص الطافي:</b> ارسم مربعًا فوق نص أو علامة مائية على الشاشة لإخفائها أثناء التشغيل (<code>⋮ → Cover text</code>).</li>
-</ul>
-
-<h2 id="editing">8. تحرير المقاطع</h2>
-<p>من قائمة <code>⋮</code> الخاصة بالمقطع يمكنك <b>إعادة تسميته</b>، و<b>تحرير وصفه</b>، و<b>تعيين فئته</b>، وإضافته إلى <b>المفضلة</b>، ونقله إلى القسم <b>الخاص</b>، أو <b>حذفه</b> (مع ملفه اختياريًا).</p>
-
-<h2 id="image">9. محرّر الصور</h2>
-<p>للصور المحفوظة يمكنك <b>القصّ</b>، و<b>إخفاء</b> اسم أو علامة مائية بمربع مصمت، و<b>إضافة نص</b> في أي مكان، واستخراج النص من الصورة عبر <b>التعرّف الضوئي على الحروف (OCR)</b> (يُنسخ إلى الحافظة). تُحفظ الصور نظيفة دون آثار إعادة الترميز.</p>
-
-<h2 id="youtube">10. تبويب يوتيوب بلا إعلانات</h2>
-<p>من <code>⋮ → YouTube</code> افتح عارضًا نظيفًا بلا إعلانات:</p>
-<ul>
-  <li>يُعرَض المحتوى الرائج للمنطقة العربية افتراضيًا.</li>
-  <li>مفتاح واحد يخفي مقاطع Shorts.</li>
-  <li>ابحث بالعدسة المكبّرة وبدّل بين العرض الشبكي والقائمة.</li>
-</ul>
-<p>إنه تبويب منفصل ولا يحل محل مكتبتك أبدًا. عد بزر الرجوع أو <code>⋮ → Library</code>.</p>
-
-<h2 id="stats">11. الإحصائيات</h2>
-<p>افتح <code>⋮ → Statistics</code> للحصول على لوحة معلومات: إجمالي مقاطع الفيديو، والحجم الإجمالي، والمدة الإجمالية، وإجمالي مرات التشغيل، إضافةً إلى أكثر مقاطعك تشغيلًا والمقاطع المُشغَّلة مؤخرًا والأعداد حسب الفئة وحسب المصدر.</p>
-
-<h2 id="settings">12. اللغة والمظهر والإعدادات</h2>
-<ul>
-  <li><b>اللغة:</b> الإعدادات ← اللغة — اختر من بين 14 لغة؛ يتبدّل التطبيق فورًا.</li>
-  <li><b>المظهر:</b> النظام أو فاتح أو داكن.</li>
-  <li><b>Wi-Fi فقط:</b> نزّل عبر Wi-Fi فقط.</li>
-  <li><b>التنزيلات المتزامنة:</b> كم عددها الذي يُنزَّل في آنٍ واحد.</li>
-  <li><b>موقع الحفظ:</b> أين تُخزَّن نسخة من التنزيلات.</li>
-  <li><b>دليل المستخدم:</b> يُفتح هذا الدليل دائمًا بلغة التطبيق الحالية.</li>
-</ul>
-
-<h2 id="backup">13. النسخ الاحتياطي والاستعادة</h2>
-<p>في <b>الإعدادات</b>، صدّر <b>نسخة احتياطية مشفّرة</b> من مكتبتك محميّة بكلمة مرور، واستعِدها لاحقًا بالكلمة نفسها. احتفظ بكلمة المرور بأمان — فبدونها لا يمكن فتح النسخة الاحتياطية.</p>
-
-<h2 id="faq">14. استكشاف الأخطاء والأسئلة الشائعة</h2>
-<h3>فشل تنزيل</h3>
-<p>تنتهي صلاحية الروابط من بعض المواقع بسرعة. افتح <b>التنزيلات</b> واضغط إعادة المحاولة — يجلب التطبيق رابطًا جديدًا ويتابع. تحقّق من اتصالك ومن أن المنشور عام.</p>
-<h3>منشور لا يُنزَّل</h3>
-<p>يُتيح Instagram و Snapchat المنشورات <b>العامة</b> فقط؛ لا يمكن استخراج المنشورات الخاصة أو التي تتطلّب تسجيل الدخول. يعتمد الاستخراج على المنصّة وقد يفشل أحيانًا — حاول لاحقًا.</p>
-<h3>يُشغَّل الصوت كشاشة سوداء</h3>
-<p>تأكّد من اختيارك <b>الصوت فقط</b> عند التنزيل؛ تُظهر الملفات الصوتية صورة الغلاف بدلًا من إطار فيديو.</p>
-<h3>قفل التطبيق نفسه</h3>
-<p>انتهت تجربتك أو اشتراكك. تنزيلاتك آمنة — جدّد (أدخِل رمزًا، أو اشترك عبر Google Play) للمتابعة.</p>
-<h3>هل يُرسَل أي شيء إلى خادم؟</h3>
-<p>لا. لا يملك التطبيق خادمًا خلفيًا. يتصل فقط بموقع الفيديو نفسه لجلب ما طلبت تنزيله.</p>
-
-<p class="lead" style="margin-top:28px">هذا هو التطبيق بأكمله. استمتع بمكتبة الفيديو الخاصة بك.</p>
-
+  // Open the first card so the interaction is obvious
+  if(cards[0]) cards[0].classList.add('open');
+})();
+</script>
 </body>
 </html>
