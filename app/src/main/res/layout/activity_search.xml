@@ -13,53 +13,38 @@
         android:layout_height="?attr/actionBarSize"
         app:navigationIcon="@drawable/ic_arrow_back"
         app:navigationIconTint="?attr/colorOnSurface"
-        app:title="@string/search_title" />
+        app:title="@string/search_platforms_title" />
 
-    <HorizontalScrollView
+    <!-- Two equal, icon-led segments filling the width — YouTube / TikTok. -->
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/sourceToggle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:scrollbars="none"
-        android:fillViewport="true">
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="10dp"
+        app:singleSelection="true"
+        app:selectionRequired="true">
 
-        <com.google.android.material.button.MaterialButtonToggleGroup
-            android:id="@+id/sourceToggle"
-            android:layout_width="wrap_content"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/sourceYoutube"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:paddingHorizontal="12dp"
-            app:singleSelection="true"
-            app:selectionRequired="true">
+            app:icon="@drawable/ic_tab_youtube"
+            app:iconGravity="textStart"
+            android:text="@string/source_youtube" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/sourceYoutube"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/source_youtube" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/sourceTiktok"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/source_tiktok" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/sourceInstagram"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/source_instagram" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/sourceSnapchat"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/source_snapchat" />
-        </com.google.android.material.button.MaterialButtonToggleGroup>
-    </HorizontalScrollView>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/sourceTiktok"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            app:icon="@drawable/ic_tab_tiktok"
+            app:iconGravity="textStart"
+            android:text="@string/source_tiktok" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -103,20 +88,6 @@
         android:text="@string/tiktok_link_hint"
         android:textColor="?android:attr/textColorSecondary"
         android:textSize="13sp"
-        android:visibility="gone" />
-
-    <!-- Instagram/Snapchat have no public keyword search, so we offer the in-app
-         browser: the user browses the platform there and the media sniffer
-         captures the video for download. Shown only for those sources. -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/browseButton"
-        style="@style/Widget.Material3.Button.TonalButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="12dp"
-        android:layout_marginBottom="4dp"
-        app:icon="@drawable/ic_search"
-        android:text="@string/browse_in_app"
         android:visibility="gone" />
 
     <!-- Live download indicator; tap to open the Downloads screen. -->

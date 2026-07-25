@@ -48,12 +48,7 @@ class SearchActivity : AppCompatActivity() {
         binding.sourceToggle.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked) {
                 viewModel.setSource(
-                    when (checkedId) {
-                        R.id.sourceTiktok -> VideoSource.TIKTOK
-                        R.id.sourceInstagram -> VideoSource.INSTAGRAM
-                        R.id.sourceSnapchat -> VideoSource.SNAPCHAT
-                        else -> VideoSource.YOUTUBE
-                    }
+                    if (checkedId == R.id.sourceTiktok) VideoSource.TIKTOK else VideoSource.YOUTUBE
                 )
             }
         }
@@ -69,7 +64,6 @@ class SearchActivity : AppCompatActivity() {
                 )
             )
         }
-        binding.browseButton.setOnClickListener { openInAppBrowser() }
 
         observe()
         observeDownloads()
@@ -107,40 +101,21 @@ class SearchActivity : AppCompatActivity() {
         viewModel.search(binding.searchInput.text?.toString().orEmpty())
     }
 
-    /**
-     * Opens the in-app browser — the reliable offline path for Instagram/Snapchat,
-     * which have no public keyword search. If the field holds a link we open it
-     * directly; otherwise we land on the platform's home so the user can browse
-     * and the media sniffer captures whatever plays.
-     */
-    private fun openInAppBrowser() {
-        val typed = binding.searchInput.text?.toString()?.trim().orEmpty()
-        val url = when {
-            typed.startsWith("http") -> typed
-            styledSource == VideoSource.SNAPCHAT -> "https://www.snapchat.com/explore"
-            else -> "https://www.instagram.com/"
-        }
-        startActivity(com.myvideolibrary.app.ui.browser.BrowserActivity.intent(this, url))
-    }
-
     private var styledSource: VideoSource? = null
 
     /** Mimics each platform's look: YouTube = landscape list, TikTok = 9:16 grid. */
     private fun applyStyle(source: VideoSource) {
         if (styledSource == source) return
         styledSource = source
-        when (source) {
-            VideoSource.TIKTOK, VideoSource.INSTAGRAM, VideoSource.SNAPCHAT -> {
-                adapter.style = SearchResultAdapter.Style.PORTRAIT
-                binding.recyclerView.layoutManager =
-                    androidx.recyclerview.widget.GridLayoutManager(this, 3)
-            }
-            else -> {
-                // YouTube: a 2-column grid of 16:9 cards, mirroring the YouTube app.
-                adapter.style = SearchResultAdapter.Style.GRID
-                binding.recyclerView.layoutManager =
-                    androidx.recyclerview.widget.GridLayoutManager(this, 2)
-            }
+        if (source == VideoSource.TIKTOK) {
+            adapter.style = SearchResultAdapter.Style.PORTRAIT
+            binding.recyclerView.layoutManager =
+                androidx.recyclerview.widget.GridLayoutManager(this, 3)
+        } else {
+            // YouTube: a 2-column grid of 16:9 cards, mirroring the YouTube app.
+            adapter.style = SearchResultAdapter.Style.GRID
+            binding.recyclerView.layoutManager =
+                androidx.recyclerview.widget.GridLayoutManager(this, 2)
         }
     }
 
@@ -182,18 +157,12 @@ class SearchActivity : AppCompatActivity() {
                     currentItems = state.results
                     adapter.submitList(state.results)
 
-                    // Link-based sources (TikTok/Instagram/Snapchat): hint the user
-                    // to paste a link and switch the field to URL mode.
+                    // Both YouTube and TikTok support keyword search.
                     binding.hintText.isVisible = !state.searchSupported
                     binding.hintText.setText(R.string.link_only_hint)
                     binding.searchInput.hint = getString(
                         if (state.searchSupported) R.string.search_hint else R.string.paste_url_hint
                     )
-
-                    // Instagram/Snapchat have no public keyword search: surface the
-                    // in-app browser so the user can browse and download via the sniffer.
-                    binding.browseButton.isVisible =
-                        state.source == VideoSource.INSTAGRAM || state.source == VideoSource.SNAPCHAT
 
                     binding.errorText.isVisible = state.error != null
                     binding.errorText.text = state.error

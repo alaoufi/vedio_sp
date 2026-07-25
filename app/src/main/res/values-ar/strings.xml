@@ -161,12 +161,13 @@
 
     <!-- Add download (providers) -->
     <string name="search_title">بحث وتحميل</string>
+    <string name="search_platforms_title">يوتيوب / تيك توك</string>
     <string name="action_search">بحث</string>
     <string name="tiktok_link_hint">تيك توك لا يدعم البحث بالكلمات — الصق رابط تيك توك ثم اضغط بحث لتحميله.</string>
     <string name="link_only_hint">لا يوجد بحث بالكلمات هنا — الصق رابط منشور عام ثم اضغط بحث لتحميله. انستقرام وسناب شات للمنشورات العامة فقط.</string>
     <string name="browse_in_app">تصفّح داخل التطبيق للبحث والتحميل</string>
     <string name="add_download_title">تحميل من رابط</string>
-    <string name="add_download_hint">الصق رابط تيك توك أو يوتيوب أو انستقرام أو سناب شات. فيديوهات تيك توك تُحفظ بدون علامة مائية. انستقرام وسناب شات يعملان فقط للمنشورات العامة. الاستخراج يعتمد على المنصّة وقد يفشل أحيانًا.</string>
+    <string name="add_download_hint">الصق رابط تيك توك أو يوتيوب. فيديوهات تيك توك تُحفظ بدون علامة مائية. الاستخراج يعتمد على المنصّة وقد يفشل أحيانًا.</string>
     <string name="paste_url_hint">رابط الفيديو</string>
     <string name="paste">لصق</string>
     <string name="fetch_info">جلب المعلومات</string>
