@@ -596,6 +596,33 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /** Pick an existing playlist for this video, or create a new one on the spot. */
+    private fun showAddToPlaylist(video: VideoEntity) {
+        val playlists = viewModel.playlists.value
+        val labels = playlists.map { it.name } + getString(R.string.playlist_new)
+        AlertDialog.Builder(this)
+            .setTitle(R.string.add_to_playlist)
+            .setItems(labels.toTypedArray()) { _, which ->
+                if (which < playlists.size) {
+                    viewModel.addToPlaylist(playlists[which].id, video.id)
+                    android.widget.Toast.makeText(this, R.string.playlist_added, android.widget.Toast.LENGTH_SHORT).show()
+                } else {
+                    val input = EditText(this).apply { hint = getString(R.string.playlist_name_hint) }
+                    AlertDialog.Builder(this)
+                        .setTitle(R.string.playlist_new)
+                        .setView(input)
+                        .setPositiveButton(R.string.create) { _, _ ->
+                            viewModel.createPlaylistWith(input.text.toString(), video.id)
+                            android.widget.Toast.makeText(this, R.string.playlist_added, android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                        .setNegativeButton(R.string.cancel, null)
+                        .show()
+                }
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
     private fun promptSetCategory(video: VideoEntity) {
         // Offer the same categories shown in "Manage categories", in the same
         // managed order, so the two match.
@@ -788,6 +815,7 @@ class MainActivity : AppCompatActivity() {
             isChecked = video.isLocked
         }
         popup.menu.add(0, 4, 5, getString(R.string.set_category))
+        popup.menu.add(0, 14, 5, getString(R.string.add_to_playlist))
         popup.menu.add(0, 5, 6, getString(R.string.edit_info))
         // Trim (lossless) only for downloaded video files.
         val isVideoFile = video.mediaType == com.myvideolibrary.app.data.model.MediaType.VIDEO.id &&
@@ -814,6 +842,7 @@ class MainActivity : AppCompatActivity() {
                 6 -> { confirmDeleteSingle(video); true }
                 8 -> { openSource(video); true }
                 9 -> { viewModel.toggleFavorite(video); true }
+                14 -> { showAddToPlaylist(video); true }
                 10 -> { showFileInfo(video); true }
                 12 -> {
                     startActivity(
@@ -1053,7 +1082,8 @@ class MainActivity : AppCompatActivity() {
         // Search and view-toggle work on both tabs; the rest are library-only.
         for (id in intArrayOf(
             R.id.action_filter, R.id.action_favorites, R.id.action_sort,
-            R.id.action_protected, R.id.action_manage_categories, R.id.action_stats
+            R.id.action_protected, R.id.action_manage_categories, R.id.action_stats,
+            R.id.action_playlists
         )) menu.findItem(id)?.isVisible = !youtubeTab
         return super.onPrepareOptionsMenu(menu)
     }
@@ -1091,6 +1121,10 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.action_stats -> {
                 startActivity(Intent(this, com.myvideolibrary.app.ui.stats.StatsActivity::class.java))
+                true
+            }
+            R.id.action_playlists -> {
+                startActivity(com.myvideolibrary.app.ui.playlists.PlaylistsActivity.intent(this))
                 true
             }
             R.id.action_guide -> {

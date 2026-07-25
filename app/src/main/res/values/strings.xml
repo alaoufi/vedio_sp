@@ -468,4 +468,21 @@
     <string name="shared_video">Shared video</string>
     <string name="share_saved">Saved %1$d video(s) to your library</string>
     <string name="share_save_failed">Couldn\'t save the shared video</string>
+
+    <!-- Playlists -->
+    <string name="playlists">Playlists</string>
+    <string name="playlists_empty">No playlists yet. Tap + to create one.</string>
+    <string name="playlist_empty">No videos in this playlist yet.</string>
+    <string name="playlist_new">New playlist</string>
+    <string name="playlist_name_hint">Playlist name</string>
+    <string name="playlist_delete_confirm">Delete “%1$s”?</string>
+    <string name="playlist_remove_video">Remove from playlist</string>
+    <string name="playlist_removed">Removed from playlist</string>
+    <string name="play_all">Play all</string>
+    <string name="add_to_playlist">Add to playlist</string>
+    <string name="playlist_added">Added to playlist</string>
+    <plurals name="playlist_video_count">
+        <item quantity="one">%d video</item>
+        <item quantity="other">%d videos</item>
+    </plurals>
 </resources>

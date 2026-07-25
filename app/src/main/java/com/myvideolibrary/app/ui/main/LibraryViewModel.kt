@@ -58,8 +58,40 @@ class LibraryViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val downloadRepository: com.myvideolibrary.app.data.repository.DownloadRepository,
     private val downloadManager: com.myvideolibrary.app.download.DownloadManager,
-    private val providerRegistry: com.myvideolibrary.app.provider.ProviderRegistry
+    private val providerRegistry: com.myvideolibrary.app.provider.ProviderRegistry,
+    private val playlistDao: com.myvideolibrary.app.data.local.dao.PlaylistDao
 ) : ViewModel() {
+
+    /** All playlists (with counts), for the "add to playlist" picker. */
+    val playlists: StateFlow<List<com.myvideolibrary.app.data.local.entity.PlaylistWithCount>> =
+        playlistDao.observePlaylists()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    /** Adds a video to an existing playlist at the end. */
+    fun addToPlaylist(playlistId: Long, videoId: Long) = viewModelScope.launch {
+        val pos = playlistDao.nextPosition(playlistId)
+        playlistDao.addVideo(
+            com.myvideolibrary.app.data.local.entity.PlaylistVideoEntity(
+                playlistId = playlistId, videoId = videoId, position = pos
+            )
+        )
+    }
+
+    /** Creates a new playlist and drops the video into it. */
+    fun createPlaylistWith(name: String, videoId: Long) = viewModelScope.launch {
+        val trimmed = name.trim()
+        if (trimmed.isEmpty()) return@launch
+        val id = playlistDao.insert(
+            com.myvideolibrary.app.data.local.entity.PlaylistEntity(
+                name = trimmed, createdDate = System.currentTimeMillis()
+            )
+        )
+        playlistDao.addVideo(
+            com.myvideolibrary.app.data.local.entity.PlaylistVideoEntity(
+                playlistId = id, videoId = videoId, position = 0
+            )
+        )
+    }
 
     /** Active (waiting/downloading/paused) downloads, for the dashboard banner. */
     val activeDownloads: StateFlow<List<com.myvideolibrary.app.data.local.entity.DownloadEntity>> =

@@ -61,6 +61,12 @@
     <!-- Content sections -->
     <group android:id="@+id/grp_sections">
         <item
+            android:id="@+id/action_playlists"
+            android:icon="@drawable/ic_view_list"
+            android:title="@string/playlists"
+            app:showAsAction="never" />
+
+        <item
             android:id="@+id/action_manage_categories"
             android:icon="@drawable/ic_filter_list"
             android:title="@string/manage_categories"

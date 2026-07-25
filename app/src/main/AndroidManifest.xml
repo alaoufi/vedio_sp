@@ -150,6 +150,16 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.playlists.PlaylistsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyVideoLibrary" />
+
+        <activity
+            android:name=".ui.playlists.PlaylistDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyVideoLibrary" />
+
         <!-- Receives videos shared from other apps and saves them to the library. -->
         <activity
             android:name=".ui.share.ShareReceiverActivity"
