@@ -86,12 +86,15 @@ class PlayerActivity : AppCompatActivity() {
         else intent.getLongExtra(EXTRA_VIDEO_ID, -1)
         this.videoId = videoId
         val streamUrl = intent.getStringExtra(EXTRA_STREAM_URL)
+        // Opened from a file manager / another app via "Open with" — play that file.
+        val externalUri = if (intent.action == Intent.ACTION_VIEW) intent.data else null
 
         setupControls()
         setupGestures()
         loadHideBox()
 
         when {
+            externalUri != null -> viewModel.loadStream(externalUri.toString(), externalTitle(externalUri))
             streamUrls.isNotEmpty() -> viewModel.loadStream(
                 streamUrls[playlistIndex], streamTitles.getOrElse(playlistIndex) { "" }
             )
@@ -275,8 +278,9 @@ class PlayerActivity : AppCompatActivity() {
         binding.playerView.player = exo
 
         val uri = when {
-            source.startsWith("content://") -> Uri.parse(source)
-            source.startsWith("http") -> Uri.parse(source)
+            source.startsWith("content://") ||
+                source.startsWith("http") ||
+                source.startsWith("file://") -> Uri.parse(source)
             else -> Uri.fromFile(java.io.File(source))
         }
         exo.setMediaItem(MediaItem.fromUri(uri))
@@ -569,6 +573,18 @@ class PlayerActivity : AppCompatActivity() {
                 (it.duration > 0 && it.currentPosition >= it.duration - 3000)
             viewModel.savePosition(if (ended) 0L else it.currentPosition)
         }
+    }
+
+    /** A readable title for an externally-opened file: its display name, else the URI tail. */
+    private fun externalTitle(uri: Uri): String {
+        val name = runCatching {
+            if (uri.scheme == "content") {
+                contentResolver.query(
+                    uri, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME), null, null, null
+                )?.use { c -> if (c.moveToFirst()) c.getString(0) else null }
+            } else null
+        }.getOrNull()
+        return name ?: uri.lastPathSegment?.substringAfterLast('/') ?: getString(R.string.app_name)
     }
 
     companion object {

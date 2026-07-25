@@ -137,10 +137,18 @@
         <!-- Player: supports PiP, rotation, and keeps screen on. -->
         <activity
             android:name=".ui.player.PlayerActivity"
-            android:exported="false"
+            android:exported="true"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden|uiMode"
             android:supportsPictureInPicture="true"
-            android:theme="@style/Theme.MyVideoLibrary.Player" />
+            android:theme="@style/Theme.MyVideoLibrary.Player">
+            <!-- "Open with" for video files from a file manager or another app. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+        </activity>
 
         <!-- FileProvider for sharing exported backups. -->
         <provider
