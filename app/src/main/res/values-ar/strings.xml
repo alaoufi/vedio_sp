@@ -426,4 +426,9 @@
     <!-- Player subtitles -->
     <string name="subtitles_add">الترجمة (SRT/VTT)</string>
     <string name="subtitles_loaded">تم تحميل الترجمة</string>
+
+    <!-- Shared-video receiver -->
+    <string name="shared_video">فيديو مُشارَك</string>
+    <string name="share_saved">تم حفظ %1$d فيديو في مكتبتك</string>
+    <string name="share_save_failed">تعذّر حفظ الفيديو المُشارَك</string>
 </resources>

@@ -463,4 +463,9 @@
     <!-- Player subtitles -->
     <string name="subtitles_add">Subtitles (SRT/VTT)</string>
     <string name="subtitles_loaded">Subtitles loaded</string>
+
+    <!-- Shared-video receiver -->
+    <string name="shared_video">Shared video</string>
+    <string name="share_saved">Saved %1$d video(s) to your library</string>
+    <string name="share_save_failed">Couldn\'t save the shared video</string>
 </resources>
