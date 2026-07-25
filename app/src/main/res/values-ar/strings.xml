@@ -183,7 +183,7 @@
     <string name="error_not_found">الفيديو غير موجود أو محذوف.</string>
     <string name="error_unsupported">هذا الرابط غير مدعوم.</string>
     <string name="error_network">خطأ في الشبكة. تحقّق من اتصالك.</string>
-    <string name="error_extraction">تعذّر استخراج الفيديو. قد يكون المصدر تغيّر.</string>
+    <string name="error_extraction">تعذّر جلب هذا المقطع. قد يكون خاصًا أو مقيّدًا في منطقتك أو جديدًا جدًا لم يُتَح بعد. أعد المحاولة بعد قليل، أو استخدم «افتح في المتصفّح لالتقاطه».</string>
     <string name="open_in_browser">افتح في المتصفّح لالتقاطه</string>
     <string name="error_unknown">حدث خطأ ما.</string>
 

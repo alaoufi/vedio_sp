@@ -220,7 +220,7 @@
     <string name="error_not_found">Video not found or deleted.</string>
     <string name="error_unsupported">This link is not supported.</string>
     <string name="error_network">Network error. Check your connection.</string>
-    <string name="error_extraction">Could not extract the video. The source may have changed.</string>
+    <string name="error_extraction">Couldn\'t fetch this clip. It may be private, region-restricted, or too new to resolve yet. Try again in a bit, or use “Open in browser to capture”.</string>
     <string name="open_in_browser">Open in browser to capture</string>
     <string name="error_unknown">Something went wrong.</string>
 
