@@ -459,4 +459,8 @@
     <string name="guide_prompt_title">User guide</string>
     <string name="guide_prompt_message">Would you like a quick look at the interactive guide to learn what the app can do?</string>
     <string name="view_guide">View guide</string>
+
+    <!-- Player subtitles -->
+    <string name="subtitles_add">Subtitles (SRT/VTT)</string>
+    <string name="subtitles_loaded">Subtitles loaded</string>
 </resources>

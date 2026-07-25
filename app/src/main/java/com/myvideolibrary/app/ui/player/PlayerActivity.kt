@@ -61,6 +61,26 @@ class PlayerActivity : AppCompatActivity() {
     private val speeds = floatArrayOf(0.5f, 0.75f, 1f, 1.25f, 1.5f, 2f)
     private var speedIndex = 2
 
+    // Currently playing source and an optional user-chosen subtitle sidecar file.
+    private var currentSource: String? = null
+    private var subtitleUri: Uri? = null
+
+    /** Lets the user pick an .srt / .vtt subtitle file to overlay on the video. */
+    private val subtitlePicker = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            runCatching {
+                contentResolver.takePersistableUriPermission(
+                    uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            }
+            subtitleUri = uri
+            reloadWithSubtitles()
+            showGestureHint(getString(R.string.subtitles_loaded))
+        }
+    }
+
     private lateinit var gestureDetector: GestureDetector
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -168,8 +188,9 @@ class PlayerActivity : AppCompatActivity() {
         if (!isAudioTrack) {
             m.add(0, 1, 0, getString(if (rotationLocked) R.string.rotation_auto else R.string.rotation_lock))
             m.add(0, 2, 1, getString(R.string.cd_resize))
-            m.add(0, 5, 2, getString(R.string.hide_text))
-            if (binding.hideBox.hasBox) m.add(0, 6, 3, getString(R.string.hide_text_remove))
+            m.add(0, 9, 2, getString(R.string.subtitles_add))
+            m.add(0, 5, 3, getString(R.string.hide_text))
+            if (binding.hideBox.hasBox) m.add(0, 6, 4, getString(R.string.hide_text_remove))
         }
         m.add(0, 3, 4, getString(R.string.background_play)).apply {
             isCheckable = true
@@ -191,6 +212,14 @@ class PlayerActivity : AppCompatActivity() {
                 }
                 7 -> { playNext(); true }
                 8 -> { playPrevious(); true }
+                9 -> {
+                    runCatching {
+                        subtitlePicker.launch(
+                            arrayOf("application/x-subrip", "text/vtt", "text/*", "*/*")
+                        )
+                    }
+                    true
+                }
                 else -> false
             }
         }
@@ -262,6 +291,41 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
+    private fun sourceUri(source: String): Uri = when {
+        source.startsWith("content://") ||
+            source.startsWith("http") ||
+            source.startsWith("file://") -> Uri.parse(source)
+        else -> Uri.fromFile(java.io.File(source))
+    }
+
+    /** MediaItem for [uri], with the user's chosen subtitle sidecar if any. */
+    private fun buildMediaItem(uri: Uri): MediaItem {
+        val sub = subtitleUri ?: return MediaItem.fromUri(uri)
+        val mime = if ((sub.lastPathSegment ?: "").lowercase().endsWith(".vtt")) {
+            androidx.media3.common.MimeTypes.TEXT_VTT
+        } else {
+            androidx.media3.common.MimeTypes.APPLICATION_SUBRIP
+        }
+        val config = MediaItem.SubtitleConfiguration.Builder(sub)
+            .setMimeType(mime)
+            .setLanguage("und")
+            .setSelectionFlags(androidx.media3.common.C.SELECTION_FLAG_DEFAULT)
+            .build()
+        return MediaItem.Builder().setUri(uri).setSubtitleConfigurations(listOf(config)).build()
+    }
+
+    /** Rebuilds the current media with the chosen subtitle track, keeping position. */
+    private fun reloadWithSubtitles() {
+        val exo = player ?: return
+        val src = currentSource ?: return
+        val pos = exo.currentPosition
+        val wasPlaying = exo.playWhenReady
+        exo.setMediaItem(buildMediaItem(sourceUri(src)))
+        exo.prepare()
+        exo.seekTo(pos)
+        exo.playWhenReady = wasPlaying
+    }
+
     private fun preparePlayer(source: String, resumeMs: Long) {
         if (player != null) return
         // Start playback as soon as ~0.5s is buffered instead of ExoPlayer's
@@ -277,13 +341,8 @@ class PlayerActivity : AppCompatActivity() {
         val exo = ExoPlayer.Builder(this).setLoadControl(loadControl).build()
         binding.playerView.player = exo
 
-        val uri = when {
-            source.startsWith("content://") ||
-                source.startsWith("http") ||
-                source.startsWith("file://") -> Uri.parse(source)
-            else -> Uri.fromFile(java.io.File(source))
-        }
-        exo.setMediaItem(MediaItem.fromUri(uri))
+        currentSource = source
+        exo.setMediaItem(buildMediaItem(sourceUri(source)))
         exo.playWhenReady = true
         if (resumeMs > 0) exo.seekTo(resumeMs)
         exo.setPlaybackSpeed(speeds[speedIndex])

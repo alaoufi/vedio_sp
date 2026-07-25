@@ -422,4 +422,8 @@
     <string name="guide_prompt_title">دليل الاستخدام</string>
     <string name="guide_prompt_message">هل تريد إلقاء نظرة سريعة على الدليل التفاعلي لتتعرّف على إمكانات التطبيق؟</string>
     <string name="view_guide">عرض الدليل</string>
+
+    <!-- Player subtitles -->
+    <string name="subtitles_add">الترجمة (SRT/VTT)</string>
+    <string name="subtitles_loaded">تم تحميل الترجمة</string>
 </resources>
