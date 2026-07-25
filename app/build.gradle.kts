@@ -62,9 +62,11 @@ android {
         }
         debug {
             isMinifyEnabled = false
-            // No ".debug" applicationId suffix or "-debug" version suffix, so the
-            // installed app reads as a clean release build (package
-            // com.myvideolibrary.app, version 1.0.x) rather than a debug variant.
+            // Keep the ".debug" applicationId so a new build UPDATES the already
+            // installed app in place (same package + same signing key) instead of
+            // installing as a second, empty app. No "-debug" version suffix, so the
+            // version still reads clean as 1.0.x.
+            applicationIdSuffix = ".debug"
             signingConfig = signingConfigs.getByName("debug")
         }
     }

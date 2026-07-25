@@ -393,4 +393,11 @@
     <string name="resize_fit">احتواء</string>
     <string name="resize_zoom">تكبير (قص)</string>
     <string name="resize_fill">ملء (تمديد)</string>
+
+    <!-- In-app update check -->
+    <string name="update_available_title">يتوفّر تحديث</string>
+    <string name="update_available_message">يتوفّر إصدار أحدث (%1$s). هل تريد تنزيله الآن؟</string>
+    <string name="update_download">تنزيل</string>
+    <string name="update_skip">تخطّي هذا الإصدار</string>
+    <string name="later">لاحقًا</string>
 </resources>

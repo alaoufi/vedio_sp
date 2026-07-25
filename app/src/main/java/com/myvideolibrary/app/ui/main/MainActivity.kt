@@ -42,6 +42,7 @@ class MainActivity : AppCompatActivity() {
     private val youtubeViewModel: com.myvideolibrary.app.ui.search.SearchViewModel by viewModels()
 
     @javax.inject.Inject lateinit var securityManager: SecurityManager
+    @javax.inject.Inject lateinit var okHttpClient: okhttp3.OkHttpClient
 
     private lateinit var adapter: VideoPagingAdapter
     private lateinit var youtubeAdapter: com.myvideolibrary.app.ui.search.SearchResultAdapter
@@ -89,6 +90,7 @@ class MainActivity : AppCompatActivity() {
         binding.filterChip.setOnClickListener { viewModel.setCategoryFilters(emptySet()) }
         binding.filterChip.setOnCloseIconClickListener { viewModel.setCategoryFilters(emptySet()) }
         requestNotificationPermissionIfNeeded()
+        maybeCheckForUpdate()
     }
 
     private fun observeDownloads() {
@@ -456,6 +458,44 @@ class MainActivity : AppCompatActivity() {
             state.videoCount,
             Formatters.fileSize(state.totalSize)
         )
+    }
+
+    /**
+     * Once every few hours, quietly asks GitHub Releases whether a newer build
+     * exists and, if so, offers to download it. Any failure is silent — this
+     * never blocks or nags, and nothing about the library is sent.
+     */
+    private fun maybeCheckForUpdate() {
+        val prefs = getSharedPreferences("updates", MODE_PRIVATE)
+        val now = System.currentTimeMillis()
+        if (now - prefs.getLong("last_check", 0L) < 6 * 60 * 60 * 1000L) return
+        prefs.edit().putLong("last_check", now).apply()
+
+        lifecycleScope.launch {
+            val result = com.myvideolibrary.app.util.UpdateChecker.check(
+                com.myvideolibrary.app.BuildConfig.VERSION_CODE, okHttpClient
+            ) ?: return@launch
+            if (prefs.getInt("skip_build", -1) == result.latestBuild) return@launch
+            if (isFinishing || isDestroyed) return@launch
+            AlertDialog.Builder(this@MainActivity)
+                .setTitle(R.string.update_available_title)
+                .setMessage(getString(R.string.update_available_message, result.latestVersion))
+                .setPositiveButton(R.string.update_download) { _, _ ->
+                    runCatching {
+                        startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                android.net.Uri.parse(com.myvideolibrary.app.util.UpdateChecker.APK_URL)
+                            )
+                        )
+                    }
+                }
+                .setNeutralButton(R.string.update_skip) { _, _ ->
+                    prefs.edit().putInt("skip_build", result.latestBuild).apply()
+                }
+                .setNegativeButton(R.string.later, null)
+                .show()
+        }
     }
 
     /**

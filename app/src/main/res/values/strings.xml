@@ -430,4 +430,11 @@
     <string name="resize_fit">Fit</string>
     <string name="resize_zoom">Zoom (crop)</string>
     <string name="resize_fill">Fill (stretch)</string>
+
+    <!-- In-app update check -->
+    <string name="update_available_title">Update available</string>
+    <string name="update_available_message">A newer version (%1$s) is available. Download it now?</string>
+    <string name="update_download">Download</string>
+    <string name="update_skip">Skip this version</string>
+    <string name="later">Later</string>
 </resources>
