@@ -41,7 +41,16 @@ class ImportActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.toolbar.setNavigationOnClickListener { finish() }
 
-        adapter = ImportAdapter(onToggle = viewModel::toggle)
+        adapter = ImportAdapter(
+            onToggle = viewModel::toggle,
+            onPlay = { video ->
+                startActivity(
+                    com.myvideolibrary.app.ui.player.PlayerActivity.streamIntent(
+                        this, video.contentUri, video.displayName
+                    )
+                )
+            }
+        )
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = adapter
 

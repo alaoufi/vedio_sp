@@ -9,14 +9,34 @@
     android:paddingVertical="6dp"
     android:background="?attr/selectableItemBackground">
 
-    <ImageView
-        android:id="@+id/thumbnail"
+    <!-- Tap the thumbnail to preview the clip before importing. -->
+    <FrameLayout
+        android:id="@+id/thumbFrame"
         android:layout_width="96dp"
         android:layout_height="60dp"
-        android:background="#20000000"
-        android:contentDescription="@string/cd_thumbnail"
-        android:scaleType="centerCrop"
-        tools:src="@drawable/ic_video_placeholder" />
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:id="@+id/thumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#20000000"
+            android:contentDescription="@string/cd_thumbnail"
+            android:scaleType="centerCrop"
+            tools:src="@drawable/ic_video_placeholder" />
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_play_badge"
+            android:padding="4dp"
+            android:src="@drawable/ic_play_arrow"
+            android:tint="@android:color/white"
+            android:contentDescription="@string/play" />
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="0dp"

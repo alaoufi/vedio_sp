@@ -12,7 +12,8 @@ import com.myvideolibrary.app.util.Formatters
 import com.myvideolibrary.app.util.ScannedVideo
 
 class ImportAdapter(
-    private val onToggle: (String) -> Unit
+    private val onToggle: (String) -> Unit,
+    private val onPlay: (ScannedVideo) -> Unit
 ) : ListAdapter<ImportAdapter.Row, ImportAdapter.VH>(DIFF) {
 
     data class Row(val video: ScannedVideo, val selected: Boolean)
@@ -46,6 +47,8 @@ class ImportAdapter(
 
             binding.root.setOnClickListener { onToggle(v.contentUri) }
             binding.checkbox.setOnClickListener { onToggle(v.contentUri) }
+            // Tapping the thumbnail previews the clip instead of toggling it.
+            binding.thumbFrame.setOnClickListener { onPlay(v) }
         }
     }
 
