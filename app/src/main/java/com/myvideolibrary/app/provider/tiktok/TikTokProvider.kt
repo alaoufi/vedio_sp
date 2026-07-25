@@ -128,48 +128,63 @@ class TikTokProvider @Inject constructor(
         withContext(Dispatchers.IO) {
             val q = query.trim()
             if (q.isEmpty()) return@withContext emptyList()
-            val api = "$RESOLVER_BASE/api/feed/search?count=20&keywords=" +
-                URLEncoder.encode(q, "UTF-8")
-            val request = Request.Builder().url(api).header("User-Agent", UA).build()
 
-            val body = try {
-                client.newCall(request).execute().use { resp ->
-                    if (!resp.isSuccessful) return@withContext emptyList()
-                    resp.body?.string()
-                }
-            } catch (e: IOException) {
-                throw ProviderException(ProviderErrorType.NETWORK, "Network error", e)
-            } ?: return@withContext emptyList()
+            // Page through the search feed (tikwm returns a small batch + a cursor)
+            // so the user gets a full, scrollable list like TikTok itself, not ~6.
+            val out = ArrayList<ProviderSearchItem>()
+            var cursor = "0"
+            var pages = 0
+            while (out.size < MAX_SEARCH_RESULTS && pages < MAX_SEARCH_PAGES) {
+                val api = "$RESOLVER_BASE/api/feed/search?count=30&cursor=$cursor&keywords=" +
+                    URLEncoder.encode(q, "UTF-8")
+                val request = Request.Builder().url(api).header("User-Agent", UA).build()
+                val body = try {
+                    client.newCall(request).execute().use { resp ->
+                        if (!resp.isSuccessful) return@use null
+                        resp.body?.string()
+                    }
+                } catch (e: IOException) {
+                    if (out.isEmpty()) throw ProviderException(ProviderErrorType.NETWORK, "Network error", e)
+                    break
+                } ?: break
 
-            val root = runCatching { gson.fromJson(body, JsonObject::class.java) }.getOrNull()
-                ?: return@withContext emptyList()
-            if ((root.get("code")?.takeIf { !it.isJsonNull }?.asInt ?: -1) != 0) {
-                return@withContext emptyList()
+                val root = runCatching { gson.fromJson(body, JsonObject::class.java) }.getOrNull() ?: break
+                if ((root.get("code")?.takeIf { !it.isJsonNull }?.asInt ?: -1) != 0) break
+                val data = root.obj("data") ?: break
+                val videos = data.get("videos")?.takeIf { it.isJsonArray }?.asJsonArray ?: break
+                if (videos.size() == 0) break
+
+                out += videos.mapNotNull(::mapSearchVideo)
+                pages++
+
+                val hasMore = runCatching { data.get("hasMore")?.asBoolean }.getOrNull() == true
+                val next = data.str("cursor") ?: break
+                if (!hasMore || next == cursor) break
+                cursor = next
             }
-            val videos = root.obj("data")?.get("videos")?.takeIf { it.isJsonArray }?.asJsonArray
-                ?: return@withContext emptyList()
-
-            videos.mapNotNull { el ->
-                val v = el.asJsonObject
-                val id = v.str("video_id") ?: v.str("id") ?: return@mapNotNull null
-                val author = v.obj("author")
-                val handle = author?.str("unique_id")
-                ProviderSearchItem(
-                    source = VideoSource.TIKTOK,
-                    url = if (handle != null) "https://www.tiktok.com/@$handle/video/$id"
-                    else "https://www.tiktok.com/video/$id",
-                    title = v.str("title")?.takeIf { it.isNotBlank() } ?: "TikTok video",
-                    thumbnailUrl = v.cleanImage(),
-                    author = author?.str("nickname"),
-                    durationMs = (v.num("duration") ?: 0) * 1000,
-                    // tikwm already gives the watermark-free URL in search results,
-                    // but for a photo post "play" is only the music — leave it null
-                    // so the download path re-resolves and saves the picture.
-                    directUrl = if (v.isPhotoPost()) null
-                    else v.str("play")?.let { absolutize(it) }
-                )
-            }
+            out
         }
+
+    private fun mapSearchVideo(el: com.google.gson.JsonElement): ProviderSearchItem? {
+        val v = el.takeIf { it.isJsonObject }?.asJsonObject ?: return null
+        val id = v.str("video_id") ?: v.str("id") ?: return null
+        val author = v.obj("author")
+        val handle = author?.str("unique_id")
+        return ProviderSearchItem(
+            source = VideoSource.TIKTOK,
+            url = if (handle != null) "https://www.tiktok.com/@$handle/video/$id"
+            else "https://www.tiktok.com/video/$id",
+            title = v.str("title")?.takeIf { it.isNotBlank() } ?: "TikTok video",
+            thumbnailUrl = v.cleanImage(),
+            author = author?.str("nickname"),
+            durationMs = (v.num("duration") ?: 0) * 1000,
+            // tikwm already gives the watermark-free URL in search results,
+            // but for a photo post "play" is only the music — leave it null
+            // so the download path re-resolves and saves the picture.
+            directUrl = if (v.isPhotoPost()) null
+            else v.str("play")?.let { absolutize(it) }
+        )
+    }
 
     private fun mapError(msg: String): ProviderException {
         val m = msg.lowercase()
@@ -231,6 +246,9 @@ class TikTokProvider @Inject constructor(
 
     companion object {
         private const val RESOLVER_BASE = "https://www.tikwm.com"
+        /** Upper bounds for paging the TikTok search feed. */
+        private const val MAX_SEARCH_RESULTS = 60
+        private const val MAX_SEARCH_PAGES = 4
         private const val UA =
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
                 "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"

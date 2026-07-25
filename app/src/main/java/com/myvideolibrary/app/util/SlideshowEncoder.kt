@@ -5,9 +5,11 @@ import android.graphics.BitmapFactory
 import android.media.Image
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
+import android.media.MediaCodecList
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.media.MediaMuxer
+import android.os.Build
 import java.io.File
 import java.nio.ByteBuffer
 
@@ -55,7 +57,10 @@ object SlideshowEncoder {
                 setInteger(MediaFormat.KEY_FRAME_RATE, FPS)
                 setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1)
             }
-            encoder = MediaCodec.createEncoderByType(MIME)
+            // Prefer a SOFTWARE encoder: many hardware encoders (notably on
+            // Xiaomi/MediaTek) stall on ByteBuffer YUV input, which is exactly the
+            // "timed out" hang. Software encoders accept flexible YUV reliably.
+            encoder = createAvcEncoder()
             encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
             encoder.start()
 
@@ -171,6 +176,28 @@ object SlideshowEncoder {
             runCatching { muxer?.release() }
             runCatching { audioExtractor?.release() }
         }
+    }
+
+    /** Finds a software AVC encoder that accepts flexible YUV; falls back to any. */
+    private fun createAvcEncoder(): MediaCodec {
+        val flexible = MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible
+        val infos = MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos
+        for (info in infos) {
+            if (!info.isEncoder) continue
+            if (info.supportedTypes.none { it.equals(MIME, ignoreCase = true) }) continue
+            val software = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                info.isSoftwareOnly
+            } else {
+                val n = info.name.lowercase()
+                n.startsWith("omx.google") || n.startsWith("c2.android")
+            }
+            if (!software) continue
+            val supportsFlexible = runCatching {
+                info.getCapabilitiesForType(MIME).colorFormats.any { it == flexible }
+            }.getOrDefault(false)
+            if (supportsFlexible) return MediaCodec.createByCodecName(info.name)
+        }
+        return MediaCodec.createEncoderByType(MIME)
     }
 
     private fun ptsUs(frameIndex: Int): Long = frameIndex.toLong() * 1_000_000L / FPS
