@@ -550,7 +550,7 @@ class DownloadWorker @AssistedInject constructor(
     ): String? {
         suspend fun attempt(withAudio: File?): String? {
             val stage = java.util.concurrent.atomic.AtomicReference("start")
-            return kotlinx.coroutines.withTimeoutOrNull(4 * 60 * 1000L) {
+            return kotlinx.coroutines.withTimeoutOrNull(8 * 60 * 1000L) {
                 withContext(Dispatchers.IO) {
                     // Low-level MediaCodec/MediaMuxer encoder — no Media3, no GL.
                     com.myvideolibrary.app.util.SlideshowEncoder.encode(

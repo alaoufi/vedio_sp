@@ -31,8 +31,10 @@ object SlideshowEncoder {
     private const val MIME = "video/avc"
     private const val W = 720
     private const val H = 1280
-    // Static pictures don't need a high frame rate; a low one keeps the encode fast.
-    private const val FPS = 6
+    // Static pictures just hold on screen, so a very low frame rate looks
+    // identical while cutting the frame count (and encode time) several-fold —
+    // a large slideshow at 6fps was hundreds of frames and overran the timeout.
+    private const val FPS = 2
     private const val BITRATE = 4_000_000
     private const val TIMEOUT_US = 10_000L
 
@@ -261,17 +263,45 @@ object SlideshowEncoder {
         val ch = H / 2
 
         val yb = planes[0].buffer; val yRow = planes[0].rowStride; val yPix = planes[0].pixelStride
-        if (yPix == 1 && yRow == W) {
-            yb.position(0); yb.put(yuv.y)
+        if (yPix == 1) {
+            if (yRow == W) {
+                yb.position(0); yb.put(yuv.y)
+            } else {
+                for (j in 0 until H) { yb.position(j * yRow); yb.put(yuv.y, j * W, W) }
+            }
         } else {
             for (j in 0 until H) for (i in 0 until W) yb.put(j * yRow + i * yPix, yuv.y[j * W + i])
         }
 
-        val ub = planes[1].buffer; val uRow = planes[1].rowStride; val uPix = planes[1].pixelStride
-        for (j in 0 until ch) for (i in 0 until cw) ub.put(j * uRow + i * uPix, yuv.u[j * cw + i])
+        fillChroma(planes[1], yuv.u, cw, ch)
+        fillChroma(planes[2], yuv.v, cw, ch)
+    }
 
-        val vb = planes[2].buffer; val vRow = planes[2].rowStride; val vPix = planes[2].pixelStride
-        for (j in 0 until ch) for (i in 0 until cw) vb.put(j * vRow + i * vPix, yuv.v[j * cw + i])
+    /**
+     * Copies a chroma plane, choosing the fastest path the encoder's layout
+     * allows: a per-row bulk copy for planar I420 (pixelStride == 1), else a
+     * per-sample write for semi-planar (interleaved UV, pixelStride == 2).
+     */
+    private fun fillChroma(plane: Image.Plane, src: ByteArray, cw: Int, ch: Int) {
+        val buf = plane.buffer
+        val row = plane.rowStride
+        val pix = plane.pixelStride
+        if (pix == 1) {
+            if (row == cw) {
+                buf.position(0); buf.put(src)
+            } else {
+                for (j in 0 until ch) {
+                    buf.position(j * row)
+                    buf.put(src, j * cw, cw)
+                }
+            }
+        } else {
+            for (j in 0 until ch) {
+                val base = j * row
+                val srcBase = j * cw
+                for (i in 0 until cw) buf.put(base + i * pix, src[srcBase + i])
+            }
+        }
     }
 
     private fun writeAudioLooped(
