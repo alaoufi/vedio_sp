@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">مكتبة الفيديو</string>
+    <string name="app_name">Video Library</string>
 
     <!-- Tabs / YouTube -->
     <string name="tab_library">Library</string>

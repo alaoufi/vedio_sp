@@ -8,6 +8,8 @@
         <item name="colorTertiary">@color/brand_accent</item>
         <item name="android:statusBarColor">?attr/colorSurface</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <!-- Every MaterialToolbar picks up one consistent look app-wide. -->
+        <item name="toolbarStyle">@style/Widget.App.Toolbar</item>
     </style>
 
     <!-- Fullscreen, dark, no action bar for the video player. -->

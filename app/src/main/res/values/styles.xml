@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!--
+      One toolbar look for every screen. Set as the theme's toolbarStyle so all
+      MaterialToolbars share the same surface background, on-surface icon tint and
+      bold title — no per-screen attributes to drift out of sync. The back arrow
+      stays per-layout (app:navigationIcon) so root screens can omit it.
+    -->
+    <style name="Widget.App.Toolbar" parent="Widget.Material3.Toolbar.OnSurface">
+        <item name="navigationIconTint">?attr/colorOnSurface</item>
+        <item name="titleTextColor">?attr/colorOnSurface</item>
+        <item name="titleTextAppearance">@style/TextAppearance.App.ToolbarTitle</item>
+        <item name="android:background">?attr/colorSurface</item>
+    </style>
+
+    <style name="TextAppearance.App.ToolbarTitle" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="SettingsHeader">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
