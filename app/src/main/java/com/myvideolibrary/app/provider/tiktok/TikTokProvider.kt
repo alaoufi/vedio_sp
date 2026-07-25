@@ -50,16 +50,17 @@ class TikTokProvider @Inject constructor(
         val candidates = listOf(expandShortLink(url), url).distinct()
         var lastError: ProviderException? = null
         var root: JsonObject? = null
-        for (target in candidates) {
-            var attempt = 0
-            while (attempt < 2 && root == null) {
-                attempt++
-                val result = runCatching { fetchResolve(target) }
+        // Try each URL form against each resolver host: tikwm rate-limits/goes
+        // flaky per-host, so rotating hosts recovers links that one host rejects.
+        outer@ for (target in candidates) {
+            for (base in RESOLVER_BASES) {
+                val result = runCatching { fetchResolve(target, base) }
                 val obj = result.getOrNull()
                 if (obj != null) {
                     val code = obj.get("code")?.takeIf { !it.isJsonNull }?.asInt ?: -1
                     if (code == 0) {
                         root = obj
+                        break@outer
                     } else {
                         lastError = mapError(obj.str("msg").orEmpty())
                     }
@@ -68,7 +69,6 @@ class TikTokProvider @Inject constructor(
                         ?: ProviderException(ProviderErrorType.EXTRACTION_FAILED, "Resolve failed")
                 }
             }
-            if (root != null) break
         }
         val resolved = root ?: throw (lastError
             ?: ProviderException(ProviderErrorType.EXTRACTION_FAILED, "Could not extract the video"))
@@ -190,8 +190,8 @@ class TikTokProvider @Inject constructor(
     }
 
     /** Fetches and parses the tikwm resolve response, or throws a typed error. */
-    private fun fetchResolve(target: String): JsonObject {
-        val api = "$RESOLVER_BASE/api/?hd=1&url=" + URLEncoder.encode(target, "UTF-8")
+    private fun fetchResolve(target: String, base: String = RESOLVER_BASE): JsonObject {
+        val api = "$base/api/?hd=1&url=" + URLEncoder.encode(target, "UTF-8")
         val request = Request.Builder().url(api).header("User-Agent", UA).build()
         val body = try {
             client.newCall(request).execute().use { resp ->
@@ -225,10 +225,11 @@ class TikTokProvider @Inject constructor(
             )
             m.contains("not found") || m.contains("deleted") || m.contains("does not exist") ->
                 ProviderException(ProviderErrorType.NOT_FOUND, "Video not found or deleted")
-            // Only flag a genuinely malformed link — NOT rate-limit / transient
-            // resolver errors, which were wrongly showing as "invalid link".
-            m.contains("parsing") || (m.contains("url") && m.contains("invalid")) ->
-                ProviderException(ProviderErrorType.INVALID_LINK, "Invalid TikTok link")
+            // Never map a resolver message to INVALID_LINK: the link already passed
+            // canHandle(), so it IS a valid TikTok link. tikwm's "Url parsing is
+            // failed" and similar are transient resolver / rate-limit failures, so
+            // report them as extraction failures the user can retry — not as a bad
+            // link, which wrongly told users a real TikTok URL was invalid.
             else -> ProviderException(
                 ProviderErrorType.EXTRACTION_FAILED,
                 msg.ifBlank { "Could not extract the video (the resolver may be busy)" }
@@ -278,6 +279,8 @@ class TikTokProvider @Inject constructor(
 
     companion object {
         private const val RESOLVER_BASE = "https://www.tikwm.com"
+        /** Resolver hosts tried in order; rotating recovers per-host rate limits. */
+        private val RESOLVER_BASES = listOf("https://www.tikwm.com", "https://tikwm.com")
         /** Upper bounds for paging the TikTok search feed. */
         private const val MAX_SEARCH_RESULTS = 60
         private const val MAX_SEARCH_PAGES = 4
