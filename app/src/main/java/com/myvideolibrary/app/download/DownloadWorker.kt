@@ -562,6 +562,12 @@ class DownloadWorker @AssistedInject constructor(
 
         val withMusic = attempt(audio)
         if (withMusic == null) return null
+        // A timeout means the video encode itself is too slow on this device —
+        // NOT the audio track. encode() is a blocking call that withTimeoutOrNull
+        // can't actually interrupt, so starting a second (silent) attempt here
+        // would run concurrently with the first still-running encode, and both
+        // would then time out. Only retry without audio for a real encoder error.
+        if (withMusic == "timed out") return "timed out"
         if (audio != null) {
             progress.set(0)
             output.delete()

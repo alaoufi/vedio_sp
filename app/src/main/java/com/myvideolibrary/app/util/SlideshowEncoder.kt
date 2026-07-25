@@ -127,7 +127,9 @@ object SlideshowEncoder {
                             )
                             inputDone = true
                         } else {
-                            encoder!!.getInputImage(inIndex)?.let { fillImage(it, yuv) }
+                            val image = encoder!!.getInputImage(inIndex)
+                                ?: return "$encoderName: encoder gave no input image"
+                            fillImage(image, yuv)
                             encoder!!.queueInputBuffer(inIndex, 0, W * H * 3 / 2, ptsUs(frameIndex), 0)
                             frameIndex++
                             onProgress(frameIndex * 100 / totalFrames)
