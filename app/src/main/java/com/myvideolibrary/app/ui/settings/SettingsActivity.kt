@@ -28,6 +28,7 @@ class SettingsActivity : AppCompatActivity() {
     private val viewModel: SettingsViewModel by viewModels()
 
     @javax.inject.Inject lateinit var licenseManager: com.myvideolibrary.app.security.LicenseManager
+    @javax.inject.Inject lateinit var okHttpClient: okhttp3.OkHttpClient
 
     private val restorePicker = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
@@ -72,6 +73,7 @@ class SettingsActivity : AppCompatActivity() {
         binding.guideRow.setOnClickListener {
             startActivity(android.content.Intent(this, com.myvideolibrary.app.ui.help.HelpActivity::class.java))
         }
+        binding.checkUpdateRow.setOnClickListener { checkForUpdates() }
         binding.wifiOnlySwitch.setOnClickListener {
             viewModel.setWifiOnly(binding.wifiOnlySwitch.isChecked)
         }
@@ -176,6 +178,41 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     /** Human-readable trial / subscription state for the About section. */
+    /**
+     * Manual update check: asks GitHub Releases for the newest build and either
+     * offers to download it or reports that the app is already up to date.
+     */
+    private fun checkForUpdates() {
+        binding.checkUpdateValue.setText(R.string.checking_updates)
+        lifecycleScope.launch {
+            val result = com.myvideolibrary.app.util.UpdateChecker.check(
+                com.myvideolibrary.app.BuildConfig.VERSION_CODE, okHttpClient
+            )
+            if (result == null) {
+                binding.checkUpdateValue.setText(R.string.up_to_date)
+                Toast.makeText(this@SettingsActivity, R.string.up_to_date, Toast.LENGTH_SHORT).show()
+            } else {
+                binding.checkUpdateValue.text =
+                    getString(R.string.update_available_message, result.latestVersion)
+                AlertDialog.Builder(this@SettingsActivity)
+                    .setTitle(R.string.update_available_title)
+                    .setMessage(getString(R.string.update_available_message, result.latestVersion))
+                    .setPositiveButton(R.string.update_download) { _, _ ->
+                        runCatching {
+                            startActivity(
+                                android.content.Intent(
+                                    android.content.Intent.ACTION_VIEW,
+                                    Uri.parse(com.myvideolibrary.app.util.UpdateChecker.APK_URL)
+                                )
+                            )
+                        }
+                    }
+                    .setNegativeButton(R.string.later, null)
+                    .show()
+            }
+        }
+    }
+
     private fun licenseStatusText(): String {
         val days = licenseManager.daysLeft()
         return when {

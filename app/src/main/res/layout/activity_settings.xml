@@ -181,6 +181,14 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <LinearLayout android:id="@+id/checkUpdateRow" style="@style/SettingsRow">
+                <LinearLayout style="@style/SettingsRowText">
+                    <TextView style="@style/SettingsTitle" android:text="@string/check_updates" />
+                    <TextView android:id="@+id/checkUpdateValue" style="@style/SettingsSubtitle"
+                        android:text="@string/check_updates_desc" />
+                </LinearLayout>
+            </LinearLayout>
+
             <LinearLayout style="@style/SettingsRow">
                 <LinearLayout style="@style/SettingsRowText">
                     <TextView style="@style/SettingsTitle" android:text="@string/version" />

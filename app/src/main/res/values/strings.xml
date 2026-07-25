@@ -449,4 +449,8 @@
     <string name="update_download">Download</string>
     <string name="update_skip">Skip this version</string>
     <string name="later">Later</string>
+    <string name="check_updates">Check for updates</string>
+    <string name="check_updates_desc">Look for a newer version</string>
+    <string name="checking_updates">Checking…</string>
+    <string name="up_to_date">You\'re on the latest version</string>
 </resources>
