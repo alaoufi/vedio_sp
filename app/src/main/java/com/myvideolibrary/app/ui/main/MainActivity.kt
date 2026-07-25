@@ -85,6 +85,9 @@ class MainActivity : AppCompatActivity() {
         binding.downloadBanner.setOnClickListener {
             startActivity(Intent(this, DownloadsActivity::class.java))
         }
+        // Tapping the active-filter chip (or its ×) returns to the full library.
+        binding.filterChip.setOnClickListener { viewModel.setCategoryFilters(emptySet()) }
+        binding.filterChip.setOnCloseIconClickListener { viewModel.setCategoryFilters(emptySet()) }
         requestNotificationPermissionIfNeeded()
     }
 
@@ -430,6 +433,7 @@ class MainActivity : AppCompatActivity() {
                     applyLayoutManager(state.viewMode)
                     adapter.setSelection(state.selectionMode, state.selectedIds)
                     renderStats(state)
+                    renderFilterChip(state)
                     renderSelectionBar(state)
                     renderProtectedTitle(state)
                     invalidateOptionsMenu()
@@ -452,6 +456,21 @@ class MainActivity : AppCompatActivity() {
             state.videoCount,
             Formatters.fileSize(state.totalSize)
         )
+    }
+
+    /**
+     * Shows a removable chip whenever a category filter is active, so it's clear
+     * the library is filtered and there's an obvious way back to all videos —
+     * tap the chip or its × to clear. Hidden when nothing is filtered.
+     */
+    private fun renderFilterChip(state: LibraryUiState) {
+        val filters = state.categoryFilters
+        if (filters.isEmpty()) {
+            binding.filterChip.isVisible = false
+        } else {
+            binding.filterChip.isVisible = true
+            binding.filterChip.text = filters.joinToString("، ")
+        }
     }
 
     private fun promptSetCategory(video: VideoEntity) {

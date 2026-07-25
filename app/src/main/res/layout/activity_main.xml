@@ -28,6 +28,21 @@
             android:textColor="?android:attr/textColorSecondary"
             tools:text="0 videos · 0 B" />
 
+        <!-- Active category filter: shown only while filtering; tap (or its ×) to
+             clear it and return to the full library. -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/filterChip"
+            style="@style/Widget.Material3.Chip.Input"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginBottom="4dp"
+            android:visibility="gone"
+            app:closeIconEnabled="true"
+            app:chipIcon="@drawable/ic_filter_list"
+            tools:text="شيلات"
+            tools:visibility="visible" />
+
         <!-- Active-download banner: tap to open the Downloads screen. -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/downloadBanner"
