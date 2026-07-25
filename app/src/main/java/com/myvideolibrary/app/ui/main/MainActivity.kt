@@ -86,9 +86,6 @@ class MainActivity : AppCompatActivity() {
         binding.downloadBanner.setOnClickListener {
             startActivity(Intent(this, DownloadsActivity::class.java))
         }
-        // Tapping the active-filter chip (or its ×) returns to the full library.
-        binding.filterChip.setOnClickListener { viewModel.setCategoryFilters(emptySet()) }
-        binding.filterChip.setOnCloseIconClickListener { viewModel.setCategoryFilters(emptySet()) }
         requestNotificationPermissionIfNeeded()
         maybeCheckForUpdate()
     }
@@ -254,7 +251,8 @@ class MainActivity : AppCompatActivity() {
             viewMode = LibraryViewMode.GRID,
             onClick = ::onVideoClick,
             onLongClick = { viewModel.enterSelection(it.id) },
-            onMenu = ::showVideoMenu
+            onMenu = ::showVideoMenu,
+            onFavorite = { viewModel.toggleFavorite(it) }
         )
         binding.recyclerView.adapter = adapter
         binding.recyclerView.setHasFixedSize(true)
@@ -506,17 +504,38 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Shows a removable chip whenever a category filter is active, so it's clear
-     * the library is filtered and there's an obvious way back to all videos —
-     * tap the chip or its × to clear. Hidden when nothing is filtered.
+     * Shows a removable chip for each active quick-filter (favourites, category
+     * selection), so it's clear the library is filtered and there's an obvious
+     * way back — tap a chip or its × to clear that filter. Hidden when none.
      */
     private fun renderFilterChip(state: LibraryUiState) {
-        val filters = state.categoryFilters
-        if (filters.isEmpty()) {
-            binding.filterChip.isVisible = false
-        } else {
-            binding.filterChip.isVisible = true
-            binding.filterChip.text = filters.joinToString("، ")
+        val group = binding.filterChips
+        group.removeAllViews()
+        if (state.favoritesOnly) {
+            group.addView(
+                quickFilterChip(getString(R.string.action_favorites)) {
+                    viewModel.setFavoritesOnly(false)
+                }
+            )
+        }
+        if (state.categoryFilters.isNotEmpty()) {
+            group.addView(
+                quickFilterChip(state.categoryFilters.joinToString("، ")) {
+                    viewModel.setCategoryFilters(emptySet())
+                }
+            )
+        }
+        binding.filterChipsScroll.isVisible = group.childCount > 0
+    }
+
+    /** A removable chip; both its body and its × clear the filter via [onClear]. */
+    private fun quickFilterChip(text: String, onClear: () -> Unit): com.google.android.material.chip.Chip {
+        return com.google.android.material.chip.Chip(this).apply {
+            this.text = text
+            isCheckable = false
+            isCloseIconVisible = true
+            setOnCloseIconClickListener { onClear() }
+            setOnClickListener { onClear() }
         }
     }
 
@@ -1075,6 +1094,7 @@ class MainActivity : AppCompatActivity() {
             state.protectedMode -> viewModel.setProtectedMode(false)
             // Back first returns to the full, unfiltered library.
             state.categoryFilters.isNotEmpty() -> viewModel.setCategoryFilters(emptySet())
+            state.favoritesOnly -> viewModel.setFavoritesOnly(false)
             state.search.isNotEmpty() -> viewModel.setSearch("")
             else -> {
                 @Suppress("DEPRECATION")

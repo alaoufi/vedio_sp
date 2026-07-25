@@ -22,7 +22,8 @@ class VideoPagingAdapter(
     private var viewMode: LibraryViewMode,
     private val onClick: (VideoEntity) -> Unit,
     private val onLongClick: (VideoEntity) -> Unit,
-    private val onMenu: (VideoEntity, android.view.View) -> Unit
+    private val onMenu: (VideoEntity, android.view.View) -> Unit,
+    private val onFavorite: (VideoEntity) -> Unit = {}
 ) : PagingDataAdapter<VideoEntity, RecyclerView.ViewHolder>(DIFF) {
 
     private var selectedIds: Set<Long> = emptySet()
@@ -69,7 +70,17 @@ class VideoPagingAdapter(
         fun bind(video: VideoEntity) {
             binding.title.text = video.title
             binding.duration.text = Formatters.duration(video.duration)
-            binding.favoriteIcon.isVisible = video.isFavorite
+            // Always-visible heart toggle: filled red when favourite, outline when
+            // not — the obvious one-tap way to add or remove a favourite.
+            binding.favoriteIcon.setImageResource(
+                if (video.isFavorite) com.myvideolibrary.app.R.drawable.ic_favorite
+                else com.myvideolibrary.app.R.drawable.ic_favorite_border
+            )
+            binding.favoriteIcon.imageTintList = android.content.res.ColorStateList.valueOf(
+                if (video.isFavorite) android.graphics.Color.parseColor("#E53935")
+                else android.graphics.Color.WHITE
+            )
+            binding.favoriteIcon.setOnClickListener { onFavorite(video) }
             binding.lockIcon.isVisible = video.isLocked
             binding.linkBadge.isVisible = video.isLinkOnly
             // A saved link has no duration until downloaded.
@@ -91,7 +102,17 @@ class VideoPagingAdapter(
             binding.duration.text = Formatters.duration(video.duration)
             binding.size.text = Formatters.fileSize(video.fileSize)
             binding.quality.text = video.quality ?: "—"
-            binding.favoriteIcon.isVisible = video.isFavorite
+            // Always-visible heart toggle: filled red when favourite, outline when
+            // not — the obvious one-tap way to add or remove a favourite.
+            binding.favoriteIcon.setImageResource(
+                if (video.isFavorite) com.myvideolibrary.app.R.drawable.ic_favorite
+                else com.myvideolibrary.app.R.drawable.ic_favorite_border
+            )
+            binding.favoriteIcon.imageTintList = android.content.res.ColorStateList.valueOf(
+                if (video.isFavorite) android.graphics.Color.parseColor("#E53935")
+                else android.graphics.Color.WHITE
+            )
+            binding.favoriteIcon.setOnClickListener { onFavorite(video) }
             binding.lockIcon.isVisible = video.isLocked
             binding.linkBadge.isVisible = video.isLinkOnly
             binding.duration.isVisible = video.duration > 0
