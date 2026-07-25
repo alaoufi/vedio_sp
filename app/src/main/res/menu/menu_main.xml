@@ -2,83 +2,93 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- Grouped by purpose so the overflow reads top-to-bottom in a logical order:
-         browse actions, then view options, then tab switch, then content
-         sections, then app info & settings (Settings conventionally last). -->
+    <!-- Items are split into <group>s so the overflow shows a divider between each
+         logical block: browse, view options, tab switch, content sections, and
+         app info & settings (Settings conventionally last). -->
 
     <!-- Browse actions -->
-    <!-- Collapsible search: a magnifier that expands into a field to save space. -->
-    <item
-        android:id="@+id/action_search"
-        android:icon="@drawable/ic_search"
-        android:title="@string/search_hint"
-        app:showAsAction="always|collapseActionView"
-        app:actionViewClass="androidx.appcompat.widget.SearchView" />
+    <group android:id="@+id/grp_browse">
+        <!-- Collapsible search: a magnifier that expands into a field to save space. -->
+        <item
+            android:id="@+id/action_search"
+            android:icon="@drawable/ic_search"
+            android:title="@string/search_hint"
+            app:showAsAction="always|collapseActionView"
+            app:actionViewClass="androidx.appcompat.widget.SearchView" />
 
-    <item
-        android:id="@+id/action_filter"
-        android:icon="@drawable/ic_filter_list"
-        android:title="@string/filter"
-        app:showAsAction="ifRoom" />
+        <item
+            android:id="@+id/action_filter"
+            android:icon="@drawable/ic_filter_list"
+            android:title="@string/filter"
+            app:showAsAction="ifRoom" />
 
-    <item
-        android:id="@+id/action_favorites"
-        android:icon="@drawable/ic_favorite_border"
-        android:title="@string/action_favorites"
-        app:showAsAction="ifRoom" />
+        <item
+            android:id="@+id/action_favorites"
+            android:icon="@drawable/ic_favorite_border"
+            android:title="@string/action_favorites"
+            app:showAsAction="ifRoom" />
+    </group>
 
     <!-- View options -->
-    <item
-        android:id="@+id/action_toggle_view"
-        android:icon="@drawable/ic_grid_view"
-        android:title="@string/action_toggle_view"
-        app:showAsAction="never" />
+    <group android:id="@+id/grp_view">
+        <item
+            android:id="@+id/action_toggle_view"
+            android:icon="@drawable/ic_grid_view"
+            android:title="@string/action_toggle_view"
+            app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_sort"
-        android:icon="@drawable/ic_sort"
-        android:title="@string/action_sort"
-        app:showAsAction="never" />
+        <item
+            android:id="@+id/action_sort"
+            android:icon="@drawable/ic_sort"
+            android:title="@string/action_sort"
+            app:showAsAction="never" />
+    </group>
 
     <!-- Tab switch (library / ad-free YouTube) -->
-    <item
-        android:id="@+id/action_view_library"
-        android:title="@string/tab_library"
-        app:showAsAction="never" />
+    <group android:id="@+id/grp_tabs">
+        <item
+            android:id="@+id/action_view_library"
+            android:title="@string/tab_library"
+            app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_view_youtube"
-        android:title="@string/tab_youtube"
-        app:showAsAction="never" />
+        <item
+            android:id="@+id/action_view_youtube"
+            android:title="@string/tab_youtube"
+            app:showAsAction="never" />
+    </group>
 
     <!-- Content sections -->
-    <item
-        android:id="@+id/action_manage_categories"
-        android:icon="@drawable/ic_filter_list"
-        android:title="@string/manage_categories"
-        app:showAsAction="never" />
+    <group android:id="@+id/grp_sections">
+        <item
+            android:id="@+id/action_manage_categories"
+            android:icon="@drawable/ic_filter_list"
+            android:title="@string/manage_categories"
+            app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_protected"
-        android:icon="@drawable/ic_lock"
-        android:title="@string/protected_videos"
-        app:showAsAction="never" />
+        <item
+            android:id="@+id/action_protected"
+            android:icon="@drawable/ic_lock"
+            android:title="@string/protected_videos"
+            app:showAsAction="never" />
+    </group>
 
     <!-- App info & settings -->
-    <item
-        android:id="@+id/action_stats"
-        android:title="@string/statistics"
-        app:showAsAction="never" />
+    <group android:id="@+id/grp_info">
+        <item
+            android:id="@+id/action_stats"
+            android:title="@string/statistics"
+            app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_guide"
-        android:title="@string/user_guide"
-        app:showAsAction="never" />
+        <item
+            android:id="@+id/action_guide"
+            android:title="@string/user_guide"
+            app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_settings"
-        android:icon="@drawable/ic_settings"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        <item
+            android:id="@+id/action_settings"
+            android:icon="@drawable/ic_settings"
+            android:title="@string/action_settings"
+            app:showAsAction="never" />
+    </group>
 
 </menu>

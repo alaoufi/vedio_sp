@@ -75,6 +75,14 @@
                     tools:text="2" />
             </LinearLayout>
 
+            <LinearLayout android:id="@+id/saveLocationRow" style="@style/SettingsRow">
+                <LinearLayout style="@style/SettingsRowText">
+                    <TextView style="@style/SettingsTitle" android:text="@string/save_location" />
+                    <TextView android:id="@+id/saveLocationValue" style="@style/SettingsSubtitle"
+                        tools:text="Downloads" />
+                </LinearLayout>
+            </LinearLayout>
+
             <!-- Security -->
             <TextView style="@style/SettingsHeader" android:text="@string/section_security" />
 
@@ -134,14 +142,6 @@
                 </LinearLayout>
                 <TextView android:id="@+id/storageValue" style="@style/SettingsValue"
                     tools:text="1.4 GB" />
-            </LinearLayout>
-
-            <LinearLayout android:id="@+id/saveLocationRow" style="@style/SettingsRow">
-                <LinearLayout style="@style/SettingsRowText">
-                    <TextView style="@style/SettingsTitle" android:text="@string/save_location" />
-                    <TextView android:id="@+id/saveLocationValue" style="@style/SettingsSubtitle"
-                        tools:text="Downloads" />
-                </LinearLayout>
             </LinearLayout>
 
             <LinearLayout android:id="@+id/clearCacheRow" style="@style/SettingsRow">
