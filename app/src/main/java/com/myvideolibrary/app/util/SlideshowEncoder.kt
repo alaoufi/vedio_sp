@@ -19,9 +19,10 @@ import java.nio.ByteBuffer
  * MP4 — with no Media3/Transformer and no OpenGL. This is the most portable path
  * and works where the Transformer image pipeline stalls.
  *
- * Frames are expected to already be uniform WxH JPEGs. Runs synchronously, so
- * call it from a background (IO) thread; MediaCodec here is in blocking mode and
- * needs no Looper.
+ * Each picture is converted to YUV exactly once (not per output frame) and the
+ * frame rate is low, since the images are static — otherwise the encode is so
+ * slow on weak devices that it looks like it hangs. Runs synchronously; call it
+ * from a background thread (MediaCodec here is in blocking mode, no Looper).
  *
  * @return null on success, else a short error message.
  */
@@ -30,9 +31,12 @@ object SlideshowEncoder {
     private const val MIME = "video/avc"
     private const val W = 720
     private const val H = 1280
-    private const val FPS = 24
-    private const val BITRATE = 5_000_000
+    // Static pictures don't need a high frame rate; a low one keeps the encode fast.
+    private const val FPS = 6
+    private const val BITRATE = 4_000_000
     private const val TIMEOUT_US = 10_000L
+
+    private class Yuv(val y: ByteArray, val u: ByteArray, val v: ByteArray)
 
     fun encode(
         frames: List<File>,
@@ -42,11 +46,13 @@ object SlideshowEncoder {
         onProgress: (Int) -> Unit = {}
     ): String? {
         if (frames.isEmpty()) return "no images"
-        val totalFrames = (frames.size * maxOf(1, (perImageMs * FPS / 1000).toInt())).coerceAtLeast(1)
+        val framesPerImage = maxOf(1, (perImageMs * FPS / 1000).toInt())
+        val totalFrames = (frames.size * framesPerImage).coerceAtLeast(1)
 
         var encoder: MediaCodec? = null
         var muxer: MediaMuxer? = null
         var audioExtractor: MediaExtractor? = null
+        var encoderName = "?"
         try {
             val format = MediaFormat.createVideoFormat(MIME, W, H).apply {
                 setInteger(
@@ -57,17 +63,13 @@ object SlideshowEncoder {
                 setInteger(MediaFormat.KEY_FRAME_RATE, FPS)
                 setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1)
             }
-            // Prefer a SOFTWARE encoder: many hardware encoders (notably on
-            // Xiaomi/MediaTek) stall on ByteBuffer YUV input, which is exactly the
-            // "timed out" hang. Software encoders accept flexible YUV reliably.
             encoder = createAvcEncoder()
-            encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
-            encoder.start()
+            encoderName = runCatching { encoder!!.name }.getOrDefault("?")
+            encoder!!.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+            encoder!!.start()
 
             muxer = MediaMuxer(output.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
 
-            // Prepare the music track up front (AAC only) so it can be added to the
-            // muxer before it starts. Anything else → silent video.
             var audioFormat: MediaFormat? = null
             var audioSrcTrack = -1
             if (audio != null && audio.exists() && audio.length() > 0) {
@@ -91,44 +93,46 @@ object SlideshowEncoder {
             var audioDstTrack = -1
             var muxerStarted = false
 
-            val framesPerImage = maxOf(1, (perImageMs * FPS / 1000).toInt())
             var frameIndex = 0
             var repeats = 0
             var imgIdx = 0
 
-            fun loadNext(): Bitmap? {
+            fun loadNext(): Yuv? {
                 while (imgIdx < frames.size) {
                     val bm = runCatching { BitmapFactory.decodeFile(frames[imgIdx].absolutePath) }
                         .getOrNull()
                     imgIdx++
-                    if (bm != null) return bm
+                    if (bm != null) {
+                        val yuv = bitmapToYuv(bm)
+                        bm.recycle()
+                        return yuv
+                    }
                 }
                 return null
             }
-            var current: Bitmap? = loadNext()
+            var current: Yuv? = loadNext()
 
             var inputDone = false
             var outputDone = false
 
             while (!outputDone) {
                 if (!inputDone) {
-                    val inIndex = encoder.dequeueInputBuffer(TIMEOUT_US)
+                    val inIndex = encoder!!.dequeueInputBuffer(TIMEOUT_US)
                     if (inIndex >= 0) {
-                        val bm = current
-                        if (bm == null) {
-                            encoder.queueInputBuffer(
+                        val yuv = current
+                        if (yuv == null) {
+                            encoder!!.queueInputBuffer(
                                 inIndex, 0, 0, ptsUs(frameIndex),
                                 MediaCodec.BUFFER_FLAG_END_OF_STREAM
                             )
                             inputDone = true
                         } else {
-                            encoder.getInputImage(inIndex)?.let { fillImage(it, bm) }
-                            encoder.queueInputBuffer(inIndex, 0, W * H * 3 / 2, ptsUs(frameIndex), 0)
+                            encoder!!.getInputImage(inIndex)?.let { fillImage(it, yuv) }
+                            encoder!!.queueInputBuffer(inIndex, 0, W * H * 3 / 2, ptsUs(frameIndex), 0)
                             frameIndex++
                             onProgress(frameIndex * 100 / totalFrames)
                             repeats++
                             if (repeats >= framesPerImage) {
-                                bm.recycle()
                                 current = loadNext()
                                 repeats = 0
                             }
@@ -136,29 +140,29 @@ object SlideshowEncoder {
                     }
                 }
 
-                val outIndex = encoder.dequeueOutputBuffer(info, TIMEOUT_US)
+                val outIndex = encoder!!.dequeueOutputBuffer(info, TIMEOUT_US)
                 when {
                     outIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
-                        videoTrack = muxer.addTrack(encoder.outputFormat)
+                        videoTrack = muxer.addTrack(encoder!!.outputFormat)
                         audioFormat?.let { audioDstTrack = muxer.addTrack(it) }
                         muxer.start()
                         muxerStarted = true
                     }
                     outIndex >= 0 -> {
-                        val outBuf = encoder.getOutputBuffer(outIndex)
+                        val outBuf = encoder!!.getOutputBuffer(outIndex)
                         if (info.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) info.size = 0
                         if (info.size > 0 && muxerStarted && outBuf != null) {
                             outBuf.position(info.offset)
                             outBuf.limit(info.offset + info.size)
                             muxer.writeSampleData(videoTrack, outBuf, info)
                         }
-                        encoder.releaseOutputBuffer(outIndex, false)
+                        encoder!!.releaseOutputBuffer(outIndex, false)
                         if (info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) outputDone = true
                     }
                 }
             }
 
-            if (frameIndex == 0) return "no frames encoded"
+            if (frameIndex == 0) return "$encoderName: no frames encoded"
 
             val videoDurationUs = frameIndex.toLong() * 1_000_000L / FPS
             val ex = audioExtractor
@@ -168,7 +172,7 @@ object SlideshowEncoder {
             return null
         } catch (e: Throwable) {
             output.delete()
-            return "${e.javaClass.simpleName}: ${e.message}"
+            return "$encoderName ${e.javaClass.simpleName}: ${e.message}"
         } finally {
             runCatching { encoder?.stop() }
             runCatching { encoder?.release() }
@@ -202,36 +206,54 @@ object SlideshowEncoder {
 
     private fun ptsUs(frameIndex: Int): Long = frameIndex.toLong() * 1_000_000L / FPS
 
-    /** Fills a YUV420-flexible input image from an ARGB bitmap (BT.601 full-range-ish). */
-    private fun fillImage(image: Image, bitmap: Bitmap) {
+    /** Converts an ARGB bitmap to packed I420 YUV once (BT.601), reused per frame. */
+    private fun bitmapToYuv(bitmap: Bitmap): Yuv {
         val pixels = IntArray(W * H)
         val bw = bitmap.width.coerceAtMost(W)
         val bh = bitmap.height.coerceAtMost(H)
         bitmap.getPixels(pixels, 0, W, 0, 0, bw, bh)
-
-        val planes = image.planes
-        val yBuf = planes[0].buffer; val yRow = planes[0].rowStride; val yPix = planes[0].pixelStride
-        val uBuf = planes[1].buffer; val uRow = planes[1].rowStride; val uPix = planes[1].pixelStride
-        val vBuf = planes[2].buffer; val vRow = planes[2].rowStride; val vPix = planes[2].pixelStride
-
-        for (y in 0 until H) {
-            for (x in 0 until W) {
-                val c = pixels[y * W + x]
+        val cw = W / 2
+        val ch = H / 2
+        val y = ByteArray(W * H)
+        val u = ByteArray(cw * ch)
+        val v = ByteArray(cw * ch)
+        for (j in 0 until H) {
+            val rowBase = j * W
+            for (i in 0 until W) {
+                val c = pixels[rowBase + i]
                 val r = (c shr 16) and 0xff
                 val g = (c shr 8) and 0xff
                 val b = c and 0xff
-                val yy = ((66 * r + 129 * g + 25 * b + 128) shr 8) + 16
-                yBuf.put(y * yRow + x * yPix, yy.coerceIn(0, 255).toByte())
-                if (x and 1 == 0 && y and 1 == 0) {
-                    val u = ((-38 * r - 74 * g + 112 * b + 128) shr 8) + 128
-                    val v = ((112 * r - 94 * g - 18 * b + 128) shr 8) + 128
-                    val cx = x / 2
-                    val cy = y / 2
-                    uBuf.put(cy * uRow + cx * uPix, u.coerceIn(0, 255).toByte())
-                    vBuf.put(cy * vRow + cx * vPix, v.coerceIn(0, 255).toByte())
+                y[rowBase + i] = (((66 * r + 129 * g + 25 * b + 128) shr 8) + 16)
+                    .coerceIn(0, 255).toByte()
+                if (i and 1 == 0 && j and 1 == 0) {
+                    val ci = (j / 2) * cw + i / 2
+                    u[ci] = (((-38 * r - 74 * g + 112 * b + 128) shr 8) + 128).coerceIn(0, 255).toByte()
+                    v[ci] = (((112 * r - 94 * g - 18 * b + 128) shr 8) + 128).coerceIn(0, 255).toByte()
                 }
             }
         }
+        return Yuv(y, u, v)
+    }
+
+    /** Copies cached YUV into the encoder's flexible input image, respecting strides. */
+    private fun fillImage(image: Image, yuv: Yuv) {
+        val planes = image.planes
+        val cw = W / 2
+        val ch = H / 2
+
+        val yb = planes[0].buffer; val yRow = planes[0].rowStride; val yPix = planes[0].pixelStride
+        if (yPix == 1 && yRow == W) {
+            yb.position(0); yb.put(yuv.y)
+        } else {
+            for (j in 0 until H) for (i in 0 until W) yb.put(j * yRow + i * yPix, yuv.y[j * W + i])
+        }
+
+        val ub = planes[1].buffer; val uRow = planes[1].rowStride; val uPix = planes[1].pixelStride
+        for (j in 0 until ch) for (i in 0 until cw) ub.put(j * uRow + i * uPix, yuv.u[j * cw + i])
+
+        val vb = planes[2].buffer; val vRow = planes[2].rowStride; val vPix = planes[2].pixelStride
+        for (j in 0 until ch) for (i in 0 until cw) vb.put(j * vRow + i * vPix, yuv.v[j * cw + i])
     }
 
     private fun writeAudioLooped(
