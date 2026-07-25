@@ -22,11 +22,12 @@ data class LibraryQuery(
      * hidden/locked category can still be opened deliberately.
      */
     val excludedCategories: Set<String> = emptySet(),
-    val sourceFilter: SourceFilter = SourceFilter.ALL,
+    /** Show videos from any of these sources; empty means all sources. */
+    val sourceFilters: Set<SourceFilter> = emptySet(),
     /** When true show only locked (protected) videos; when false hide them. */
     val protectedOnly: Boolean = false,
-    /** "video"/"audio"/"image", or null for all types. */
-    val mediaType: String? = null,
+    /** Any of "video"/"audio"/"image"; empty means all types. */
+    val mediaTypes: Set<String> = emptySet(),
     val sortOrder: SortOrder = SortOrder.DATE_ADDED_DESC
 ) {
 
@@ -61,25 +62,27 @@ data class LibraryQuery(
             )
             excludedCategories.forEach { args.add(it.trim()) }
         }
-        mediaType?.let {
-            where.append(" AND media_type = ?")
-            args.add(it)
+        if (mediaTypes.isNotEmpty()) {
+            val placeholders = mediaTypes.joinToString(", ") { "?" }
+            where.append(" AND media_type IN ($placeholders)")
+            mediaTypes.forEach { args.add(it) }
         }
-        when (sourceFilter) {
-            SourceFilter.TIKTOK -> {
-                where.append(" AND source = ?")
-                args.add(VideoSource.TIKTOK.id)
+        // Multi-select source: OR the chosen buckets together. Empty = all sources.
+        if (sourceFilters.isNotEmpty()) {
+            val clauses = mutableListOf<String>()
+            if (SourceFilter.TIKTOK in sourceFilters) {
+                clauses.add("source = ?"); args.add(VideoSource.TIKTOK.id)
             }
-            SourceFilter.YOUTUBE -> {
-                where.append(" AND source = ?")
-                args.add(VideoSource.YOUTUBE.id)
+            if (SourceFilter.YOUTUBE in sourceFilters) {
+                clauses.add("source = ?"); args.add(VideoSource.YOUTUBE.id)
             }
-            SourceFilter.OTHER -> {
-                where.append(" AND source NOT IN (?, ?)")
-                args.add(VideoSource.TIKTOK.id)
-                args.add(VideoSource.YOUTUBE.id)
+            if (SourceFilter.OTHER in sourceFilters) {
+                clauses.add("source NOT IN (?, ?)")
+                args.add(VideoSource.TIKTOK.id); args.add(VideoSource.YOUTUBE.id)
             }
-            SourceFilter.ALL -> Unit
+            if (clauses.isNotEmpty()) {
+                where.append(" AND (").append(clauses.joinToString(" OR ")).append(")")
+            }
         }
 
         val orderBy = when (sortOrder) {

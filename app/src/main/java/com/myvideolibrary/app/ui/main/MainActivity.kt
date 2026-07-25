@@ -318,65 +318,68 @@ class MainActivity : AppCompatActivity() {
         val popup = android.widget.PopupMenu(this, anchor)
         val menu = popup.menu
 
-        // --- Source ---
-        val source = menu.addSubMenu(getString(R.string.filter_source))
-        source.add(GROUP_SOURCE, ID_SRC_ALL, 0, R.string.filter_all)
-        source.add(GROUP_SOURCE, ID_SRC_TIKTOK, 1, R.string.source_tiktok)
-        source.add(GROUP_SOURCE, ID_SRC_YOUTUBE, 2, R.string.source_youtube)
-        source.add(GROUP_SOURCE, ID_SRC_OTHER, 3, R.string.source_other)
-        source.setGroupCheckable(GROUP_SOURCE, true, true)
-        source.findItem(
-            when (state.sourceFilter) {
-                SourceFilter.TIKTOK -> ID_SRC_TIKTOK
-                SourceFilter.YOUTUBE -> ID_SRC_YOUTUBE
-                SourceFilter.OTHER -> ID_SRC_OTHER
-                SourceFilter.ALL -> ID_SRC_ALL
-            }
-        )?.isChecked = true
-
-        // --- Type (video / audio / image) ---
-        val type = menu.addSubMenu(getString(R.string.filter_type))
-        type.add(GROUP_TYPE, ID_TYPE_ALL, 0, R.string.filter_all)
-        type.add(GROUP_TYPE, ID_TYPE_VIDEO, 1, R.string.type_video)
-        type.add(GROUP_TYPE, ID_TYPE_AUDIO, 2, R.string.type_audio)
-        type.add(GROUP_TYPE, ID_TYPE_IMAGE, 3, R.string.type_image)
-        type.setGroupCheckable(GROUP_TYPE, true, true)
-        type.findItem(
-            when (state.mediaTypeFilter) {
-                "video" -> ID_TYPE_VIDEO
-                "audio" -> ID_TYPE_AUDIO
-                "image" -> ID_TYPE_IMAGE
-                else -> ID_TYPE_ALL
-            }
-        )?.isChecked = true
-
-        // --- Category (multi-select; only when categories exist) ---
+        // Each opens a multi-select dialog; a count shows how many are active.
+        fun label(base: Int, n: Int) = if (n > 0) getString(base) + " ($n)" else getString(base)
+        menu.add(GROUP_SOURCE, ID_SRC_ALL, 0, label(R.string.filter_source, state.sourceFilters.size))
+        menu.add(GROUP_TYPE, ID_TYPE_ALL, 1, label(R.string.filter_type, state.mediaTypeFilters.size))
         if (state.categories.isNotEmpty()) {
-            val selected = state.categoryFilters.size
-            val label = if (selected > 0) {
-                getString(R.string.category) + " ($selected)"
-            } else {
-                getString(R.string.category)
-            }
-            menu.add(GROUP_CATEGORY, ID_CAT_PICK, 100, label)
+            menu.add(GROUP_CATEGORY, ID_CAT_PICK, 2, label(R.string.category, state.categoryFilters.size))
         }
 
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
-                ID_SRC_ALL -> viewModel.setSourceFilter(SourceFilter.ALL)
-                ID_SRC_TIKTOK -> viewModel.setSourceFilter(SourceFilter.TIKTOK)
-                ID_SRC_YOUTUBE -> viewModel.setSourceFilter(SourceFilter.YOUTUBE)
-                ID_SRC_OTHER -> viewModel.setSourceFilter(SourceFilter.OTHER)
-                ID_TYPE_ALL -> viewModel.setMediaTypeFilter(null)
-                ID_TYPE_VIDEO -> viewModel.setMediaTypeFilter("video")
-                ID_TYPE_AUDIO -> viewModel.setMediaTypeFilter("audio")
-                ID_TYPE_IMAGE -> viewModel.setMediaTypeFilter("image")
+                ID_SRC_ALL -> showSourceFilterDialog(state.sourceFilters)
+                ID_TYPE_ALL -> showTypeFilterDialog(state.mediaTypeFilters)
                 ID_CAT_PICK -> showCategoryFilterDialog(state.categories, state.categoryFilters)
                 else -> return@setOnMenuItemClickListener false
             }
             true
         }
         popup.show()
+    }
+
+    /** Multi-select source filter: tick any sources to show; "All" clears them. */
+    private fun showSourceFilterDialog(selected: Set<SourceFilter>) {
+        val options = listOf(
+            SourceFilter.TIKTOK to getString(R.string.source_tiktok),
+            SourceFilter.YOUTUBE to getString(R.string.source_youtube),
+            SourceFilter.OTHER to getString(R.string.source_other)
+        )
+        val labels = options.map { it.second }.toTypedArray()
+        val checked = BooleanArray(options.size) { options[it].first in selected }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.filter_source)
+            .setMultiChoiceItems(labels, checked) { _, which, isChecked -> checked[which] = isChecked }
+            .setPositiveButton(R.string.apply) { _, _ ->
+                viewModel.setSourceFilters(
+                    options.filterIndexed { i, _ -> checked[i] }.map { it.first }.toSet()
+                )
+            }
+            .setNeutralButton(R.string.filter_all) { _, _ -> viewModel.setSourceFilters(emptySet()) }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    /** Multi-select media-type filter: tick any of video/audio/image; "All" clears them. */
+    private fun showTypeFilterDialog(selected: Set<String>) {
+        val options = listOf(
+            "video" to getString(R.string.type_video),
+            "audio" to getString(R.string.type_audio),
+            "image" to getString(R.string.type_image)
+        )
+        val labels = options.map { it.second }.toTypedArray()
+        val checked = BooleanArray(options.size) { options[it].first in selected }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.filter_type)
+            .setMultiChoiceItems(labels, checked) { _, which, isChecked -> checked[which] = isChecked }
+            .setPositiveButton(R.string.apply) { _, _ ->
+                viewModel.setMediaTypeFilters(
+                    options.filterIndexed { i, _ -> checked[i] }.map { it.first }.toSet()
+                )
+            }
+            .setNeutralButton(R.string.filter_all) { _, _ -> viewModel.setMediaTypeFilters(emptySet()) }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     /**

@@ -35,13 +35,14 @@ data class LibraryUiState(
     val search: String = "",
     val folderId: Long? = null,
     val favoritesOnly: Boolean = false,
-    val sourceFilter: SourceFilter = SourceFilter.ALL,
+    /** Selected sources; empty means "all sources". */
+    val sourceFilters: Set<SourceFilter> = emptySet(),
     val protectedMode: Boolean = false,
     /** Selected category labels; empty means "all categories". */
     val categoryFilters: Set<String> = emptySet(),
     val categories: List<String> = emptyList(),
-    /** "video"/"audio"/"image", or null for all types. */
-    val mediaTypeFilter: String? = null,
+    /** Selected media types ("video"/"audio"/"image"); empty means all types. */
+    val mediaTypeFilters: Set<String> = emptySet(),
     val videoCount: Int = 0,
     val totalSize: Long = 0,
     val folders: List<FolderEntity> = emptyList(),
@@ -71,16 +72,16 @@ class LibraryViewModel @Inject constructor(
     private val _search = MutableStateFlow("")
     private val _folderFilter = MutableStateFlow<Long?>(null)
     private val _favoritesOnly = MutableStateFlow(false)
-    private val _sourceFilter = MutableStateFlow(SourceFilter.ALL)
+    private val _sourceFilters = MutableStateFlow<Set<SourceFilter>>(emptySet())
     private val _protectedMode = MutableStateFlow(false)
     private val _categoryFilters = MutableStateFlow<Set<String>>(emptySet())
-    private val _mediaTypeFilter = MutableStateFlow<String?>(null)
+    private val _mediaTypeFilters = MutableStateFlow<Set<String>>(emptySet())
 
     /** Merged source + protected + category + type, kept as one flow for combine arity. */
     private val extraFilters = combine(
-        _sourceFilter, _protectedMode, _categoryFilters, _mediaTypeFilter
-    ) { source, protectedMode, categories, mediaType ->
-        ExtraFilters(source, protectedMode, categories, mediaType)
+        _sourceFilters, _protectedMode, _categoryFilters, _mediaTypeFilters
+    ) { sources, protectedMode, categories, mediaTypes ->
+        ExtraFilters(sources, protectedMode, categories, mediaTypes)
     }
 
     /** Paged videos, recomputed whenever the query changes. */
@@ -127,11 +128,11 @@ class LibraryViewModel @Inject constructor(
             search = f.search,
             folderId = f.folderId,
             favoritesOnly = f.favoritesOnly,
-            sourceFilter = f.extra.sourceFilter,
+            sourceFilters = f.extra.sourceFilters,
             protectedMode = f.extra.protectedMode,
             categoryFilters = f.extra.categories,
             categories = m.categories,
-            mediaTypeFilter = f.extra.mediaType,
+            mediaTypeFilters = f.extra.mediaTypes,
             videoCount = m.count,
             totalSize = m.size,
             folders = m.folders,
@@ -156,9 +157,9 @@ class LibraryViewModel @Inject constructor(
                     favoritesOnly = favoritesOnly,
                     categories = extra.categories,
                     excludedCategories = excludedCategories(settings),
-                    sourceFilter = extra.sourceFilter,
+                    sourceFilters = extra.sourceFilters,
                     protectedOnly = extra.protectedMode,
-                    mediaType = extra.mediaType,
+                    mediaTypes = extra.mediaTypes,
                     sortOrder = SortOrder.fromId(settings.sortOrder)
                 )
             }.collect { queryState.value = it }
@@ -187,13 +188,13 @@ class LibraryViewModel @Inject constructor(
 
     fun setFavoritesOnly(only: Boolean) { _favoritesOnly.value = only }
 
-    fun setSourceFilter(filter: SourceFilter) { _sourceFilter.value = filter }
+    fun setSourceFilters(filters: Set<SourceFilter>) { _sourceFilters.value = filters }
 
     fun setProtectedMode(on: Boolean) { _protectedMode.value = on }
 
     fun setCategoryFilters(categories: Set<String>) { _categoryFilters.value = categories }
 
-    fun setMediaTypeFilter(type: String?) { _mediaTypeFilter.value = type }
+    fun setMediaTypeFilters(types: Set<String>) { _mediaTypeFilters.value = types }
 
     fun setSortOrder(order: SortOrder) = viewModelScope.launch {
         settingsRepository.update { it.copy(sortOrder = order.id) }
@@ -304,10 +305,10 @@ class LibraryViewModel @Inject constructor(
     )
 
     private data class ExtraFilters(
-        val sourceFilter: SourceFilter,
+        val sourceFilters: Set<SourceFilter>,
         val protectedMode: Boolean,
         val categories: Set<String>,
-        val mediaType: String?
+        val mediaTypes: Set<String>
     )
 
     private data class LibraryFilters(
