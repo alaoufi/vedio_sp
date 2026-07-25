@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="12dp">
+
+    <View
+        android:layout_width="36dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="6dp"
+        android:background="?attr/colorOutline"
+        android:alpha="0.5" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="8dp"
+        android:text="@string/add_sheet_title"
+        android:textAppearance="?attr/textAppearanceTitleMedium"
+        android:textStyle="bold" />
+
+    <!-- Reusable row: icon badge + title + subtitle -->
+    <LinearLayout android:id="@+id/rowBrowser" style="@style/AddSheetRow">
+        <ImageView style="@style/AddSheetIcon" android:src="@drawable/ic_public"
+            android:contentDescription="@null" />
+        <LinearLayout style="@style/AddSheetText">
+            <TextView style="@style/AddSheetTitle" android:text="@string/browser_title" />
+            <TextView style="@style/AddSheetDesc" android:text="@string/add_browser_desc" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout android:id="@+id/rowSearch" style="@style/AddSheetRow">
+        <ImageView style="@style/AddSheetIcon" android:src="@drawable/ic_search"
+            android:contentDescription="@null" />
+        <LinearLayout style="@style/AddSheetText">
+            <TextView style="@style/AddSheetTitle" android:text="@string/search_title" />
+            <TextView style="@style/AddSheetDesc" android:text="@string/add_search_desc" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout android:id="@+id/rowLink" style="@style/AddSheetRow">
+        <ImageView style="@style/AddSheetIcon" android:src="@drawable/ic_link"
+            android:contentDescription="@null" />
+        <LinearLayout style="@style/AddSheetText">
+            <TextView style="@style/AddSheetTitle" android:text="@string/action_add_download" />
+            <TextView style="@style/AddSheetDesc" android:text="@string/add_link_desc" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout android:id="@+id/rowDownloads" style="@style/AddSheetRow">
+        <ImageView style="@style/AddSheetIcon" android:src="@drawable/ic_download"
+            android:contentDescription="@null" />
+        <LinearLayout style="@style/AddSheetText">
+            <TextView style="@style/AddSheetTitle" android:text="@string/action_downloads" />
+            <TextView style="@style/AddSheetDesc" android:text="@string/add_downloads_desc" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout android:id="@+id/rowImport" style="@style/AddSheetRow">
+        <ImageView style="@style/AddSheetIcon" android:src="@drawable/ic_folder"
+            android:contentDescription="@null" />
+        <LinearLayout style="@style/AddSheetText">
+            <TextView style="@style/AddSheetTitle" android:text="@string/import_title" />
+            <TextView style="@style/AddSheetDesc" android:text="@string/add_import_desc" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

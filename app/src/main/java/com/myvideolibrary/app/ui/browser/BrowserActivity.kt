@@ -52,6 +52,7 @@ class BrowserActivity : AppCompatActivity() {
         binding.closeButton.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
         binding.reloadButton.setOnClickListener { binding.webView.reload() }
         binding.downloadFab.setOnClickListener { showFoundMedia() }
+        maybeShowIntro()
 
         binding.webView.settings.apply {
             javaScriptEnabled = true
@@ -82,6 +83,18 @@ class BrowserActivity : AppCompatActivity() {
     }
 
     /** Loads a typed address, or searches for it if it isn't a URL. */
+    /** Explains the browser's purpose the first time it's opened. */
+    private fun maybeShowIntro() {
+        val prefs = getSharedPreferences("browser", MODE_PRIVATE)
+        if (prefs.getBoolean("intro_shown", false)) return
+        prefs.edit().putBoolean("intro_shown", true).apply()
+        AlertDialog.Builder(this)
+            .setTitle(R.string.browser_intro_title)
+            .setMessage(R.string.browser_intro_message)
+            .setPositiveButton(R.string.got_it, null)
+            .show()
+    }
+
     private fun go(raw: String) {
         val t = raw.trim()
         if (t.isEmpty()) return

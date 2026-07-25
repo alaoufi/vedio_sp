@@ -431,6 +431,17 @@
     <string name="resize_zoom">Zoom (crop)</string>
     <string name="resize_fill">Fill (stretch)</string>
 
+    <!-- "+" add sheet -->
+    <string name="add_sheet_title">Add to library</string>
+    <string name="add_browser_desc">Open any site and grab the video from it</string>
+    <string name="add_search_desc">Search the platforms and download directly</string>
+    <string name="add_link_desc">Paste a video link to download it</string>
+    <string name="add_downloads_desc">Track your running download jobs</string>
+    <string name="add_import_desc">Add videos already on your device</string>
+    <string name="browser_intro_title">What is the browser for?</string>
+    <string name="browser_intro_message">Open any website, play a video, and this browser detects it and offers a Download button — use it for sites the direct downloader doesn\'t support, or when a link fails.</string>
+    <string name="got_it">Got it</string>
+
     <!-- In-app update check -->
     <string name="update_available_title">Update available</string>
     <string name="update_available_message">A newer version (%1$s) is available. Download it now?</string>

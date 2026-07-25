@@ -408,24 +408,28 @@ class MainActivity : AppCompatActivity() {
 
     /** The bottom "+" opens the download/import actions, within easy thumb reach. */
     private fun showAddMenu(anchor: android.view.View) {
-        val popup = android.widget.PopupMenu(this, anchor)
-        popup.menu.add(0, 5, 0, getString(R.string.browser_title))
-        popup.menu.add(0, 1, 1, getString(R.string.search_title))
-        popup.menu.add(0, 2, 2, getString(R.string.action_add_download))
-        popup.menu.add(0, 3, 3, getString(R.string.action_downloads))
-        popup.menu.add(0, 4, 4, getString(R.string.import_title))
-        popup.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                5 -> startActivity(Intent(this, com.myvideolibrary.app.ui.browser.BrowserActivity::class.java))
-                1 -> startActivity(Intent(this, com.myvideolibrary.app.ui.search.SearchActivity::class.java))
-                2 -> startActivity(AddDownloadActivity.intent(this))
-                3 -> startActivity(Intent(this, DownloadsActivity::class.java))
-                4 -> startActivity(Intent(this, ImportActivity::class.java))
-                else -> return@setOnMenuItemClickListener false
-            }
-            true
+        // A bottom sheet (not a bare popup) so each action can carry a one-line
+        // description — it's clear what the browser and import actually do.
+        val sheet = com.google.android.material.bottomsheet.BottomSheetDialog(this)
+        val view = layoutInflater.inflate(R.layout.sheet_add, null)
+        sheet.setContentView(view)
+        fun go(intent: Intent) { sheet.dismiss(); startActivity(intent) }
+        view.findViewById<android.view.View>(R.id.rowBrowser).setOnClickListener {
+            go(Intent(this, com.myvideolibrary.app.ui.browser.BrowserActivity::class.java))
         }
-        popup.show()
+        view.findViewById<android.view.View>(R.id.rowSearch).setOnClickListener {
+            go(Intent(this, com.myvideolibrary.app.ui.search.SearchActivity::class.java))
+        }
+        view.findViewById<android.view.View>(R.id.rowLink).setOnClickListener {
+            go(AddDownloadActivity.intent(this))
+        }
+        view.findViewById<android.view.View>(R.id.rowDownloads).setOnClickListener {
+            go(Intent(this, DownloadsActivity::class.java))
+        }
+        view.findViewById<android.view.View>(R.id.rowImport).setOnClickListener {
+            go(Intent(this, ImportActivity::class.java))
+        }
+        sheet.show()
     }
 
     private fun observeState() {

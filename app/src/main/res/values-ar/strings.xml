@@ -394,6 +394,17 @@
     <string name="resize_zoom">تكبير (قص)</string>
     <string name="resize_fill">ملء (تمديد)</string>
 
+    <!-- "+" add sheet -->
+    <string name="add_sheet_title">إضافة إلى المكتبة</string>
+    <string name="add_browser_desc">افتح أي موقع والتقط الفيديو منه</string>
+    <string name="add_search_desc">ابحث في المنصّات ونزّل مباشرة</string>
+    <string name="add_link_desc">الصق رابط فيديو لتنزيله</string>
+    <string name="add_downloads_desc">تابع مهام التنزيل الجارية</string>
+    <string name="add_import_desc">أضِف فيديوهات موجودة على جهازك</string>
+    <string name="browser_intro_title">ما فائدة المتصفّح؟</string>
+    <string name="browser_intro_message">افتح أي موقع، شغّل فيديو، وسيكتشفه هذا المتصفّح ويعرض زر تنزيل — استخدمه للمواقع التي لا يدعمها التنزيل المباشر، أو عند فشل رابط.</string>
+    <string name="got_it">حسنًا</string>
+
     <!-- In-app update check -->
     <string name="update_available_title">يتوفّر تحديث</string>
     <string name="update_available_message">يتوفّر إصدار أحدث (%1$s). هل تريد تنزيله الآن؟</string>
