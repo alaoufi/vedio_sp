@@ -62,6 +62,37 @@
         <item name="android:textSize">13sp</item>
     </style>
 
+    <!-- Collapsible, coloured section header for the settings screen. -->
+    <style name="SettingsSectionHeader">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:layout_marginHorizontal">8dp</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:paddingHorizontal">16dp</item>
+        <item name="android:paddingVertical">10dp</item>
+        <item name="android:background">@drawable/bg_settings_section</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <style name="SettingsSectionTitle">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textAppearance">?attr/textAppearanceTitleMedium</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/colorOnSecondaryContainer</item>
+    </style>
+
+    <style name="SettingsSectionChevron">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:tint">?attr/colorOnSecondaryContainer</item>
+    </style>
+
     <style name="SettingsHeader">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
@@ -78,9 +109,9 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:orientation">horizontal</item>
         <item name="android:gravity">center_vertical</item>
-        <item name="android:minHeight">56dp</item>
-        <item name="android:paddingHorizontal">16dp</item>
-        <item name="android:paddingVertical">8dp</item>
+        <item name="android:minHeight">50dp</item>
+        <item name="android:paddingHorizontal">18dp</item>
+        <item name="android:paddingVertical">5dp</item>
         <item name="android:background">?attr/selectableItemBackground</item>
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>

@@ -24,176 +24,221 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingVertical="8dp">
+            android:paddingBottom="16dp">
 
-            <!-- Appearance -->
-            <TextView style="@style/SettingsHeader" android:text="@string/section_appearance" />
+            <!-- ===== Appearance ===== -->
+            <LinearLayout android:id="@+id/headerAppearance" style="@style/SettingsSectionHeader">
+                <TextView style="@style/SettingsSectionTitle" android:text="@string/section_appearance" />
+                <ImageView android:id="@+id/chevAppearance" style="@style/SettingsSectionChevron"
+                    android:src="@drawable/ic_expand_more" android:contentDescription="@null" />
+            </LinearLayout>
 
-            <LinearLayout android:id="@+id/themeRow" style="@style/SettingsRow">
-                <LinearLayout style="@style/SettingsRowText">
-                    <TextView style="@style/SettingsTitle" android:text="@string/theme" />
-                    <TextView android:id="@+id/themeValue" style="@style/SettingsSubtitle"
-                        tools:text="System" />
+            <LinearLayout android:id="@+id/bodyAppearance"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout android:id="@+id/themeRow" style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/theme" />
+                        <TextView android:id="@+id/themeValue" style="@style/SettingsSubtitle"
+                            tools:text="System" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout android:id="@+id/languageRow" style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/language" />
+                        <TextView android:id="@+id/languageValue" style="@style/SettingsSubtitle"
+                            tools:text="العربية" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout android:id="@+id/endActionRow" style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/end_of_clip" />
+                        <TextView android:id="@+id/endActionValue" style="@style/SettingsSubtitle"
+                            tools:text="Play next" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 
-            <LinearLayout android:id="@+id/languageRow" style="@style/SettingsRow">
-                <LinearLayout style="@style/SettingsRowText">
-                    <TextView style="@style/SettingsTitle" android:text="@string/language" />
-                    <TextView android:id="@+id/languageValue" style="@style/SettingsSubtitle"
-                        tools:text="العربية" />
+            <!-- ===== Downloads ===== -->
+            <LinearLayout android:id="@+id/headerDownloads" style="@style/SettingsSectionHeader">
+                <TextView style="@style/SettingsSectionTitle" android:text="@string/section_downloads" />
+                <ImageView android:id="@+id/chevDownloads" style="@style/SettingsSectionChevron"
+                    android:src="@drawable/ic_expand_more" android:contentDescription="@null" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/bodyDownloads"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/wifi_only" />
+                        <TextView style="@style/SettingsSubtitle" android:text="@string/wifi_only_desc" />
+                    </LinearLayout>
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/wifiOnlySwitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout android:id="@+id/maxConcurrentRow" style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/max_concurrent" />
+                    </LinearLayout>
+                    <TextView android:id="@+id/maxConcurrentValue" style="@style/SettingsValue"
+                        tools:text="2" />
+                </LinearLayout>
+
+                <LinearLayout android:id="@+id/saveLocationRow" style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/save_location" />
+                        <TextView android:id="@+id/saveLocationValue" style="@style/SettingsSubtitle"
+                            tools:text="Downloads" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 
-            <LinearLayout android:id="@+id/endActionRow" style="@style/SettingsRow">
-                <LinearLayout style="@style/SettingsRowText">
-                    <TextView style="@style/SettingsTitle" android:text="@string/end_of_clip" />
-                    <TextView android:id="@+id/endActionValue" style="@style/SettingsSubtitle"
-                        tools:text="Play next" />
+            <!-- ===== Security ===== -->
+            <LinearLayout android:id="@+id/headerSecurity" style="@style/SettingsSectionHeader">
+                <TextView style="@style/SettingsSectionTitle" android:text="@string/section_security" />
+                <ImageView android:id="@+id/chevSecurity" style="@style/SettingsSectionChevron"
+                    android:src="@drawable/ic_expand_more" android:contentDescription="@null" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/bodySecurity"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/app_lock" />
+                        <TextView style="@style/SettingsSubtitle" android:text="@string/app_lock_desc" />
+                    </LinearLayout>
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/appLockSwitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout android:id="@+id/changePinRow" style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/change_pin" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/biometric" />
+                    </LinearLayout>
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/biometricSwitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/prevent_screenshots" />
+                    </LinearLayout>
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/screenshotsSwitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/hide_recents" />
+                    </LinearLayout>
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/recentsSwitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Downloads -->
-            <TextView style="@style/SettingsHeader" android:text="@string/section_downloads" />
-
-            <LinearLayout style="@style/SettingsRow">
-                <LinearLayout style="@style/SettingsRowText">
-                    <TextView style="@style/SettingsTitle" android:text="@string/wifi_only" />
-                    <TextView style="@style/SettingsSubtitle" android:text="@string/wifi_only_desc" />
-                </LinearLayout>
-                <com.google.android.material.materialswitch.MaterialSwitch
-                    android:id="@+id/wifiOnlySwitch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+            <!-- ===== Storage & backup ===== -->
+            <LinearLayout android:id="@+id/headerStorage" style="@style/SettingsSectionHeader">
+                <TextView style="@style/SettingsSectionTitle" android:text="@string/section_storage" />
+                <ImageView android:id="@+id/chevStorage" style="@style/SettingsSectionChevron"
+                    android:src="@drawable/ic_expand_more" android:contentDescription="@null" />
             </LinearLayout>
 
-            <LinearLayout android:id="@+id/maxConcurrentRow" style="@style/SettingsRow">
-                <LinearLayout style="@style/SettingsRowText">
-                    <TextView style="@style/SettingsTitle" android:text="@string/max_concurrent" />
+            <LinearLayout android:id="@+id/bodyStorage"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/storage_used" />
+                    </LinearLayout>
+                    <TextView android:id="@+id/storageValue" style="@style/SettingsValue"
+                        tools:text="1.4 GB" />
                 </LinearLayout>
-                <TextView android:id="@+id/maxConcurrentValue" style="@style/SettingsValue"
-                    tools:text="2" />
-            </LinearLayout>
 
-            <LinearLayout android:id="@+id/saveLocationRow" style="@style/SettingsRow">
-                <LinearLayout style="@style/SettingsRowText">
-                    <TextView style="@style/SettingsTitle" android:text="@string/save_location" />
-                    <TextView android:id="@+id/saveLocationValue" style="@style/SettingsSubtitle"
-                        tools:text="Downloads" />
+                <LinearLayout android:id="@+id/clearCacheRow" style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/clear_cache" />
+                    </LinearLayout>
                 </LinearLayout>
-            </LinearLayout>
 
-            <!-- Security -->
-            <TextView style="@style/SettingsHeader" android:text="@string/section_security" />
-
-            <LinearLayout style="@style/SettingsRow">
-                <LinearLayout style="@style/SettingsRowText">
-                    <TextView style="@style/SettingsTitle" android:text="@string/app_lock" />
-                    <TextView style="@style/SettingsSubtitle" android:text="@string/app_lock_desc" />
+                <LinearLayout android:id="@+id/backupRow" style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/backup" />
+                        <TextView style="@style/SettingsSubtitle" android:text="@string/backup_desc" />
+                    </LinearLayout>
                 </LinearLayout>
-                <com.google.android.material.materialswitch.MaterialSwitch
-                    android:id="@+id/appLockSwitch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
 
-            <LinearLayout android:id="@+id/changePinRow" style="@style/SettingsRow">
-                <LinearLayout style="@style/SettingsRowText">
-                    <TextView style="@style/SettingsTitle" android:text="@string/change_pin" />
+                <LinearLayout android:id="@+id/restoreRow" style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/restore" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 
-            <LinearLayout style="@style/SettingsRow">
-                <LinearLayout style="@style/SettingsRowText">
-                    <TextView style="@style/SettingsTitle" android:text="@string/biometric" />
-                </LinearLayout>
-                <com.google.android.material.materialswitch.MaterialSwitch
-                    android:id="@+id/biometricSwitch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+            <!-- ===== About ===== -->
+            <LinearLayout android:id="@+id/headerAbout" style="@style/SettingsSectionHeader">
+                <TextView style="@style/SettingsSectionTitle" android:text="@string/section_about" />
+                <ImageView android:id="@+id/chevAbout" style="@style/SettingsSectionChevron"
+                    android:src="@drawable/ic_expand_more" android:contentDescription="@null" />
             </LinearLayout>
 
-            <LinearLayout style="@style/SettingsRow">
-                <LinearLayout style="@style/SettingsRowText">
-                    <TextView style="@style/SettingsTitle" android:text="@string/prevent_screenshots" />
+            <LinearLayout android:id="@+id/bodyAbout"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/license_status" />
+                        <TextView android:id="@+id/licenseValue" style="@style/SettingsSubtitle"
+                            tools:text="Trial · 8 days left" />
+                    </LinearLayout>
                 </LinearLayout>
-                <com.google.android.material.materialswitch.MaterialSwitch
-                    android:id="@+id/screenshotsSwitch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
 
-            <LinearLayout style="@style/SettingsRow">
-                <LinearLayout style="@style/SettingsRowText">
-                    <TextView style="@style/SettingsTitle" android:text="@string/hide_recents" />
+                <LinearLayout android:id="@+id/guideRow" style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/user_guide" />
+                        <TextView style="@style/SettingsSubtitle" android:text="@string/user_guide_desc" />
+                    </LinearLayout>
                 </LinearLayout>
-                <com.google.android.material.materialswitch.MaterialSwitch
-                    android:id="@+id/recentsSwitch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
 
-            <!-- Storage & backup -->
-            <TextView style="@style/SettingsHeader" android:text="@string/section_storage" />
-
-            <LinearLayout style="@style/SettingsRow">
-                <LinearLayout style="@style/SettingsRowText">
-                    <TextView style="@style/SettingsTitle" android:text="@string/storage_used" />
+                <LinearLayout android:id="@+id/checkUpdateRow" style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/check_updates" />
+                        <TextView android:id="@+id/checkUpdateValue" style="@style/SettingsSubtitle"
+                            android:text="@string/check_updates_desc" />
+                    </LinearLayout>
                 </LinearLayout>
-                <TextView android:id="@+id/storageValue" style="@style/SettingsValue"
-                    tools:text="1.4 GB" />
-            </LinearLayout>
 
-            <LinearLayout android:id="@+id/clearCacheRow" style="@style/SettingsRow">
-                <LinearLayout style="@style/SettingsRowText">
-                    <TextView style="@style/SettingsTitle" android:text="@string/clear_cache" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout android:id="@+id/backupRow" style="@style/SettingsRow">
-                <LinearLayout style="@style/SettingsRowText">
-                    <TextView style="@style/SettingsTitle" android:text="@string/backup" />
-                    <TextView style="@style/SettingsSubtitle" android:text="@string/backup_desc" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout android:id="@+id/restoreRow" style="@style/SettingsRow">
-                <LinearLayout style="@style/SettingsRowText">
-                    <TextView style="@style/SettingsTitle" android:text="@string/restore" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- About -->
-            <TextView style="@style/SettingsHeader" android:text="@string/section_about" />
-
-            <LinearLayout style="@style/SettingsRow">
-                <LinearLayout style="@style/SettingsRowText">
-                    <TextView style="@style/SettingsTitle" android:text="@string/license_status" />
-                    <TextView android:id="@+id/licenseValue" style="@style/SettingsSubtitle"
-                        tools:text="Trial · 8 days left" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout android:id="@+id/guideRow" style="@style/SettingsRow">
-                <LinearLayout style="@style/SettingsRowText">
-                    <TextView style="@style/SettingsTitle" android:text="@string/user_guide" />
-                    <TextView style="@style/SettingsSubtitle" android:text="@string/user_guide_desc" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout android:id="@+id/checkUpdateRow" style="@style/SettingsRow">
-                <LinearLayout style="@style/SettingsRowText">
-                    <TextView style="@style/SettingsTitle" android:text="@string/check_updates" />
-                    <TextView android:id="@+id/checkUpdateValue" style="@style/SettingsSubtitle"
-                        android:text="@string/check_updates_desc" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout style="@style/SettingsRow">
-                <LinearLayout style="@style/SettingsRowText">
-                    <TextView style="@style/SettingsTitle" android:text="@string/version" />
-                    <TextView android:id="@+id/versionValue" style="@style/SettingsSubtitle"
-                        tools:text="1.0.0" />
+                <LinearLayout style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/version" />
+                        <TextView android:id="@+id/versionValue" style="@style/SettingsSubtitle"
+                            tools:text="1.0.0" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

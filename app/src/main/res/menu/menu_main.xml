@@ -29,14 +29,15 @@
             app:showAsAction="ifRoom" />
     </group>
 
+    <!-- Grid / list toggle lives in the toolbar; its icon flips with the mode. -->
+    <item
+        android:id="@+id/action_toggle_view"
+        android:icon="@drawable/ic_view_list"
+        android:title="@string/action_toggle_view"
+        app:showAsAction="always" />
+
     <!-- View options -->
     <group android:id="@+id/grp_view">
-        <item
-            android:id="@+id/action_toggle_view"
-            android:icon="@drawable/ic_grid_view"
-            android:title="@string/action_toggle_view"
-            app:showAsAction="never" />
-
         <item
             android:id="@+id/action_sort"
             android:icon="@drawable/ic_sort"

@@ -66,6 +66,12 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun bindActions() {
+        setupSection(binding.headerAppearance, binding.bodyAppearance, binding.chevAppearance)
+        setupSection(binding.headerDownloads, binding.bodyDownloads, binding.chevDownloads)
+        setupSection(binding.headerSecurity, binding.bodySecurity, binding.chevSecurity)
+        setupSection(binding.headerStorage, binding.bodyStorage, binding.chevStorage)
+        setupSection(binding.headerAbout, binding.bodyAbout, binding.chevAbout)
+
         binding.themeRow.setOnClickListener { showThemeDialog() }
         binding.languageRow.setOnClickListener { showLanguageDialog() }
         binding.endActionRow.setOnClickListener { showEndActionDialog() }
@@ -178,6 +184,20 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     /** Human-readable trial / subscription state for the About section. */
+    /** Makes a settings section collapsible: tap the coloured header to toggle. */
+    private fun setupSection(
+        header: android.view.View,
+        body: android.view.View,
+        chevron: android.view.View
+    ) {
+        chevron.rotation = if (body.visibility == android.view.View.VISIBLE) 180f else 0f
+        header.setOnClickListener {
+            val show = body.visibility != android.view.View.VISIBLE
+            body.visibility = if (show) android.view.View.VISIBLE else android.view.View.GONE
+            chevron.animate().rotation(if (show) 180f else 0f).setDuration(180).start()
+        }
+    }
+
     /**
      * Manual update check: asks GitHub Releases for the newest build and either
      * offers to download it or reports that the app is already up to date.

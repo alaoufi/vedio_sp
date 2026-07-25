@@ -561,6 +561,13 @@ class MainActivity : AppCompatActivity() {
     private fun renderFilterChip(state: LibraryUiState) {
         val group = binding.filterChips
         group.removeAllViews()
+        if (state.protectedMode) {
+            group.addView(
+                quickFilterChip(getString(R.string.protected_videos)) {
+                    viewModel.setProtectedMode(false)
+                }
+            )
+        }
         if (state.favoritesOnly) {
             group.addView(
                 quickFilterChip(getString(R.string.action_favorites)) {
@@ -1034,6 +1041,12 @@ class MainActivity : AppCompatActivity() {
         menu.findItem(R.id.action_favorites)?.setIcon(
             if (favoritesOnly) R.drawable.ic_favorite else R.drawable.ic_favorite_border
         )
+        // Toolbar grid/list toggle shows the mode you'd switch TO.
+        val gridNow = if (youtubeTab) youtubeGrid
+        else viewModel.uiState.value.viewMode == LibraryViewMode.GRID
+        menu.findItem(R.id.action_toggle_view)?.setIcon(
+            if (gridNow) R.drawable.ic_view_list else R.drawable.ic_grid_view
+        )
         // Show the tab you can switch TO; library-only actions are hidden on YouTube.
         menu.findItem(R.id.action_view_youtube)?.isVisible = !youtubeTab
         menu.findItem(R.id.action_view_library)?.isVisible = youtubeTab
@@ -1059,6 +1072,7 @@ class MainActivity : AppCompatActivity() {
                 if (youtubeTab) {
                     youtubeGrid = !youtubeGrid
                     applyYouTubeLayout()
+                    invalidateOptionsMenu()
                 } else {
                     viewModel.toggleViewMode()
                 }
