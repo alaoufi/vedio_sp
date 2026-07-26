@@ -429,7 +429,8 @@
 
     <!-- Shared-video receiver -->
     <string name="shared_video">فيديو مُشارَك</string>
-    <string name="share_saved">تم حفظ %1$d فيديو في مكتبتك</string>
+    <string name="shared_image">صورة مُشارَكة</string>
+    <string name="share_saved">تم حفظ %1$d عنصرًا في مكتبتك</string>
     <string name="share_save_failed">تعذّر حفظ الفيديو المُشارَك</string>
 
     <!-- Playlists -->

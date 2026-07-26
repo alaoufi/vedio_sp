@@ -77,31 +77,63 @@ class ShareReceiverActivity : AppCompatActivity() {
     }
 
     private suspend fun saveOne(uri: Uri): Boolean {
+        val mime = contentResolver.getType(uri).orEmpty()
+        val isImage = mime.startsWith("image/")
+        val ext = android.webkit.MimeTypeMap.getSingleton().getExtensionFromMimeType(mime)
+            ?: if (isImage) "jpg" else "mp4"
         val name = queryDisplayName(uri)
-        val dest = storageManager.newVideoFile("mp4")
+
+        val dest = storageManager.newVideoFile(ext)
         contentResolver.openInputStream(uri)?.use { input ->
             dest.outputStream().use { output -> input.copyTo(output) }
         } ?: return false
         if (dest.length() == 0L) { dest.delete(); return false }
 
-        val meta = thumbnailGenerator.readMetadata(dest.absolutePath)
-        val thumb = thumbnailGenerator.generateThumbnail(dest.absolutePath)
-        videoRepository.addVideo(
-            VideoEntity(
-                title = name?.substringBeforeLast('.')?.takeIf { it.isNotBlank() }
-                    ?: getString(R.string.shared_video),
-                thumbnailPath = thumb,
-                localPath = dest.absolutePath,
-                source = VideoSource.LOCAL_IMPORT.id,
-                duration = meta?.durationMs ?: 0L,
-                fileSize = dest.length(),
-                width = meta?.width ?: 0,
-                height = meta?.height ?: 0,
-                createdDate = System.currentTimeMillis(),
-                contentHash = "${dest.length()}_${meta?.durationMs ?: 0L}"
+        val title = name?.substringBeforeLast('.')?.takeIf { it.isNotBlank() }
+            ?: getString(if (isImage) R.string.shared_image else R.string.shared_video)
+
+        if (isImage) {
+            val (w, h) = imageDimensions(dest.absolutePath)
+            videoRepository.addVideo(
+                VideoEntity(
+                    title = title,
+                    thumbnailPath = dest.absolutePath,
+                    localPath = dest.absolutePath,
+                    source = VideoSource.LOCAL_IMPORT.id,
+                    mediaType = com.myvideolibrary.app.data.model.MediaType.IMAGE.id,
+                    duration = 0L,
+                    fileSize = dest.length(),
+                    width = w,
+                    height = h,
+                    createdDate = System.currentTimeMillis(),
+                    contentHash = "img_${dest.length()}"
+                )
             )
-        )
+        } else {
+            val meta = thumbnailGenerator.readMetadata(dest.absolutePath)
+            val thumb = thumbnailGenerator.generateThumbnail(dest.absolutePath)
+            videoRepository.addVideo(
+                VideoEntity(
+                    title = title,
+                    thumbnailPath = thumb,
+                    localPath = dest.absolutePath,
+                    source = VideoSource.LOCAL_IMPORT.id,
+                    duration = meta?.durationMs ?: 0L,
+                    fileSize = dest.length(),
+                    width = meta?.width ?: 0,
+                    height = meta?.height ?: 0,
+                    createdDate = System.currentTimeMillis(),
+                    contentHash = "${dest.length()}_${meta?.durationMs ?: 0L}"
+                )
+            )
+        }
         return true
+    }
+
+    private fun imageDimensions(path: String): Pair<Int, Int> {
+        val opts = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        android.graphics.BitmapFactory.decodeFile(path, opts)
+        return opts.outWidth.coerceAtLeast(0) to opts.outHeight.coerceAtLeast(0)
     }
 
     private fun queryDisplayName(uri: Uri): String? = runCatching {

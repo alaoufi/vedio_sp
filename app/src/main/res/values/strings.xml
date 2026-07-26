@@ -466,7 +466,8 @@
 
     <!-- Shared-video receiver -->
     <string name="shared_video">Shared video</string>
-    <string name="share_saved">Saved %1$d video(s) to your library</string>
+    <string name="shared_image">Shared image</string>
+    <string name="share_saved">Saved %1$d item(s) to your library</string>
     <string name="share_save_failed">Couldn\'t save the shared video</string>
 
     <!-- Playlists -->
