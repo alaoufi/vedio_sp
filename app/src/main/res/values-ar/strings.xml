@@ -426,6 +426,20 @@
     <!-- Player subtitles -->
     <string name="subtitles_add">الترجمة (SRT/VTT)</string>
     <string name="subtitles_loaded">تم تحميل الترجمة</string>
+    <string name="loop_one">تكرار هذا المقطع</string>
+    <string name="loop_on">التكرار مُفعّل</string>
+    <string name="loop_off">التكرار مُوقف</string>
+    <string name="sleep_timer">مؤقّت النوم</string>
+    <string name="sleep_minutes">%1$d دقيقة</string>
+    <string name="sleep_off">إيقاف</string>
+    <string name="sleep_set">مؤقّت النوم: %1$d دقيقة</string>
+    <string name="sleep_cancelled">أُوقف مؤقّت النوم</string>
+    <string name="sleep_done">أُوقف التشغيل (مؤقّت النوم)</string>
+    <string name="capture_frame">التقاط لقطة</string>
+    <string name="capturing_frame">جارٍ الالتقاط…</string>
+    <string name="frame_saved">حُفظت اللقطة في المكتبة</string>
+    <string name="frame_failed">تعذّر التقاط اللقطة</string>
+    <string name="captured_frame">لقطة ملتقطة</string>
 
     <!-- Shared-video receiver -->
     <string name="shared_video">فيديو مُشارَك</string>

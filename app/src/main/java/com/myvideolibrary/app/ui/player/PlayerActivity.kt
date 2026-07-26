@@ -44,6 +44,17 @@ class PlayerActivity : AppCompatActivity() {
     @javax.inject.Inject
     lateinit var securityManager: SecurityManager
 
+    @javax.inject.Inject
+    lateinit var storageManager: com.myvideolibrary.app.util.StorageManager
+
+    @javax.inject.Inject
+    lateinit var videoRepository: com.myvideolibrary.app.data.repository.VideoRepository
+
+    // Sleep timer + loop state.
+    private var sleepRunnable: Runnable? = null
+    private val sleepHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private var looping = false
+
     private var player: ExoPlayer? = null
     private var controlsLocked = false
     private var backgroundPlayback = false
@@ -189,14 +200,20 @@ class PlayerActivity : AppCompatActivity() {
             m.add(0, 1, 0, getString(if (rotationLocked) R.string.rotation_auto else R.string.rotation_lock))
             m.add(0, 2, 1, getString(R.string.cd_resize))
             m.add(0, 9, 2, getString(R.string.subtitles_add))
-            m.add(0, 5, 3, getString(R.string.hide_text))
-            if (binding.hideBox.hasBox) m.add(0, 6, 4, getString(R.string.hide_text_remove))
+            m.add(0, 12, 3, getString(R.string.capture_frame))
+            m.add(0, 5, 4, getString(R.string.hide_text))
+            if (binding.hideBox.hasBox) m.add(0, 6, 5, getString(R.string.hide_text_remove))
         }
-        m.add(0, 3, 4, getString(R.string.background_play)).apply {
+        m.add(0, 11, 6, getString(R.string.loop_one)).apply {
+            isCheckable = true
+            isChecked = looping
+        }
+        m.add(0, 10, 7, getString(R.string.sleep_timer))
+        m.add(0, 3, 8, getString(R.string.background_play)).apply {
             isCheckable = true
             isChecked = backgroundPlayback
         }
-        if (supportsPip() && !isAudioTrack) m.add(0, 4, 5, getString(R.string.cd_pip))
+        if (supportsPip() && !isAudioTrack) m.add(0, 4, 9, getString(R.string.cd_pip))
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 1 -> { toggleRotationLock(); true }
@@ -220,11 +237,107 @@ class PlayerActivity : AppCompatActivity() {
                     }
                     true
                 }
+                10 -> { showSleepTimerMenu(anchor); true }
+                11 -> { toggleLoop(); true }
+                12 -> { captureFrame(); true }
                 else -> false
             }
         }
         popup.show()
     }
+
+    // ---- Loop / sleep timer / frame capture ----
+
+    private fun toggleLoop() {
+        looping = !looping
+        player?.repeatMode =
+            if (looping) Player.REPEAT_MODE_ONE else Player.REPEAT_MODE_OFF
+        showGestureHint(getString(if (looping) R.string.loop_on else R.string.loop_off))
+    }
+
+    private fun showSleepTimerMenu(anchor: View) {
+        val popup = android.widget.PopupMenu(this, anchor)
+        val mins = intArrayOf(10, 20, 30, 60)
+        mins.forEachIndexed { i, min -> popup.menu.add(0, i, i, getString(R.string.sleep_minutes, min)) }
+        popup.menu.add(0, 100, mins.size, getString(R.string.sleep_off))
+        popup.setOnMenuItemClickListener { item ->
+            cancelSleep()
+            if (item.itemId == 100) {
+                showGestureHint(getString(R.string.sleep_cancelled))
+            } else {
+                val minutes = mins[item.itemId]
+                val r = Runnable {
+                    player?.pause()
+                    showGestureHint(getString(R.string.sleep_done))
+                }
+                sleepRunnable = r
+                sleepHandler.postDelayed(r, minutes * 60_000L)
+                showGestureHint(getString(R.string.sleep_set, minutes))
+            }
+            true
+        }
+        popup.show()
+    }
+
+    private fun cancelSleep() {
+        sleepRunnable?.let { sleepHandler.removeCallbacks(it) }
+        sleepRunnable = null
+    }
+
+    /** Saves the currently displayed frame as an image in the library. */
+    private fun captureFrame() {
+        val src = currentSource ?: return
+        val posMs = player?.currentPosition ?: return
+        showGestureHint(getString(R.string.capturing_frame))
+        lifecycleScope.launch {
+            val ok = runCatching { saveFrame(src, posMs) }.getOrDefault(false)
+            showGestureHint(getString(if (ok) R.string.frame_saved else R.string.frame_failed))
+        }
+    }
+
+    private suspend fun saveFrame(source: String, positionMs: Long): Boolean =
+        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            val retriever = android.media.MediaMetadataRetriever()
+            try {
+                when {
+                    source.startsWith("content://") -> retriever.setDataSource(this@PlayerActivity, Uri.parse(source))
+                    source.startsWith("http") -> retriever.setDataSource(source, HashMap())
+                    source.startsWith("file://") -> retriever.setDataSource(Uri.parse(source).path)
+                    else -> retriever.setDataSource(source)
+                }
+                val bmp = retriever.getFrameAtTime(
+                    positionMs * 1000, android.media.MediaMetadataRetriever.OPTION_CLOSEST
+                ) ?: return@withContext false
+                val dest = storageManager.newVideoFile("jpg")
+                java.io.FileOutputStream(dest).use { out ->
+                    bmp.compress(android.graphics.Bitmap.CompressFormat.JPEG, 95, out)
+                }
+                val w = bmp.width
+                val h = bmp.height
+                bmp.recycle()
+                if (dest.length() == 0L) { dest.delete(); return@withContext false }
+                videoRepository.addVideo(
+                    com.myvideolibrary.app.data.local.entity.VideoEntity(
+                        title = getString(R.string.captured_frame),
+                        thumbnailPath = dest.absolutePath,
+                        localPath = dest.absolutePath,
+                        source = com.myvideolibrary.app.data.model.VideoSource.LOCAL_IMPORT.id,
+                        mediaType = com.myvideolibrary.app.data.model.MediaType.IMAGE.id,
+                        duration = 0L,
+                        fileSize = dest.length(),
+                        width = w,
+                        height = h,
+                        createdDate = System.currentTimeMillis(),
+                        contentHash = "frame_${dest.length()}_$positionMs"
+                    )
+                )
+                true
+            } catch (e: Exception) {
+                false
+            } finally {
+                runCatching { retriever.release() }
+            }
+        }
 
     // ---- Hide-box: cover floating text during playback ----
 
@@ -619,6 +732,7 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        cancelSleep()
         savePosition()
         player?.release()
         player = null

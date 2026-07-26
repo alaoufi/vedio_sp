@@ -463,6 +463,20 @@
     <!-- Player subtitles -->
     <string name="subtitles_add">Subtitles (SRT/VTT)</string>
     <string name="subtitles_loaded">Subtitles loaded</string>
+    <string name="loop_one">Loop this video</string>
+    <string name="loop_on">Looping on</string>
+    <string name="loop_off">Looping off</string>
+    <string name="sleep_timer">Sleep timer</string>
+    <string name="sleep_minutes">%1$d minutes</string>
+    <string name="sleep_off">Off</string>
+    <string name="sleep_set">Sleep timer: %1$d min</string>
+    <string name="sleep_cancelled">Sleep timer off</string>
+    <string name="sleep_done">Paused (sleep timer)</string>
+    <string name="capture_frame">Capture frame</string>
+    <string name="capturing_frame">Capturing…</string>
+    <string name="frame_saved">Frame saved to library</string>
+    <string name="frame_failed">Couldn\'t capture the frame</string>
+    <string name="captured_frame">Captured frame</string>
 
     <!-- Shared-video receiver -->
     <string name="shared_video">Shared video</string>
