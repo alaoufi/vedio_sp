@@ -465,7 +465,7 @@
     <string name="view_guide">View guide</string>
 
     <!-- Player subtitles -->
-    <string name="subtitles_add">Subtitles (SRT/VTT)</string>
+    <string name="subtitles_add">Add subtitles (SRT/VTT file)</string>
     <string name="subtitles_loaded">Subtitles loaded</string>
     <string name="loop_one">Loop this video</string>
     <string name="loop_on">Looping on</string>
@@ -478,7 +478,7 @@
     <string name="sleep_done">Paused (sleep timer)</string>
     <string name="capture_frame">Capture frame</string>
     <string name="capturing_frame">Capturing…</string>
-    <string name="frame_saved">Frame saved to library</string>
+    <string name="frame_saved">Frame saved to gallery</string>
     <string name="frame_failed">Couldn\'t capture the frame</string>
     <string name="captured_frame">Captured frame</string>
 

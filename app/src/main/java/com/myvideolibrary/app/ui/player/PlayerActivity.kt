@@ -360,36 +360,46 @@ class PlayerActivity : AppCompatActivity() {
                 val bmp = retriever.getFrameAtTime(
                     positionMs * 1000, android.media.MediaMetadataRetriever.OPTION_CLOSEST
                 ) ?: return@withContext false
-                val dest = storageManager.newVideoFile("jpg")
-                java.io.FileOutputStream(dest).use { out ->
-                    bmp.compress(android.graphics.Bitmap.CompressFormat.JPEG, 95, out)
-                }
-                val w = bmp.width
-                val h = bmp.height
+                // Save to the phone's gallery (Pictures), not the app library.
+                val saved = saveBitmapToGallery(bmp)
                 bmp.recycle()
-                if (dest.length() == 0L) { dest.delete(); return@withContext false }
-                videoRepository.addVideo(
-                    com.myvideolibrary.app.data.local.entity.VideoEntity(
-                        title = getString(R.string.captured_frame),
-                        thumbnailPath = dest.absolutePath,
-                        localPath = dest.absolutePath,
-                        source = com.myvideolibrary.app.data.model.VideoSource.LOCAL_IMPORT.id,
-                        mediaType = com.myvideolibrary.app.data.model.MediaType.IMAGE.id,
-                        duration = 0L,
-                        fileSize = dest.length(),
-                        width = w,
-                        height = h,
-                        createdDate = System.currentTimeMillis(),
-                        contentHash = "frame_${dest.length()}_$positionMs"
-                    )
-                )
-                true
+                saved
             } catch (e: Exception) {
                 false
             } finally {
                 runCatching { retriever.release() }
             }
         }
+
+    /** Writes a frame into the device gallery under Pictures/VideoLibrary. */
+    private fun saveBitmapToGallery(bmp: android.graphics.Bitmap): Boolean {
+        val resolver = contentResolver
+        val values = android.content.ContentValues().apply {
+            put(android.provider.MediaStore.Images.Media.DISPLAY_NAME, "frame_${System.currentTimeMillis()}.jpg")
+            put(android.provider.MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                put(android.provider.MediaStore.Images.Media.RELATIVE_PATH, "Pictures/VideoLibrary")
+                put(android.provider.MediaStore.Images.Media.IS_PENDING, 1)
+            }
+        }
+        val uri = resolver.insert(
+            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values
+        ) ?: return false
+        return try {
+            resolver.openOutputStream(uri)?.use { out ->
+                if (!bmp.compress(android.graphics.Bitmap.CompressFormat.JPEG, 95, out)) return false
+            } ?: return false
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                values.clear()
+                values.put(android.provider.MediaStore.Images.Media.IS_PENDING, 0)
+                resolver.update(uri, values, null, null)
+            }
+            true
+        } catch (e: Exception) {
+            runCatching { resolver.delete(uri, null, null) }
+            false
+        }
+    }
 
     // ---- Hide-box: cover floating text during playback ----
 

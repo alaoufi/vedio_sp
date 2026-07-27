@@ -15,6 +15,10 @@
 
     <!-- Media access. Scoped per SDK level. -->
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <!-- Saving a captured frame to the gallery on pre-Q (Q+ needs no permission). -->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />

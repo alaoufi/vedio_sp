@@ -428,7 +428,7 @@
     <string name="view_guide">عرض الدليل</string>
 
     <!-- Player subtitles -->
-    <string name="subtitles_add">الترجمة (SRT/VTT)</string>
+    <string name="subtitles_add">إضافة ترجمة (ملف SRT/VTT)</string>
     <string name="subtitles_loaded">تم تحميل الترجمة</string>
     <string name="loop_one">تكرار هذا المقطع</string>
     <string name="loop_on">التكرار مُفعّل</string>
@@ -441,7 +441,7 @@
     <string name="sleep_done">أُوقف التشغيل (مؤقّت النوم)</string>
     <string name="capture_frame">التقاط لقطة</string>
     <string name="capturing_frame">جارٍ الالتقاط…</string>
-    <string name="frame_saved">حُفظت اللقطة في المكتبة</string>
+    <string name="frame_saved">حُفظت اللقطة في المعرض</string>
     <string name="frame_failed">تعذّر التقاط اللقطة</string>
     <string name="captured_frame">لقطة ملتقطة</string>
 
