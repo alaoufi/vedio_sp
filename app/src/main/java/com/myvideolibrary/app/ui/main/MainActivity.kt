@@ -259,6 +259,8 @@ class MainActivity : AppCompatActivity() {
         )
         binding.recyclerView.adapter = adapter
         binding.recyclerView.setHasFixedSize(true)
+        // Keep a few more views ready off-screen for smoother fast scrolling.
+        binding.recyclerView.setItemViewCacheSize(12)
 
         binding.swipeRefresh.setOnRefreshListener {
             adapter.refresh()

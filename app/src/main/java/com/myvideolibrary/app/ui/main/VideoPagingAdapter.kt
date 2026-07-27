@@ -80,7 +80,10 @@ class VideoPagingAdapter(
                 if (video.isFavorite) android.graphics.Color.parseColor("#E53935")
                 else android.graphics.Color.WHITE
             )
-            binding.favoriteIcon.setOnClickListener { onFavorite(video) }
+            binding.favoriteIcon.setOnClickListener {
+                it.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
+                onFavorite(video)
+            }
             binding.lockIcon.isVisible = video.isLocked
             binding.linkBadge.isVisible = video.isLinkOnly
             // A saved link has no duration until downloaded.
@@ -90,7 +93,10 @@ class VideoPagingAdapter(
             binding.selectionOverlay.isVisible = selectionMode && video.id in selectedIds
             binding.menuButton.setOnClickListener { onMenu(video, it) }
             binding.root.setOnClickListener { onClick(video) }
-            binding.root.setOnLongClickListener { onLongClick(video); true }
+            binding.root.setOnLongClickListener {
+                it.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+                onLongClick(video); true
+            }
         }
     }
 
@@ -112,7 +118,10 @@ class VideoPagingAdapter(
                 if (video.isFavorite) android.graphics.Color.parseColor("#E53935")
                 else android.graphics.Color.WHITE
             )
-            binding.favoriteIcon.setOnClickListener { onFavorite(video) }
+            binding.favoriteIcon.setOnClickListener {
+                it.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
+                onFavorite(video)
+            }
             binding.lockIcon.isVisible = video.isLocked
             binding.linkBadge.isVisible = video.isLinkOnly
             binding.duration.isVisible = video.duration > 0
@@ -122,7 +131,10 @@ class VideoPagingAdapter(
             loadThumbnail(binding.thumbnail, video)
             binding.selectionOverlay.isVisible = selectionMode && video.id in selectedIds
             binding.root.setOnClickListener { onClick(video) }
-            binding.root.setOnLongClickListener { onLongClick(video); true }
+            binding.root.setOnLongClickListener {
+                it.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+                onLongClick(video); true
+            }
         }
     }
 
