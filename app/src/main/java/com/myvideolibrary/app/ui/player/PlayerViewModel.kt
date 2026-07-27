@@ -56,6 +56,21 @@ class PlayerViewModel @Inject constructor(
     private var loaded = false
     private var countedPlay = false
 
+    /** Favourite state of the current library video (null id ⇒ button hidden). */
+    private val _favorite = MutableStateFlow(false)
+    val favorite: StateFlow<Boolean> = _favorite.asStateFlow()
+    private var favoriteId: Long? = null
+
+    /** Toggles the current library video's favourite flag. */
+    fun toggleFavorite() {
+        val id = favoriteId ?: return
+        viewModelScope.launch {
+            val next = !_favorite.value
+            videoRepository.setFavorite(id, next)
+            _favorite.value = next
+        }
+    }
+
     /** Plays a stored library video; streams from source if it's a saved link. */
     fun loadVideo(id: Long) {
         if (loaded) return
@@ -66,6 +81,8 @@ class PlayerViewModel @Inject constructor(
                 _state.value = PlayerUiState.Error(null)
                 return@launch
             }
+            favoriteId = id
+            _favorite.value = video.isFavorite
             if (video.isLinkOnly) {
                 val src = video.sourceUrl
                 if (src == null) {

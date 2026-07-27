@@ -147,6 +147,9 @@ class PlayerActivity : AppCompatActivity() {
                         is PlayerUiState.Ready -> {
                             binding.loadingBar.isVisible = false
                             binding.titleText.text = state.title
+                            currentReady = state
+                            // Favourite only applies to a saved library video.
+                            binding.favoriteButton.isVisible = state.trackId != null
                             showArtworkIfAudio(state.isAudio, state.artwork)
                             preparePlayer(state.url, state.resumeMs)
                         }
@@ -159,6 +162,55 @@ class PlayerActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+
+        // Reflect the favourite state on the heart button.
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.favorite.collectLatest { fav ->
+                    binding.favoriteButton.setImageResource(
+                        if (fav) R.drawable.ic_favorite else R.drawable.ic_favorite_border
+                    )
+                }
+            }
+        }
+        binding.favoriteButton.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
+            viewModel.toggleFavorite()
+        }
+        binding.shareButton.setOnClickListener { shareCurrent() }
+    }
+
+    private var currentReady: PlayerUiState.Ready? = null
+
+    /** Shares the current clip — the local file (via FileProvider) or its URL. */
+    private fun shareCurrent() {
+        val ready = currentReady ?: return
+        val url = ready.url
+        try {
+            val send = Intent(Intent.ACTION_SEND)
+            when {
+                url.startsWith("http") -> {
+                    send.type = "text/plain"
+                    send.putExtra(Intent.EXTRA_TEXT, url)
+                }
+                url.startsWith("content://") -> {
+                    send.type = "video/*"
+                    send.putExtra(Intent.EXTRA_STREAM, Uri.parse(url))
+                    send.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                else -> {
+                    val uri = androidx.core.content.FileProvider.getUriForFile(
+                        this, "$packageName.fileprovider", java.io.File(url)
+                    )
+                    send.type = "video/*"
+                    send.putExtra(Intent.EXTRA_STREAM, uri)
+                    send.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+            }
+            startActivity(Intent.createChooser(send, getString(R.string.action_share)))
+        } catch (e: Exception) {
+            showGestureHint(getString(R.string.share_failed))
         }
     }
 
