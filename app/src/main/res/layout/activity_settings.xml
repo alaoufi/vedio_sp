@@ -233,6 +233,13 @@
                     </LinearLayout>
                 </LinearLayout>
 
+                <LinearLayout android:id="@+id/crashLogRow" style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/crash_log" />
+                        <TextView style="@style/SettingsSubtitle" android:text="@string/crash_log_desc" />
+                    </LinearLayout>
+                </LinearLayout>
+
                 <LinearLayout style="@style/SettingsRow">
                     <LinearLayout style="@style/SettingsRowText">
                         <TextView style="@style/SettingsTitle" android:text="@string/version" />

@@ -80,6 +80,7 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(android.content.Intent(this, com.myvideolibrary.app.ui.help.HelpActivity::class.java))
         }
         binding.checkUpdateRow.setOnClickListener { checkForUpdates() }
+        binding.crashLogRow.setOnClickListener { showCrashLog() }
         binding.wifiOnlySwitch.setOnClickListener {
             viewModel.setWifiOnly(binding.wifiOnlySwitch.isChecked)
         }
@@ -184,6 +185,31 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     /** Human-readable trial / subscription state for the About section. */
+    /** Shows the last recorded crash (if any), with options to share or clear it. */
+    private fun showCrashLog() {
+        val log = com.myvideolibrary.app.util.CrashLogger.lastCrash(this)
+        if (log == null) {
+            Toast.makeText(this, R.string.no_crash_log, Toast.LENGTH_SHORT).show()
+            return
+        }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.crash_log)
+            .setMessage(log.take(4000))
+            .setPositiveButton(R.string.action_share) { _, _ ->
+                val send = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(android.content.Intent.EXTRA_SUBJECT, "Crash log")
+                    putExtra(android.content.Intent.EXTRA_TEXT, log)
+                }
+                startActivity(android.content.Intent.createChooser(send, getString(R.string.action_share)))
+            }
+            .setNeutralButton(R.string.clear) { _, _ ->
+                com.myvideolibrary.app.util.CrashLogger.clear(this)
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
     /** Makes a settings section collapsible: tap the coloured header to toggle. */
     private fun setupSection(
         header: android.view.View,

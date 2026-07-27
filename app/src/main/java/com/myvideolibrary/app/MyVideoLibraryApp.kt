@@ -40,6 +40,8 @@ class MyVideoLibraryApp : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
+        // Record any uncaught crash locally so it can be viewed/shared (no server).
+        com.myvideolibrary.app.util.CrashLogger.install(this)
         // Apply the saved day/night theme before any activity is shown.
         themeManager.apply()
         // Re-lock the app whenever it is sent to the background.

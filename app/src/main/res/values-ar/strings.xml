@@ -416,6 +416,10 @@
     <string name="check_updates_desc">ابحث عن إصدار أحدث</string>
     <string name="checking_updates">جارٍ التحقق…</string>
     <string name="up_to_date">أنت على أحدث إصدار</string>
+    <string name="crash_log">سجل الأعطال</string>
+    <string name="crash_log_desc">عرض أو مشاركة آخر عطل</string>
+    <string name="no_crash_log">لا توجد أعطال مسجّلة — كل شيء سليم</string>
+    <string name="clear">مسح</string>
 
     <!-- First-launch onboarding -->
     <string name="choose_language">اختر لغتك</string>
