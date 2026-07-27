@@ -500,4 +500,5 @@
         <item quantity="one">%d video</item>
         <item quantity="other">%d videos</item>
     </plurals>
+    <string name="continue_watching">Continue watching</string>
 </resources>

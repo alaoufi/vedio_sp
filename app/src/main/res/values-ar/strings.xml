@@ -467,4 +467,5 @@
         <item quantity="many">%d مقطعًا</item>
         <item quantity="other">%d مقطع</item>
     </plurals>
+    <string name="continue_watching">متابعة المشاهدة</string>
 </resources>

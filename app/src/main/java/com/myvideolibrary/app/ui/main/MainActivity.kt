@@ -45,6 +45,7 @@ class MainActivity : AppCompatActivity() {
     @javax.inject.Inject lateinit var okHttpClient: okhttp3.OkHttpClient
 
     private lateinit var adapter: VideoPagingAdapter
+    private lateinit var continueAdapter: ContinueAdapter
     private lateinit var youtubeAdapter: com.myvideolibrary.app.ui.search.SearchResultAdapter
 
     /** The YouTube results currently on screen, used to build a swipe-able queue. */
@@ -156,6 +157,7 @@ class MainActivity : AppCompatActivity() {
         binding.youtubePanel.isVisible = youtube
         binding.swipeRefresh.isVisible = !youtube
         binding.fabImport.isVisible = !youtube
+        binding.continueSection.isVisible = !youtube && continueAdapter.itemCount > 0
         if (youtube) binding.emptyState.isVisible = false
         supportActionBar?.title =
             getString(if (youtube) R.string.tab_youtube else R.string.app_name)
@@ -268,6 +270,19 @@ class MainActivity : AppCompatActivity() {
             binding.progressBar.isVisible = refresh is LoadState.Loading && adapter.itemCount == 0
             val empty = refresh is LoadState.NotLoading && adapter.itemCount == 0
             binding.emptyState.isVisible = empty
+        }
+
+        continueAdapter = ContinueAdapter { startActivity(PlayerActivity.intent(this, it.id)) }
+        binding.continueRecycler.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.continueRecycler.adapter = continueAdapter
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.continueWatching.collectLatest { list ->
+                    continueAdapter.submitList(list)
+                    binding.continueSection.isVisible = list.isNotEmpty() && !youtubeTab
+                }
+            }
         }
     }
 

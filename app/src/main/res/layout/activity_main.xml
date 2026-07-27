@@ -47,6 +47,36 @@
                 app:singleLine="true" />
         </HorizontalScrollView>
 
+        <!-- Continue watching: recently-played, still-in-progress videos. -->
+        <LinearLayout
+            android:id="@+id/continueSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="4dp"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="4dp"
+                android:text="@string/continue_watching"
+                android:textAppearance="?attr/textAppearanceTitleSmall"
+                android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/continueRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:paddingHorizontal="12dp"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        </LinearLayout>
+
         <!-- Active-download banner: tap to open the Downloads screen. -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/downloadBanner"

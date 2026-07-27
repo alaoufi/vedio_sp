@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -61,6 +62,18 @@ class LibraryViewModel @Inject constructor(
     private val providerRegistry: com.myvideolibrary.app.provider.ProviderRegistry,
     private val playlistDao: com.myvideolibrary.app.data.local.dao.PlaylistDao
 ) : ViewModel() {
+
+    /** Recently-played videos still in progress, for the "Continue watching" row. */
+    val continueWatching: StateFlow<List<VideoEntity>> =
+        videoRepository.observeRecentlyPlayed(20)
+            .map { list ->
+                list.filter { v ->
+                    v.mediaType != "image" &&
+                        v.lastPlayedPosition > 3_000 &&
+                        (v.duration <= 0 || v.lastPlayedPosition < v.duration * 95 / 100)
+                }.take(10)
+            }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     /** All playlists (with counts), for the "add to playlist" picker. */
     val playlists: StateFlow<List<com.myvideolibrary.app.data.local.entity.PlaylistWithCount>> =
