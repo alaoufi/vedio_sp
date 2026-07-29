@@ -22,6 +22,8 @@ enum class VideoSource(val id: String) {
 enum class DownloadStatus(val id: String) {
     WAITING("waiting"),
     DOWNLOADING("downloading"),
+    /** Bytes are in; the device is muxing/extracting or building the thumbnail. */
+    PROCESSING("processing"),
     PAUSED("paused"),
     COMPLETED("completed"),
     FAILED("failed"),

@@ -38,7 +38,10 @@ class DownloadsAdapter(
             val status = DownloadStatus.fromId(item.status)
             binding.title.text = item.title
 
-            val indeterminate = status == DownloadStatus.DOWNLOADING && item.totalBytes <= 0
+            // Both the initial "no size yet" download and the post-download
+            // processing phase show a moving-but-value-less bar.
+            val indeterminate = (status == DownloadStatus.DOWNLOADING && item.totalBytes <= 0) ||
+                status == DownloadStatus.PROCESSING
             binding.progressBar.isIndeterminate = indeterminate
             if (!indeterminate) binding.progressBar.progress = item.progress
 
@@ -49,6 +52,7 @@ class DownloadsAdapter(
                     item.progress,
                     Formatters.speed(item.downloadSpeed)
                 )
+                DownloadStatus.PROCESSING -> ctx.getString(R.string.status_processing)
                 DownloadStatus.PAUSED -> ctx.getString(R.string.status_paused)
                 DownloadStatus.COMPLETED -> ctx.getString(
                     R.string.status_completed, Formatters.fileSize(item.totalBytes)
@@ -59,9 +63,12 @@ class DownloadsAdapter(
             }
 
             binding.progressBar.isVisible = status == DownloadStatus.DOWNLOADING ||
-                status == DownloadStatus.WAITING || status == DownloadStatus.PAUSED
+                status == DownloadStatus.WAITING || status == DownloadStatus.PAUSED ||
+                status == DownloadStatus.PROCESSING
 
-            // Action button visibility per state.
+            // Action button visibility per state. Processing is a brief, on-device
+            // finishing step (mux/thumbnail) that isn't cleanly interruptible, so it
+            // shows no buttons — just the indeterminate bar.
             binding.pauseButton.isVisible = status == DownloadStatus.DOWNLOADING
             // Resume also re-kicks a stuck "Waiting" job with the current settings.
             binding.resumeButton.isVisible = status == DownloadStatus.PAUSED ||

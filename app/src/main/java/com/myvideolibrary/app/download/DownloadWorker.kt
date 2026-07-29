@@ -106,6 +106,9 @@ class DownloadWorker @AssistedInject constructor(
                 return Result.success()
             }
 
+            // Reading metadata + generating a thumbnail is the last on-device step;
+            // show it as processing rather than a stalled 100%.
+            markProcessing(downloadId)
             finalize(downloadId, download.title, destFile, kind)
             notifier.showComplete(notificationId, download.title, true)
             Result.success(workDataOf(KEY_DOWNLOAD_ID to downloadId))
@@ -427,7 +430,9 @@ class DownloadWorker @AssistedInject constructor(
             return@withContext false
         }
 
-        // Merge phase.
+        // Merge phase — bytes are in, now the device muxes. Surface it so the row
+        // doesn't sit frozen at 100% while this (sometimes slow) step runs.
+        markProcessing(downloadId)
         val merged = VideoMuxer.mux(videoTmp, audioTmp, destFile)
         videoTmp.delete()
         audioTmp.delete()
@@ -447,6 +452,7 @@ class DownloadWorker @AssistedInject constructor(
         }
         val src = File(destFile.parentFile, destFile.name + ".src")
         if (!downloadSmart(download.downloadUrl!!, src, downloadId, download.title)) return false
+        markProcessing(downloadId)
         val ok = withContext(Dispatchers.IO) { VideoMuxer.extractAudio(src, destFile) }
         src.delete()
         if (!ok) throw IllegalStateException("Failed to extract audio")
@@ -465,6 +471,7 @@ class DownloadWorker @AssistedInject constructor(
         }
         val src = File(destFile.parentFile, destFile.name + ".src")
         if (!downloadSmart(download.downloadUrl!!, src, downloadId, download.title)) return false
+        markProcessing(downloadId)
         val ok = withContext(Dispatchers.IO) { VideoMuxer.stripAudio(src, destFile) }
         src.delete()
         if (!ok) throw IllegalStateException("Failed to remove audio")
@@ -770,6 +777,16 @@ class DownloadWorker @AssistedInject constructor(
             "$name.audio.part", "$name.audio.part$PARTS_SUFFIX",
             "$name.src"
         ).forEach { runCatching { File(parent, it).delete() } }
+    }
+
+    /**
+     * Flags the job as PROCESSING: the bytes are downloaded and the device is now
+     * muxing/extracting or building the thumbnail. The Downloads screen renders
+     * this as an indeterminate "Processing…" bar so a slow finishing step doesn't
+     * look like a frozen 100%. Best-effort — never fails the download.
+     */
+    private suspend fun markProcessing(downloadId: Long) {
+        runCatching { downloadRepository.setStatus(downloadId, DownloadStatus.PROCESSING) }
     }
 
     private fun isTikTokCdn(url: String): Boolean {

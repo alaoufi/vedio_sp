@@ -40,6 +40,7 @@ class DownloadRepositoryImpl @Inject constructor(
             listOf(
                 DownloadStatus.WAITING.id,
                 DownloadStatus.DOWNLOADING.id,
+                DownloadStatus.PROCESSING.id,
                 DownloadStatus.PAUSED.id
             )
         )

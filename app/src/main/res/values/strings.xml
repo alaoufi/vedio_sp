@@ -186,6 +186,7 @@
     <string name="action_retry">Retry</string>
     <string name="status_waiting">Waiting…</string>
     <string name="status_downloading">%1$d%% · %2$s</string>
+    <string name="status_processing">Processing…</string>
     <string name="status_paused">Paused</string>
     <string name="status_completed">Completed · %1$s</string>
     <string name="status_failed">Failed</string>

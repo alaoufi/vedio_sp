@@ -149,6 +149,7 @@
     <string name="action_retry">إعادة المحاولة</string>
     <string name="status_waiting">في الانتظار…</string>
     <string name="status_downloading">%1$d%% · %2$s</string>
+    <string name="status_processing">جارٍ المعالجة…</string>
     <string name="status_paused">متوقف مؤقتًا</string>
     <string name="status_completed">مكتمل · %1$s</string>
     <string name="status_failed">فشل</string>
