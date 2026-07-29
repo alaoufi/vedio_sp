@@ -89,6 +89,7 @@ class VideoPagingAdapter(
             // A saved link has no duration until downloaded.
             binding.duration.isVisible = video.duration > 0
             bindCategory(binding.category, video)
+            bindWatchProgress(binding.watchProgress, video)
             loadThumbnail(binding.thumbnail, video)
             binding.selectionOverlay.isVisible = selectionMode && video.id in selectedIds
             binding.menuButton.setOnClickListener { onMenu(video, it) }
@@ -127,6 +128,7 @@ class VideoPagingAdapter(
             binding.duration.isVisible = video.duration > 0
             binding.size.isVisible = !video.isLinkOnly
             bindCategory(binding.category, video)
+            bindWatchProgress(binding.watchProgress, video)
             binding.menuButton.setOnClickListener { onMenu(video, it) }
             loadThumbnail(binding.thumbnail, video)
             binding.selectionOverlay.isVisible = selectionMode && video.id in selectedIds
@@ -135,6 +137,26 @@ class VideoPagingAdapter(
                 it.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
                 onLongClick(video); true
             }
+        }
+    }
+
+    /**
+     * Thin resume bar along the bottom of the thumbnail showing how far the clip
+     * has been watched. Hidden for saved links and for clips that were never
+     * started or are effectively finished (>98%), so a finished clip looks clean.
+     */
+    private fun bindWatchProgress(
+        bar: com.google.android.material.progressindicator.LinearProgressIndicator,
+        video: VideoEntity
+    ) {
+        val pct = if (!video.isLinkOnly && video.duration > 0) {
+            (video.lastPlayedPosition * 1000 / video.duration).toInt().coerceIn(0, 1000)
+        } else 0
+        if (pct in 1..979) {
+            bar.progress = pct
+            bar.isVisible = true
+        } else {
+            bar.isVisible = false
         }
     }
 
