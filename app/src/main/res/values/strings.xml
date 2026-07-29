@@ -378,6 +378,9 @@
     <string name="category_none">Uncategorized</string>
     <string name="category_all">All categories</string>
     <string name="set_category">Set category</string>
+    <string name="tags">Tags</string>
+    <string name="edit_tags">Edit tags</string>
+    <string name="tags_hint">Comma-separated, e.g. trip, 2024, kids</string>
     <string name="category_hint">Category name</string>
     <string name="category_general">General</string>
     <string name="category_education">Education</string>

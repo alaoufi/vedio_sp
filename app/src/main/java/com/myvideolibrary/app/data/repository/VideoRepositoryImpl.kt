@@ -6,6 +6,7 @@ import androidx.paging.PagingData
 import com.myvideolibrary.app.data.local.dao.VideoDao
 import com.myvideolibrary.app.data.local.entity.VideoEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -77,6 +78,16 @@ class VideoRepositoryImpl @Inject constructor(
     override suspend fun deleteCategory(name: String) = videoDao.clearCategory(name)
 
     override fun observeCategories(): Flow<List<String>> = videoDao.observeCategories()
+
+    override suspend fun setTags(id: Long, rawTags: String?) =
+        videoDao.setTags(id, TagFormat.normalise(rawTags))
+
+    override fun observeTags(): Flow<List<String>> =
+        videoDao.observeTagStrings().map { rows ->
+            rows.flatMap { TagFormat.split(it) }
+                .distinctBy { it.lowercase() }
+                .sortedBy { it.lowercase() }
+        }
 
     override suspend fun moveToFolder(ids: List<Long>, folderId: Long?) =
         videoDao.moveToFolder(ids, folderId)

@@ -94,6 +94,14 @@ interface VideoDao {
     @Query("UPDATE videos SET category = :category WHERE id IN (:ids)")
     suspend fun setCategory(ids: List<Long>, category: String?)
 
+    /** Sets the comma-separated [tags] string on a video (null clears it). */
+    @Query("UPDATE videos SET tags = :tags WHERE id = :id")
+    suspend fun setTags(id: Long, tags: String?)
+
+    /** Every non-empty tags string in use; split into individual tags in Kotlin. */
+    @Query("SELECT tags FROM videos WHERE tags IS NOT NULL AND TRIM(tags) != ''")
+    fun observeTagStrings(): Flow<List<String>>
+
     // Match tolerantly (trimmed, case-insensitive) so rename/delete still work
     // when a video's stored label differs from the displayed name by case or
     // surrounding whitespace — otherwise a non-empty category can't be removed.

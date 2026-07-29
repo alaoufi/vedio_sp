@@ -341,6 +341,9 @@
     <string name="category_none">بدون تصنيف</string>
     <string name="category_all">كل التصنيفات</string>
     <string name="set_category">تعيين التصنيف</string>
+    <string name="tags">الوسوم</string>
+    <string name="edit_tags">تعديل الوسوم</string>
+    <string name="tags_hint">مفصولة بفواصل، مثل: رحلة، 2024، أطفال</string>
     <string name="category_hint">اسم التصنيف</string>
     <string name="category_general">عام</string>
     <string name="category_education">تعليمي</string>

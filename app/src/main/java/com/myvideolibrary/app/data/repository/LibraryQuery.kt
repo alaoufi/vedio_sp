@@ -28,6 +28,8 @@ data class LibraryQuery(
     val protectedOnly: Boolean = false,
     /** Any of "video"/"audio"/"image"; empty means all types. */
     val mediaTypes: Set<String> = emptySet(),
+    /** Show videos carrying any of these tags; empty means no tag filter. */
+    val tags: Set<String> = emptySet(),
     val sortOrder: SortOrder = SortOrder.DATE_ADDED_DESC
 ) {
 
@@ -66,6 +68,16 @@ data class LibraryQuery(
             val placeholders = mediaTypes.joinToString(", ") { "?" }
             where.append(" AND media_type IN ($placeholders)")
             mediaTypes.forEach { args.add(it) }
+        }
+        // Tags are stored comma-joined; wrap the column in commas and match a whole
+        // tag so "kids" never matches "kids-party". OR the chosen tags together.
+        val cleanTags = tags.map { it.trim() }.filter { it.isNotEmpty() }
+        if (cleanTags.isNotEmpty()) {
+            val clauses = cleanTags.joinToString(" OR ") {
+                "(',' || tags || ',') LIKE ?"
+            }
+            where.append(" AND ($clauses)")
+            cleanTags.forEach { args.add("%,$it,%") }
         }
         // Multi-select source: OR the chosen buckets together. Empty = all sources.
         if (sourceFilters.isNotEmpty()) {

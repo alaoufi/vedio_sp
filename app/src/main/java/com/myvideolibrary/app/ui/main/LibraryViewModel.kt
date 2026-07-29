@@ -44,6 +44,8 @@ data class LibraryUiState(
     val categories: List<String> = emptyList(),
     /** Selected media types ("video"/"audio"/"image"); empty means all types. */
     val mediaTypeFilters: Set<String> = emptySet(),
+    /** Selected tags; empty means no tag filter. */
+    val tagFilters: Set<String> = emptySet(),
     val videoCount: Int = 0,
     val totalSize: Long = 0,
     val folders: List<FolderEntity> = emptyList(),
@@ -121,13 +123,19 @@ class LibraryViewModel @Inject constructor(
     private val _protectedMode = MutableStateFlow(false)
     private val _categoryFilters = MutableStateFlow<Set<String>>(emptySet())
     private val _mediaTypeFilters = MutableStateFlow<Set<String>>(emptySet())
+    private val _tagFilters = MutableStateFlow<Set<String>>(emptySet())
 
-    /** Merged source + protected + category + type, kept as one flow for combine arity. */
+    /** Merged source + protected + category + type + tags, one flow for combine arity. */
     private val extraFilters = combine(
-        _sourceFilters, _protectedMode, _categoryFilters, _mediaTypeFilters
-    ) { sources, protectedMode, categories, mediaTypes ->
-        ExtraFilters(sources, protectedMode, categories, mediaTypes)
+        _sourceFilters, _protectedMode, _categoryFilters, _mediaTypeFilters, _tagFilters
+    ) { sources, protectedMode, categories, mediaTypes, tags ->
+        ExtraFilters(sources, protectedMode, categories, mediaTypes, tags)
     }
+
+    /** Distinct tags currently in use, for the tag filter picker. */
+    val allTags: StateFlow<List<String>> =
+        videoRepository.observeTags()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     /** Paged videos, recomputed whenever the query changes. */
     val videos: Flow<PagingData<VideoEntity>> =
@@ -178,6 +186,7 @@ class LibraryViewModel @Inject constructor(
             categoryFilters = f.extra.categories,
             categories = m.categories,
             mediaTypeFilters = f.extra.mediaTypes,
+            tagFilters = f.extra.tags,
             videoCount = m.count,
             totalSize = m.size,
             folders = m.folders,
@@ -205,6 +214,7 @@ class LibraryViewModel @Inject constructor(
                     sourceFilters = extra.sourceFilters,
                     protectedOnly = extra.protectedMode,
                     mediaTypes = extra.mediaTypes,
+                    tags = extra.tags,
                     sortOrder = SortOrder.fromId(settings.sortOrder)
                 )
             }.collect { queryState.value = it }
@@ -240,6 +250,13 @@ class LibraryViewModel @Inject constructor(
     fun setCategoryFilters(categories: Set<String>) { _categoryFilters.value = categories }
 
     fun setMediaTypeFilters(types: Set<String>) { _mediaTypeFilters.value = types }
+
+    fun setTagFilters(tags: Set<String>) { _tagFilters.value = tags }
+
+    /** Assigns a raw (comma-separated) tag string to a single video. */
+    fun setTags(id: Long, rawTags: String?) = viewModelScope.launch {
+        videoRepository.setTags(id, rawTags)
+    }
 
     fun setSortOrder(order: SortOrder) = viewModelScope.launch {
         settingsRepository.update { it.copy(sortOrder = order.id) }
@@ -353,7 +370,8 @@ class LibraryViewModel @Inject constructor(
         val sourceFilters: Set<SourceFilter>,
         val protectedMode: Boolean,
         val categories: Set<String>,
-        val mediaTypes: Set<String>
+        val mediaTypes: Set<String>,
+        val tags: Set<String>
     )
 
     private data class LibraryFilters(

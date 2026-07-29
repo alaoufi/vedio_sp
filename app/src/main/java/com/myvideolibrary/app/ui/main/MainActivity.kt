@@ -427,12 +427,16 @@ class MainActivity : AppCompatActivity() {
         if (state.categories.isNotEmpty()) {
             menu.add(GROUP_CATEGORY, ID_CAT_PICK, 2, label(R.string.category, state.categoryFilters.size))
         }
+        if (viewModel.allTags.value.isNotEmpty()) {
+            menu.add(GROUP_TAG, ID_TAG_PICK, 3, label(R.string.tags, state.tagFilters.size))
+        }
 
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 ID_SRC_ALL -> showSourceFilterDialog(state.sourceFilters)
                 ID_TYPE_ALL -> showTypeFilterDialog(state.mediaTypeFilters)
                 ID_CAT_PICK -> showCategoryFilterDialog(state.categories, state.categoryFilters)
+                ID_TAG_PICK -> showTagFilterDialog(viewModel.allTags.value, state.tagFilters)
                 else -> return@setOnMenuItemClickListener false
             }
             true
@@ -458,6 +462,22 @@ class MainActivity : AppCompatActivity() {
                 )
             }
             .setNeutralButton(R.string.filter_all) { _, _ -> viewModel.setSourceFilters(emptySet()) }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    /** Multi-select tag filter: tick any tags to show clips carrying any of them. */
+    private fun showTagFilterDialog(tags: List<String>, selected: Set<String>) {
+        if (tags.isEmpty()) return
+        val labels = tags.toTypedArray()
+        val checked = BooleanArray(tags.size) { tags[it] in selected }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.tags)
+            .setMultiChoiceItems(labels, checked) { _, which, isChecked -> checked[which] = isChecked }
+            .setPositiveButton(R.string.apply) { _, _ ->
+                viewModel.setTagFilters(tags.filterIndexed { i, _ -> checked[i] }.toSet())
+            }
+            .setNeutralButton(R.string.filter_all) { _, _ -> viewModel.setTagFilters(emptySet()) }
             .setNegativeButton(R.string.cancel, null)
             .show()
     }
@@ -920,6 +940,7 @@ class MainActivity : AppCompatActivity() {
         popup.menu.add(0, 4, 5, getString(R.string.set_category))
         popup.menu.add(0, 14, 5, getString(R.string.add_to_playlist))
         popup.menu.add(0, 5, 6, getString(R.string.edit_info))
+        popup.menu.add(0, 16, 6, getString(R.string.edit_tags))
         // Trim (lossless) only for downloaded video files.
         val isVideoFile = video.mediaType == com.myvideolibrary.app.data.model.MediaType.VIDEO.id &&
             !video.isLinkOnly && video.localPath.isNotBlank() &&
@@ -944,6 +965,7 @@ class MainActivity : AppCompatActivity() {
                 3 -> { protectVideo(video); true }
                 4 -> { promptSetCategory(video); true }
                 5 -> { promptEditInfo(video); true }
+                16 -> { promptEditTags(video); true }
                 6 -> { confirmDeleteSingle(video); true }
                 8 -> { openSource(video); true }
                 9 -> { viewModel.toggleFavorite(video); true }
@@ -1187,6 +1209,33 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
+    /** Edit a clip's tags as a comma-separated list. */
+    private fun promptEditTags(video: VideoEntity) {
+        val pad = (16 * resources.displayMetrics.density).toInt()
+        val container = android.widget.LinearLayout(this).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding(pad, pad / 2, pad, 0)
+        }
+        val input = EditText(this).apply {
+            // Show current tags comma-joined for easy editing.
+            setText(
+                com.myvideolibrary.app.data.repository.TagFormat.split(video.tags)
+                    .joinToString(", ")
+            )
+            hint = getString(R.string.tags_hint)
+            setSingleLine(true)
+        }
+        container.addView(input)
+        AlertDialog.Builder(this)
+            .setTitle(R.string.edit_tags)
+            .setView(container)
+            .setPositiveButton(R.string.save) { _, _ ->
+                viewModel.setTags(video.id, input.text.toString())
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
     private fun confirmDeleteSingle(video: VideoEntity) {
         AlertDialog.Builder(this)
             .setTitle(R.string.delete_videos_title)
@@ -1365,6 +1414,8 @@ class MainActivity : AppCompatActivity() {
         const val ID_TYPE_AUDIO = 152
         const val ID_TYPE_IMAGE = 153
         const val ID_CAT_PICK = 200
+        const val GROUP_TAG = 5
+        const val ID_TAG_PICK = 250
     }
 
     override fun onBackPressed() {

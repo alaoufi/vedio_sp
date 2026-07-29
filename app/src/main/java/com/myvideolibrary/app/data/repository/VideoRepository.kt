@@ -38,6 +38,12 @@ interface VideoRepository {
 
     fun observeCategories(): Flow<List<String>>
 
+    /** Sets a video's tags from a raw user string (normalised to trimmed tokens). */
+    suspend fun setTags(id: Long, rawTags: String?)
+
+    /** Distinct tags currently in use across the library, alphabetised. */
+    fun observeTags(): Flow<List<String>>
+
     suspend fun moveToFolder(ids: List<Long>, folderId: Long?)
 
     suspend fun recordPlayback(id: Long, position: Long, countAsPlay: Boolean)
