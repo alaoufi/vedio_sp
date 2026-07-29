@@ -38,10 +38,9 @@ class DownloadsAdapter(
             val status = DownloadStatus.fromId(item.status)
             binding.title.text = item.title
 
-            // Both the initial "no size yet" download and the post-download
-            // processing phase show a moving-but-value-less bar.
-            val indeterminate = (status == DownloadStatus.DOWNLOADING && item.totalBytes <= 0) ||
-                status == DownloadStatus.PROCESSING
+            // A download with no advertised size shows a value-less bar; the
+            // processing phase reports real percent (e.g. muxing) so it's determinate.
+            val indeterminate = status == DownloadStatus.DOWNLOADING && item.totalBytes <= 0
             binding.progressBar.isIndeterminate = indeterminate
             if (!indeterminate) binding.progressBar.progress = item.progress
 

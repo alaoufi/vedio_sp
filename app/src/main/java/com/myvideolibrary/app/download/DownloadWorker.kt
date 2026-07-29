@@ -430,10 +430,27 @@ class DownloadWorker @AssistedInject constructor(
             return@withContext false
         }
 
-        // Merge phase — bytes are in, now the device muxes. Surface it so the row
-        // doesn't sit frozen at 100% while this (sometimes slow) step runs.
-        markProcessing(downloadId)
-        val merged = VideoMuxer.mux(videoTmp, audioTmp, destFile)
+        // Merge phase — bytes are in, now the device muxes. Report real progress
+        // (derived from sample timestamps) via a reporter coroutine so the row
+        // shows it advancing instead of sitting frozen at 100%.
+        downloadRepository.updateProgress(downloadId, DownloadStatus.PROCESSING, 0, 0, 0, 0)
+        val muxPct = java.util.concurrent.atomic.AtomicInteger(0)
+        val merged = coroutineScope {
+            val reporter = launch(Dispatchers.IO) {
+                while (isActive) {
+                    downloadRepository.updateProgress(
+                        downloadId, DownloadStatus.PROCESSING, muxPct.get(), 0, 0, 0
+                    )
+                    delay(400)
+                }
+            }
+            val ok = VideoMuxer.mux(videoTmp, audioTmp, destFile) { p -> muxPct.set(p) }
+            reporter.cancel()
+            downloadRepository.updateProgress(
+                downloadId, DownloadStatus.PROCESSING, if (ok) 100 else muxPct.get(), 0, 0, 0
+            )
+            ok
+        }
         videoTmp.delete()
         audioTmp.delete()
         if (!merged) throw IllegalStateException("Failed to merge video and audio")
