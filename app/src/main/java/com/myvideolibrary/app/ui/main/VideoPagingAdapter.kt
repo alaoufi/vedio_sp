@@ -6,7 +6,10 @@ import androidx.core.view.isVisible
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import androidx.palette.graphics.Palette
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.myvideolibrary.app.R
 import com.myvideolibrary.app.data.local.entity.VideoEntity
 import com.myvideolibrary.app.data.model.LibraryViewMode
@@ -91,6 +94,7 @@ class VideoPagingAdapter(
             bindCategory(binding.category, video)
             bindWatchProgress(binding.watchProgress, video)
             loadThumbnail(binding.thumbnail, video)
+            tintCover(binding.infoStrip, video)
             binding.selectionOverlay.isVisible = selectionMode && video.id in selectedIds
             binding.menuButton.setOnClickListener { onMenu(video, it) }
             binding.root.setOnClickListener { onClick(video) }
@@ -165,6 +169,53 @@ class VideoPagingAdapter(
         val label = video.category?.takeIf { it.isNotBlank() }
         textView.text = label
         textView.isVisible = label != null
+    }
+
+    /**
+     * Tints the info strip under a grid card with a colour pulled from the
+     * thumbnail, so each cover feels cohesive. A tiny 64px bitmap is decoded and
+     * run through Palette off the main thread; the result is applied as a subtle
+     * top-down gradient fading into the card surface.
+     *
+     * Palette runs asynchronously and rows are recycled, so the strip is tagged
+     * with the video id and the callback bails if the row has since been rebound
+     * — this prevents a late colour landing on the wrong card.
+     */
+    private fun tintCover(strip: android.widget.LinearLayout, video: VideoEntity) {
+        strip.tag = video.id
+        strip.background = null
+        val model: Any = video.thumbnailPath ?: video.localPath
+        Glide.with(strip)
+            .asBitmap()
+            .load(model)
+            .override(64, 64)
+            .centerCrop()
+            .into(object : CustomTarget<android.graphics.Bitmap>() {
+                override fun onResourceReady(
+                    resource: android.graphics.Bitmap,
+                    transition: Transition<in android.graphics.Bitmap>?
+                ) {
+                    Palette.from(resource).generate { palette ->
+                        if (strip.tag != video.id) return@generate
+                        val base = palette?.let {
+                            it.getMutedColor(it.getDominantColor(0))
+                        } ?: 0
+                        if (base == 0) {
+                            strip.background = null
+                        } else {
+                            val tinted = (base and 0x00FFFFFF) or (0x40 shl 24) // ~25% alpha
+                            strip.background = android.graphics.drawable.GradientDrawable(
+                                android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM,
+                                intArrayOf(tinted, android.graphics.Color.TRANSPARENT)
+                            )
+                        }
+                    }
+                }
+
+                override fun onLoadCleared(placeholder: android.graphics.drawable.Drawable?) {
+                    // Nothing to release; the strip keeps whatever background it has.
+                }
+            })
     }
 
     private fun loadThumbnail(

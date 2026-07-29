@@ -114,34 +114,44 @@
                 app:trackColor="#33000000" />
         </FrameLayout>
 
-        <!-- Title on its own full-width line below the thumbnail. -->
-        <TextView
-            android:id="@+id/title"
+        <!-- Info strip below the thumbnail. Its background is tinted at runtime
+             with a colour pulled from the thumbnail (see VideoPagingAdapter) so
+             each cover feels cohesive; falls back to the card surface. -->
+        <LinearLayout
+            android:id="@+id/infoStrip"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="2"
-            android:paddingHorizontal="8dp"
-            android:paddingTop="6dp"
-            android:paddingBottom="4dp"
-            android:textSize="12sp"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
-            tools:text="Sample video title" />
+            android:orientation="vertical">
 
-        <!-- Category chip so the clip's category is visible at a glance. -->
-        <TextView
-            android:id="@+id/category"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="8dp"
-            android:layout_marginBottom="8dp"
-            android:background="@drawable/bg_category_chip"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="2dp"
-            android:textColor="?attr/colorOnSecondaryContainer"
-            android:textSize="11sp"
-            android:visibility="gone"
-            tools:text="Music"
-            tools:visibility="visible" />
+            <!-- Title on its own full-width line below the thumbnail. -->
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:paddingHorizontal="8dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="4dp"
+                android:textSize="12sp"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                tools:text="Sample video title" />
+
+            <!-- Category chip so the clip's category is visible at a glance. -->
+            <TextView
+                android:id="@+id/category"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/bg_category_chip"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="2dp"
+                android:textColor="?attr/colorOnSecondaryContainer"
+                android:textSize="11sp"
+                android:visibility="gone"
+                tools:text="Music"
+                tools:visibility="visible" />
+        </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

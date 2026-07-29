@@ -143,6 +143,9 @@ dependencies {
     implementation(libs.glide)
     ksp(libs.glide.compiler)
 
+    // Palette — extract cover colours from thumbnails
+    implementation(libs.androidx.palette)
+
     // Media3 ExoPlayer
     implementation(libs.media3.exoplayer)
     implementation(libs.media3.exoplayer.dash)
