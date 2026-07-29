@@ -463,6 +463,10 @@
     <string name="play_all">تشغيل الكل</string>
     <string name="add_to_playlist">إضافة إلى قائمة</string>
     <string name="playlist_added">أُضيف إلى القائمة</string>
+    <string name="close">إغلاق</string>
+    <string name="quick_preview">معاينة سريعة</string>
+    <string name="preview_loading">جارٍ تجهيز المعاينة…</string>
+    <string name="preview_failed">تعذّر إنشاء معاينة لهذا المقطع</string>
     <plurals name="playlist_video_count">
         <item quantity="zero">لا مقاطع</item>
         <item quantity="one">مقطع واحد</item>

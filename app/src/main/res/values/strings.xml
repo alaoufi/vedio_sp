@@ -500,6 +500,10 @@
     <string name="play_all">Play all</string>
     <string name="add_to_playlist">Add to playlist</string>
     <string name="playlist_added">Added to playlist</string>
+    <string name="close">Close</string>
+    <string name="quick_preview">Quick preview</string>
+    <string name="preview_loading">Preparing preview…</string>
+    <string name="preview_failed">Couldn\'t build a preview for this clip</string>
     <plurals name="playlist_video_count">
         <item quantity="one">%d video</item>
         <item quantity="other">%d videos</item>

@@ -43,6 +43,7 @@ class MainActivity : AppCompatActivity() {
 
     @javax.inject.Inject lateinit var securityManager: SecurityManager
     @javax.inject.Inject lateinit var okHttpClient: okhttp3.OkHttpClient
+    @javax.inject.Inject lateinit var thumbnailGenerator: com.myvideolibrary.app.util.ThumbnailGenerator
 
     private lateinit var adapter: VideoPagingAdapter
     private lateinit var continueAdapter: ContinueAdapter
@@ -838,6 +839,8 @@ class MainActivity : AppCompatActivity() {
         val isVideoFile = video.mediaType == com.myvideolibrary.app.data.model.MediaType.VIDEO.id &&
             !video.isLinkOnly && video.localPath.isNotBlank() &&
             !video.localPath.startsWith("content://")
+        // Animated quick preview — video files only (needs decodable frames).
+        if (isVideoFile) popup.menu.add(0, 15, 7, getString(R.string.quick_preview))
         if (isVideoFile) popup.menu.add(0, 12, 7, getString(R.string.trim_menu))
         // Compress (HEVC) to reclaim space — downloaded video files only.
         if (isVideoFile) popup.menu.add(0, 13, 7, getString(R.string.compress_menu))
@@ -860,6 +863,7 @@ class MainActivity : AppCompatActivity() {
                 8 -> { openSource(video); true }
                 9 -> { viewModel.toggleFavorite(video); true }
                 14 -> { showAddToPlaylist(video); true }
+                15 -> { showQuickPreview(video); true }
                 10 -> { showFileInfo(video); true }
                 12 -> {
                     startActivity(
@@ -896,6 +900,79 @@ class MainActivity : AppCompatActivity() {
             }
         }
         popup.show()
+    }
+
+    /**
+     * Animated "quick preview": extracts a handful of frames across the clip and
+     * cycles through them in a dialog, giving a sense of the content without
+     * opening the player. Frames are decoded off the main thread; the cycling
+     * loop and every bitmap are torn down when the dialog is dismissed.
+     */
+    private fun showQuickPreview(video: VideoEntity) {
+        val image = android.widget.ImageView(this).apply {
+            adjustViewBounds = true
+            scaleType = android.widget.ImageView.ScaleType.FIT_CENTER
+            minimumHeight = (220 * resources.displayMetrics.density).toInt()
+            setBackgroundColor(android.graphics.Color.BLACK)
+        }
+        val progress = android.widget.ProgressBar(this).apply {
+            isIndeterminate = true
+        }
+        val container = android.widget.FrameLayout(this).apply {
+            addView(
+                image,
+                android.widget.FrameLayout.LayoutParams(
+                    android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+                    android.widget.FrameLayout.LayoutParams.WRAP_CONTENT
+                )
+            )
+            addView(
+                progress,
+                android.widget.FrameLayout.LayoutParams(
+                    android.widget.FrameLayout.LayoutParams.WRAP_CONTENT,
+                    android.widget.FrameLayout.LayoutParams.WRAP_CONTENT,
+                    android.view.Gravity.CENTER
+                )
+            )
+        }
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(video.title)
+            .setView(container)
+            .setPositiveButton(R.string.play) { _, _ -> onVideoClick(video) }
+            .setNegativeButton(R.string.close, null)
+            .create()
+
+        val frames = mutableListOf<android.graphics.Bitmap>()
+        // Cycle frames on the main thread; cancelled on dismiss so it can't leak.
+        val cycleJob = lifecycleScope.launch {
+            // extractPreviewFrames already does its decoding on Dispatchers.IO.
+            val loaded = thumbnailGenerator.extractPreviewFrames(video.localPath)
+            frames.addAll(loaded)
+            progress.visibility = android.view.View.GONE
+            if (frames.isEmpty()) {
+                android.widget.Toast.makeText(
+                    this@MainActivity, R.string.preview_failed, android.widget.Toast.LENGTH_SHORT
+                ).show()
+                dialog.dismiss()
+                return@launch
+            }
+            var i = 0
+            while (true) {
+                image.setImageBitmap(frames[i % frames.size])
+                i++
+                kotlinx.coroutines.delay(450)
+            }
+        }
+
+        dialog.setOnDismissListener {
+            cycleJob.cancel()
+            // Detach before recycling so a redraw can't hit a recycled bitmap.
+            image.setImageDrawable(null)
+            frames.forEach { runCatching { it.recycle() } }
+            frames.clear()
+        }
+        dialog.show()
     }
 
     /** Shows the file's format (MP4/M4A/JPG…), type, size, resolution and duration. */

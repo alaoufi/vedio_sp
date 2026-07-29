@@ -92,6 +92,58 @@ class ThumbnailGenerator @Inject constructor(
         }
     }
 
+    /**
+     * Extracts up to [count] evenly-spaced, downscaled frames across the clip for
+     * an animated "quick preview". Frames are sampled between 5% and 95% of the
+     * duration to skip intros/black tails, decoded at [OPTION_CLOSEST_SYNC] for
+     * speed, and scaled down so cycling them stays light on memory. Returns an
+     * empty list on failure; the caller owns recycling the returned bitmaps.
+     */
+    suspend fun extractPreviewFrames(
+        source: String,
+        count: Int = 8,
+        targetWidth: Int = 480
+    ): List<Bitmap> = withContext(Dispatchers.IO) {
+        val retriever = MediaMetadataRetriever()
+        val frames = ArrayList<Bitmap>(count)
+        try {
+            setDataSource(retriever, source)
+            val durationMs = retriever
+                .extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                ?.toLongOrNull() ?: 0L
+            if (durationMs <= 0L) return@withContext emptyList()
+
+            val startMs = (durationMs * 0.05).toLong()
+            val endMs = (durationMs * 0.95).toLong()
+            val span = (endMs - startMs).coerceAtLeast(1L)
+            val steps = count.coerceAtLeast(1)
+            for (i in 0 until steps) {
+                val atMs = startMs + span * i / steps
+                val frame: Bitmap? = if (android.os.Build.VERSION.SDK_INT >= 27) {
+                    // Decode straight to a small bitmap — cheaper than full-size.
+                    retriever.getScaledFrameAtTime(
+                        atMs * 1000,
+                        MediaMetadataRetriever.OPTION_CLOSEST_SYNC,
+                        targetWidth,
+                        0 // 0 height = keep aspect ratio
+                    )
+                } else {
+                    retriever.getFrameAtTime(
+                        atMs * 1000,
+                        MediaMetadataRetriever.OPTION_CLOSEST_SYNC
+                    )
+                }
+                if (frame != null) frames.add(frame)
+            }
+            frames
+        } catch (e: Exception) {
+            frames.forEach { runCatching { it.recycle() } }
+            emptyList()
+        } finally {
+            runCatching { retriever.release() }
+        }
+    }
+
     private fun setDataSource(retriever: MediaMetadataRetriever, source: String) {
         if (source.startsWith("content://")) {
             retriever.setDataSource(context, Uri.parse(source))
