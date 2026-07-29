@@ -32,6 +32,17 @@ class VideoPagingAdapter(
     private var selectedIds: Set<Long> = emptySet()
     private var selectionMode: Boolean = false
 
+    /**
+     * The thumbnail ImageView for a grid row (null for list rows), so the host can
+     * cycle animated-preview frames onto the centred card. [peekAt] exposes the
+     * paged item for a position without forcing a load.
+     */
+    fun previewImageFor(holder: RecyclerView.ViewHolder): android.widget.ImageView? =
+        (holder as? GridViewHolder)?.thumbnailView
+
+    fun peekAt(position: Int): VideoEntity? =
+        if (position in 0 until itemCount) peek(position) else null
+
     fun setViewMode(mode: LibraryViewMode) {
         if (mode != viewMode) {
             viewMode = mode
@@ -70,6 +81,9 @@ class VideoPagingAdapter(
     inner class GridViewHolder(
         private val binding: ItemVideoGridBinding
     ) : RecyclerView.ViewHolder(binding.root) {
+        /** Thumbnail target the auto-preview cycles frames onto. */
+        val thumbnailView: android.widget.ImageView get() = binding.thumbnail
+
         fun bind(video: VideoEntity) {
             binding.title.text = video.title
             binding.duration.text = Formatters.duration(video.duration)

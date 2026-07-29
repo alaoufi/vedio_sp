@@ -17,6 +17,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.myvideolibrary.app.R
 import com.myvideolibrary.app.data.local.entity.VideoEntity
 import com.myvideolibrary.app.data.model.LibraryViewMode
@@ -31,7 +32,10 @@ import com.myvideolibrary.app.ui.player.PlayerActivity
 import com.myvideolibrary.app.ui.provider.AddDownloadActivity
 import com.myvideolibrary.app.util.Formatters
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -47,6 +51,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var adapter: VideoPagingAdapter
     private lateinit var continueAdapter: ContinueAdapter
+    /** Runs the animated preview on the centred grid card; one at a time. */
+    private var previewJob: Job? = null
     private lateinit var youtubeAdapter: com.myvideolibrary.app.ui.search.SearchResultAdapter
 
     /** The YouTube results currently on screen, used to build a swipe-able queue. */
@@ -263,6 +269,14 @@ class MainActivity : AppCompatActivity() {
         // Keep a few more views ready off-screen for smoother fast scrolling.
         binding.recyclerView.setItemViewCacheSize(12)
 
+        // Auto-preview: when scrolling settles, briefly animate the centred card.
+        binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(rv: RecyclerView, newState: Int) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) startCenterPreview(rv)
+                else stopPreview()
+            }
+        })
+
         binding.swipeRefresh.setOnRefreshListener {
             adapter.refresh()
             binding.swipeRefresh.isRefreshing = false
@@ -291,8 +305,70 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
+        // Don't keep decoding preview frames while the screen isn't visible.
+        stopPreview()
         // Privacy: don't keep the last search term around after leaving the screen.
         if (viewModel.uiState.value.search.isNotEmpty()) viewModel.setSearch("")
+    }
+
+    /** Cancels any running auto-preview (called when scrolling resumes or on pause). */
+    private fun stopPreview() {
+        previewJob?.cancel()
+        previewJob = null
+    }
+
+    /**
+     * When scrolling settles, animates the card sitting under the centre of the
+     * grid: a few decoded frames cycled on its thumbnail. Grid mode only, never in
+     * selection mode, and only for local playable video files. A short debounce
+     * skips cards the user merely scrolled past. Every guard re-checks that the row
+     * still shows the same clip, so a recycled row is never touched, and frames are
+     * left to GC (not recycled) so a late draw can't hit a dead bitmap.
+     */
+    private fun startCenterPreview(rv: RecyclerView) {
+        stopPreview()
+        val state = viewModel.uiState.value
+        if (state.viewMode != LibraryViewMode.GRID || state.selectionMode) return
+
+        val child = rv.findChildViewUnder(rv.width / 2f, rv.height / 2f) ?: return
+        val pos = rv.getChildAdapterPosition(child)
+        if (pos == RecyclerView.NO_POSITION) return
+        val video = adapter.peekAt(pos) ?: return
+        if (video.isLinkOnly ||
+            video.mediaType != com.myvideolibrary.app.data.model.MediaType.VIDEO.id ||
+            video.localPath.isBlank() || video.localPath.startsWith("content://")
+        ) return
+        val target = adapter.previewImageFor(rv.getChildViewHolder(child)) ?: return
+
+        previewJob = lifecycleScope.launch {
+            delay(500) // debounce: ignore quick fly-bys
+            val frames = thumbnailGenerator.extractPreviewFrames(
+                video.localPath, count = 6, targetWidth = 360
+            )
+            if (frames.isEmpty()) return@launch
+            try {
+                var i = 0
+                while (isActive) {
+                    val curPos = rv.getChildAdapterPosition(child)
+                    if (curPos == RecyclerView.NO_POSITION ||
+                        adapter.peekAt(curPos)?.id != video.id
+                    ) break
+                    target.setImageBitmap(frames[i % frames.size])
+                    i++
+                    delay(600)
+                }
+            } finally {
+                // Restore the static thumbnail if the row still shows this clip.
+                val curPos = rv.getChildAdapterPosition(child)
+                if (curPos != RecyclerView.NO_POSITION && adapter.peekAt(curPos)?.id == video.id) {
+                    com.bumptech.glide.Glide.with(target)
+                        .load(video.thumbnailPath ?: video.localPath)
+                        .placeholder(R.drawable.ic_video_placeholder)
+                        .centerCrop()
+                        .into(target)
+                }
+            }
+        }
     }
 
     private fun applyLayoutManager(mode: LibraryViewMode) {
