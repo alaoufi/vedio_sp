@@ -6,10 +6,7 @@ import androidx.core.view.isVisible
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import androidx.palette.graphics.Palette
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.myvideolibrary.app.R
 import com.myvideolibrary.app.data.local.entity.VideoEntity
 import com.myvideolibrary.app.data.model.LibraryViewMode
@@ -147,6 +144,10 @@ class VideoPagingAdapter(
             binding.size.isVisible = !video.isLinkOnly
             bindCategory(binding.category, video)
             bindWatchProgress(binding.watchProgress, video)
+            com.myvideolibrary.app.util.CoverTint.apply(
+                binding.rowContent, video.thumbnailPath ?: video.localPath, video.id,
+                android.graphics.drawable.GradientDrawable.Orientation.LEFT_RIGHT
+            )
             binding.menuButton.setOnClickListener { onMenu(video, it) }
             loadThumbnail(binding.thumbnail, video)
             binding.selectionOverlay.isVisible = selectionMode && video.id in selectedIds
@@ -196,40 +197,9 @@ class VideoPagingAdapter(
      * — this prevents a late colour landing on the wrong card.
      */
     private fun tintCover(strip: android.widget.LinearLayout, video: VideoEntity) {
-        strip.tag = video.id
-        strip.background = null
-        val model: Any = video.thumbnailPath ?: video.localPath
-        Glide.with(strip)
-            .asBitmap()
-            .load(model)
-            .override(64, 64)
-            .centerCrop()
-            .into(object : CustomTarget<android.graphics.Bitmap>() {
-                override fun onResourceReady(
-                    resource: android.graphics.Bitmap,
-                    transition: Transition<in android.graphics.Bitmap>?
-                ) {
-                    Palette.from(resource).generate { palette ->
-                        if (strip.tag != video.id) return@generate
-                        val base = palette?.let {
-                            it.getMutedColor(it.getDominantColor(0))
-                        } ?: 0
-                        if (base == 0) {
-                            strip.background = null
-                        } else {
-                            val tinted = (base and 0x00FFFFFF) or (0x40 shl 24) // ~25% alpha
-                            strip.background = android.graphics.drawable.GradientDrawable(
-                                android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM,
-                                intArrayOf(tinted, android.graphics.Color.TRANSPARENT)
-                            )
-                        }
-                    }
-                }
-
-                override fun onLoadCleared(placeholder: android.graphics.drawable.Drawable?) {
-                    // Nothing to release; the strip keeps whatever background it has.
-                }
-            })
+        com.myvideolibrary.app.util.CoverTint.apply(
+            strip, video.thumbnailPath ?: video.localPath, video.id
+        )
     }
 
     private fun loadThumbnail(

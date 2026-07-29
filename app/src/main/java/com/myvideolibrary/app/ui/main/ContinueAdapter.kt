@@ -27,6 +27,10 @@ class ContinueAdapter(
         fun bind(video: VideoEntity) {
             binding.title.text = video.title
             binding.duration.text = Formatters.duration(video.duration)
+            // Cohesive cover tint pulled from the thumbnail, behind the title.
+            com.myvideolibrary.app.util.CoverTint.apply(
+                binding.title, video.thumbnailPath, video.id
+            )
             val pct = if (video.duration > 0) {
                 (video.lastPlayedPosition * 1000 / video.duration).toInt().coerceIn(0, 1000)
             } else 0
