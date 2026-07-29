@@ -63,6 +63,15 @@
     <string name="user_guide">User guide</string>
     <string name="user_guide_desc">How to use every feature</string>
     <string name="statistics">Statistics</string>
+    <string name="duplicates_title">Duplicates</string>
+    <string name="find_duplicates">Find duplicates</string>
+    <string name="dup_none">No duplicates found</string>
+    <string name="dup_clean">Clean</string>
+    <string name="dup_clean_all">Remove all extras</string>
+    <string name="dup_summary">%1$d groups · %2$d extra copies · reclaim %3$s</string>
+    <string name="dup_group_subtitle">%1$d copies · reclaim %2$s</string>
+    <string name="dup_confirm_group">Delete %1$d extra copies and reclaim %2$s? The oldest copy is kept.</string>
+    <string name="dup_confirm_all">Delete %1$d extra copies across all groups and reclaim %2$s? The oldest of each group is kept.</string>
     <string name="stat_videos">Videos</string>
     <string name="stat_size">Total size</string>
     <string name="stat_duration">Total length</string>

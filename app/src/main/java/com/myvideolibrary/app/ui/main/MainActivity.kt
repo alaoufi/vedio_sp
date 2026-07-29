@@ -1262,7 +1262,7 @@ class MainActivity : AppCompatActivity() {
         for (id in intArrayOf(
             R.id.action_filter, R.id.action_favorites, R.id.action_sort,
             R.id.action_protected, R.id.action_manage_categories, R.id.action_stats,
-            R.id.action_playlists
+            R.id.action_playlists, R.id.action_duplicates
         )) menu.findItem(id)?.isVisible = !youtubeTab
         return super.onPrepareOptionsMenu(menu)
     }
@@ -1300,6 +1300,10 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.action_stats -> {
                 startActivity(Intent(this, com.myvideolibrary.app.ui.stats.StatsActivity::class.java))
+                true
+            }
+            R.id.action_duplicates -> {
+                startActivity(com.myvideolibrary.app.ui.duplicates.DuplicatesActivity.intent(this))
                 true
             }
             R.id.action_playlists -> {

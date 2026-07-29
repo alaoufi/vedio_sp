@@ -63,6 +63,15 @@
     <string name="user_guide">دليل الاستخدام</string>
     <string name="user_guide_desc">شرح كل ميزة خطوة بخطوة</string>
     <string name="statistics">الإحصائيات</string>
+    <string name="duplicates_title">المكرّرات</string>
+    <string name="find_duplicates">البحث عن المكرّرات</string>
+    <string name="dup_none">لا توجد مكرّرات</string>
+    <string name="dup_clean">تنظيف</string>
+    <string name="dup_clean_all">حذف كل النُّسخ الزائدة</string>
+    <string name="dup_summary">%1$d مجموعات · %2$d نسخة زائدة · توفير %3$s</string>
+    <string name="dup_group_subtitle">%1$d نُسخ · توفير %2$s</string>
+    <string name="dup_confirm_group">حذف %1$d نسخة زائدة وتوفير %2$s؟ تُبقى أقدم نسخة.</string>
+    <string name="dup_confirm_all">حذف %1$d نسخة زائدة من كل المجموعات وتوفير %2$s؟ تُبقى أقدم نسخة في كل مجموعة.</string>
     <string name="stat_videos">مقاطع</string>
     <string name="stat_size">الحجم الكلي</string>
     <string name="stat_duration">المدة الكلية</string>

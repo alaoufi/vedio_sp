@@ -87,6 +87,11 @@
             app:showAsAction="never" />
 
         <item
+            android:id="@+id/action_duplicates"
+            android:title="@string/find_duplicates"
+            app:showAsAction="never" />
+
+        <item
             android:id="@+id/action_guide"
             android:title="@string/user_guide"
             app:showAsAction="never" />
