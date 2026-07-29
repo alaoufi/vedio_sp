@@ -18,6 +18,7 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.myvideolibrary.app.R
 import com.myvideolibrary.app.data.local.entity.VideoEntity
 import com.myvideolibrary.app.data.model.LibraryViewMode
@@ -373,7 +374,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun applyLayoutManager(mode: LibraryViewMode) {
         binding.recyclerView.layoutManager = when (mode) {
-            LibraryViewMode.GRID -> GridLayoutManager(this, gridSpanCount())
+            LibraryViewMode.GRID -> {
+                val span = gridSpanCount()
+                adapter.setSpanCount(span)
+                // Staggered so cards can take the clip's real aspect ratio. NONE
+                // keeps items from swapping columns mid-scroll.
+                StaggeredGridLayoutManager(span, StaggeredGridLayoutManager.VERTICAL).apply {
+                    gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
+                }
+            }
             LibraryViewMode.LIST -> LinearLayoutManager(this)
         }
         adapter.setViewMode(mode)

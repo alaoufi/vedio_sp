@@ -28,6 +28,16 @@ class VideoPagingAdapter(
 
     private var selectedIds: Set<Long> = emptySet()
     private var selectionMode: Boolean = false
+    /** Column count of the staggered grid; used to size cards by aspect ratio. */
+    private var spanCount: Int = 3
+
+    fun setSpanCount(count: Int) {
+        val c = count.coerceAtLeast(1)
+        if (c != spanCount) {
+            spanCount = c
+            notifyDataSetChanged()
+        }
+    }
 
     /**
      * The thumbnail ImageView for a grid row (null for list rows), so the host can
@@ -82,6 +92,7 @@ class VideoPagingAdapter(
         val thumbnailView: android.widget.ImageView get() = binding.thumbnail
 
         fun bind(video: VideoEntity) {
+            sizeThumbnail(binding.thumbnail, video)
             binding.title.text = video.title
             binding.duration.text = Formatters.duration(video.duration)
             // Always-visible heart toggle: filled red when favourite, outline when
@@ -176,6 +187,31 @@ class VideoPagingAdapter(
             bar.isVisible = true
         } else {
             bar.isVisible = false
+        }
+    }
+
+    /**
+     * Sizes a grid thumbnail to the clip's real aspect ratio so the grid staggers
+     * (tall portrait clips, short landscape ones) instead of forcing one height.
+     * The column width is estimated from the screen and span count; the ratio is
+     * clamped so extreme shapes stay reasonable, and unknown dimensions fall back
+     * to 16:9. Runs every bind so recycled cards get the right height.
+     */
+    private fun sizeThumbnail(imageView: android.widget.ImageView, video: VideoEntity) {
+        val dm = imageView.resources.displayMetrics
+        val cardMarginPx = 6 * dm.density // 3dp each side of the card
+        val colWidth = (dm.widthPixels / spanCount - cardMarginPx).coerceAtLeast(1f)
+        val ratio = if (video.width > 0 && video.height > 0) {
+            video.height.toFloat() / video.width
+        } else {
+            9f / 16f
+        }
+        val height = (colWidth * ratio).coerceIn(colWidth * 0.56f, colWidth * 1.9f)
+        val lp = imageView.layoutParams
+        val target = height.toInt()
+        if (lp.height != target) {
+            lp.height = target
+            imageView.layoutParams = lp
         }
     }
 
