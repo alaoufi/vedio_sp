@@ -231,30 +231,41 @@ class SettingsActivity : AppCompatActivity() {
     private fun checkForUpdates() {
         binding.checkUpdateValue.setText(R.string.checking_updates)
         lifecycleScope.launch {
-            val result = com.myvideolibrary.app.util.UpdateChecker.check(
+            val outcome = com.myvideolibrary.app.util.UpdateChecker.checkOutcome(
                 com.myvideolibrary.app.BuildConfig.VERSION_CODE, okHttpClient
             )
-            if (result == null) {
-                binding.checkUpdateValue.setText(R.string.up_to_date)
-                Toast.makeText(this@SettingsActivity, R.string.up_to_date, Toast.LENGTH_SHORT).show()
-            } else {
-                binding.checkUpdateValue.text =
-                    getString(R.string.update_available_message, result.latestVersion)
-                AlertDialog.Builder(this@SettingsActivity)
-                    .setTitle(R.string.update_available_title)
-                    .setMessage(getString(R.string.update_available_message, result.latestVersion))
-                    .setPositiveButton(R.string.update_download) { _, _ ->
-                        runCatching {
-                            startActivity(
-                                android.content.Intent(
-                                    android.content.Intent.ACTION_VIEW,
-                                    Uri.parse(com.myvideolibrary.app.util.UpdateChecker.APK_URL)
+            when (outcome) {
+                is com.myvideolibrary.app.util.UpdateChecker.Outcome.UpToDate -> {
+                    binding.checkUpdateValue.setText(R.string.up_to_date)
+                    Toast.makeText(this@SettingsActivity, R.string.up_to_date, Toast.LENGTH_SHORT).show()
+                }
+                is com.myvideolibrary.app.util.UpdateChecker.Outcome.Failed -> {
+                    // A failed check must NOT read as "up to date" — say so and let the user retry.
+                    binding.checkUpdateValue.setText(R.string.update_check_failed)
+                    Toast.makeText(
+                        this@SettingsActivity, R.string.update_check_failed, Toast.LENGTH_LONG
+                    ).show()
+                }
+                is com.myvideolibrary.app.util.UpdateChecker.Outcome.Available -> {
+                    val result = outcome.result
+                    binding.checkUpdateValue.text =
+                        getString(R.string.update_available_message, result.latestVersion)
+                    AlertDialog.Builder(this@SettingsActivity)
+                        .setTitle(R.string.update_available_title)
+                        .setMessage(getString(R.string.update_available_message, result.latestVersion))
+                        .setPositiveButton(R.string.update_download) { _, _ ->
+                            runCatching {
+                                startActivity(
+                                    android.content.Intent(
+                                        android.content.Intent.ACTION_VIEW,
+                                        Uri.parse(com.myvideolibrary.app.util.UpdateChecker.APK_URL)
+                                    )
                                 )
-                            )
+                            }
                         }
-                    }
-                    .setNegativeButton(R.string.later, null)
-                    .show()
+                        .setNegativeButton(R.string.later, null)
+                        .show()
+                }
             }
         }
     }

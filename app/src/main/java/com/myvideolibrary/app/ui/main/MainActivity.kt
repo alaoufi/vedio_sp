@@ -709,12 +709,17 @@ class MainActivity : AppCompatActivity() {
         val prefs = getSharedPreferences("updates", MODE_PRIVATE)
         val now = System.currentTimeMillis()
         if (now - prefs.getLong("last_check", 0L) < 6 * 60 * 60 * 1000L) return
-        prefs.edit().putLong("last_check", now).apply()
 
         lifecycleScope.launch {
-            val result = com.myvideolibrary.app.util.UpdateChecker.check(
+            val outcome = com.myvideolibrary.app.util.UpdateChecker.checkOutcome(
                 com.myvideolibrary.app.BuildConfig.VERSION_CODE, okHttpClient
-            ) ?: return@launch
+            )
+            // A failed check (e.g. a dropped connection) must not suppress retries for
+            // 6h — only stamp the timestamp once we actually reached GitHub.
+            if (outcome is com.myvideolibrary.app.util.UpdateChecker.Outcome.Failed) return@launch
+            prefs.edit().putLong("last_check", now).apply()
+            val result = (outcome as? com.myvideolibrary.app.util.UpdateChecker.Outcome.Available)
+                ?.result ?: return@launch
             if (prefs.getInt("skip_build", -1) == result.latestBuild) return@launch
             if (isFinishing || isDestroyed) return@launch
             AlertDialog.Builder(this@MainActivity)

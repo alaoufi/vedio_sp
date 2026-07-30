@@ -471,6 +471,7 @@
     <string name="check_updates_desc">Look for a newer version</string>
     <string name="checking_updates">Checking…</string>
     <string name="up_to_date">You\'re on the latest version</string>
+    <string name="update_check_failed">Couldn\'t check for updates. Check your connection and try again.</string>
     <string name="crash_log">Crash log</string>
     <string name="crash_log_desc">View or share the last crash</string>
     <string name="no_crash_log">No crashes recorded — all good</string>
