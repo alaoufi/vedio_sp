@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.myvideolibrary.app.data.local.entity.FolderEntity
+import com.myvideolibrary.app.data.local.entity.SavedSearchEntity
 import com.myvideolibrary.app.data.local.entity.SettingsEntity
 import com.myvideolibrary.app.data.local.entity.VideoEntity
 import com.myvideolibrary.app.data.model.LibraryViewMode
@@ -62,7 +63,8 @@ class LibraryViewModel @Inject constructor(
     private val downloadRepository: com.myvideolibrary.app.data.repository.DownloadRepository,
     private val downloadManager: com.myvideolibrary.app.download.DownloadManager,
     private val providerRegistry: com.myvideolibrary.app.provider.ProviderRegistry,
-    private val playlistDao: com.myvideolibrary.app.data.local.dao.PlaylistDao
+    private val playlistDao: com.myvideolibrary.app.data.local.dao.PlaylistDao,
+    private val savedSearchDao: com.myvideolibrary.app.data.local.dao.SavedSearchDao
 ) : ViewModel() {
 
     /** Recently-played videos still in progress, for the "Continue watching" row. */
@@ -135,6 +137,11 @@ class LibraryViewModel @Inject constructor(
     /** Distinct tags currently in use, for the tag filter picker. */
     val allTags: StateFlow<List<String>> =
         videoRepository.observeTags()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    /** Named filter snapshots the user can re-apply in one tap. */
+    val savedSearches: StateFlow<List<SavedSearchEntity>> =
+        savedSearchDao.observeAll()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     /** Paged videos, recomputed whenever the query changes. */
@@ -256,6 +263,44 @@ class LibraryViewModel @Inject constructor(
     /** Assigns a raw (comma-separated) tag string to a single video. */
     fun setTags(id: Long, rawTags: String?) = viewModelScope.launch {
         videoRepository.setTags(id, rawTags)
+    }
+
+    /** Saves the current filter + sort state under [name] (replacing a same-named one). */
+    fun saveCurrentSearch(name: String) = viewModelScope.launch {
+        val clean = name.trim()
+        if (clean.isEmpty()) return@launch
+        savedSearchDao.deleteByName(clean)
+        savedSearchDao.insert(
+            SavedSearchEntity(
+                name = clean,
+                createdDate = System.currentTimeMillis(),
+                search = _search.value.trim().ifEmpty { null },
+                favoritesOnly = _favoritesOnly.value,
+                protectedMode = _protectedMode.value,
+                sources = SavedSearchEntity.join(_sourceFilters.value.map { it.id }),
+                categories = SavedSearchEntity.join(_categoryFilters.value),
+                mediaTypes = SavedSearchEntity.join(_mediaTypeFilters.value),
+                tags = SavedSearchEntity.join(_tagFilters.value),
+                sortOrder = uiState.value.sortOrder.id
+            )
+        )
+    }
+
+    /** Re-applies every filter (and sort) captured by a saved search. */
+    fun applySavedSearch(entity: SavedSearchEntity) {
+        _search.value = entity.search.orEmpty()
+        _favoritesOnly.value = entity.favoritesOnly
+        _protectedMode.value = entity.protectedMode
+        _sourceFilters.value = SavedSearchEntity.split(entity.sources)
+            .map { SourceFilter.fromId(it) }.toSet()
+        _categoryFilters.value = SavedSearchEntity.split(entity.categories).toSet()
+        _mediaTypeFilters.value = SavedSearchEntity.split(entity.mediaTypes).toSet()
+        _tagFilters.value = SavedSearchEntity.split(entity.tags).toSet()
+        entity.sortOrder?.let { setSortOrder(SortOrder.fromId(it)) }
+    }
+
+    fun deleteSavedSearch(id: Long) = viewModelScope.launch {
+        savedSearchDao.deleteById(id)
     }
 
     fun setSortOrder(order: SortOrder) = viewModelScope.launch {

@@ -5,12 +5,14 @@ import androidx.room.RoomDatabase
 import com.myvideolibrary.app.data.local.dao.DownloadDao
 import com.myvideolibrary.app.data.local.dao.FolderDao
 import com.myvideolibrary.app.data.local.dao.PlaylistDao
+import com.myvideolibrary.app.data.local.dao.SavedSearchDao
 import com.myvideolibrary.app.data.local.dao.SettingsDao
 import com.myvideolibrary.app.data.local.dao.VideoDao
 import com.myvideolibrary.app.data.local.entity.DownloadEntity
 import com.myvideolibrary.app.data.local.entity.FolderEntity
 import com.myvideolibrary.app.data.local.entity.PlaylistEntity
 import com.myvideolibrary.app.data.local.entity.PlaylistVideoEntity
+import com.myvideolibrary.app.data.local.entity.SavedSearchEntity
 import com.myvideolibrary.app.data.local.entity.SettingsEntity
 import com.myvideolibrary.app.data.local.entity.VideoEntity
 
@@ -21,9 +23,10 @@ import com.myvideolibrary.app.data.local.entity.VideoEntity
         DownloadEntity::class,
         SettingsEntity::class,
         PlaylistEntity::class,
-        PlaylistVideoEntity::class
+        PlaylistVideoEntity::class,
+        SavedSearchEntity::class
     ],
-    version = 13,
+    version = 14,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -32,6 +35,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun downloadDao(): DownloadDao
     abstract fun settingsDao(): SettingsDao
     abstract fun playlistDao(): PlaylistDao
+    abstract fun savedSearchDao(): SavedSearchDao
 
     companion object {
         const val DATABASE_NAME = "my_video_library.db"

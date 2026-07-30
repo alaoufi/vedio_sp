@@ -113,3 +113,17 @@ val MIGRATION_12_13 = object : Migration(12, 13) {
         )
     }
 }
+
+val MIGRATION_13_14 = object : Migration(13, 14) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS saved_searches (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "name TEXT NOT NULL, created_date INTEGER NOT NULL, " +
+                "search TEXT, " +
+                "favorites_only INTEGER NOT NULL DEFAULT 0, " +
+                "protected_mode INTEGER NOT NULL DEFAULT 0, " +
+                "sources TEXT, categories TEXT, media_types TEXT, tags TEXT, sort_order TEXT)"
+        )
+    }
+}

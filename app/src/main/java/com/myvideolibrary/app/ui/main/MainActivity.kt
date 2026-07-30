@@ -430,6 +430,12 @@ class MainActivity : AppCompatActivity() {
         if (viewModel.allTags.value.isNotEmpty()) {
             menu.add(GROUP_TAG, ID_TAG_PICK, 3, label(R.string.tags, state.tagFilters.size))
         }
+        // Persist / re-apply whole filter combinations.
+        menu.add(GROUP_SAVED, ID_SEARCH_SAVE, 4, getString(R.string.save_filters))
+        val saved = viewModel.savedSearches.value
+        if (saved.isNotEmpty()) {
+            menu.add(GROUP_SAVED, ID_SEARCH_LIST, 5, label(R.string.saved_searches, saved.size))
+        }
 
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
@@ -437,6 +443,8 @@ class MainActivity : AppCompatActivity() {
                 ID_TYPE_ALL -> showTypeFilterDialog(state.mediaTypeFilters)
                 ID_CAT_PICK -> showCategoryFilterDialog(state.categories, state.categoryFilters)
                 ID_TAG_PICK -> showTagFilterDialog(viewModel.allTags.value, state.tagFilters)
+                ID_SEARCH_SAVE -> promptSaveSearch()
+                ID_SEARCH_LIST -> showSavedSearchesDialog()
                 else -> return@setOnMenuItemClickListener false
             }
             true
@@ -478,6 +486,60 @@ class MainActivity : AppCompatActivity() {
                 viewModel.setTagFilters(tags.filterIndexed { i, _ -> checked[i] }.toSet())
             }
             .setNeutralButton(R.string.filter_all) { _, _ -> viewModel.setTagFilters(emptySet()) }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    /** Names the current filter + sort combination and saves it for one-tap re-use. */
+    private fun promptSaveSearch() {
+        val pad = (16 * resources.displayMetrics.density).toInt()
+        val container = android.widget.LinearLayout(this).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding(pad, pad / 2, pad, 0)
+        }
+        val input = EditText(this).apply {
+            hint = getString(R.string.save_filters_hint)
+            setSingleLine(true)
+        }
+        container.addView(input)
+        AlertDialog.Builder(this)
+            .setTitle(R.string.save_filters)
+            .setView(container)
+            .setPositiveButton(R.string.save) { _, _ ->
+                val name = input.text.toString().trim()
+                if (name.isNotEmpty()) {
+                    viewModel.saveCurrentSearch(name)
+                    android.widget.Toast.makeText(this, R.string.saved, android.widget.Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    /** Lists saved searches; tapping one re-applies it, "Delete" opens a remove picker. */
+    private fun showSavedSearchesDialog() {
+        val saved = viewModel.savedSearches.value
+        if (saved.isEmpty()) return
+        val names = saved.map { it.name }.toTypedArray()
+        AlertDialog.Builder(this)
+            .setTitle(R.string.saved_searches)
+            .setItems(names) { _, which -> viewModel.applySavedSearch(saved[which]) }
+            .setNeutralButton(R.string.delete) { _, _ -> showDeleteSavedSearchesDialog(saved) }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun showDeleteSavedSearchesDialog(
+        saved: List<com.myvideolibrary.app.data.local.entity.SavedSearchEntity>
+    ) {
+        val names = saved.map { it.name }.toTypedArray()
+        val checked = BooleanArray(saved.size)
+        AlertDialog.Builder(this)
+            .setTitle(R.string.delete)
+            .setMultiChoiceItems(names, checked) { _, which, isChecked -> checked[which] = isChecked }
+            .setPositiveButton(R.string.delete) { _, _ ->
+                saved.filterIndexed { i, _ -> checked[i] }.forEach { viewModel.deleteSavedSearch(it.id) }
+            }
             .setNegativeButton(R.string.cancel, null)
             .show()
     }
@@ -1416,6 +1478,9 @@ class MainActivity : AppCompatActivity() {
         const val ID_CAT_PICK = 200
         const val GROUP_TAG = 5
         const val ID_TAG_PICK = 250
+        const val GROUP_SAVED = 6
+        const val ID_SEARCH_SAVE = 300
+        const val ID_SEARCH_LIST = 301
     }
 
     override fun onBackPressed() {
