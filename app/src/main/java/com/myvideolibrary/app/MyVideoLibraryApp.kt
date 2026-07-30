@@ -47,6 +47,8 @@ class MyVideoLibraryApp : Application(), Configuration.Provider {
         // Re-lock the app whenever it is sent to the background.
         ProcessLifecycleOwner.get().lifecycle.addObserver(appLockManager)
         normalizeDownloadDefaultsOnce()
+        // Register the Direct Share target so the app appears in the share sheet's top row.
+        com.myvideolibrary.app.ui.share.ShareShortcuts.publish(this)
     }
 
     /**

@@ -348,6 +348,7 @@
     <string name="save_filters_hint">سمِّ هذا البحث</string>
     <string name="saved_searches">عمليات البحث المحفوظة</string>
     <string name="saved">تم الحفظ</string>
+    <string name="share_add_to_library">إضافة إلى مكتبة الفيديو</string>
     <string name="category_hint">اسم التصنيف</string>
     <string name="category_general">عام</string>
     <string name="category_education">تعليمي</string>

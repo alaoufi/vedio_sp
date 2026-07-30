@@ -385,6 +385,7 @@
     <string name="save_filters_hint">Name this search</string>
     <string name="saved_searches">Saved searches</string>
     <string name="saved">Saved</string>
+    <string name="share_add_to_library">Add to Video Library</string>
     <string name="category_hint">Category name</string>
     <string name="category_general">General</string>
     <string name="category_education">Education</string>

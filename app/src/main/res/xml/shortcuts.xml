@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Declares this app as a Direct Share target so it can appear in the TOP row of
+  the Android share sheet (not only under "More"). The matching long-lived
+  dynamic shortcut is published at runtime (see ShareShortcuts).
+-->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <share-target android:targetClass="com.myvideolibrary.app.ui.share.ShareReceiverActivity">
+        <data android:mimeType="video/*" />
+        <data android:mimeType="image/*" />
+        <category android:name="com.myvideolibrary.app.category.SHARE_TARGET" />
+    </share-target>
+</shortcuts>
