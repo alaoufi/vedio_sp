@@ -386,6 +386,15 @@
     <string name="saved_searches">Saved searches</string>
     <string name="saved">Saved</string>
     <string name="share_add_to_library">Add to Video Library</string>
+    <string name="private_video">Extra privacy</string>
+    <string name="private_video_label">🔒 Private</string>
+    <string name="create_vault_password">Set a private password</string>
+    <string name="vault_password_explain">This password is separate from the app lock and hides these clips\' covers until you enter it.</string>
+    <string name="enter_vault_password">Enter private password</string>
+    <string name="vault_password_hint">Private password</string>
+    <string name="vault_confirm_hint">Confirm password</string>
+    <string name="vault_password_too_short">Password must be at least 4 characters</string>
+    <string name="vault_passwords_mismatch">Passwords don\'t match</string>
     <string name="category_hint">Category name</string>
     <string name="category_general">General</string>
     <string name="category_education">Education</string>

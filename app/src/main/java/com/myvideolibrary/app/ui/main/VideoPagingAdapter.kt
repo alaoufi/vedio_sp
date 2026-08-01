@@ -93,7 +93,10 @@ class VideoPagingAdapter(
 
         fun bind(video: VideoEntity) {
             sizeThumbnail(binding.thumbnail, video)
-            binding.title.text = video.title
+            val obscured = isObscured(video)
+            binding.title.text =
+                if (obscured) binding.root.context.getString(R.string.private_video_label)
+                else video.title
             binding.duration.text = Formatters.duration(video.duration)
             // Always-visible heart toggle: filled red when favourite, outline when
             // not — the obvious one-tap way to add or remove a favourite.
@@ -109,14 +112,16 @@ class VideoPagingAdapter(
                 it.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
                 onFavorite(video)
             }
-            binding.lockIcon.isVisible = video.isLocked
-            binding.linkBadge.isVisible = video.isLinkOnly
-            // A saved link has no duration until downloaded.
-            binding.duration.isVisible = video.duration > 0
-            bindCategory(binding.category, video)
-            bindWatchProgress(binding.watchProgress, video)
-            loadThumbnail(binding.thumbnail, video)
-            tintCover(binding.infoStrip, video)
+            // While obscured, hide every cue that could reveal the clip.
+            binding.favoriteIcon.isVisible = !obscured
+            binding.lockIcon.isVisible = video.isLocked || obscured
+            binding.linkBadge.isVisible = video.isLinkOnly && !obscured
+            binding.duration.isVisible = video.duration > 0 && !obscured
+            if (obscured) binding.category.isVisible = false else bindCategory(binding.category, video)
+            if (obscured) binding.watchProgress.isVisible = false
+            else bindWatchProgress(binding.watchProgress, video)
+            loadThumbnail(binding.thumbnail, video, obscured)
+            if (!obscured) tintCover(binding.infoStrip, video)
             binding.selectionOverlay.isVisible = selectionMode && video.id in selectedIds
             binding.menuButton.setOnClickListener { onMenu(video, it) }
             binding.root.setOnClickListener { onClick(video) }
@@ -131,7 +136,10 @@ class VideoPagingAdapter(
         private val binding: ItemVideoListBinding
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(video: VideoEntity) {
-            binding.title.text = video.title
+            val obscured = isObscured(video)
+            binding.title.text =
+                if (obscured) binding.root.context.getString(R.string.private_video_label)
+                else video.title
             binding.duration.text = Formatters.duration(video.duration)
             binding.size.text = Formatters.fileSize(video.fileSize)
             binding.quality.text = video.quality ?: "—"
@@ -149,18 +157,20 @@ class VideoPagingAdapter(
                 it.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
                 onFavorite(video)
             }
-            binding.lockIcon.isVisible = video.isLocked
-            binding.linkBadge.isVisible = video.isLinkOnly
-            binding.duration.isVisible = video.duration > 0
-            binding.size.isVisible = !video.isLinkOnly
-            bindCategory(binding.category, video)
-            bindWatchProgress(binding.watchProgress, video)
-            com.myvideolibrary.app.util.CoverTint.apply(
+            binding.lockIcon.isVisible = video.isLocked || obscured
+            binding.linkBadge.isVisible = video.isLinkOnly && !obscured
+            binding.duration.isVisible = video.duration > 0 && !obscured
+            binding.size.isVisible = !video.isLinkOnly && !obscured
+            binding.favoriteIcon.isVisible = !obscured
+            if (obscured) binding.category.isVisible = false else bindCategory(binding.category, video)
+            if (obscured) binding.watchProgress.isVisible = false
+            else bindWatchProgress(binding.watchProgress, video)
+            if (!obscured) com.myvideolibrary.app.util.CoverTint.apply(
                 binding.rowContent, video.thumbnailPath ?: video.localPath, video.id,
                 android.graphics.drawable.GradientDrawable.Orientation.LEFT_RIGHT
             )
             binding.menuButton.setOnClickListener { onMenu(video, it) }
-            loadThumbnail(binding.thumbnail, video)
+            loadThumbnail(binding.thumbnail, video, obscured)
             binding.selectionOverlay.isVisible = selectionMode && video.id in selectedIds
             binding.root.setOnClickListener { onClick(video) }
             binding.root.setOnLongClickListener {
@@ -240,8 +250,17 @@ class VideoPagingAdapter(
 
     private fun loadThumbnail(
         imageView: android.widget.ImageView,
-        video: VideoEntity
+        video: VideoEntity,
+        obscured: Boolean = false
     ) {
+        if (obscured) {
+            // Never even load the real cover while locked — cancel any pending load
+            // and show the padlock placeholder instead.
+            Glide.with(imageView).clear(imageView)
+            imageView.scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
+            imageView.setImageResource(R.drawable.ic_private_cover)
+            return
+        }
         val model: Any = video.thumbnailPath ?: video.localPath
         Glide.with(imageView)
             .load(model)
@@ -250,6 +269,10 @@ class VideoPagingAdapter(
             .centerCrop()
             .into(imageView)
     }
+
+    /** True when a clip's cover/title must stay hidden (private + vault still locked). */
+    private fun isObscured(video: VideoEntity): Boolean =
+        video.isPrivate && !com.myvideolibrary.app.security.PrivateVaultSession.unlocked
 
     companion object {
         private const val TYPE_GRID = 0

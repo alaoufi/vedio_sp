@@ -114,6 +114,14 @@ data class VideoEntity(
     val isLocked: Boolean = false,
 
     /**
+     * Extra-privacy flag: the clip's cover stays obscured in the library and it
+     * won't open until the separate "private vault" password is entered. This is
+     * independent of [isLocked] (the app-lock protected view).
+     */
+    @ColumnInfo(name = "is_private")
+    val isPrivate: Boolean = false,
+
+    /**
      * When true this row is a saved *link* only — no local file. It streams from
      * its [sourceUrl] on playback and can be downloaded on demand later.
      */

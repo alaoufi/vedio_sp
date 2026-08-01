@@ -62,6 +62,9 @@ class VideoRepositoryImpl @Inject constructor(
     override suspend fun setLocked(id: Long, locked: Boolean) =
         videoDao.setLocked(id, locked)
 
+    override suspend fun setPrivate(id: Long, private: Boolean) =
+        videoDao.setPrivate(id, private)
+
     override suspend fun rename(id: Long, title: String) = videoDao.rename(id, title)
 
     override suspend fun updateInfo(id: Long, title: String, description: String?) =

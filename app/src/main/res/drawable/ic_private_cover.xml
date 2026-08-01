@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Full-bleed placeholder shown instead of an extra-private clip's real cover
+     until the vault is unlocked: a muted tile with a centred padlock. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    <path
+        android:fillColor="#26323C"
+        android:pathData="M0,0h120v120h-120z" />
+    <path
+        android:fillColor="#8A99A6"
+        android:pathData="M60,44 m-13,0 a13,13 0 1,0 26,0 a13,13 0 1,0 -26,0 M60,36 a5,5 0 0,1 5,5 v3 h-10 v-3 a5,5 0 0,1 5,-5 z" />
+    <path
+        android:fillColor="#8A99A6"
+        android:pathData="M46,52 h28 a4,4 0 0,1 4,4 v20 a4,4 0 0,1 -4,4 h-28 a4,4 0 0,1 -4,-4 v-20 a4,4 0 0,1 4,-4 z" />
+    <path
+        android:fillColor="#26323C"
+        android:pathData="M60,62 a3,3 0 0,1 3,3 a3,3 0 0,1 -1.5,2.6 l1.5,5.4 h-6 l1.5,-5.4 a3,3 0 0,1 -1.5,-2.6 a3,3 0 0,1 3,-3 z" />
+</vector>

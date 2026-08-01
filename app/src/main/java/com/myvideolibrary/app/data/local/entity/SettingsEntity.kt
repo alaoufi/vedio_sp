@@ -81,6 +81,13 @@ data class SettingsEntity(
     @ColumnInfo(name = "manage_categories_password")
     val manageCategoriesPassword: String? = null,
 
+    /**
+     * SHA-256 hash of the "private vault" password that guards extra-private
+     * videos (separate from the app lock). Null = no vault password set yet.
+     */
+    @ColumnInfo(name = "private_vault_password")
+    val privateVaultPassword: String? = null,
+
     /** [com.myvideolibrary.app.data.model.EndOfClipAction.id] — stop/repeat/next. */
     @ColumnInfo(name = "end_of_clip_action")
     val endOfClipAction: String = "next"

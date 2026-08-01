@@ -349,6 +349,15 @@
     <string name="saved_searches">عمليات البحث المحفوظة</string>
     <string name="saved">تم الحفظ</string>
     <string name="share_add_to_library">إضافة إلى مكتبة الفيديو</string>
+    <string name="private_video">خصوصية إضافية</string>
+    <string name="private_video_label">🔒 خاص</string>
+    <string name="create_vault_password">تعيين كلمة مرور خاصة</string>
+    <string name="vault_password_explain">كلمة المرور هذه منفصلة عن قفل التطبيق، وتُخفي أغلفة هذه المقاطع حتى تُدخلها.</string>
+    <string name="enter_vault_password">أدخل كلمة المرور الخاصة</string>
+    <string name="vault_password_hint">كلمة المرور الخاصة</string>
+    <string name="vault_confirm_hint">تأكيد كلمة المرور</string>
+    <string name="vault_password_too_short">كلمة المرور 4 أحرف على الأقل</string>
+    <string name="vault_passwords_mismatch">كلمتا المرور غير متطابقتين</string>
     <string name="category_hint">اسم التصنيف</string>
     <string name="category_general">عام</string>
     <string name="category_education">تعليمي</string>

@@ -127,3 +127,10 @@ val MIGRATION_13_14 = object : Migration(13, 14) {
         )
     }
 }
+
+val MIGRATION_14_15 = object : Migration(14, 15) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE videos ADD COLUMN is_private INTEGER NOT NULL DEFAULT 0")
+        db.execSQL("ALTER TABLE settings ADD COLUMN private_vault_password TEXT")
+    }
+}

@@ -7,6 +7,7 @@ import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.EditText
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -335,6 +336,8 @@ class MainActivity : AppCompatActivity() {
         val pos = rv.getChildAdapterPosition(child)
         if (pos == RecyclerView.NO_POSITION) return
         val video = adapter.peekAt(pos) ?: return
+        // Never animate-preview an extra-private clip while the vault is locked.
+        if (video.isPrivate && !com.myvideolibrary.app.security.PrivateVaultSession.unlocked) return
         if (video.isLinkOnly ||
             video.mediaType != com.myvideolibrary.app.data.model.MediaType.VIDEO.id ||
             video.localPath.isBlank() || video.localPath.startsWith("content://")
@@ -946,6 +949,10 @@ class MainActivity : AppCompatActivity() {
         val state = viewModel.uiState.value
         when {
             state.selectionMode -> viewModel.toggleSelected(video.id)
+            // Extra-private clip with the vault still locked: ask for the vault
+            // password first, then re-open once unlocked.
+            video.isPrivate && !com.myvideolibrary.app.security.PrivateVaultSession.unlocked ->
+                promptVaultUnlock { onVideoClick(video) }
             // A downloaded cover image opens in an image viewer, not the player.
             video.mediaType == "image" -> openImage(video)
             // Private videos only appear in the already-unlocked private view, so
@@ -989,6 +996,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showVideoMenu(video: VideoEntity, anchor: android.view.View) {
+        // An obscured private clip's menu (preview/trim/open source…) could leak it,
+        // so require the vault password before showing it.
+        if (video.isPrivate && !com.myvideolibrary.app.security.PrivateVaultSession.unlocked) {
+            promptVaultUnlock { showVideoMenu(video, anchor) }
+            return
+        }
         val popup = android.widget.PopupMenu(this, anchor)
         popup.menu.add(0, 1, 0, getString(R.string.play))
         // Favorite lives here now (the per-row heart was removed to save space).
@@ -1003,6 +1016,11 @@ class MainActivity : AppCompatActivity() {
         popup.menu.add(0, 3, 4, getString(R.string.lock_video)).apply {
             isCheckable = true
             isChecked = video.isLocked
+        }
+        // Extra privacy: obscured cover + a separate vault password to open.
+        popup.menu.add(0, 17, 4, getString(R.string.private_video)).apply {
+            isCheckable = true
+            isChecked = video.isPrivate
         }
         popup.menu.add(0, 4, 5, getString(R.string.set_category))
         popup.menu.add(0, 14, 5, getString(R.string.add_to_playlist))
@@ -1033,6 +1051,7 @@ class MainActivity : AppCompatActivity() {
                 4 -> { promptSetCategory(video); true }
                 5 -> { promptEditInfo(video); true }
                 16 -> { promptEditTags(video); true }
+                17 -> { promptTogglePrivate(video); true }
                 6 -> { confirmDeleteSingle(video); true }
                 8 -> { openSource(video); true }
                 9 -> { viewModel.toggleFavorite(video); true }
@@ -1302,6 +1321,107 @@ class MainActivity : AppCompatActivity() {
             .setNegativeButton(R.string.cancel, null)
             .show()
     }
+
+    // ---- Extra-privacy (obscured cover + separate vault password) ----
+
+    /** Password EditText inside a padded container, matching the edit dialogs. */
+    private fun passwordField(hintRes: Int): Pair<android.widget.LinearLayout, EditText> {
+        val pad = (16 * resources.displayMetrics.density).toInt()
+        val container = android.widget.LinearLayout(this).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding(pad, pad / 2, pad, 0)
+        }
+        val input = EditText(this).apply {
+            hint = getString(hintRes)
+            setSingleLine(true)
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or
+                android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+        }
+        container.addView(input)
+        return container to input
+    }
+
+    /** Toggles a clip's extra-privacy flag, setting up the vault password if needed. */
+    private fun promptTogglePrivate(video: VideoEntity) {
+        if (video.isPrivate) {
+            // Turning it off must prove vault access first.
+            ensureVaultUnlocked { viewModel.setPrivate(video.id, false) }
+        } else {
+            ensureVaultPasswordSet {
+                viewModel.setPrivate(video.id, true)
+                // The owner just marked it — keep it visible to them this session.
+                com.myvideolibrary.app.security.PrivateVaultSession.unlock()
+            }
+        }
+    }
+
+    /** Runs [onReady] once a vault password exists (creating one on first use). */
+    private fun ensureVaultPasswordSet(onReady: () -> Unit) {
+        if (viewModel.uiState.value.privateVaultHash != null) onReady()
+        else promptCreateVaultPassword(onReady)
+    }
+
+    /** Runs [onSuccess] once the vault is unlocked in this session. */
+    private fun ensureVaultUnlocked(onSuccess: () -> Unit) {
+        if (com.myvideolibrary.app.security.PrivateVaultSession.unlocked) onSuccess()
+        else promptVaultUnlock(onSuccess)
+    }
+
+    private fun promptCreateVaultPassword(onDone: () -> Unit) {
+        val (container, first) = passwordField(R.string.vault_password_hint)
+        val confirm = EditText(this).apply {
+            hint = getString(R.string.vault_confirm_hint)
+            setSingleLine(true)
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or
+                android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+        }
+        container.addView(confirm)
+        AlertDialog.Builder(this)
+            .setTitle(R.string.create_vault_password)
+            .setMessage(R.string.vault_password_explain)
+            .setView(container)
+            .setPositiveButton(R.string.save) { _, _ ->
+                val pw = first.text.toString()
+                when {
+                    pw.length < 4 ->
+                        Toast.makeText(this, R.string.vault_password_too_short, Toast.LENGTH_SHORT).show()
+                    pw != confirm.text.toString() ->
+                        Toast.makeText(this, R.string.vault_passwords_mismatch, Toast.LENGTH_SHORT).show()
+                    else -> { viewModel.setVaultPassword(pw); onDone() }
+                }
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun promptVaultUnlock(onSuccess: () -> Unit) {
+        val hash = viewModel.uiState.value.privateVaultHash
+        if (hash == null) { // no password yet — set one, then proceed
+            promptCreateVaultPassword {
+                com.myvideolibrary.app.security.PrivateVaultSession.unlock()
+                refreshCovers(); onSuccess()
+            }
+            return
+        }
+        val (container, input) = passwordField(R.string.vault_password_hint)
+        AlertDialog.Builder(this)
+            .setTitle(R.string.enter_vault_password)
+            .setView(container)
+            .setPositiveButton(R.string.unlock) { _, _ ->
+                if (com.myvideolibrary.app.util.CategorySecurity.verifyHash(hash, input.text.toString())) {
+                    com.myvideolibrary.app.security.PrivateVaultSession.unlock()
+                    refreshCovers()
+                    onSuccess()
+                } else {
+                    Toast.makeText(this, R.string.wrong_password, Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    /** Rebinds the grid so obscured covers re-evaluate after the vault unlocks. */
+    private fun refreshCovers() = adapter.refresh()
 
     private fun confirmDeleteSingle(video: VideoEntity) {
         AlertDialog.Builder(this)

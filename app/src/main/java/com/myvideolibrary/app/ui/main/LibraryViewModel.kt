@@ -51,7 +51,9 @@ data class LibraryUiState(
     val totalSize: Long = 0,
     val folders: List<FolderEntity> = emptyList(),
     val selectionMode: Boolean = false,
-    val selectedIds: Set<Long> = emptySet()
+    val selectedIds: Set<Long> = emptySet(),
+    /** SHA-256 hash of the private-vault password, or null if none is set yet. */
+    val privateVaultHash: String? = null
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -73,6 +75,8 @@ class LibraryViewModel @Inject constructor(
             .map { list ->
                 list.filter { v ->
                     v.mediaType != "image" &&
+                        // Extra-private clips never surface in the Continue row.
+                        !v.isPrivate &&
                         v.lastPlayedPosition > 3_000 &&
                         (v.duration <= 0 || v.lastPlayedPosition < v.duration * 95 / 100)
                 }.take(10)
@@ -198,7 +202,8 @@ class LibraryViewModel @Inject constructor(
             totalSize = m.size,
             folders = m.folders,
             selectionMode = selection.active,
-            selectedIds = selection.ids
+            selectedIds = selection.ids,
+            privateVaultHash = m.settings.privateVaultPassword
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), LibraryUiState())
 
@@ -263,6 +268,17 @@ class LibraryViewModel @Inject constructor(
     /** Assigns a raw (comma-separated) tag string to a single video. */
     fun setTags(id: Long, rawTags: String?) = viewModelScope.launch {
         videoRepository.setTags(id, rawTags)
+    }
+
+    /** Marks a video as extra-private (obscured cover + vault password) or clears it. */
+    fun setPrivate(id: Long, private: Boolean) = viewModelScope.launch {
+        videoRepository.setPrivate(id, private)
+    }
+
+    /** Sets (or changes) the private-vault password, storing only its SHA-256 hash. */
+    fun setVaultPassword(rawPassword: String) = viewModelScope.launch {
+        val hash = com.myvideolibrary.app.util.CategorySecurity.hashPassword(rawPassword)
+        settingsRepository.update { it.copy(privateVaultPassword = hash) }
     }
 
     /** Saves the current filter + sort state under [name] (replacing a same-named one). */

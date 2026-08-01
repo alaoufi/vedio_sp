@@ -28,5 +28,7 @@ class AppLockManager @Inject constructor(
     // ProcessLifecycleOwner callbacks: re-lock as soon as the app is backgrounded.
     override fun onStop(owner: LifecycleOwner) {
         authenticated = false
+        // Also re-obscure extra-private covers until the vault is unlocked again.
+        PrivateVaultSession.lock()
     }
 }
