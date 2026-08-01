@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">La mia videoteca</string>
+
+    <!-- Tabs / YouTube -->
+    <string name="tab_library">Libreria</string>
+    <string name="tab_youtube">YouTube</string>
+    <string name="hide_shorts">Nascondi gli Shorts</string>
+    <string name="youtube_search_hint">Cerca su YouTube</string>
+    <string name="youtube_tab_hint">Cerca su YouTube — guarda senza pubblicità o scarica. Gli Shorts sono nascosti.</string>
+
+    <!-- Library -->
+    <string name="library_stats">%1$d video · %2$s</string>
+    <string name="filter_all">Tutti</string>
+    <string name="filter">Filtra</string>
+    <string name="filter_source">Fonte</string>
+    <string name="filter_folder">Cartella</string>
+    <string name="filter_type">Tipo</string>
+    <string name="type_video">Video</string>
+    <string name="type_audio">Audio</string>
+    <string name="type_image">Immagine</string>
+    <string name="source_tiktok">TikTok</string>
+    <string name="source_youtube">YouTube</string>
+    <string name="source_instagram">Instagram</string>
+    <string name="source_snapchat">Snapchat</string>
+    <string name="source_other">Altro</string>
+    <string name="search_hint">Cerca video</string>
+    <string name="empty_library_title">La tua libreria è vuota</string>
+    <string name="empty_library_message">Tocca il pulsante + per importare video dal tuo dispositivo.</string>
+
+    <!-- Selection -->
+    <string name="selected_count">%1$d selezionati</string>
+    <string name="delete_videos_title">Elimina video</string>
+    <string name="delete_videos_message">Rimuovere solo dalla libreria oppure eliminare anche i file di proprietà dell\'app?</string>
+    <string name="delete_files">Elimina i file</string>
+    <string name="remove_only">Rimuovi soltanto</string>
+    <string name="move_to_folder">Sposta nella cartella</string>
+    <string name="no_folder">Nessuna cartella</string>
+
+    <!-- Sort -->
+    <string name="sort_by">Ordina per</string>
+    <string name="sort_date_new">Data di aggiunta (più recenti)</string>
+    <string name="sort_date_old">Data di aggiunta (più vecchi)</string>
+    <string name="sort_name_az">Nome (A–Z)</string>
+    <string name="sort_name_za">Nome (Z–A)</string>
+    <string name="sort_duration_long">Durata (più lunghi)</string>
+    <string name="sort_duration_short">Durata (più brevi)</string>
+    <string name="sort_size_large">Dimensione (più grandi)</string>
+    <string name="sort_size_small">Dimensione (più piccoli)</string>
+    <string name="sort_category">Categoria</string>
+
+    <!-- Folders -->
+    <string name="new_folder">Nuova cartella</string>
+    <string name="folder_name_hint">Nome della cartella</string>
+    <string name="create">Crea</string>
+    <string name="cancel">Annulla</string>
+    <string name="apply">Applica</string>
+    <string name="play_next">Successivo</string>
+    <string name="play_previous">Precedente</string>
+    <string name="autoplay">Riproduci automaticamente il successivo</string>
+    <string name="language">Lingua</string>
+    <string name="language_system">Predefinita del sistema</string>
+    <string name="user_guide">Guida utente</string>
+    <string name="user_guide_desc">Come usare ogni funzione</string>
+
+    <!-- Menu -->
+    <string name="action_toggle_view">Cambia vista</string>
+    <string name="action_sort">Ordina</string>
+    <string name="action_favorites">Preferiti</string>
+    <string name="action_new_folder">Nuova cartella</string>
+
+    <!-- Import -->
+    <string name="import_title">Importa video</string>
+    <string name="import_select_all">Seleziona tutto</string>
+    <string name="import_selected_count">Importa (%1$d)</string>
+    <string name="import_item_meta">%1$s · %2$s</string>
+    <string name="import_done">Importati %1$d video</string>
+    <string name="import_empty">Nessun nuovo video trovato su questo dispositivo</string>
+    <string name="permission_denied_media">È necessaria l\'autorizzazione ai contenuti multimediali per importare i video.</string>
+
+    <!-- Player -->
+    <string name="speed_format">%.2f×</string>
+    <string name="playback_error">Impossibile riprodurre questo video</string>
+    <string name="brightness_label">Luminosità %1$d%%</string>
+    <string name="volume_label">Volume %1$d%%</string>
+
+    <!-- Downloads -->
+    <string name="downloads_title">Download</string>
+    <string name="downloads_empty">Ancora nessun download</string>
+    <string name="downloading_banner">Download %1$d · %2$d%%</string>
+    <string name="clear_completed">Cancella completati</string>
+    <string name="action_downloads">Download</string>
+    <string name="action_resume">Riprendi</string>
+    <string name="action_pause">Sospendi</string>
+    <string name="action_retry">Riprova</string>
+    <string name="status_waiting">In attesa…</string>
+    <string name="status_downloading">%1$d%% · %2$s</string>
+    <string name="status_paused">Sospeso</string>
+    <string name="status_completed">Completato · %1$s</string>
+    <string name="status_failed">Non riuscito</string>
+    <string name="status_canceled">Annullato</string>
+    <string name="download_channel_name">Download</string>
+    <string name="download_channel_desc">Mostra l\'avanzamento dei download dei video</string>
+    <string name="download_preparing">Preparazione…</string>
+    <string name="download_complete">Download completato</string>
+    <string name="download_failed">Download non riuscito</string>
+
+    <!-- Add download (providers) -->
+    <string name="search_title">Cerca e scarica</string>
+    <string name="action_search">Cerca</string>
+    <string name="tiktok_link_hint">TikTok non ha la ricerca per parole chiave — incolla un link di TikTok, poi premi Cerca per scaricarlo.</string>
+    <string name="link_only_hint">Qui non c\'è la ricerca per parole chiave — incolla il link di un post pubblico, poi premi Cerca per scaricarlo. Instagram/Snapchat funzionano solo con i post pubblici.</string>
+    <string name="add_download_title">Scarica dal link</string>
+    <string name="add_download_hint">Incolla un link di TikTok, YouTube, Instagram o Snapchat. I video di TikTok vengono salvati senza filigrana. Instagram e Snapchat funzionano solo con i post pubblici. L\'estrazione dipende dalla piattaforma e occasionalmente può non riuscire.</string>
+    <string name="paste_url_hint">URL del video</string>
+    <string name="paste">Incolla</string>
+    <string name="fetch_info">Recupera informazioni</string>
+    <string name="download">Scarica</string>
+    <string name="download_started">Download aggiunto alla coda</string>
+    <string name="download_options">Opzioni di download</string>
+    <string name="kind_full">Video completo (audio + immagine)</string>
+    <string name="kind_video_only">Video senza audio</string>
+    <string name="kind_audio_only">Solo audio</string>
+    <string name="kind_image_only">Solo immagine (copertina)</string>
+    <string name="action_add_download">Scarica dal link</string>
+    <string name="error_invalid_link">Questo link non è valido.</string>
+    <string name="error_private">Questo video è privato.</string>
+    <string name="error_not_found">Video non trovato o eliminato.</string>
+    <string name="error_unsupported">Questo link non è supportato.</string>
+    <string name="error_network">Errore di rete. Controlla la connessione.</string>
+    <string name="error_extraction">Impossibile estrarre il video. La fonte potrebbe essere cambiata.</string>
+    <string name="error_unknown">Qualcosa è andato storto.</string>
+
+    <!-- Security / lock -->
+    <string name="unlock_title">Sblocca</string>
+    <string name="unlock">Sblocca</string>
+    <string name="pin_hint">Inserisci il PIN</string>
+    <string name="wrong_pin">PIN errato</string>
+    <string name="use_biometric">Usa l\'impronta digitale</string>
+    <string name="use_pin">Usa il PIN</string>
+    <string name="unlock_biometric_subtitle">Autenticati per aprire la tua libreria</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Impostazioni</string>
+    <string name="section_about">Informazioni</string>
+    <string name="version">Versione</string>
+    <string name="action_settings">Impostazioni</string>
+    <string name="section_appearance">Aspetto</string>
+    <string name="section_downloads">Download</string>
+    <string name="section_security">Sicurezza</string>
+    <string name="section_storage">Archiviazione e backup</string>
+    <string name="theme">Tema</string>
+    <string name="theme_system">Segui il sistema</string>
+    <string name="theme_light">Chiaro</string>
+    <string name="theme_dark">Scuro</string>
+    <string name="wifi_only">Download solo tramite Wi-Fi</string>
+    <string name="wifi_only_desc">Scarica solo su una rete senza limiti di dati</string>
+    <string name="max_concurrent">Numero massimo di download simultanei</string>
+    <string name="app_lock">Blocco dell\'app</string>
+    <string name="app_lock_desc">Richiedi un PIN per aprire l\'app</string>
+    <string name="change_pin">Cambia il PIN</string>
+    <string name="biometric">Sblocco con impronta digitale</string>
+    <string name="prevent_screenshots">Impedisci gli screenshot</string>
+    <string name="hide_recents">Nascondi i contenuti nelle app recenti</string>
+    <string name="storage_used">Spazio utilizzato</string>
+    <string name="clear_cache">Svuota la cache</string>
+    <string name="cache_cleared">Cache svuotata</string>
+    <string name="backup">Backup</string>
+    <string name="backup_desc">Esporta un file di backup crittografato</string>
+    <string name="restore">Ripristina</string>
+    <string name="set_pin">Imposta il PIN</string>
+    <string name="save">Salva</string>
+    <string name="pin_length_error">Il PIN deve avere da 4 a 12 cifre</string>
+    <string name="backup_encrypt_title">Cripta il backup</string>
+    <string name="backup_encrypt_message">Scegli una password. Ti servirà per il ripristino.</string>
+    <string name="backup_password_hint">Password</string>
+    <string name="export">Esporta</string>
+    <string name="password_too_short">La password deve contenere almeno 6 caratteri</string>
+    <string name="restore_title">Ripristina il backup</string>
+    <string name="restore_message">Inserisci la password usata per creare questo backup.</string>
+    <string name="backup_exported">Backup salvato: %1$s</string>
+    <string name="backup_restored">Ripristinati %1$d video</string>
+    <string name="backup_restore_failed">Ripristino non riuscito — password errata o file corrotto</string>
+
+    <!-- Per-video actions -->
+    <string name="delete">Elimina</string>
+    <string name="play">Riproduci</string>
+    <string name="action_share">Condividi</string>
+    <string name="rename">Rinomina</string>
+    <string name="more_options">Altre opzioni</string>
+    <string name="open_source">Apri nella fonte</string>
+    <string name="favorite">Aggiungi ai preferiti</string>
+    <string name="unfavorite">Rimuovi dai preferiti</string>
+    <string name="lock_video">Privato</string>
+    <string name="unlock_video">Privato</string>
+
+    <!-- Activation -->
+    <string name="activation_title">Attiva l\'app</string>
+    <string name="activation_desc">Invia il numero del tuo dispositivo allo sviluppatore per ricevere un codice di attivazione. Funziona offline.</string>
+    <string name="activation_device_id">Numero del dispositivo</string>
+    <string name="activation_copy_device">Copia il numero del dispositivo</string>
+    <string name="activation_copied">Copiato ✓</string>
+    <string name="activation_code_hint">Inserisci il codice di attivazione</string>
+    <string name="activation_activate">Attiva</string>
+    <string name="activation_invalid">Codice non valido per questo dispositivo.</string>
+    <string name="activation_owner_recovery">Recupero del proprietario (seme segreto)</string>
+    <string name="activation_seed_hint">Seme del proprietario (64 esadecimali)</string>
+    <string name="activation_seed_invalid">Il seme non corrisponde.</string>
+    <string name="activation_activated">Attivato ✅</string>
+    <string name="activation_status">Licenza</string>
+    <string name="activation_status_permanent">Attivato (permanente)</string>
+    <string name="activation_status_days">Attivato · %1$d giorni rimanenti</string>
+    <string name="activation_deactivate">Disattiva (blocca di nuovo)</string>
+
+    <!-- Image editor -->
+    <string name="edit_image">Modifica immagine</string>
+    <string name="editor_hint">Trascina sull\'immagine per selezionare una regione</string>
+    <string name="editor_crop">Ritaglia</string>
+    <string name="editor_hide">Nascondi</string>
+    <string name="editor_text">Testo</string>
+    <string name="editor_add">Aggiungi</string>
+    <string name="editor_extract_text">Estrai il testo</string>
+    <string name="editor_need_selection">Trascina prima per selezionare una regione</string>
+    <string name="editor_ocr_running">Lettura del testo…</string>
+    <string name="editor_ocr_empty">Nessun testo trovato</string>
+    <string name="editor_ocr_copied">Testo copiato</string>
+    <string name="editor_saved">Salvato nella libreria</string>
+    <string name="color_white">Bianco</string>
+    <string name="color_yellow">Giallo</string>
+    <string name="color_red">Rosso</string>
+    <string name="color_black">Nero</string>
+
+    <!-- File info -->
+    <string name="file_info">Informazioni sul file</string>
+    <string name="edit_info">Modifica informazioni</string>
+    <string name="info_title_hint">Titolo</string>
+    <string name="info_desc_hint">Descrizione / note</string>
+    <string name="info_description">Note: %1$s</string>
+    <string name="info_format">Formato: %1$s</string>
+    <string name="info_type">Tipo: %1$s</string>
+    <string name="info_size">Dimensione: %1$s</string>
+    <string name="info_resolution">Risoluzione: %1$d × %2$d</string>
+    <string name="info_duration">Durata: %1$s</string>
+
+    <!-- Save location -->
+    <string name="save_location">Posizione di salvataggio</string>
+    <string name="save_location_default">Archiviazione dell\'app (predefinita)</string>
+    <string name="choose_folder">Scegli la cartella…</string>
+    <string name="video_locked">Questo video è bloccato</string>
+    <string name="share_failed">Impossibile condividere questo video</string>
+
+    <!-- Streaming / saved links -->
+    <string name="save_link">Salva il link</string>
+    <string name="link_saved">Link salvato nella libreria</string>
+    <string name="link_badge">Link salvato</string>
+
+    <!-- Protected videos -->
+    <string name="protected_videos">Video privati</string>
+    <string name="protected_set_pin_hint">Contrassegnato come privato. Imposta un PIN/un\'impronta digitale in Impostazioni → Sicurezza per un blocco reale.</string>
+    <string name="protected_moved_hint">Spostato nei Video privati (menu → Video privati).</string>
+    <string name="protected_title">Privati · %1$d</string>
+    <string name="protected_need_lock">Configura un\'impronta digitale o un blocco schermo sul telefono per aprire i video privati.</string>
+
+    <!-- Categories -->
+    <string name="category">Categoria</string>
+    <string name="category_none">Senza categoria</string>
+    <string name="category_all">Tutte le categorie</string>
+    <string name="set_category">Imposta la categoria</string>
+    <string name="category_hint">Nome della categoria</string>
+    <string name="category_general">Generale</string>
+    <string name="category_education">Istruzione</string>
+    <string name="category_entertainment">Intrattenimento</string>
+    <string name="category_music">Musica</string>
+    <string name="category_sports">Sport</string>
+    <string name="category_news">Notizie</string>
+    <string name="category_cooking">Cucina</string>
+    <string name="category_tech">Tecnologia</string>
+    <string name="category_religion">Religione</string>
+    <string name="category_kids">Bambini</string>
+    <string name="manage_categories">Gestisci le categorie</string>
+    <string name="add_category">Aggiungi categoria</string>
+    <string name="no_categories">Ancora nessuna categoria. Tocca + per aggiungerne una.</string>
+    <string name="reorder">Riordina</string>
+    <string name="delete_category_message">Rimuovere la categoria \"%1$s\"? I video vengono conservati, ma diventano senza categoria.</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_thumbnail">Miniatura del video</string>
+    <string name="cd_favorite">Preferito</string>
+    <string name="cd_back">Indietro</string>
+    <string name="cd_lock">Blocca i comandi</string>
+    <string name="cd_rotate">Ruota</string>
+    <string name="cd_pip">Picture in picture</string>
+    <string name="cd_background">Riproduzione in background</string>
+    <string name="cd_import">Importa video</string>
+    <string name="cd_resize">Ridimensiona il video</string>
+
+    <!-- Hide floating text on video (playback overlay) -->
+    <string name="hide_text">Copri il testo</string>
+    <string name="hide_text_hint">Trascina per coprire il testo; trascina l\'angolo per ridimensionare. Apri il menu e tocca di nuovo Copri il testo per bloccare.</string>
+    <string name="hide_text_cleared">Copertura rimossa</string>
+    <string name="hide_text_remove">Rimuovi la copertura</string>
+    <string name="background_play">Riproduzione in background (solo audio)</string>
+
+    <!-- Player resize modes -->
+    <string name="resize_fit">Adatta</string>
+    <string name="resize_zoom">Zoom (ritaglia)</string>
+    <string name="resize_fill">Riempi (allunga)</string>
+</resources>

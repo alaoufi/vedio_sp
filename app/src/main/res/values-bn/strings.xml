@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ভিডিও লাইব্রেরি</string>
+
+    <!-- Tabs / YouTube -->
+    <string name="tab_library">লাইব্রেরি</string>
+    <string name="tab_youtube">YouTube</string>
+    <string name="hide_shorts">Shorts লুকান</string>
+    <string name="youtube_search_hint">YouTube অনুসন্ধান করুন</string>
+    <string name="youtube_tab_hint">YouTube অনুসন্ধান করুন — বিজ্ঞাপন ছাড়া চালান বা ডাউনলোড করুন। Shorts লুকানো আছে।</string>
+
+    <!-- Library -->
+    <string name="library_stats">%1$d টি ভিডিও · %2$s</string>
+    <string name="filter_all">সব</string>
+    <string name="filter">ফিল্টার</string>
+    <string name="filter_source">উৎস</string>
+    <string name="filter_folder">ফোল্ডার</string>
+    <string name="filter_type">ধরন</string>
+    <string name="type_video">ভিডিও</string>
+    <string name="type_audio">অডিও</string>
+    <string name="type_image">ছবি</string>
+    <string name="source_tiktok">TikTok</string>
+    <string name="source_youtube">YouTube</string>
+    <string name="source_instagram">Instagram</string>
+    <string name="source_snapchat">Snapchat</string>
+    <string name="source_other">অন্যান্য</string>
+    <string name="search_hint">ভিডিও অনুসন্ধান করুন</string>
+    <string name="empty_library_title">আপনার লাইব্রেরি খালি</string>
+    <string name="empty_library_message">আপনার ডিভাইস থেকে ভিডিও ইম্পোর্ট করতে + বোতামে ট্যাপ করুন।</string>
+
+    <!-- Selection -->
+    <string name="selected_count">%1$d টি নির্বাচিত</string>
+    <string name="delete_videos_title">ভিডিও মুছুন</string>
+    <string name="delete_videos_message">শুধুমাত্র লাইব্রেরি থেকে সরাবেন, নাকি অ্যাপের মালিকানাধীন ফাইলগুলোও মুছবেন?</string>
+    <string name="delete_files">ফাইল মুছুন</string>
+    <string name="remove_only">শুধু সরান</string>
+    <string name="move_to_folder">ফোল্ডারে সরান</string>
+    <string name="no_folder">কোনো ফোল্ডার নেই</string>
+
+    <!-- Sort -->
+    <string name="sort_by">সাজান</string>
+    <string name="sort_date_new">যোগ করার তারিখ (নতুন)</string>
+    <string name="sort_date_old">যোগ করার তারিখ (পুরনো)</string>
+    <string name="sort_name_az">নাম (A–Z)</string>
+    <string name="sort_name_za">নাম (Z–A)</string>
+    <string name="sort_duration_long">দৈর্ঘ্য (দীর্ঘতম)</string>
+    <string name="sort_duration_short">দৈর্ঘ্য (সংক্ষিপ্ততম)</string>
+    <string name="sort_size_large">আকার (বৃহত্তম)</string>
+    <string name="sort_size_small">আকার (ক্ষুদ্রতম)</string>
+    <string name="sort_category">বিভাগ</string>
+
+    <!-- Folders -->
+    <string name="new_folder">নতুন ফোল্ডার</string>
+    <string name="folder_name_hint">ফোল্ডারের নাম</string>
+    <string name="create">তৈরি করুন</string>
+    <string name="cancel">বাতিল</string>
+    <string name="apply">প্রয়োগ করুন</string>
+    <string name="play_next">পরবর্তী</string>
+    <string name="play_previous">পূর্ববর্তী</string>
+    <string name="autoplay">পরবর্তীটি স্বয়ংক্রিয় চালান</string>
+    <string name="language">ভাষা</string>
+    <string name="language_system">সিস্টেম ডিফল্ট</string>
+    <string name="user_guide">ব্যবহারকারী নির্দেশিকা</string>
+    <string name="user_guide_desc">প্রতিটি বৈশিষ্ট্য কীভাবে ব্যবহার করবেন</string>
+
+    <!-- Menu -->
+    <string name="action_toggle_view">ভিউ পরিবর্তন</string>
+    <string name="action_sort">সাজান</string>
+    <string name="action_favorites">প্রিয়</string>
+    <string name="action_new_folder">নতুন ফোল্ডার</string>
+
+    <!-- Import -->
+    <string name="import_title">ভিডিও ইম্পোর্ট করুন</string>
+    <string name="import_select_all">সব নির্বাচন করুন</string>
+    <string name="import_selected_count">ইম্পোর্ট (%1$d)</string>
+    <string name="import_item_meta">%1$s · %2$s</string>
+    <string name="import_done">%1$d টি ভিডিও ইম্পোর্ট করা হয়েছে</string>
+    <string name="import_empty">এই ডিভাইসে কোনো নতুন ভিডিও পাওয়া যায়নি</string>
+    <string name="permission_denied_media">ভিডিও ইম্পোর্ট করতে মিডিয়া অনুমতি প্রয়োজন।</string>
+
+    <!-- Player -->
+    <string name="speed_format">%.2f×</string>
+    <string name="playback_error">এই ভিডিওটি চালানো যাচ্ছে না</string>
+    <string name="brightness_label">উজ্জ্বলতা %1$d%%</string>
+    <string name="volume_label">ভলিউম %1$d%%</string>
+
+    <!-- Downloads -->
+    <string name="downloads_title">ডাউনলোড</string>
+    <string name="downloads_empty">এখনো কোনো ডাউনলোড নেই</string>
+    <string name="downloading_banner">ডাউনলোড হচ্ছে %1$d · %2$d%%</string>
+    <string name="clear_completed">সম্পন্নগুলো সাফ করুন</string>
+    <string name="action_downloads">ডাউনলোড</string>
+    <string name="action_resume">পুনরায় শুরু</string>
+    <string name="action_pause">বিরতি</string>
+    <string name="action_retry">পুনরায় চেষ্টা করুন</string>
+    <string name="status_waiting">অপেক্ষমাণ…</string>
+    <string name="status_downloading">%1$d%% · %2$s</string>
+    <string name="status_paused">বিরত</string>
+    <string name="status_completed">সম্পন্ন · %1$s</string>
+    <string name="status_failed">ব্যর্থ</string>
+    <string name="status_canceled">বাতিল করা হয়েছে</string>
+    <string name="download_channel_name">ডাউনলোড</string>
+    <string name="download_channel_desc">ভিডিও ডাউনলোডের অগ্রগতি দেখায়</string>
+    <string name="download_preparing">প্রস্তুত হচ্ছে…</string>
+    <string name="download_complete">ডাউনলোড সম্পন্ন</string>
+    <string name="download_failed">ডাউনলোড ব্যর্থ</string>
+
+    <!-- Add download (providers) -->
+    <string name="search_title">অনুসন্ধান ও ডাউনলোড</string>
+    <string name="action_search">অনুসন্ধান</string>
+    <string name="tiktok_link_hint">TikTok-এ কীওয়ার্ড অনুসন্ধান নেই — একটি TikTok লিঙ্ক পেস্ট করুন, তারপর ডাউনলোড করতে অনুসন্ধান চাপুন।</string>
+    <string name="link_only_hint">এখানে কীওয়ার্ড অনুসন্ধান নেই — একটি সর্বজনীন পোস্টের লিঙ্ক পেস্ট করুন, তারপর ডাউনলোড করতে অনুসন্ধান চাপুন। Instagram/Snapchat শুধুমাত্র সর্বজনীন পোস্টের জন্য কাজ করে।</string>
+    <string name="add_download_title">লিঙ্ক থেকে ডাউনলোড</string>
+    <string name="add_download_hint">একটি TikTok, YouTube, Instagram বা Snapchat লিঙ্ক পেস্ট করুন। TikTok ভিডিও ওয়াটারমার্ক ছাড়া সংরক্ষিত হয়। Instagram এবং Snapchat শুধুমাত্র সর্বজনীন পোস্টের জন্য কাজ করে। এক্সট্রাকশন প্ল্যাটফর্মের উপর নির্ভর করে এবং মাঝে মাঝে ব্যর্থ হতে পারে।</string>
+    <string name="paste_url_hint">ভিডিও URL</string>
+    <string name="paste">পেস্ট করুন</string>
+    <string name="fetch_info">তথ্য আনুন</string>
+    <string name="download">ডাউনলোড</string>
+    <string name="download_started">ডাউনলোড সারিতে যোগ করা হয়েছে</string>
+    <string name="download_options">ডাউনলোড অপশন</string>
+    <string name="kind_full">সম্পূর্ণ ভিডিও (শব্দ + ছবি)</string>
+    <string name="kind_video_only">শব্দ ছাড়া ভিডিও</string>
+    <string name="kind_audio_only">শুধুমাত্র অডিও</string>
+    <string name="kind_image_only">শুধুমাত্র ছবি (কভার)</string>
+    <string name="action_add_download">লিঙ্ক থেকে ডাউনলোড</string>
+    <string name="error_invalid_link">এই লিঙ্কটি বৈধ নয়।</string>
+    <string name="error_private">এই ভিডিওটি ব্যক্তিগত।</string>
+    <string name="error_not_found">ভিডিও পাওয়া যায়নি বা মুছে ফেলা হয়েছে।</string>
+    <string name="error_unsupported">এই লিঙ্কটি সমর্থিত নয়।</string>
+    <string name="error_network">নেটওয়ার্ক ত্রুটি। আপনার সংযোগ পরীক্ষা করুন।</string>
+    <string name="error_extraction">ভিডিওটি বের করা যায়নি। উৎস পরিবর্তিত হতে পারে।</string>
+    <string name="error_unknown">কিছু একটা ভুল হয়েছে।</string>
+
+    <!-- Security / lock -->
+    <string name="unlock_title">আনলক করুন</string>
+    <string name="unlock">আনলক করুন</string>
+    <string name="pin_hint">PIN লিখুন</string>
+    <string name="wrong_pin">ভুল PIN</string>
+    <string name="use_biometric">ফিঙ্গারপ্রিন্ট ব্যবহার করুন</string>
+    <string name="use_pin">PIN ব্যবহার করুন</string>
+    <string name="unlock_biometric_subtitle">আপনার লাইব্রেরি খুলতে প্রমাণীকরণ করুন</string>
+
+    <!-- Settings -->
+    <string name="settings_title">সেটিংস</string>
+    <string name="section_about">সম্পর্কে</string>
+    <string name="version">সংস্করণ</string>
+    <string name="action_settings">সেটিংস</string>
+    <string name="section_appearance">চেহারা</string>
+    <string name="section_downloads">ডাউনলোড</string>
+    <string name="section_security">নিরাপত্তা</string>
+    <string name="section_storage">স্টোরেজ ও ব্যাকআপ</string>
+    <string name="theme">থিম</string>
+    <string name="theme_system">সিস্টেম অনুসরণ করুন</string>
+    <string name="theme_light">লাইট</string>
+    <string name="theme_dark">ডার্ক</string>
+    <string name="wifi_only">শুধুমাত্র Wi-Fi ডাউনলোড</string>
+    <string name="wifi_only_desc">শুধুমাত্র আনমিটারড নেটওয়ার্কে ডাউনলোড করুন</string>
+    <string name="max_concurrent">সর্বোচ্চ একসাথে ডাউনলোড</string>
+    <string name="app_lock">অ্যাপ লক</string>
+    <string name="app_lock_desc">অ্যাপ খুলতে একটি PIN প্রয়োজন</string>
+    <string name="change_pin">PIN পরিবর্তন করুন</string>
+    <string name="biometric">ফিঙ্গারপ্রিন্ট আনলক</string>
+    <string name="prevent_screenshots">স্ক্রিনশট প্রতিরোধ করুন</string>
+    <string name="hide_recents">সাম্প্রতিক অ্যাপে বিষয়বস্তু লুকান</string>
+    <string name="storage_used">ব্যবহৃত স্টোরেজ</string>
+    <string name="clear_cache">ক্যাশ সাফ করুন</string>
+    <string name="cache_cleared">ক্যাশ সাফ করা হয়েছে</string>
+    <string name="backup">ব্যাকআপ</string>
+    <string name="backup_desc">একটি এনক্রিপ্টেড ব্যাকআপ ফাইল এক্সপোর্ট করুন</string>
+    <string name="restore">পুনরুদ্ধার করুন</string>
+    <string name="set_pin">PIN সেট করুন</string>
+    <string name="save">সংরক্ষণ করুন</string>
+    <string name="pin_length_error">PIN অবশ্যই ৪–১২ অঙ্কের হতে হবে</string>
+    <string name="backup_encrypt_title">ব্যাকআপ এনক্রিপ্ট করুন</string>
+    <string name="backup_encrypt_message">একটি পাসওয়ার্ড বেছে নিন। পুনরুদ্ধার করতে এটি প্রয়োজন হবে।</string>
+    <string name="backup_password_hint">পাসওয়ার্ড</string>
+    <string name="export">এক্সপোর্ট করুন</string>
+    <string name="password_too_short">পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে</string>
+    <string name="restore_title">ব্যাকআপ পুনরুদ্ধার করুন</string>
+    <string name="restore_message">এই ব্যাকআপ তৈরিতে ব্যবহৃত পাসওয়ার্ড লিখুন।</string>
+    <string name="backup_exported">ব্যাকআপ সংরক্ষিত: %1$s</string>
+    <string name="backup_restored">%1$d টি ভিডিও পুনরুদ্ধার করা হয়েছে</string>
+    <string name="backup_restore_failed">পুনরুদ্ধার ব্যর্থ — ভুল পাসওয়ার্ড বা ক্ষতিগ্রস্ত ফাইল</string>
+
+    <!-- Per-video actions -->
+    <string name="delete">মুছুন</string>
+    <string name="play">চালান</string>
+    <string name="action_share">শেয়ার করুন</string>
+    <string name="rename">নাম পরিবর্তন করুন</string>
+    <string name="more_options">আরও অপশন</string>
+    <string name="open_source">উৎসে খুলুন</string>
+    <string name="favorite">প্রিয় তালিকায় যোগ করুন</string>
+    <string name="unfavorite">প্রিয় তালিকা থেকে সরান</string>
+    <string name="lock_video">ব্যক্তিগত</string>
+    <string name="unlock_video">ব্যক্তিগত</string>
+
+    <!-- Activation -->
+    <string name="activation_title">অ্যাপ অ্যাক্টিভেট করুন</string>
+    <string name="activation_desc">অ্যাক্টিভেশন কোড পেতে আপনার ডিভাইস নম্বর ডেভেলপারকে পাঠান। অফলাইনে কাজ করে।</string>
+    <string name="activation_device_id">ডিভাইস নম্বর</string>
+    <string name="activation_copy_device">ডিভাইস নম্বর কপি করুন</string>
+    <string name="activation_copied">কপি করা হয়েছে ✓</string>
+    <string name="activation_code_hint">অ্যাক্টিভেশন কোড লিখুন</string>
+    <string name="activation_activate">অ্যাক্টিভেট করুন</string>
+    <string name="activation_invalid">এই ডিভাইসের জন্য অবৈধ কোড।</string>
+    <string name="activation_owner_recovery">মালিক পুনরুদ্ধার (গোপন সিড)</string>
+    <string name="activation_seed_hint">মালিক সিড (৬৪ হেক্স)</string>
+    <string name="activation_seed_invalid">সিড মিলছে না।</string>
+    <string name="activation_activated">অ্যাক্টিভেট করা হয়েছে ✅</string>
+    <string name="activation_status">লাইসেন্স</string>
+    <string name="activation_status_permanent">অ্যাক্টিভেট করা হয়েছে (স্থায়ী)</string>
+    <string name="activation_status_days">অ্যাক্টিভেট করা হয়েছে · %1$d দিন বাকি</string>
+    <string name="activation_deactivate">নিষ্ক্রিয় করুন (পুনরায় লক)</string>
+
+    <!-- Image editor -->
+    <string name="edit_image">ছবি সম্পাদনা করুন</string>
+    <string name="editor_hint">একটি অঞ্চল নির্বাচন করতে ছবির উপর টেনে আনুন</string>
+    <string name="editor_crop">ক্রপ</string>
+    <string name="editor_hide">লুকান</string>
+    <string name="editor_text">টেক্সট</string>
+    <string name="editor_add">যোগ করুন</string>
+    <string name="editor_extract_text">টেক্সট বের করুন</string>
+    <string name="editor_need_selection">প্রথমে টেনে একটি অঞ্চল নির্বাচন করুন</string>
+    <string name="editor_ocr_running">টেক্সট পড়া হচ্ছে…</string>
+    <string name="editor_ocr_empty">কোনো টেক্সট পাওয়া যায়নি</string>
+    <string name="editor_ocr_copied">টেক্সট কপি করা হয়েছে</string>
+    <string name="editor_saved">লাইব্রেরিতে সংরক্ষিত</string>
+    <string name="color_white">সাদা</string>
+    <string name="color_yellow">হলুদ</string>
+    <string name="color_red">লাল</string>
+    <string name="color_black">কালো</string>
+
+    <!-- File info -->
+    <string name="file_info">ফাইল তথ্য</string>
+    <string name="edit_info">তথ্য সম্পাদনা করুন</string>
+    <string name="info_title_hint">শিরোনাম</string>
+    <string name="info_desc_hint">বিবরণ / নোট</string>
+    <string name="info_description">নোট: %1$s</string>
+    <string name="info_format">ফরম্যাট: %1$s</string>
+    <string name="info_type">ধরন: %1$s</string>
+    <string name="info_size">আকার: %1$s</string>
+    <string name="info_resolution">রেজোলিউশন: %1$d × %2$d</string>
+    <string name="info_duration">দৈর্ঘ্য: %1$s</string>
+
+    <!-- Save location -->
+    <string name="save_location">সংরক্ষণের স্থান</string>
+    <string name="save_location_default">অ্যাপ স্টোরেজ (ডিফল্ট)</string>
+    <string name="choose_folder">ফোল্ডার বেছে নিন…</string>
+    <string name="video_locked">এই ভিডিওটি লক করা</string>
+    <string name="share_failed">এই ভিডিওটি শেয়ার করা যাচ্ছে না</string>
+
+    <!-- Streaming / saved links -->
+    <string name="save_link">লিঙ্ক সংরক্ষণ করুন</string>
+    <string name="link_saved">লিঙ্ক লাইব্রেরিতে সংরক্ষিত</string>
+    <string name="link_badge">সংরক্ষিত লিঙ্ক</string>
+
+    <!-- Protected videos -->
+    <string name="protected_videos">ব্যক্তিগত ভিডিও</string>
+    <string name="protected_set_pin_hint">ব্যক্তিগত হিসেবে চিহ্নিত। প্রকৃত লকের জন্য সেটিংস → নিরাপত্তা-তে একটি PIN/ফিঙ্গারপ্রিন্ট সেট করুন।</string>
+    <string name="protected_moved_hint">ব্যক্তিগত ভিডিওতে সরানো হয়েছে (মেনু → ব্যক্তিগত ভিডিও)।</string>
+    <string name="protected_title">ব্যক্তিগত · %1$d</string>
+    <string name="protected_need_lock">ব্যক্তিগত ভিডিও খুলতে আপনার ফোনে একটি ফিঙ্গারপ্রিন্ট বা স্ক্রিন লক সেট আপ করুন।</string>
+
+    <!-- Categories -->
+    <string name="category">বিভাগ</string>
+    <string name="category_none">অবিভাগীকৃত</string>
+    <string name="category_all">সব বিভাগ</string>
+    <string name="set_category">বিভাগ সেট করুন</string>
+    <string name="category_hint">বিভাগের নাম</string>
+    <string name="category_general">সাধারণ</string>
+    <string name="category_education">শিক্ষা</string>
+    <string name="category_entertainment">বিনোদন</string>
+    <string name="category_music">সঙ্গীত</string>
+    <string name="category_sports">খেলাধুলা</string>
+    <string name="category_news">সংবাদ</string>
+    <string name="category_cooking">রান্না</string>
+    <string name="category_tech">প্রযুক্তি</string>
+    <string name="category_religion">ধর্ম</string>
+    <string name="category_kids">শিশু</string>
+    <string name="manage_categories">বিভাগ পরিচালনা করুন</string>
+    <string name="add_category">বিভাগ যোগ করুন</string>
+    <string name="no_categories">এখনো কোনো বিভাগ নেই। একটি যোগ করতে + ট্যাপ করুন।</string>
+    <string name="reorder">পুনরায় সাজান</string>
+    <string name="delete_category_message">\"%1$s\" বিভাগটি সরাবেন? ভিডিওগুলো থাকবে, তবে অবিভাগীকৃত হয়ে যাবে।</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_thumbnail">ভিডিও থাম্বনেইল</string>
+    <string name="cd_favorite">প্রিয়</string>
+    <string name="cd_back">পেছনে</string>
+    <string name="cd_lock">নিয়ন্ত্রণ লক করুন</string>
+    <string name="cd_rotate">ঘোরান</string>
+    <string name="cd_pip">পিকচার ইন পিকচার</string>
+    <string name="cd_background">ব্যাকগ্রাউন্ড প্লেব্যাক</string>
+    <string name="cd_import">ভিডিও ইম্পোর্ট করুন</string>
+    <string name="cd_resize">ভিডিওর আকার পরিবর্তন করুন</string>
+
+    <!-- Hide floating text on video (playback overlay) -->
+    <string name="hide_text">টেক্সট ঢাকুন</string>
+    <string name="hide_text_hint">টেক্সট ঢাকতে টেনে আনুন; আকার পরিবর্তন করতে কোণ টেনে আনুন। মেনু খুলে লক করতে আবার টেক্সট ঢাকুন ট্যাপ করুন।</string>
+    <string name="hide_text_cleared">আবরণ সরানো হয়েছে</string>
+    <string name="hide_text_remove">আবরণ সরান</string>
+    <string name="background_play">ব্যাকগ্রাউন্ড প্লেব্যাক (শুধুমাত্র অডিও)</string>
+
+    <!-- Player resize modes -->
+    <string name="resize_fit">ফিট</string>
+    <string name="resize_zoom">জুম (ক্রপ)</string>
+    <string name="resize_fill">পূর্ণ (প্রসারিত)</string>
+</resources>

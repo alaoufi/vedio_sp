@@ -1,0 +1,507 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">مكتبة الفيديو</string>
+
+    <!-- Tabs / YouTube -->
+    <string name="tab_library">المكتبة</string>
+    <string name="tab_youtube">يوتيوب</string>
+    <string name="hide_shorts">إخفاء Shorts</string>
+    <string name="youtube_search_hint">ابحث في يوتيوب</string>
+    <string name="youtube_tab_hint">ابحث في يوتيوب — شغّل بلا إعلانات أو حمّل. مقاطع Shorts مخفية.</string>
+
+    <!-- Library -->
+    <string name="library_stats">%1$d فيديو · %2$s</string>
+    <string name="filter_all">الكل</string>
+    <string name="filter">تصفية</string>
+    <string name="filter_source">المصدر</string>
+    <string name="filter_folder">المجلد</string>
+    <string name="filter_type">النوع</string>
+    <string name="type_video">فيديو</string>
+    <string name="type_audio">صوت</string>
+    <string name="type_image">صورة</string>
+    <string name="source_tiktok">تيك توك</string>
+    <string name="source_youtube">يوتيوب</string>
+    <string name="source_instagram">انستقرام</string>
+    <string name="source_snapchat">سناب شات</string>
+    <string name="source_other">أخرى</string>
+    <string name="search_hint">ابحث عن فيديو</string>
+    <string name="empty_library_title">مكتبتك فارغة</string>
+    <string name="empty_library_message">اضغط زر + لاستيراد الفيديوهات من جهازك.</string>
+
+    <!-- Selection -->
+    <string name="selected_count">%1$d محدد</string>
+    <string name="delete_videos_title">حذف الفيديوهات</string>
+    <string name="delete_videos_message">إزالة من المكتبة فقط، أم حذف الملفات المملوكة للتطبيق أيضًا؟</string>
+    <string name="delete_files">حذف الملفات</string>
+    <string name="remove_only">إزالة فقط</string>
+    <string name="move_to_folder">نقل إلى مجلد</string>
+    <string name="no_folder">بدون مجلد</string>
+
+    <!-- Sort -->
+    <string name="sort_by">ترتيب حسب</string>
+    <string name="sort_date_new">تاريخ الإضافة (الأحدث)</string>
+    <string name="sort_date_old">تاريخ الإضافة (الأقدم)</string>
+    <string name="sort_name_az">الاسم (أ–ي)</string>
+    <string name="sort_name_za">الاسم (ي–أ)</string>
+    <string name="sort_duration_long">المدة (الأطول)</string>
+    <string name="sort_duration_short">المدة (الأقصر)</string>
+    <string name="sort_size_large">الحجم (الأكبر)</string>
+    <string name="sort_size_small">الحجم (الأصغر)</string>
+    <string name="sort_category">التصنيف</string>
+
+    <!-- Folders -->
+    <string name="new_folder">مجلد جديد</string>
+    <string name="folder_name_hint">اسم المجلد</string>
+    <string name="create">إنشاء</string>
+    <string name="cancel">إلغاء</string>
+    <string name="apply">تطبيق</string>
+    <string name="play_next">التالي</string>
+    <string name="play_previous">السابق</string>
+    <string name="autoplay">تشغيل التالي تلقائياً</string>
+    <string name="language">اللغة</string>
+    <string name="language_system">لغة النظام</string>
+    <string name="user_guide">دليل الاستخدام</string>
+    <string name="user_guide_desc">شرح كل ميزة خطوة بخطوة</string>
+    <string name="statistics">الإحصائيات</string>
+    <string name="duplicates_title">المكرّرات</string>
+    <string name="find_duplicates">البحث عن المكرّرات</string>
+    <string name="dup_none">لا توجد مكرّرات</string>
+    <string name="dup_clean">تنظيف</string>
+    <string name="dup_clean_all">حذف كل النُّسخ الزائدة</string>
+    <string name="dup_summary">%1$d مجموعات · %2$d نسخة زائدة · توفير %3$s</string>
+    <string name="dup_group_subtitle">%1$d نُسخ · توفير %2$s</string>
+    <string name="dup_confirm_group">حذف %1$d نسخة زائدة وتوفير %2$s؟ تُبقى أقدم نسخة.</string>
+    <string name="dup_confirm_all">حذف %1$d نسخة زائدة من كل المجموعات وتوفير %2$s؟ تُبقى أقدم نسخة في كل مجموعة.</string>
+    <string name="stat_videos">مقاطع</string>
+    <string name="stat_size">الحجم الكلي</string>
+    <string name="stat_duration">المدة الكلية</string>
+    <string name="stat_plays">مرات التشغيل</string>
+    <string name="stat_play_count">%d تشغيل</string>
+    <string name="stat_empty">لا شيء بعد</string>
+    <string name="most_played">الأكثر تشغيلاً</string>
+    <string name="recently_played">شُغّلت مؤخراً</string>
+    <string name="by_category">حسب التصنيف</string>
+    <string name="by_source">حسب المصدر</string>
+    <string name="source_device">الجهاز</string>
+    <string name="browser_title">المتصفّح</string>
+    <string name="browser_hint">ابحث أو اكتب رابطاً</string>
+    <string name="browser_reload">تحديث</string>
+    <string name="browser_download_found">تحميل</string>
+    <string name="browser_download_count">تحميل (%d)</string>
+    <string name="browser_found_title">وسائط موجودة في هذه الصفحة</string>
+    <string name="browser_no_media">لم يُكتشف أي محتوى قابل للتحميل بعد</string>
+
+    <!-- Menu -->
+    <string name="action_toggle_view">تبديل العرض</string>
+    <string name="action_sort">ترتيب</string>
+    <string name="action_favorites">المفضلة</string>
+    <string name="action_new_folder">مجلد جديد</string>
+
+    <!-- Import -->
+    <string name="import_title">استيراد الفيديوهات</string>
+    <string name="import_select_all">تحديد الكل</string>
+    <string name="import_selected_count">استيراد (%1$d)</string>
+    <string name="import_item_meta">%1$s · %2$s</string>
+    <string name="import_done">تم استيراد %1$d فيديو</string>
+    <string name="import_empty">لا توجد فيديوهات جديدة على هذا الجهاز</string>
+    <string name="permission_denied_media">إذن الوسائط مطلوب لاستيراد الفيديوهات.</string>
+
+    <!-- Player -->
+    <string name="speed_format">%.2f×</string>
+    <string name="playback_error">تعذّر تشغيل هذا الفيديو</string>
+    <string name="brightness_label">السطوع %1$d%%</string>
+    <string name="seek_forward">⏩ +10 ثانية</string>
+    <string name="seek_back">⏪ −10 ثانية</string>
+    <string name="rotation_lock">قفل الاتجاه</string>
+    <string name="rotation_auto">تدوير تلقائي</string>
+    <string name="rotation_locked">الاتجاه مقفل</string>
+    <string name="player_locked">🔒 مقفل — تجاهُل اللمس والسحب</string>
+    <string name="player_unlocked">🔓 غير مقفل</string>
+    <string name="end_of_clip">عند نهاية المقطع</string>
+    <string name="end_stop">يتوقف</string>
+    <string name="end_repeat">يُعاد تشغيله</string>
+    <string name="end_next">ينتقل للتالي</string>
+    <string name="trim_menu">قص المقطع</string>
+    <string name="trim_title">قص المقطع</string>
+    <string name="trim_hint">حرّك المقبضين لإبقاء الجزء المطلوب فقط (مثلاً لحذف المقدمة).</string>
+    <string name="trim_save">قص وحفظ</string>
+    <string name="trim_too_short">التحديد قصير جداً</string>
+    <string name="trim_done">تم حفظ المقطع المقصوص</string>
+    <string name="trim_failed">تعذّر قص هذا المقطع</string>
+    <string name="trim_result_title">%1$s (مقصوص)</string>
+
+    <!-- ضغط الفيديو على الجهاز -->
+    <string name="compress_menu">ضغط لتوفير المساحة</string>
+    <string name="compress_title">ضغط</string>
+    <string name="compressing">جارٍ الضغط…</string>
+    <string name="compress_hint">إعادة ترميز إلى HEVC على جهازك — جودة عالية وحجم أصغر بكثير. قد يستغرق وقتاً للمقاطع الطويلة.</string>
+    <string name="compress_done">اكتمل الضغط</string>
+    <string name="compress_result">الحجم: %1$s ← %2$s (وفّرت %3$d%%)</string>
+    <string name="compress_failed">تعذّر ضغط هذا الفيديو على هذا الجهاز</string>
+    <string name="compress_no_gain">هذا الفيديو مضغوط لأقصى حد — لا مساحة إضافية للتوفير</string>
+    <string name="compress_replaced">تم استبدال الأصل بالنسخة المضغوطة</string>
+    <string name="compress_saved">تمت إضافة النسخة المضغوطة</string>
+    <string name="compress_result_title">%1$s (مضغوط)</string>
+    <string name="replace_original">استبدال الأصل</string>
+    <string name="keep_both">الاحتفاظ بالاثنين</string>
+
+    <string name="volume_label">الصوت %1$d%%</string>
+
+    <!-- Downloads -->
+    <string name="downloads_title">التحميلات</string>
+    <string name="downloads_empty">لا توجد تحميلات بعد</string>
+    <string name="downloading_banner">جارٍ تحميل %1$d · %2$d%%</string>
+    <string name="clear_completed">مسح المكتمل</string>
+    <string name="action_downloads">التحميلات</string>
+    <string name="action_resume">استئناف</string>
+    <string name="action_pause">إيقاف مؤقت</string>
+    <string name="action_retry">إعادة المحاولة</string>
+    <string name="status_waiting">في الانتظار…</string>
+    <string name="status_downloading">%1$d%% · %2$s</string>
+    <string name="status_processing">جارٍ المعالجة…</string>
+    <string name="status_paused">متوقف مؤقتًا</string>
+    <string name="status_completed">مكتمل · %1$s</string>
+    <string name="status_failed">فشل</string>
+    <string name="status_canceled">أُلغي</string>
+    <string name="download_channel_name">التحميلات</string>
+    <string name="download_channel_desc">يعرض تقدّم تحميل الفيديوهات</string>
+    <string name="download_preparing">جارٍ التحضير…</string>
+    <string name="download_complete">اكتمل التحميل</string>
+    <string name="download_failed">فشل التحميل</string>
+
+    <!-- Add download (providers) -->
+    <string name="search_title">بحث وتحميل</string>
+    <string name="search_platforms_title">يوتيوب / تيك توك</string>
+    <string name="action_search">بحث</string>
+    <string name="tiktok_link_hint">تيك توك لا يدعم البحث بالكلمات — الصق رابط تيك توك ثم اضغط بحث لتحميله.</string>
+    <string name="link_only_hint">لا يوجد بحث بالكلمات هنا — الصق رابط منشور عام ثم اضغط بحث لتحميله. انستقرام وسناب شات للمنشورات العامة فقط.</string>
+    <string name="browse_in_app">تصفّح داخل التطبيق للبحث والتحميل</string>
+    <string name="add_download_title">تحميل من رابط</string>
+    <string name="add_download_hint">الصق رابط تيك توك أو يوتيوب. فيديوهات تيك توك تُحفظ بدون علامة مائية. الاستخراج يعتمد على المنصّة وقد يفشل أحيانًا.</string>
+    <string name="paste_url_hint">رابط الفيديو</string>
+    <string name="paste">لصق</string>
+    <string name="fetch_info">جلب المعلومات</string>
+    <string name="download">تحميل</string>
+    <string name="download_started">أُضيف التحميل إلى الطابور</string>
+    <string name="download_options">خيارات التحميل</string>
+    <string name="kind_full">فيديو كامل (صوت وصورة)</string>
+    <string name="kind_video_only">مقطع بدون صوت</string>
+    <string name="kind_audio_only">صوت فقط</string>
+    <string name="kind_image_only">صورة فقط (الغلاف)</string>
+    <string name="action_add_download">تحميل من رابط</string>
+    <string name="error_invalid_link">هذا الرابط غير صالح.</string>
+    <string name="error_private">هذا الفيديو خاص.</string>
+    <string name="error_not_found">الفيديو غير موجود أو محذوف.</string>
+    <string name="error_unsupported">هذا الرابط غير مدعوم.</string>
+    <string name="error_network">خطأ في الشبكة. تحقّق من اتصالك.</string>
+    <string name="error_extraction">تعذّر جلب هذا المقطع. قد يكون خاصًا أو مقيّدًا في منطقتك أو جديدًا جدًا لم يُتَح بعد. أعد المحاولة بعد قليل، أو استخدم «افتح في المتصفّح لالتقاطه».</string>
+    <string name="open_in_browser">افتح في المتصفّح لالتقاطه</string>
+    <string name="error_unknown">حدث خطأ ما.</string>
+
+    <!-- Security / lock -->
+    <string name="unlock_title">فتح القفل</string>
+    <string name="unlock">فتح</string>
+    <string name="pin_hint">أدخل رمز PIN</string>
+    <string name="wrong_pin">رمز PIN غير صحيح</string>
+    <string name="use_biometric">استخدم البصمة</string>
+    <string name="use_pin">استخدم رمز PIN</string>
+    <string name="unlock_biometric_subtitle">استوثق لفتح مكتبتك</string>
+
+    <!-- Settings -->
+    <string name="settings_title">الإعدادات</string>
+    <string name="section_about">حول</string>
+    <string name="version">الإصدار</string>
+    <string name="action_settings">الإعدادات</string>
+    <string name="section_appearance">المظهر</string>
+    <string name="section_downloads">التحميلات</string>
+    <string name="section_security">الأمان</string>
+    <string name="section_storage">التخزين والنسخ الاحتياطي</string>
+    <string name="theme">السمة</string>
+    <string name="theme_system">حسب النظام</string>
+    <string name="theme_light">فاتح</string>
+    <string name="theme_dark">داكن</string>
+    <string name="wifi_only">التحميل عبر Wi-Fi فقط</string>
+    <string name="wifi_only_desc">التحميل فقط على شبكة غير محدودة</string>
+    <string name="max_concurrent">أقصى عدد تحميلات متزامنة</string>
+    <string name="app_lock">قفل التطبيق</string>
+    <string name="app_lock_desc">طلب رمز PIN لفتح التطبيق</string>
+    <string name="change_pin">تغيير رمز PIN</string>
+    <string name="biometric">فتح بالبصمة</string>
+    <string name="prevent_screenshots">منع لقطات الشاشة</string>
+    <string name="hide_recents">إخفاء المحتوى في التطبيقات الأخيرة</string>
+    <string name="storage_used">المساحة المستخدمة</string>
+    <string name="clear_cache">مسح الذاكرة المؤقتة</string>
+    <string name="cache_cleared">تم مسح الذاكرة المؤقتة</string>
+    <string name="backup">نسخ احتياطي</string>
+    <string name="backup_desc">تصدير ملف نسخة احتياطية مشفّر</string>
+    <string name="restore">استعادة</string>
+    <string name="set_pin">تعيين رمز PIN</string>
+    <string name="save">حفظ</string>
+    <string name="pin_length_error">يجب أن يكون رمز PIN من 4 إلى 12 رقمًا</string>
+    <string name="backup_encrypt_title">تشفير النسخة الاحتياطية</string>
+    <string name="backup_encrypt_message">اختر كلمة مرور. ستحتاجها للاستعادة.</string>
+    <string name="backup_password_hint">كلمة المرور</string>
+    <string name="export">تصدير</string>
+    <string name="password_too_short">يجب ألا تقل كلمة المرور عن 6 أحرف</string>
+    <string name="restore_title">استعادة نسخة احتياطية</string>
+    <string name="restore_message">أدخل كلمة المرور المستخدمة لإنشاء هذه النسخة.</string>
+    <string name="backup_exported">حُفظت النسخة: %1$s</string>
+    <string name="backup_restored">استُعيد %1$d فيديو</string>
+    <string name="backup_restore_failed">فشلت الاستعادة — كلمة مرور خاطئة أو ملف تالف</string>
+
+    <!-- Per-video actions -->
+    <string name="delete">حذف</string>
+    <string name="play">تشغيل</string>
+    <string name="action_share">مشاركة</string>
+    <string name="rename">إعادة تسمية</string>
+    <string name="more_options">المزيد</string>
+    <string name="open_source">فتح من المصدر</string>
+    <string name="favorite">إضافة إلى المفضلة</string>
+    <string name="unfavorite">إزالة من المفضلة</string>
+    <string name="lock_video">خاص</string>
+    <string name="unlock_video">خاص</string>
+
+    <!-- Activation -->
+    <string name="activation_title">تفعيل التطبيق</string>
+    <string name="activation_desc">أرسل «رقم الجهاز» للمطوّر لتصلك رمز التفعيل. يعمل بدون إنترنت.</string>
+    <string name="activation_device_id">رقم الجهاز</string>
+    <string name="activation_copy_device">نسخ رقم الجهاز</string>
+    <string name="activation_copied">تم النسخ ✓</string>
+    <string name="activation_code_hint">أدخل رمز التفعيل</string>
+    <string name="activation_activate">تفعيل</string>
+    <string name="activation_invalid">رمز غير صالح لهذا الجهاز.</string>
+    <string name="activation_expired_keep">انتهت فترتك. محتواك محفوظ — جدّد الاشتراك للمتابعة.</string>
+    <string name="license_status">الاشتراك</string>
+    <string name="license_trial_days">تجربة · بقي %d يوم</string>
+    <string name="license_sub_days">مُفعّل · بقي %d يوم</string>
+    <string name="license_permanent">مُفعّل · دائم</string>
+    <string name="license_inactive">غير مُفعّل</string>
+    <string name="subscribe_play">اشترك عبر Google Play</string>
+    <string name="subscribe_or_code">أو أدخل رمز تفعيل</string>
+    <string name="activation_owner_recovery">استرجاع المالك (البذرة السرّية)</string>
+    <string name="activation_seed_hint">بذرة المالك (٦٤ hex)</string>
+    <string name="activation_seed_invalid">البذرة غير مطابقة.</string>
+    <string name="activation_activated">تم التفعيل ✅</string>
+    <string name="activation_status">الترخيص</string>
+    <string name="activation_status_permanent">مفعّل (دائم)</string>
+    <string name="activation_status_days">مفعّل · متبقٍّ %1$d يوم</string>
+    <string name="activation_deactivate">إلغاء التفعيل (إعادة القفل)</string>
+
+    <!-- Image editor -->
+    <string name="edit_image">تعديل الصورة</string>
+    <string name="editor_hint">اسحب على الصورة لتحديد منطقة</string>
+    <string name="editor_crop">قص</string>
+    <string name="editor_hide">إخفاء</string>
+    <string name="editor_text">نص</string>
+    <string name="editor_add">إضافة</string>
+    <string name="editor_extract_text">استخراج نص</string>
+    <string name="editor_need_selection">اسحب لتحديد منطقة أولاً</string>
+    <string name="editor_ocr_running">جارٍ قراءة النص…</string>
+    <string name="editor_ocr_empty">لم يُعثر على نص</string>
+    <string name="editor_ocr_copied">نُسخ النص</string>
+    <string name="editor_saved">حُفظت في المكتبة</string>
+    <string name="color_white">أبيض</string>
+    <string name="color_yellow">أصفر</string>
+    <string name="color_red">أحمر</string>
+    <string name="color_black">أسود</string>
+
+    <!-- File info -->
+    <string name="file_info">معلومات الملف</string>
+    <string name="edit_info">تعديل المعلومات</string>
+    <string name="info_title_hint">العنوان</string>
+    <string name="info_desc_hint">الوصف / ملاحظات</string>
+    <string name="info_description">ملاحظات: %1$s</string>
+    <string name="info_format">الصيغة: %1$s</string>
+    <string name="info_type">النوع: %1$s</string>
+    <string name="info_size">الحجم: %1$s</string>
+    <string name="info_resolution">الدقة: %1$d × %2$d</string>
+    <string name="info_duration">المدة: %1$s</string>
+
+    <!-- Save location -->
+    <string name="save_location">مسار الحفظ</string>
+    <string name="save_location_default">تخزين التطبيق (الافتراضي)</string>
+    <string name="choose_folder">اختيار مجلد…</string>
+    <string name="video_locked">هذا الفيديو مقفل</string>
+    <string name="share_failed">تعذّرت مشاركة هذا الفيديو</string>
+
+    <!-- Streaming / saved links -->
+    <string name="save_link">حفظ الرابط</string>
+    <string name="link_saved">حُفظ الرابط في المكتبة</string>
+    <string name="link_badge">رابط محفوظ</string>
+
+    <!-- Protected videos -->
+    <string name="protected_videos">الفيديوهات الخاصة</string>
+    <string name="protected_set_pin_hint">أصبح خاصًا. عيّن رمزًا/بصمة من الإعدادات ← الأمان لقفل حقيقي.</string>
+    <string name="protected_moved_hint">نُقل إلى الفيديوهات الخاصة (القائمة ← الفيديوهات الخاصة).</string>
+    <string name="protected_title">خاص · %1$d</string>
+    <string name="protected_need_lock">فعّل بصمة أو قفل شاشة على هاتفك لفتح الفيديوهات الخاصة.</string>
+
+    <!-- Categories -->
+    <string name="category">التصنيف</string>
+    <string name="category_none">بدون تصنيف</string>
+    <string name="category_all">كل التصنيفات</string>
+    <string name="set_category">تعيين التصنيف</string>
+    <string name="tags">الوسوم</string>
+    <string name="edit_tags">تعديل الوسوم</string>
+    <string name="tags_hint">مفصولة بفواصل، مثل: رحلة، 2024، أطفال</string>
+    <string name="save_filters">حفظ الفلاتر…</string>
+    <string name="save_filters_hint">سمِّ هذا البحث</string>
+    <string name="saved_searches">عمليات البحث المحفوظة</string>
+    <string name="saved">تم الحفظ</string>
+    <string name="share_add_to_library">إضافة إلى مكتبة الفيديو</string>
+    <string name="private_video">خصوصية إضافية</string>
+    <string name="private_video_label">🔒 خاص</string>
+    <string name="create_vault_password">تعيين كلمة مرور خاصة</string>
+    <string name="vault_password_explain">كلمة المرور هذه منفصلة عن قفل التطبيق، وتُخفي أغلفة هذه المقاطع حتى تُدخلها.</string>
+    <string name="enter_vault_password">أدخل كلمة المرور الخاصة</string>
+    <string name="vault_password_hint">كلمة المرور الخاصة</string>
+    <string name="vault_confirm_hint">تأكيد كلمة المرور</string>
+    <string name="vault_password_too_short">كلمة المرور 4 أحرف على الأقل</string>
+    <string name="vault_passwords_mismatch">كلمتا المرور غير متطابقتين</string>
+    <string name="category_hint">اسم التصنيف</string>
+    <string name="category_general">عام</string>
+    <string name="category_education">تعليمي</string>
+    <string name="category_entertainment">ترفيه</string>
+    <string name="category_music">موسيقى</string>
+    <string name="category_sports">رياضة</string>
+    <string name="category_news">أخبار</string>
+    <string name="category_cooking">طبخ</string>
+    <string name="category_tech">تقنية</string>
+    <string name="category_religion">دين</string>
+    <string name="category_kids">أطفال</string>
+    <string name="manage_categories">إدارة التصنيفات</string>
+    <string name="add_category">إضافة تصنيف</string>
+    <string name="no_categories">لا توجد تصنيفات بعد. اضغط + لإضافة تصنيف.</string>
+    <string name="reorder">إعادة الترتيب</string>
+    <string name="delete_category_message">حذف التصنيف \"%1$s\"؟ تبقى الفيديوهات لكن تصبح بدون تصنيف.</string>
+
+    <!-- إظهار/إخفاء التصنيف وحمايته بكلمة مرور -->
+    <string name="edit_category">تعديل التصنيف</string>
+    <string name="hide_clips">إخفاء المقاطع من المكتبة</string>
+    <string name="protect_section">حماية هذا القسم</string>
+    <string name="section_password_hint">كلمة مرور القسم</string>
+    <string name="section_password_change_hint">كلمة مرور جديدة (اتركها فارغة للإبقاء على الحالية)</string>
+    <string name="manage_password">كلمة مرور الإدارة</string>
+    <string name="manage_password_hint">كلمة المرور (اتركها فارغة لإزالة الحماية)</string>
+    <string name="manage_locked_title">إدارة التصنيفات محمية</string>
+    <string name="locked_section_title">قسم محمي — أدخل كلمة مروره</string>
+    <string name="toggle_visibility">إظهار / إخفاء</string>
+    <string name="category_password">كلمة المرور</string>
+    <string name="state_hidden">مخفي</string>
+    <string name="state_locked">محمي</string>
+    <string name="set_password_title">حماية بكلمة مرور</string>
+    <string name="remove_password_title">إزالة كلمة المرور</string>
+    <string name="open_locked_title">تصنيف محمي</string>
+    <string name="enter_password">أدخل كلمة المرور</string>
+    <string name="enter_new_password">كلمة مرور جديدة</string>
+    <string name="enter_current_password">كلمة المرور الحالية</string>
+    <string name="password_set">تم حماية التصنيف</string>
+    <string name="password_removed">تمت إزالة كلمة المرور</string>
+    <string name="wrong_password">كلمة المرور غير صحيحة</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_thumbnail">مصغّرة الفيديو</string>
+    <string name="cd_favorite">مفضلة</string>
+    <string name="cd_back">رجوع</string>
+    <string name="cd_lock">قفل عناصر التحكم</string>
+    <string name="cd_rotate">تدوير</string>
+    <string name="cd_pip">صورة داخل صورة</string>
+    <string name="cd_background">التشغيل في الخلفية</string>
+    <string name="cd_import">استيراد الفيديوهات</string>
+    <string name="cd_resize">تحجيم الفيديو</string>
+
+    <!-- Hide floating text on video (playback overlay) -->
+    <string name="hide_text">تغطية النص</string>
+    <string name="hide_text_hint">اسحب لتغطية النص، واسحب الزاوية لتغيير الحجم. افتح القائمة واضغط «تغطية النص» مجدداً للتثبيت.</string>
+    <string name="hide_text_cleared">أُزيلت التغطية</string>
+    <string name="hide_text_remove">إزالة التغطية</string>
+    <string name="background_play">تشغيل بالخلفية (صوت فقط)</string>
+
+    <!-- Player resize modes -->
+    <string name="resize_fit">احتواء</string>
+    <string name="resize_zoom">تكبير (قص)</string>
+    <string name="resize_fill">ملء (تمديد)</string>
+
+    <!-- "+" add sheet -->
+    <string name="add_sheet_title">إضافة إلى المكتبة</string>
+    <string name="add_browser_desc">افتح أي موقع والتقط الفيديو منه</string>
+    <string name="add_search_desc">ابحث في المنصّات ونزّل مباشرة</string>
+    <string name="add_link_desc">الصق رابط فيديو لتنزيله</string>
+    <string name="add_downloads_desc">تابع مهام التنزيل الجارية</string>
+    <string name="add_import_desc">أضِف فيديوهات موجودة على جهازك</string>
+    <string name="browser_intro_title">ما فائدة المتصفّح؟</string>
+    <string name="browser_intro_message">افتح أي موقع، شغّل فيديو، وسيكتشفه هذا المتصفّح ويعرض زر تنزيل — استخدمه للمواقع التي لا يدعمها التنزيل المباشر، أو عند فشل رابط.</string>
+    <string name="got_it">حسنًا</string>
+
+    <!-- In-app update check -->
+    <string name="update_available_title">يتوفّر تحديث</string>
+    <string name="update_available_message">يتوفّر إصدار أحدث (%1$s). هل تريد تنزيله الآن؟</string>
+    <string name="update_download">تنزيل</string>
+    <string name="update_skip">تخطّي هذا الإصدار</string>
+    <string name="later">لاحقًا</string>
+    <string name="check_updates">التحقق من التحديثات</string>
+    <string name="check_updates_desc">ابحث عن إصدار أحدث</string>
+    <string name="checking_updates">جارٍ التحقق…</string>
+    <string name="up_to_date">أنت على أحدث إصدار</string>
+    <string name="update_check_failed">تعذّر التحقق من التحديثات. تحقّق من الاتصال وأعد المحاولة.</string>
+    <string name="crash_log">سجل الأعطال</string>
+    <string name="crash_log_desc">عرض أو مشاركة آخر عطل</string>
+    <string name="no_crash_log">لا توجد أعطال مسجّلة — كل شيء سليم</string>
+    <string name="clear">مسح</string>
+
+    <!-- First-launch onboarding -->
+    <string name="choose_language">اختر لغتك</string>
+    <string name="guide_prompt_title">دليل الاستخدام</string>
+    <string name="guide_prompt_message">هل تريد إلقاء نظرة سريعة على الدليل التفاعلي لتتعرّف على إمكانات التطبيق؟</string>
+    <string name="view_guide">عرض الدليل</string>
+
+    <!-- Player subtitles -->
+    <string name="subtitles_add">إضافة ترجمة (ملف SRT/VTT)</string>
+    <string name="subtitles_loaded">تم تحميل الترجمة</string>
+    <string name="loop_one">تكرار هذا المقطع</string>
+    <string name="loop_on">التكرار مُفعّل</string>
+    <string name="loop_off">التكرار مُوقف</string>
+    <string name="sleep_timer">مؤقّت النوم</string>
+    <string name="sleep_minutes">%1$d دقيقة</string>
+    <string name="sleep_off">إيقاف</string>
+    <string name="sleep_set">مؤقّت النوم: %1$d دقيقة</string>
+    <string name="sleep_cancelled">أُوقف مؤقّت النوم</string>
+    <string name="sleep_done">أُوقف التشغيل (مؤقّت النوم)</string>
+    <string name="capture_frame">التقاط لقطة</string>
+    <string name="capturing_frame">جارٍ الالتقاط…</string>
+    <string name="frame_saved">حُفظت اللقطة في المعرض</string>
+    <string name="frame_failed">تعذّر التقاط اللقطة</string>
+    <string name="captured_frame">لقطة ملتقطة</string>
+
+    <!-- Shared-video receiver -->
+    <string name="shared_video">فيديو مُشارَك</string>
+    <string name="shared_image">صورة مُشارَكة</string>
+    <string name="share_saved">تم حفظ %1$d عنصرًا في مكتبتك</string>
+    <string name="share_save_failed">تعذّر حفظ الفيديو المُشارَك</string>
+
+    <!-- Playlists -->
+    <string name="playlists">قوائم التشغيل</string>
+    <string name="playlists_empty">لا توجد قوائم تشغيل بعد. اضغط + لإنشاء واحدة.</string>
+    <string name="playlist_empty">لا توجد مقاطع في هذه القائمة بعد.</string>
+    <string name="playlist_new">قائمة جديدة</string>
+    <string name="playlist_name_hint">اسم القائمة</string>
+    <string name="playlist_delete_confirm">حذف «%1$s»؟</string>
+    <string name="playlist_remove_video">إزالة من القائمة</string>
+    <string name="playlist_removed">أُزيل من القائمة</string>
+    <string name="play_all">تشغيل الكل</string>
+    <string name="add_to_playlist">إضافة إلى قائمة</string>
+    <string name="playlist_added">أُضيف إلى القائمة</string>
+    <string name="close">إغلاق</string>
+    <string name="quick_preview">معاينة سريعة</string>
+    <string name="preview_loading">جارٍ تجهيز المعاينة…</string>
+    <string name="preview_failed">تعذّر إنشاء معاينة لهذا المقطع</string>
+    <plurals name="playlist_video_count">
+        <item quantity="zero">لا مقاطع</item>
+        <item quantity="one">مقطع واحد</item>
+        <item quantity="two">مقطعان</item>
+        <item quantity="few">%d مقاطع</item>
+        <item quantity="many">%d مقطعًا</item>
+        <item quantity="other">%d مقطع</item>
+    </plurals>
+    <string name="continue_watching">متابعة المشاهدة</string>
+</resources>

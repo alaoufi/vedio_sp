@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="3dp"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/thumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="84dp"
+                android:background="#20000000"
+                android:contentDescription="@string/cd_thumbnail"
+                android:scaleType="centerCrop"
+                tools:src="@drawable/ic_video_placeholder" />
+
+            <TextView
+                android:id="@+id/duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="6dp"
+                android:background="@color/scrim"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="2dp"
+                android:textColor="@color/white"
+                android:textSize="11sp"
+                tools:text="3:24" />
+
+            <ImageView
+                android:id="@+id/favoriteIcon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="top|start"
+                android:layout_margin="6dp"
+                android:padding="5dp"
+                android:background="@drawable/bg_control_scrim"
+                android:clickable="true"
+                android:focusable="true"
+                android:src="@drawable/ic_favorite_border"
+                android:contentDescription="@string/cd_favorite" />
+
+            <ImageView
+                android:id="@+id/lockIcon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="bottom|start"
+                android:layout_margin="6dp"
+                android:src="@drawable/ic_lock"
+                app:tint="@color/white"
+                android:background="@drawable/bg_control_scrim"
+                android:padding="3dp"
+                android:contentDescription="@string/cd_lock"
+                android:visibility="gone" />
+
+            <!-- Shown for saved links (streamed, not downloaded). -->
+            <ImageView
+                android:id="@+id/linkBadge"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="bottom|start"
+                android:layout_margin="6dp"
+                android:src="@drawable/ic_link"
+                app:tint="@color/white"
+                android:background="@drawable/bg_control_scrim"
+                android:padding="3dp"
+                android:contentDescription="@string/link_badge"
+                android:visibility="gone" />
+
+            <ImageButton
+                android:id="@+id/menuButton"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="top|end"
+                android:layout_margin="4dp"
+                android:padding="4dp"
+                android:background="@drawable/bg_control_scrim"
+                android:src="@drawable/ic_more_vert"
+                app:tint="@color/white"
+                android:contentDescription="@string/more_options" />
+
+            <View
+                android:id="@+id/selectionOverlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/selection_overlay"
+                android:visibility="gone" />
+
+            <!-- Resume progress: how far this clip has been watched. Hidden until
+                 playback has actually started (see VideoPagingAdapter). -->
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/watchProgress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:max="1000"
+                android:visibility="gone"
+                app:trackCornerRadius="0dp"
+                app:trackThickness="3dp"
+                app:indicatorColor="?attr/colorPrimary"
+                app:trackColor="#33000000" />
+        </FrameLayout>
+
+        <!-- Info strip below the thumbnail. Its background is tinted at runtime
+             with a colour pulled from the thumbnail (see VideoPagingAdapter) so
+             each cover feels cohesive; falls back to the card surface. -->
+        <LinearLayout
+            android:id="@+id/infoStrip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Title on its own full-width line below the thumbnail. -->
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:paddingHorizontal="8dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="4dp"
+                android:textSize="12sp"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                tools:text="Sample video title" />
+
+            <!-- Category chip so the clip's category is visible at a glance. -->
+            <TextView
+                android:id="@+id/category"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/bg_category_chip"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="2dp"
+                android:textColor="?attr/colorOnSecondaryContainer"
+                android:textSize="11sp"
+                android:visibility="gone"
+                tools:text="Music"
+                tools:visibility="visible" />
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>User Guide</title>
+<style>
+  :root{
+    color-scheme: light dark;
+    --bg:#0e1020; --card:rgba(255,255,255,.06); --stroke:rgba(255,255,255,.14);
+    --txt:#f2f3ff; --muted:#b9bce0; --accent:#8b7bff; --accent2:#38e0c8; --shadow:rgba(0,0,0,.5);
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#eef0ff; --card:rgba(255,255,255,.7); --stroke:rgba(20,20,60,.10);
+           --txt:#151633; --muted:#4a4d78; --shadow:rgba(60,60,120,.20); }
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ margin:0; padding:0; }
+  body{ font-family:-apple-system,Roboto,"Segoe UI",sans-serif; color:var(--txt); background:var(--bg);
+    overflow-x:hidden; line-height:1.65; -webkit-text-size-adjust:100%; }
+  .aurora{ position:fixed; inset:-30% -10% auto -10%; height:120%; z-index:-1; filter:blur(60px); opacity:.9; }
+  .aurora span{ position:absolute; border-radius:50%; mix-blend-mode:screen; animation:float 14s ease-in-out infinite; }
+  .aurora .a{ width:55vw;height:55vw; left:-10vw; top:-10vw; background:radial-gradient(circle,#7b5bff,transparent 60%); }
+  .aurora .b{ width:50vw;height:50vw; right:-8vw; top:8vw; background:radial-gradient(circle,#19d3c5,transparent 60%); animation-delay:-4s; }
+  .aurora .c{ width:48vw;height:48vw; left:12vw; top:38vw; background:radial-gradient(circle,#ff6ea9,transparent 60%); animation-delay:-8s; }
+  @keyframes float{ 0%,100%{ transform:translate3d(0,0,0) scale(1);} 33%{ transform:translate3d(6vw,4vw,0) scale(1.1);} 66%{ transform:translate3d(-5vw,2vw,0) scale(.95);} }
+  .wrap{ max-width:680px; margin:0 auto; padding:18px 16px 60px; }
+  .hero{ text-align:center; padding:34px 8px 20px; perspective:900px; }
+  .emblem{ width:104px;height:104px;margin:0 auto 14px; border-radius:28px; display:flex;align-items:center;justify-content:center;
+    font-size:52px; background:linear-gradient(145deg,#8b7bff,#38e0c8);
+    box-shadow:0 18px 40px rgba(90,70,255,.45), inset 0 2px 6px rgba(255,255,255,.5);
+    transform-style:preserve-3d; transition:transform .1s linear; will-change:transform; }
+  .emblem b{ transform:translateZ(30px); filter:drop-shadow(0 6px 10px rgba(0,0,0,.35)); }
+  .hero h1{ font-size:1.7rem; margin:2px 0 6px;
+    background:linear-gradient(90deg,var(--txt),var(--accent)); -webkit-background-clip:text; background-clip:text; }
+  .hero p{ color:var(--muted); font-size:1.02rem; margin:0 auto; max-width:34em; }
+  .badges{ display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:14px; }
+  .badge{ font-size:.8rem; color:var(--muted); background:var(--card); border:1px solid var(--stroke); padding:5px 12px; border-radius:999px; backdrop-filter:blur(8px); }
+  .hint{ text-align:center; color:var(--muted); font-size:.85rem; margin:18px 0 8px; opacity:.9; }
+  .card{ position:relative; margin:14px 0; border-radius:20px; background:var(--card); border:1px solid var(--stroke);
+    box-shadow:0 10px 30px var(--shadow); backdrop-filter:blur(12px); transform-style:preserve-3d;
+    transition:transform .18s cubic-bezier(.2,.7,.3,1), box-shadow .2s; will-change:transform; overflow:hidden; opacity:0; translate:0 26px; }
+  .card.in{ opacity:1; translate:0 0; transition:opacity .6s ease, translate .6s cubic-bezier(.2,.8,.2,1), transform .18s; }
+  .head{ display:flex; align-items:center; gap:14px; padding:16px; cursor:pointer; transform:translateZ(28px); }
+  .ico{ flex:none; width:52px;height:52px;border-radius:16px; display:flex;align-items:center;justify-content:center; font-size:26px; color:#fff;
+    box-shadow:0 8px 18px rgba(0,0,0,.28), inset 0 1px 3px rgba(255,255,255,.4); }
+  .num{ position:absolute; inset-inline-start:12px; top:10px; font-size:.72rem; font-weight:700; color:var(--muted); opacity:.6; transform:translateZ(10px); }
+  .ttl{ flex:1; font-weight:700; font-size:1.06rem; }
+  .chev{ flex:none; color:var(--muted); transition:transform .3s; font-size:1.2rem; }
+  .card.open .chev{ transform:rotate(180deg); }
+  .body{ max-height:0; overflow:hidden; transition:max-height .45s cubic-bezier(.3,.7,.2,1); padding:0 18px; transform:translateZ(14px); }
+  .card.open .body{ max-height:1400px; }
+  .body .inner{ padding:2px 0 18px; }
+  .body h4{ margin:14px 0 4px; font-size:1rem; color:var(--accent); }
+  .body ul,.body ol{ padding-inline-start:20px; margin:6px 0; }
+  .body li{ margin:5px 0; color:var(--muted); }
+  .body li b, .body p b{ color:var(--txt); }
+  .body p{ margin:6px 0; color:var(--muted); }
+  code{ background:rgba(139,123,255,.20); color:var(--txt); padding:1px 7px; border-radius:6px; font-size:.9em; }
+  .tip{ background:linear-gradient(135deg,rgba(56,224,200,.18),rgba(56,224,200,.06)); border:1px solid rgba(56,224,200,.3); border-radius:12px; padding:9px 13px; margin:10px 0; color:var(--txt); }
+  .warn{ background:linear-gradient(135deg,rgba(255,180,70,.18),rgba(255,180,70,.05)); border:1px solid rgba(255,180,70,.3); border-radius:12px; padding:9px 13px; margin:10px 0; color:var(--txt); }
+  .foot{ text-align:center; color:var(--muted); margin:30px 8px 0; font-size:.95rem; }
+  .progress{ position:fixed; top:0; inset-inline:0; height:3px; z-index:5; background:linear-gradient(90deg,var(--accent),var(--accent2)); width:0; transition:width .1s; box-shadow:0 0 10px var(--accent); }
+</style>
+</head>
+<body>
+<div class="progress" id="prog"></div>
+<div class="aurora"><span class="a"></span><span class="b"></span><span class="c"></span></div>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="emblem" id="emblem"><b>🎬</b></div>
+    <h1>Video Library</h1>
+    <p>Your interactive guide. Everything works offline — your library, downloads and data live only on your device, nothing is uploaded to any server.</p>
+    <div class="badges">
+      <span class="badge">🔒 Fully private</span>
+      <span class="badge">📶 Works offline</span>
+      <span class="badge">🌍 14 languages</span>
+    </div>
+  </header>
+
+  <p class="hint">Tap any card to open it · drag your finger over it for the 3D depth</p>
+
+  <article class="card"><span class="num">01</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,#8b7bff,#5b4bff)">🔑</span><span class="ttl">Activation &amp; free trial</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <p>The app works offline — no account, no online sign-in.</p>
+      <ul>
+        <li><b>Free trial:</b> the first launch starts a <b>10-day free trial</b> automatically; all features are available.</li>
+        <li><b>After the trial:</b> the app asks for an activation code. Your downloads and settings are kept — access just pauses until you renew.</li>
+        <li><b>Activation:</b> the activation screen shows your <b>device number</b>. Send it to the seller, enter the code, then tap <i>Activate</i>.</li>
+        <li><b>Status:</b> open <b>Settings → Subscription</b> to see "Trial · N days left", "Active", or lifetime.</li>
+      </ul>
+      <div class="tip">On Google Play the app can activate automatically the moment your subscription becomes active — no code needed.</div>
+    </div></div>
+  </article>
+
+  <article class="card"><span class="num">02</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,#3ad0b0,#1fa88f)">🔒</span><span class="ttl">Privacy &amp; app lock</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <p>Everything is under <b>Settings → Security</b>:</p>
+      <ul>
+        <li><b>App lock:</b> set a PIN required on every launch.</li>
+        <li><b>Biometrics:</b> unlock with your fingerprint instead of a PIN.</li>
+        <li><b>Block screenshots:</b> prevents screenshots and screen recording in the app.</li>
+        <li><b>Hide from Recents:</b> hides the app preview in the recent-apps switcher.</li>
+      </ul>
+      <h4>Private videos</h4>
+      <p>Lock any clip (from its <code>⋮</code> menu) to move it to the hidden <b>Private</b> section. It disappears from the main library and only returns after a biometric check.</p>
+    </div></div>
+  </article>
+
+  <article class="card"><span class="num">03</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,#ff7eb3,#ff5c8a)">⬇️</span><span class="ttl">Downloading videos</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <h4>From a link</h4>
+      <ol>
+        <li>Copy a video link.</li>
+        <li>Tap <b>+</b> → <b>Download from link</b> (or share the link to this app).</li>
+        <li>Tap <b>Paste</b>, then <b>Fetch info</b>.</li>
+        <li>Choose <b>Full video</b>, <b>Video only</b>, or <b>Audio only</b>, then download.</li>
+      </ol>
+      <h4>Via search</h4>
+      <p>Tap the search icon, type keywords, and tap a result to preview or use its download button.</p>
+      <h4>Where files are saved</h4>
+      <p>Downloads are stored privately in-app. In <b>Settings → Save location</b> you can also place a copy in a folder that shows up in your gallery / file manager.</p>
+      <h4>Import from your device</h4>
+      <p>From <b>+ → Import videos</b> the app scans videos already on your device (gallery, other apps' downloads, WhatsApp…) and lets you add any that aren't in your library yet — no re-downloading. Tap a clip's <b>thumbnail (▶)</b> to preview it before importing.</p>
+    </div></div>
+  </article>
+
+  <article class="card"><span class="num">04</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,#5b9dff,#3d6dff)">🌐</span><span class="ttl">Built-in browser</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <p>Open <b>+ → Browser</b> for a general web browser. Use it for <b>sites the direct downloader doesn't support</b> or <b>when a link fails</b> — it opens any page and automatically detects downloadable media on it.</p>
+      <ol>
+        <li>Type a site or search in the address bar.</li>
+        <li>Play or open the video on the page.</li>
+        <li>When media is detected a <b>Download (N)</b> button appears — tap it, pick the item, and it saves to your library.</li>
+      </ol>
+      <div class="tip">The browser keeps scanning for a few seconds; if the button doesn't appear at once, play the video and wait a moment.</div>
+    </div></div>
+  </article>
+
+  <article class="card"><span class="num">05</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,#ffb057,#ff8a3d)">📥</span><span class="ttl">Managing downloads</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <p>Open <b>+ → Downloads</b> (or tap the download banner) to see active and finished jobs. You can <b>pause</b>, <b>resume</b> and <b>retry</b>. Paused or interrupted downloads resume where they stopped, and a failed download refreshes its link automatically and retries.</p>
+    </div></div>
+  </article>
+
+  <article class="card"><span class="num">06</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,#a978ff,#7d4bff)">📚</span><span class="ttl">The library</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <ul>
+        <li><b>Grid / list:</b> switch from <code>⋮ → Toggle view</code>.</li>
+        <li><b>Search:</b> tap the magnifier; the library filters live.</li>
+        <li><b>Sort:</b> by date, name, duration, size or <b>category</b>.</li>
+        <li><b>Filter:</b> by source, media type and categories — all <b>multi-select</b> (e.g. video + audio together). <b>Chips</b> for the active filters appear atop the library; tap any chip's × to return.</li>
+        <li><b>Favorites:</b> tap the <b>heart</b> on any clip to add/remove it (red heart = favourite). Tap the top heart to show favourites only, and the “Favourites ×” chip to return.</li>
+        <li><b>Categories:</b> each clip shows its category as a badge. Manage them from <code>⋮ → Manage categories</code>.</li>
+        <li><b>Multi-select:</b> long-press to start selection, then set category/favorite or delete in bulk.</li>
+      </ul>
+    </div></div>
+  </article>
+
+  <article class="card"><span class="num">07</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,#ff6a6a,#e23c5a)">▶️</span><span class="ttl">The player</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <ul>
+        <li><b>Continuous play:</b> the next clip plays automatically when one ends.</li>
+        <li><b>Next / previous:</b> from the player's <code>⋮</code> menu.</li>
+        <li><b>Resume:</b> continues where you left off.</li>
+        <li><b>Gestures:</b> swipe on the <b>left half</b> for brightness, the <b>right half</b> for volume.</li>
+        <li><b>Speed:</b> cycle 0.5×–2×.</li>
+        <li><b>Lock controls / resize:</b> fit, crop or stretch.</li>
+        <li><b>Picture-in-picture &amp; background play:</b> keep watching while using other apps.</li>
+        <li><b>Cover floating text:</b> draw a box over on-screen text or a watermark to hide it (<code>⋮ → Cover text</code>).</li>
+      </ul>
+    </div></div>
+  </article>
+
+  <article class="card"><span class="num">08</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,#4fd1c5,#2fb3a8)">✂️</span><span class="ttl">Editing clips</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <p>From a clip's <code>⋮</code> menu you can <b>rename</b> it, <b>edit its description</b>, <b>set its category</b>, add it to <b>Favorites</b>, move it to <b>Private</b>, or <b>delete</b> it (optionally with its file). You can also <b>trim</b> and <b>compress</b> a clip at high quality to save space.</p>
+    </div></div>
+  </article>
+
+  <article class="card"><span class="num">09</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,#f78cff,#c95cff)">🖼️</span><span class="ttl">Image editor</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <p>For saved images: <b>crop</b>, <b>hide</b> a name or watermark with a solid box, <b>add text</b> anywhere, and extract text from the image via <b>OCR</b> (copied to the clipboard). Images are saved clean with no re-encoding artifacts.</p>
+    </div></div>
+  </article>
+
+  <article class="card"><span class="num">10</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,#ff5c5c,#d62f2f)">📺</span><span class="ttl">Ad-free YouTube tab</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <p>From <code>⋮ → YouTube</code> open a clean, ad-free viewer:</p>
+      <ul>
+        <li>Trending content for your region by default.</li>
+        <li>One switch hides Shorts.</li>
+        <li>Search with the magnifier and toggle grid/list.</li>
+      </ul>
+      <p>It's a separate tab and never replaces your library. Go back with Back or <code>⋮ → Library</code>.</p>
+    </div></div>
+  </article>
+
+  <article class="card"><span class="num">11</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,#6ab0ff,#3f7dff)">📊</span><span class="ttl">Statistics</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <p>Open <code>⋮ → Statistics</code> for a dashboard: total videos, total size, total duration, total plays, plus your most-played and recently-played clips and counts by category and by source.</p>
+    </div></div>
+  </article>
+
+  <article class="card"><span class="num">12</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,#9aa0ff,#6a72e8)">⚙️</span><span class="ttl">Language, theme &amp; settings</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <ul>
+        <li><b>Language:</b> Settings → Language — choose from 14 languages; the app switches instantly.</li>
+        <li><b>Theme:</b> system, light or dark.</li>
+        <li><b>Wi-Fi only:</b> download over Wi-Fi only.</li>
+        <li><b>Concurrent downloads:</b> how many download at once.</li>
+        <li><b>Save location:</b> where a copy of downloads is stored.</li>
+        <li><b>User guide:</b> always opens in the app's current language.</li>
+        <li><b>Check for updates:</b> under About — looks for a newer version and offers to download it. The app also checks automatically when online and prompts you when a new version is available.</li>
+      </ul>
+    </div></div>
+  </article>
+
+  <article class="card"><span class="num">13</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,#3ad0b0,#159c86)">💾</span><span class="ttl">Backup &amp; restore</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <p>In <b>Settings</b>, export an <b>encrypted backup</b> of your library protected by a password, and restore it later with the same password.</p>
+      <div class="warn">Keep the password safe — without it the backup cannot be opened.</div>
+    </div></div>
+  </article>
+
+  <article class="card"><span class="num">14</span>
+    <div class="head"><span class="ico" style="background:linear-gradient(145deg,#ffa057,#f0762f)">❓</span><span class="ttl">Troubleshooting &amp; FAQ</span><span class="chev">⌄</span></div>
+    <div class="body"><div class="inner">
+      <h4>A download failed</h4>
+      <p>Links from some sites expire quickly. Open <b>Downloads</b> and tap retry — the app fetches a fresh link and continues. Check your connection and that the post is public.</p>
+      <h4>A post won't download</h4>
+      <p>Extraction depends on the platform (TikTok / YouTube) and can occasionally fail — make sure the post is public and try again later. For other sites, use the <b>built-in browser</b> to capture the video.</p>
+      <h4>Audio plays as a black screen</h4>
+      <p>Make sure you chose <b>Audio only</b> when downloading; audio files show the cover art instead of a video frame.</p>
+      <h4>The app locked itself</h4>
+      <p>Your trial or subscription ended. Your downloads are safe — renew (enter a code, or subscribe via Google Play) to continue.</p>
+      <h4>Is anything sent to a server?</h4>
+      <p>No. The app has no backend server. It only connects to the video's own site to fetch what you asked to download.</p>
+    </div></div>
+  </article>
+
+  <p class="foot">✨ That's the whole app. Enjoy your video library.</p>
+</div>
+
+<script>
+(function(){
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
+  cards.forEach(function(card){
+    card.querySelector('.head').addEventListener('click', function(){ card.classList.toggle('open'); });
+  });
+  function tilt(el, maxDeg){
+    var raf;
+    function move(x, y){
+      var r = el.getBoundingClientRect();
+      var px = (x - r.left) / r.width - .5, py = (y - r.top) / r.height - .5;
+      if(raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(function(){
+        el.style.transform = 'perspective(800px) rotateY(' + (px*maxDeg) + 'deg) rotateX(' + (-py*maxDeg) + 'deg)';
+      });
+    }
+    function reset(){ el.style.transform = 'perspective(800px) rotateY(0) rotateX(0)'; }
+    el.addEventListener('pointermove', function(e){ move(e.clientX, e.clientY); }, {passive:true});
+    el.addEventListener('pointerleave', reset);
+    el.addEventListener('pointercancel', reset);
+    el.addEventListener('pointerup', reset);
+  }
+  cards.forEach(function(c){ tilt(c, 7); });
+  var emblem = document.getElementById('emblem');
+  function setEmblem(rx, ry){ emblem.style.transform = 'rotateX(' + rx + 'deg) rotateY(' + ry + 'deg)'; }
+  if(window.DeviceOrientationEvent){
+    window.addEventListener('deviceorientation', function(e){
+      setEmblem(Math.max(-18,Math.min(18,-(e.beta||0)/6)), Math.max(-18,Math.min(18,(e.gamma||0)/2.5)));
+    }, true);
+  }
+  document.addEventListener('pointermove', function(e){
+    setEmblem(-(e.clientY/window.innerHeight - .5)*20, (e.clientX/window.innerWidth - .5)*26);
+  }, {passive:true});
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); } });
+    }, {threshold:.12});
+    cards.forEach(function(c){ io.observe(c); });
+  } else { cards.forEach(function(c){ c.classList.add('in'); }); }
+  var prog = document.getElementById('prog');
+  document.addEventListener('scroll', function(){
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    prog.style.width = (h>0 ? (window.scrollY/h*100) : 0) + '%';
+  }, {passive:true});
+  if(cards[0]) cards[0].classList.add('open');
+})();
+</script>
+</body>
+</html>

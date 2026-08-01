@@ -1,0 +1,66 @@
+name: Build APK
+
+# Builds a debug APK on every push and publishes it to a GitHub Release so it has a
+# stable, direct download link:
+#   https://github.com/alaoufi/vedio_sp/releases/download/apk-latest/app-debug.apk
+# The APK is also uploaded as a run artifact.
+on:
+  push:
+    branches: ["**"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Build debug APK
+        run: >-
+          ./gradlew assembleDebug --stacktrace
+          -PversionCode=${{ github.run_number }}
+          -PversionName=1.0.${{ github.run_number }}
+
+      - name: Upload APK artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-video-library-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+
+      - name: Remove old APK assets (renamed to vedio_lb.apk)
+        if: success()
+        run: |
+          gh release delete-asset apk-latest app-debug.apk -y || true
+          gh release delete-asset apk-latest مكتبة-الفيديو.apk -y || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish APK to a Release (direct link)
+        if: success()
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-latest
+          name: My Video Library — v1.0.${{ github.run_number }}
+          body: |
+            Version 1.0.${{ github.run_number }} (debug), rebuilt automatically on each push.
+            Direct link: https://github.com/${{ github.repository }}/releases/download/apk-latest/vedio_lb.apk
+          files: app/build/outputs/apk/debug/*.apk

@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Video Library</string>
+
+    <!-- Tabs / YouTube -->
+    <string name="tab_library">Library</string>
+    <string name="tab_youtube">YouTube</string>
+    <string name="hide_shorts">Itago ang Shorts</string>
+    <string name="youtube_search_hint">Maghanap sa YouTube</string>
+    <string name="youtube_tab_hint">Maghanap sa YouTube — panoorin nang walang ad o i-download. Nakatago ang Shorts.</string>
+
+    <!-- Library -->
+    <string name="library_stats">%1$d na video · %2$s</string>
+    <string name="filter_all">Lahat</string>
+    <string name="filter">I-filter</string>
+    <string name="filter_source">Pinagmulan</string>
+    <string name="filter_folder">Folder</string>
+    <string name="filter_type">Uri</string>
+    <string name="type_video">Video</string>
+    <string name="type_audio">Audio</string>
+    <string name="type_image">Larawan</string>
+    <string name="source_tiktok">TikTok</string>
+    <string name="source_youtube">YouTube</string>
+    <string name="source_instagram">Instagram</string>
+    <string name="source_snapchat">Snapchat</string>
+    <string name="source_other">Iba pa</string>
+    <string name="search_hint">Maghanap ng mga video</string>
+    <string name="empty_library_title">Walang laman ang iyong library</string>
+    <string name="empty_library_message">I-tap ang + na button para mag-import ng mga video mula sa iyong device.</string>
+
+    <!-- Selection -->
+    <string name="selected_count">%1$d ang napili</string>
+    <string name="delete_videos_title">Burahin ang mga video</string>
+    <string name="delete_videos_message">Alisin sa library lamang, o burahin din ang mga file na pag-aari ng app?</string>
+    <string name="delete_files">Burahin ang mga file</string>
+    <string name="remove_only">Alisin lamang</string>
+    <string name="move_to_folder">Ilipat sa folder</string>
+    <string name="no_folder">Walang folder</string>
+
+    <!-- Sort -->
+    <string name="sort_by">Ayusin ayon sa</string>
+    <string name="sort_date_new">Petsa ng pagdagdag (pinakabago)</string>
+    <string name="sort_date_old">Petsa ng pagdagdag (pinakaluma)</string>
+    <string name="sort_name_az">Pangalan (A–Z)</string>
+    <string name="sort_name_za">Pangalan (Z–A)</string>
+    <string name="sort_duration_long">Tagal (pinakamahaba)</string>
+    <string name="sort_duration_short">Tagal (pinakamaikli)</string>
+    <string name="sort_size_large">Laki (pinakamalaki)</string>
+    <string name="sort_size_small">Laki (pinakamaliit)</string>
+    <string name="sort_category">Kategorya</string>
+
+    <!-- Folders -->
+    <string name="new_folder">Bagong folder</string>
+    <string name="folder_name_hint">Pangalan ng folder</string>
+    <string name="create">Gumawa</string>
+    <string name="cancel">Kanselahin</string>
+    <string name="apply">Ilapat</string>
+    <string name="play_next">Susunod</string>
+    <string name="play_previous">Nakaraan</string>
+    <string name="autoplay">Awtomatikong ituloy ang susunod</string>
+    <string name="language">Wika</string>
+    <string name="language_system">Default ng system</string>
+    <string name="user_guide">Gabay sa gumagamit</string>
+    <string name="user_guide_desc">Paano gamitin ang bawat tampok</string>
+
+    <!-- Menu -->
+    <string name="action_toggle_view">I-toggle ang view</string>
+    <string name="action_sort">Ayusin</string>
+    <string name="action_favorites">Mga paborito</string>
+    <string name="action_new_folder">Bagong folder</string>
+
+    <!-- Import -->
+    <string name="import_title">Mag-import ng mga video</string>
+    <string name="import_select_all">Piliin lahat</string>
+    <string name="import_selected_count">Mag-import (%1$d)</string>
+    <string name="import_item_meta">%1$s · %2$s</string>
+    <string name="import_done">Na-import ang %1$d na video</string>
+    <string name="import_empty">Walang bagong video na nakita sa device na ito</string>
+    <string name="permission_denied_media">Kailangan ang media permission para mag-import ng mga video.</string>
+
+    <!-- Player -->
+    <string name="speed_format">%.2f×</string>
+    <string name="playback_error">Hindi mapatugtog ang video na ito</string>
+    <string name="brightness_label">Liwanag %1$d%%</string>
+    <string name="volume_label">Lakas ng tunog %1$d%%</string>
+
+    <!-- Downloads -->
+    <string name="downloads_title">Mga Download</string>
+    <string name="downloads_empty">Wala pang mga download</string>
+    <string name="downloading_banner">Nagda-download ng %1$d · %2$d%%</string>
+    <string name="clear_completed">I-clear ang nakumpleto</string>
+    <string name="action_downloads">Mga Download</string>
+    <string name="action_resume">Ituloy</string>
+    <string name="action_pause">I-pause</string>
+    <string name="action_retry">Subukang muli</string>
+    <string name="status_waiting">Naghihintay…</string>
+    <string name="status_downloading">%1$d%% · %2$s</string>
+    <string name="status_paused">Naka-pause</string>
+    <string name="status_completed">Nakumpleto · %1$s</string>
+    <string name="status_failed">Nabigo</string>
+    <string name="status_canceled">Kinansela</string>
+    <string name="download_channel_name">Mga Download</string>
+    <string name="download_channel_desc">Ipinapakita ang progreso ng mga pag-download ng video</string>
+    <string name="download_preparing">Naghahanda…</string>
+    <string name="download_complete">Kumpleto na ang download</string>
+    <string name="download_failed">Nabigo ang download</string>
+
+    <!-- Add download (providers) -->
+    <string name="search_title">Maghanap at i-download</string>
+    <string name="action_search">Maghanap</string>
+    <string name="tiktok_link_hint">Walang keyword search ang TikTok — i-paste ang isang TikTok link, pagkatapos ay pindutin ang Maghanap para i-download ito.</string>
+    <string name="link_only_hint">Walang keyword search dito — i-paste ang link ng pampublikong post, pagkatapos ay pindutin ang Maghanap para i-download ito. Ang Instagram/Snapchat ay gumagana para sa mga pampublikong post lamang.</string>
+    <string name="add_download_title">I-download mula sa link</string>
+    <string name="add_download_hint">I-paste ang isang link ng TikTok, YouTube, Instagram o Snapchat. Ang mga video ng TikTok ay nase-save nang walang watermark. Ang Instagram at Snapchat ay gumagana lamang para sa mga pampublikong post. Ang pag-extract ay depende sa platform at maaaring paminsan mabigo.</string>
+    <string name="paste_url_hint">URL ng video</string>
+    <string name="paste">I-paste</string>
+    <string name="fetch_info">Kunin ang impormasyon</string>
+    <string name="download">I-download</string>
+    <string name="download_started">Naidagdag ang download sa pila</string>
+    <string name="download_options">Mga opsyon sa pag-download</string>
+    <string name="kind_full">Buong video (tunog + larawan)</string>
+    <string name="kind_video_only">Video na walang tunog</string>
+    <string name="kind_audio_only">Audio lamang</string>
+    <string name="kind_image_only">Larawan lamang (cover)</string>
+    <string name="action_add_download">I-download mula sa link</string>
+    <string name="error_invalid_link">Hindi wasto ang link na ito.</string>
+    <string name="error_private">Pribado ang video na ito.</string>
+    <string name="error_not_found">Hindi natagpuan o nabura ang video.</string>
+    <string name="error_unsupported">Hindi suportado ang link na ito.</string>
+    <string name="error_network">May error sa network. Suriin ang iyong koneksyon.</string>
+    <string name="error_extraction">Hindi ma-extract ang video. Maaaring nagbago ang pinagmulan.</string>
+    <string name="error_unknown">May nangyaring mali.</string>
+
+    <!-- Security / lock -->
+    <string name="unlock_title">I-unlock</string>
+    <string name="unlock">I-unlock</string>
+    <string name="pin_hint">Ilagay ang PIN</string>
+    <string name="wrong_pin">Maling PIN</string>
+    <string name="use_biometric">Gamitin ang fingerprint</string>
+    <string name="use_pin">Gamitin ang PIN</string>
+    <string name="unlock_biometric_subtitle">Mag-authenticate para buksan ang iyong library</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Mga Setting</string>
+    <string name="section_about">Tungkol</string>
+    <string name="version">Bersyon</string>
+    <string name="action_settings">Mga Setting</string>
+    <string name="section_appearance">Hitsura</string>
+    <string name="section_downloads">Mga Download</string>
+    <string name="section_security">Seguridad</string>
+    <string name="section_storage">Imbakan at backup</string>
+    <string name="theme">Tema</string>
+    <string name="theme_system">Sundan ang system</string>
+    <string name="theme_light">Maliwanag</string>
+    <string name="theme_dark">Madilim</string>
+    <string name="wifi_only">Mga download sa Wi-Fi lamang</string>
+    <string name="wifi_only_desc">Mag-download lamang sa unmetered na network</string>
+    <string name="max_concurrent">Pinakamaraming sabay-sabay na download</string>
+    <string name="app_lock">App lock</string>
+    <string name="app_lock_desc">Mangailangan ng PIN para buksan ang app</string>
+    <string name="change_pin">Palitan ang PIN</string>
+    <string name="biometric">Fingerprint unlock</string>
+    <string name="prevent_screenshots">Pigilan ang mga screenshot</string>
+    <string name="hide_recents">Itago ang nilalaman sa recent apps</string>
+    <string name="storage_used">Ginamit na imbakan</string>
+    <string name="clear_cache">I-clear ang cache</string>
+    <string name="cache_cleared">Na-clear ang cache</string>
+    <string name="backup">Backup</string>
+    <string name="backup_desc">Mag-export ng naka-encrypt na backup file</string>
+    <string name="restore">I-restore</string>
+    <string name="set_pin">Magtakda ng PIN</string>
+    <string name="save">I-save</string>
+    <string name="pin_length_error">Ang PIN ay dapat 4–12 na digit</string>
+    <string name="backup_encrypt_title">I-encrypt ang backup</string>
+    <string name="backup_encrypt_message">Pumili ng password. Kakailanganin mo ito para mag-restore.</string>
+    <string name="backup_password_hint">Password</string>
+    <string name="export">I-export</string>
+    <string name="password_too_short">Ang password ay dapat hindi bababa sa 6 na karakter</string>
+    <string name="restore_title">I-restore ang backup</string>
+    <string name="restore_message">Ilagay ang password na ginamit para gawin ang backup na ito.</string>
+    <string name="backup_exported">Na-save ang backup: %1$s</string>
+    <string name="backup_restored">Na-restore ang %1$d na video</string>
+    <string name="backup_restore_failed">Nabigo ang pag-restore — maling password o sirang file</string>
+
+    <!-- Per-video actions -->
+    <string name="delete">Burahin</string>
+    <string name="play">Patugtugin</string>
+    <string name="action_share">Ibahagi</string>
+    <string name="rename">Palitan ang pangalan</string>
+    <string name="more_options">Higit pang mga opsyon</string>
+    <string name="open_source">Buksan sa pinagmulan</string>
+    <string name="favorite">Idagdag sa mga paborito</string>
+    <string name="unfavorite">Alisin sa mga paborito</string>
+    <string name="lock_video">Pribado</string>
+    <string name="unlock_video">Pribado</string>
+
+    <!-- Activation -->
+    <string name="activation_title">I-activate ang app</string>
+    <string name="activation_desc">Ipadala ang iyong device number sa developer para makatanggap ng activation code. Gumagana nang offline.</string>
+    <string name="activation_device_id">Device number</string>
+    <string name="activation_copy_device">Kopyahin ang device number</string>
+    <string name="activation_copied">Nakopya ✓</string>
+    <string name="activation_code_hint">Ilagay ang activation code</string>
+    <string name="activation_activate">I-activate</string>
+    <string name="activation_invalid">Hindi wastong code para sa device na ito.</string>
+    <string name="activation_owner_recovery">Pag-recover ng may-ari (lihim na seed)</string>
+    <string name="activation_seed_hint">Seed ng may-ari (64 na hex)</string>
+    <string name="activation_seed_invalid">Hindi tumugma ang seed.</string>
+    <string name="activation_activated">Na-activate ✅</string>
+    <string name="activation_status">Lisensya</string>
+    <string name="activation_status_permanent">Na-activate (permanente)</string>
+    <string name="activation_status_days">Na-activate · %1$d na araw ang natitira</string>
+    <string name="activation_deactivate">I-deactivate (i-lock muli)</string>
+
+    <!-- Image editor -->
+    <string name="edit_image">I-edit ang larawan</string>
+    <string name="editor_hint">I-drag sa larawan para pumili ng rehiyon</string>
+    <string name="editor_crop">I-crop</string>
+    <string name="editor_hide">Itago</string>
+    <string name="editor_text">Teksto</string>
+    <string name="editor_add">Idagdag</string>
+    <string name="editor_extract_text">I-extract ang teksto</string>
+    <string name="editor_need_selection">I-drag muna para pumili ng rehiyon</string>
+    <string name="editor_ocr_running">Binabasa ang teksto…</string>
+    <string name="editor_ocr_empty">Walang nakitang teksto</string>
+    <string name="editor_ocr_copied">Nakopya ang teksto</string>
+    <string name="editor_saved">Na-save sa library</string>
+    <string name="color_white">Puti</string>
+    <string name="color_yellow">Dilaw</string>
+    <string name="color_red">Pula</string>
+    <string name="color_black">Itim</string>
+
+    <!-- File info -->
+    <string name="file_info">Impormasyon ng file</string>
+    <string name="edit_info">I-edit ang impormasyon</string>
+    <string name="info_title_hint">Pamagat</string>
+    <string name="info_desc_hint">Paglalarawan / mga tala</string>
+    <string name="info_description">Mga tala: %1$s</string>
+    <string name="info_format">Format: %1$s</string>
+    <string name="info_type">Uri: %1$s</string>
+    <string name="info_size">Laki: %1$s</string>
+    <string name="info_resolution">Resolusyon: %1$d × %2$d</string>
+    <string name="info_duration">Tagal: %1$s</string>
+
+    <!-- Save location -->
+    <string name="save_location">Lokasyon ng pag-save</string>
+    <string name="save_location_default">Imbakan ng app (default)</string>
+    <string name="choose_folder">Pumili ng folder…</string>
+    <string name="video_locked">Naka-lock ang video na ito</string>
+    <string name="share_failed">Hindi maibahagi ang video na ito</string>
+
+    <!-- Streaming / saved links -->
+    <string name="save_link">I-save ang link</string>
+    <string name="link_saved">Na-save ang link sa library</string>
+    <string name="link_badge">Naka-save na link</string>
+
+    <!-- Protected videos -->
+    <string name="protected_videos">Mga pribadong video</string>
+    <string name="protected_set_pin_hint">Minarkahang pribado. Magtakda ng PIN/fingerprint sa Mga Setting → Seguridad para sa tunay na lock.</string>
+    <string name="protected_moved_hint">Inilipat sa Mga pribadong video (menu → Mga pribadong video).</string>
+    <string name="protected_title">Pribado · %1$d</string>
+    <string name="protected_need_lock">Mag-set up ng fingerprint o screen lock sa iyong telepono para buksan ang mga pribadong video.</string>
+
+    <!-- Categories -->
+    <string name="category">Kategorya</string>
+    <string name="category_none">Walang kategorya</string>
+    <string name="category_all">Lahat ng kategorya</string>
+    <string name="set_category">Itakda ang kategorya</string>
+    <string name="category_hint">Pangalan ng kategorya</string>
+    <string name="category_general">Pangkalahatan</string>
+    <string name="category_education">Edukasyon</string>
+    <string name="category_entertainment">Aliwan</string>
+    <string name="category_music">Musika</string>
+    <string name="category_sports">Isports</string>
+    <string name="category_news">Balita</string>
+    <string name="category_cooking">Pagluluto</string>
+    <string name="category_tech">Teknolohiya</string>
+    <string name="category_religion">Relihiyon</string>
+    <string name="category_kids">Mga bata</string>
+    <string name="manage_categories">Pamahalaan ang mga kategorya</string>
+    <string name="add_category">Magdagdag ng kategorya</string>
+    <string name="no_categories">Wala pang kategorya. I-tap ang + para magdagdag.</string>
+    <string name="reorder">Ayusing muli</string>
+    <string name="delete_category_message">Alisin ang kategoryang \"%1$s\"? Nananatili ang mga video, ngunit magiging walang kategorya.</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_thumbnail">Thumbnail ng video</string>
+    <string name="cd_favorite">Paborito</string>
+    <string name="cd_back">Bumalik</string>
+    <string name="cd_lock">I-lock ang mga kontrol</string>
+    <string name="cd_rotate">Iikot</string>
+    <string name="cd_pip">Picture in picture</string>
+    <string name="cd_background">Pagtugtog sa background</string>
+    <string name="cd_import">Mag-import ng mga video</string>
+    <string name="cd_resize">I-resize ang video</string>
+
+    <!-- Hide floating text on video (playback overlay) -->
+    <string name="hide_text">Takpan ang teksto</string>
+    <string name="hide_text_hint">I-drag para takpan ang teksto; i-drag ang sulok para i-resize. Buksan ang menu at i-tap muli ang Takpan ang teksto para i-lock.</string>
+    <string name="hide_text_cleared">Inalis ang takip</string>
+    <string name="hide_text_remove">Alisin ang takip</string>
+    <string name="background_play">Pagtugtog sa background (audio lamang)</string>
+
+    <!-- Player resize modes -->
+    <string name="resize_fit">I-fit</string>
+    <string name="resize_zoom">I-zoom (i-crop)</string>
+    <string name="resize_fill">Punuin (i-stretch)</string>
+</resources>
