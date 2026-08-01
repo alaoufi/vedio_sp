@@ -1349,8 +1349,9 @@ class MainActivity : AppCompatActivity() {
         } else {
             ensureVaultPasswordSet {
                 viewModel.setPrivate(video.id, true)
-                // The owner just marked it — keep it visible to them this session.
-                com.myvideolibrary.app.security.PrivateVaultSession.unlock()
+                // Lock the vault so the cover obscures immediately after marking.
+                com.myvideolibrary.app.security.PrivateVaultSession.lock()
+                refreshCovers()
             }
         }
     }
@@ -1472,6 +1473,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     // ---- Options menu ----
+
+    override fun onRestart() {
+        super.onRestart()
+        // Returning here after another screen (e.g. the player) re-locks extra-private
+        // covers, so a private clip is obscured again right after you finish with it.
+        // onRestart fires only after the activity was stopped — not on dialogs, and
+        // not on first launch — so an in-place unlock+play flow isn't cut short.
+        if (com.myvideolibrary.app.security.PrivateVaultSession.unlocked) {
+            com.myvideolibrary.app.security.PrivateVaultSession.lock()
+            refreshCovers()
+        }
+    }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
