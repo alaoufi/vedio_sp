@@ -26,7 +26,7 @@ interface VideoRepository {
 
     suspend fun setLocked(id: Long, locked: Boolean)
 
-    suspend fun setPrivate(id: Long, private: Boolean)
+    suspend fun setPrivate(id: Long, isPrivate: Boolean)
 
     suspend fun rename(id: Long, title: String)
 

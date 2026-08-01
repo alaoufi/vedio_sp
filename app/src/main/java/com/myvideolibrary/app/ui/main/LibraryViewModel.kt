@@ -271,8 +271,8 @@ class LibraryViewModel @Inject constructor(
     }
 
     /** Marks a video as extra-private (obscured cover + vault password) or clears it. */
-    fun setPrivate(id: Long, private: Boolean) = viewModelScope.launch {
-        videoRepository.setPrivate(id, private)
+    fun setPrivate(id: Long, isPrivate: Boolean) = viewModelScope.launch {
+        videoRepository.setPrivate(id, isPrivate)
     }
 
     /** Sets (or changes) the private-vault password, storing only its SHA-256 hash. */
