@@ -21,20 +21,13 @@
             android:maxLines="1" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Hide the section's clips from the main library view. -->
-    <com.google.android.material.materialswitch.MaterialSwitch
-        android:id="@+id/hideSwitch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="@string/hide_clips" />
-
-    <!-- Protect the section: its contents are hidden until opened with a password. -->
+    <!-- Protect the section: it stays visible but its covers are obscured until
+         opened with the section password. -->
     <com.google.android.material.materialswitch.MaterialSwitch
         android:id="@+id/protectSwitch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:text="@string/protect_section" />
 
     <com.google.android.material.textfield.TextInputLayout

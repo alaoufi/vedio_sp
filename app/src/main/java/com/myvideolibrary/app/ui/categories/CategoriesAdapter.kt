@@ -62,13 +62,9 @@ class CategoriesAdapter(
             val ctx = binding.root.context
             binding.categoryName.text = item.name
 
-            // Secondary line summarising hidden / locked state.
-            val states = listOfNotNull(
-                ctx.getString(R.string.state_hidden).takeIf { item.hidden },
-                ctx.getString(R.string.state_locked).takeIf { item.hasPassword }
-            )
-            binding.categoryState.isVisible = states.isNotEmpty()
-            binding.categoryState.text = states.joinToString(" · ")
+            // Secondary line: a protected section shows its locked/obscured state.
+            binding.categoryState.isVisible = item.hasPassword
+            binding.categoryState.text = ctx.getString(R.string.state_locked)
 
             binding.openArea.setOnClickListener { onOpen(item) }
             binding.editButton.setOnClickListener { onEdit(item) }

@@ -187,7 +187,6 @@ class CategoriesActivity : AppCompatActivity() {
         val dialogBinding = DialogEditCategoryBinding.inflate(layoutInflater)
         dialogBinding.nameInput.setText(item.name)
         dialogBinding.nameInput.setSelection(item.name.length)
-        dialogBinding.hideSwitch.isChecked = item.hidden
         dialogBinding.protectSwitch.isChecked = item.hasPassword
         dialogBinding.passwordLayout.isVisible = item.hasPassword
         dialogBinding.passwordLayout.hint = getString(
@@ -202,7 +201,6 @@ class CategoriesActivity : AppCompatActivity() {
             .setView(dialogBinding.root)
             .setPositiveButton(R.string.save) { _, _ ->
                 val newName = dialogBinding.nameInput.text?.toString().orEmpty()
-                val hidden = dialogBinding.hideSwitch.isChecked
                 val protect = dialogBinding.protectSwitch.isChecked
                 val pw = dialogBinding.passwordInput.text?.toString().orEmpty()
 
@@ -210,7 +208,9 @@ class CategoriesActivity : AppCompatActivity() {
                 val needsButMissing = protect && pw.isBlank() && !item.hasPassword
                 val clearPassword = !protect || needsButMissing
                 val newPassword = if (protect && pw.isNotBlank()) pw else null
-                viewModel.applyEdit(item.name, newName, hidden, newPassword, clearPassword)
+                // Full-hide was removed — a protected section is visible but obscured,
+                // so always clear any legacy hidden flag here.
+                viewModel.applyEdit(item.name, newName, hidden = false, newPassword, clearPassword)
                 if (needsButMissing) toast(R.string.enter_new_password)
             }
             .setNegativeButton(R.string.cancel, null)
