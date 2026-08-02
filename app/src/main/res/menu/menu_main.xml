@@ -71,12 +71,6 @@
             android:icon="@drawable/ic_filter_list"
             android:title="@string/manage_categories"
             app:showAsAction="never" />
-
-        <item
-            android:id="@+id/action_protected"
-            android:icon="@drawable/ic_lock"
-            android:title="@string/protected_videos"
-            app:showAsAction="never" />
     </group>
 
     <!-- App info & settings -->

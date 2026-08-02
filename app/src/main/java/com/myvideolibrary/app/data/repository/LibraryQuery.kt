@@ -50,8 +50,8 @@ data class LibraryQuery(
         if (favoritesOnly) {
             where.append(" AND is_favorite = 1")
         }
-        // Locked videos live in a separate protected view, hidden from the library.
-        where.append(if (protectedOnly) " AND is_locked = 1" else " AND is_locked = 0")
+        // The old per-video "private" bucket was removed: privacy is now per-category,
+        // so is_locked is no longer used to filter — every video shows in the library.
         if (categories.isNotEmpty()) {
             val placeholders = categories.joinToString(", ") { "?" }
             where.append(" AND category IN ($placeholders)")

@@ -415,7 +415,11 @@
     <!-- Category visibility & password protection -->
     <string name="edit_category">Edit category</string>
     <string name="hide_clips">Hide clips from the library</string>
-    <string name="protect_section">Protect with password (blur covers)</string>
+    <string name="protect_section">Protect with a password</string>
+    <string name="protection_mode_label">When protected, show it as:</string>
+    <string name="mode_visible">Ask password to open (cover visible)</string>
+    <string name="mode_hidden">Hidden from the library</string>
+    <string name="mode_obscured">Blur the cover (same size)</string>
     <string name="section_password_hint">Section password</string>
     <string name="section_password_change_hint">New password (leave blank to keep current)</string>
     <string name="manage_password">Management password</string>
@@ -426,6 +430,7 @@
     <string name="category_password">Password</string>
     <string name="state_hidden">Hidden</string>
     <string name="state_locked">Locked</string>
+    <string name="state_blurred">Blurred</string>
     <string name="set_password_title">Protect with a password</string>
     <string name="remove_password_title">Remove password</string>
     <string name="open_locked_title">Locked category</string>

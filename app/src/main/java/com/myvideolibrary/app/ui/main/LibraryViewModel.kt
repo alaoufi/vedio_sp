@@ -52,9 +52,11 @@ data class LibraryUiState(
     val folders: List<FolderEntity> = emptyList(),
     val selectionMode: Boolean = false,
     val selectedIds: Set<Long> = emptySet(),
-    /** Password-protected category names (normalised) whose covers are obscured. */
-    val protectedCategories: Set<String> = emptySet(),
-    /** Raw "name\thash" password store, for verifying a category unlock. */
+    /** Category names (normalised) whose covers are blurred (OBSCURED mode). */
+    val obscuredCategories: Set<String> = emptySet(),
+    /** Category names (normalised) that require a password to open (VISIBLE ∪ OBSCURED). */
+    val lockedCategories: Set<String> = emptySet(),
+    /** Raw "name\thash\tmode" password store, for verifying a category unlock. */
     val categoryPasswordsRaw: String? = null
 )
 
@@ -77,10 +79,10 @@ class LibraryViewModel @Inject constructor(
             videoRepository.observeRecentlyPlayed(20),
             settingsRepository.observeSettings()
         ) { list, settings ->
-            val protectedCats = protectedCategories(settings)
+            val protectedCats = allProtectedCategories(settings)
             list.filter { v ->
                 v.mediaType != "image" &&
-                    // Clips in a protected (obscured) category never surface here.
+                    // Clips in any protected category never surface here.
                     v.category?.trim()?.lowercase() !in protectedCats &&
                     v.lastPlayedPosition > 3_000 &&
                     (v.duration <= 0 || v.lastPlayedPosition < v.duration * 95 / 100)
@@ -183,10 +185,28 @@ class LibraryViewModel @Inject constructor(
     private fun excludedCategories(settings: SettingsEntity): Set<String> =
         com.myvideolibrary.app.util.CategorySecurity.parseHidden(settings.hiddenCategories)
 
-    /** Password-protected category names, normalised (trimmed, lower-cased). */
-    private fun protectedCategories(settings: SettingsEntity): Set<String> =
+    /** Every protected category name, normalised (trimmed, lower-cased). */
+    private fun allProtectedCategories(settings: SettingsEntity): Set<String> =
         com.myvideolibrary.app.util.CategorySecurity.protectedNames(settings.categoryPasswords)
             .map { it.trim().lowercase() }.toSet()
+
+    /** Categories whose covers are blurred (OBSCURED mode), normalised. */
+    private fun obscuredCategories(settings: SettingsEntity): Set<String> =
+        com.myvideolibrary.app.util.CategorySecurity.namesWithMode(
+            settings.categoryPasswords, com.myvideolibrary.app.util.CategoryProtectionMode.OBSCURED
+        ).map { it.trim().lowercase() }.toSet()
+
+    /** Categories shown in the library that need a password to open (VISIBLE ∪ OBSCURED). */
+    private fun lockedCategories(settings: SettingsEntity): Set<String> {
+        val pw = settings.categoryPasswords
+        val visible = com.myvideolibrary.app.util.CategorySecurity.namesWithMode(
+            pw, com.myvideolibrary.app.util.CategoryProtectionMode.VISIBLE
+        )
+        val obscured = com.myvideolibrary.app.util.CategorySecurity.namesWithMode(
+            pw, com.myvideolibrary.app.util.CategoryProtectionMode.OBSCURED
+        )
+        return (visible + obscured).map { it.trim().lowercase() }.toSet()
+    }
 
     // Active filter selections.
     private val filters = combine(
@@ -215,7 +235,8 @@ class LibraryViewModel @Inject constructor(
             folders = m.folders,
             selectionMode = selection.active,
             selectedIds = selection.ids,
-            protectedCategories = protectedCategories(m.settings),
+            obscuredCategories = obscuredCategories(m.settings),
+            lockedCategories = lockedCategories(m.settings),
             categoryPasswordsRaw = m.settings.categoryPasswords
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), LibraryUiState())

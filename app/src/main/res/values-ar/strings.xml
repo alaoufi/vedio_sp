@@ -378,7 +378,11 @@
     <!-- إظهار/إخفاء التصنيف وحمايته بكلمة مرور -->
     <string name="edit_category">تعديل التصنيف</string>
     <string name="hide_clips">إخفاء المقاطع من المكتبة</string>
-    <string name="protect_section">حماية بكلمة مرور (تعتيم الأغلفة)</string>
+    <string name="protect_section">حماية بكلمة مرور</string>
+    <string name="protection_mode_label">عند الحماية، اعرضه كـ:</string>
+    <string name="mode_visible">يفتح بكلمة مرور مع عرضه</string>
+    <string name="mode_hidden">مخفي عن العرض</string>
+    <string name="mode_obscured">تعتيم الغلاف (مشوش) بنفس الحجم</string>
     <string name="section_password_hint">كلمة مرور القسم</string>
     <string name="section_password_change_hint">كلمة مرور جديدة (اتركها فارغة للإبقاء على الحالية)</string>
     <string name="manage_password">كلمة مرور الإدارة</string>
@@ -389,6 +393,7 @@
     <string name="category_password">كلمة المرور</string>
     <string name="state_hidden">مخفي</string>
     <string name="state_locked">محمي</string>
+    <string name="state_blurred">مشوش</string>
     <string name="set_password_title">حماية بكلمة مرور</string>
     <string name="remove_password_title">إزالة كلمة المرور</string>
     <string name="open_locked_title">تصنيف محمي</string>

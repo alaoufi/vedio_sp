@@ -62,9 +62,15 @@ class CategoriesAdapter(
             val ctx = binding.root.context
             binding.categoryName.text = item.name
 
-            // Secondary line: a protected section shows its locked/obscured state.
-            binding.categoryState.isVisible = item.hasPassword
-            binding.categoryState.text = ctx.getString(R.string.state_locked)
+            // Secondary line: a protected section shows how it behaves.
+            val stateLabel = when (item.mode) {
+                com.myvideolibrary.app.util.CategoryProtectionMode.HIDDEN -> R.string.state_hidden
+                com.myvideolibrary.app.util.CategoryProtectionMode.OBSCURED -> R.string.state_blurred
+                com.myvideolibrary.app.util.CategoryProtectionMode.VISIBLE -> R.string.state_locked
+                null -> null
+            }
+            binding.categoryState.isVisible = stateLabel != null
+            if (stateLabel != null) binding.categoryState.text = ctx.getString(stateLabel)
 
             binding.openArea.setOnClickListener { onOpen(item) }
             binding.editButton.setOnClickListener { onEdit(item) }
