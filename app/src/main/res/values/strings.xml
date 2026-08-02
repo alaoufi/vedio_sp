@@ -415,7 +415,7 @@
     <!-- Category visibility & password protection -->
     <string name="edit_category">Edit category</string>
     <string name="hide_clips">Hide clips from the library</string>
-    <string name="protect_section">Protect this section</string>
+    <string name="protect_section">Protect with password (blur covers)</string>
     <string name="section_password_hint">Section password</string>
     <string name="section_password_change_hint">New password (leave blank to keep current)</string>
     <string name="manage_password">Management password</string>

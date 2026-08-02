@@ -378,7 +378,7 @@
     <!-- إظهار/إخفاء التصنيف وحمايته بكلمة مرور -->
     <string name="edit_category">تعديل التصنيف</string>
     <string name="hide_clips">إخفاء المقاطع من المكتبة</string>
-    <string name="protect_section">حماية هذا القسم</string>
+    <string name="protect_section">حماية بكلمة مرور (تعتيم الأغلفة)</string>
     <string name="section_password_hint">كلمة مرور القسم</string>
     <string name="section_password_change_hint">كلمة مرور جديدة (اتركها فارغة للإبقاء على الحالية)</string>
     <string name="manage_password">كلمة مرور الإدارة</string>

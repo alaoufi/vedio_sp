@@ -31,6 +31,16 @@ class VideoPagingAdapter(
     /** Column count of the staggered grid; used to size cards by aspect ratio. */
     private var spanCount: Int = 3
 
+    /** Names (normalised) of password-protected categories whose covers are obscured. */
+    private var protectedCategories: Set<String> = emptySet()
+
+    fun setProtectedCategories(cats: Set<String>) {
+        if (cats != protectedCategories) {
+            protectedCategories = cats
+            notifyDataSetChanged()
+        }
+    }
+
     fun setSpanCount(count: Int) {
         val c = count.coerceAtLeast(1)
         if (c != spanCount) {
@@ -270,9 +280,15 @@ class VideoPagingAdapter(
             .into(imageView)
     }
 
-    /** True when a clip's cover/title must stay hidden (private + vault still locked). */
-    private fun isObscured(video: VideoEntity): Boolean =
-        video.isPrivate && !com.myvideolibrary.app.security.PrivateVaultSession.unlocked
+    /**
+     * True when a clip's cover/title must stay hidden: it belongs to a
+     * password-protected category that hasn't been unlocked this session.
+     */
+    private fun isObscured(video: VideoEntity): Boolean {
+        val cat = video.category?.trim()?.lowercase() ?: return false
+        return cat in protectedCategories &&
+            !com.myvideolibrary.app.security.ProtectedCategoriesSession.isUnlocked(video.category)
+    }
 
     companion object {
         private const val TYPE_GRID = 0
