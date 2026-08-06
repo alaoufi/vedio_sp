@@ -878,13 +878,13 @@ class MainActivity : AppCompatActivity() {
             isCategoryLocked(video) -> promptCategoryUnlock(video.category) { onVideoClick(video) }
             // A downloaded cover image opens in an image viewer, not the player.
             video.mediaType == "image" -> openImage(video)
-            // Private videos only appear in the already-unlocked private view, so
-            // they play normally from there (no separate "locked" block).
             else -> {
                 // Queue the videos currently in view (in order) so playback
                 // continues to the next clip automatically when this one ends.
+                // Exclude clips in still-locked categories so swiping up/down in the
+                // player can't reach a protected clip without its password.
                 val queue = adapter.snapshot().items
-                    .filter { it.mediaType != "image" }
+                    .filter { it.mediaType != "image" && !isCategoryLocked(it) }
                     .map { it.id }
                 val index = queue.indexOf(video.id)
                 if (queue.size > 1 && index >= 0) {
