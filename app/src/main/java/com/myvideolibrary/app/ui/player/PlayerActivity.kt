@@ -519,7 +519,8 @@ class PlayerActivity : AppCompatActivity() {
         currentSource = source
         exo.setMediaItem(buildMediaItem(sourceUri(source)))
         exo.playWhenReady = true
-        if (resumeMs > 0) exo.seekTo(resumeMs)
+        // Always start a clip from the beginning; the saved position is intentionally
+        // ignored so reopening a clip replays it rather than resuming mid-way.
         exo.setPlaybackSpeed(speeds[speedIndex])
         exo.prepare()
 
