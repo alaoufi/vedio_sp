@@ -71,8 +71,9 @@ data class SettingsEntity(
     val hiddenCategories: String? = null,
 
     /**
-     * Password-protected categories, one per line as "name\tsha256hex". Their
-     * contents are hidden from the library until opened with the password.
+     * Password-protected categories, one per line as "name\tsha256hex\tmode",
+     * where mode is one of CategoryProtectionMode (visible/hidden/obscured); a
+     * legacy two-field line (no mode) is read as "obscured". See CategorySecurity.
      */
     @ColumnInfo(name = "category_passwords")
     val categoryPasswords: String? = null,
