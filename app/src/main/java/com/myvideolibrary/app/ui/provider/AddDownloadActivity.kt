@@ -14,6 +14,7 @@ import com.myvideolibrary.app.R
 import com.myvideolibrary.app.databinding.ActivityAddDownloadBinding
 import com.myvideolibrary.app.provider.model.ProviderErrorType
 import com.myvideolibrary.app.util.Formatters
+import com.myvideolibrary.app.security.AppLockManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -24,8 +25,19 @@ class AddDownloadActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAddDownloadBinding
     private val viewModel: AddDownloadViewModel by viewModels()
 
+    @javax.inject.Inject lateinit var appLockManager: AppLockManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (appLockManager.shouldLock()) {
+            startActivity(
+                com.myvideolibrary.app.ui.security.LockActivity.intent(
+                    this, android.content.Intent(intent)
+                )
+            )
+            finish()
+            return
+        }
         binding = ActivityAddDownloadBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)

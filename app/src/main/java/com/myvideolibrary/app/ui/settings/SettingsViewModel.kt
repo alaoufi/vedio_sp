@@ -7,6 +7,7 @@ import com.bumptech.glide.Glide
 import com.myvideolibrary.app.data.backup.BackupManager
 import com.myvideolibrary.app.data.model.AppTheme
 import com.myvideolibrary.app.data.repository.SettingsRepository
+import com.myvideolibrary.app.data.repository.VideoRepository
 import com.myvideolibrary.app.security.SecurityManager
 import com.myvideolibrary.app.util.StorageManager
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -45,6 +46,7 @@ class SettingsViewModel @Inject constructor(
     private val themeManager: ThemeManager,
     private val storageManager: StorageManager,
     private val backupManager: BackupManager
+    , private val videoRepository: VideoRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsUiState())
@@ -141,6 +143,23 @@ class SettingsViewModel @Inject constructor(
             withContext(Dispatchers.IO) { Glide.get(context).clearDiskCache() }
             Glide.get(context).clearMemory()
             postMessage(context.getString(com.myvideolibrary.app.R.string.cache_cleared))
+        }
+    }
+
+    fun checkLibraryHealth() {
+        viewModelScope.launch {
+            val unavailable = withContext(Dispatchers.IO) {
+                videoRepository.allVideos().count { video ->
+                    if (video.localPath.startsWith("content://")) {
+                        runCatching {
+                            context.contentResolver.openAssetFileDescriptor(
+                                Uri.parse(video.localPath), "r"
+                            )?.close() ?: throw IllegalStateException()
+                        }.isFailure
+                    } else !java.io.File(video.localPath).exists()
+                }
+            }
+            postMessage(context.getString(com.myvideolibrary.app.R.string.library_health_result, unavailable))
         }
     }
 

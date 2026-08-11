@@ -28,6 +28,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import com.myvideolibrary.app.R
 import com.myvideolibrary.app.databinding.ActivityPlayerBinding
 import com.myvideolibrary.app.security.SecurityManager
+import com.myvideolibrary.app.security.AppLockManager
 import com.myvideolibrary.app.security.applyScreenshotPolicy
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -43,6 +44,9 @@ class PlayerActivity : AppCompatActivity() {
 
     @javax.inject.Inject
     lateinit var securityManager: SecurityManager
+
+    @javax.inject.Inject
+    lateinit var appLockManager: AppLockManager
 
     @javax.inject.Inject
     lateinit var storageManager: com.myvideolibrary.app.util.StorageManager
@@ -96,6 +100,13 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (appLockManager.shouldLock()) {
+            startActivity(
+                com.myvideolibrary.app.ui.security.LockActivity.intent(this, Intent(intent))
+            )
+            finish()
+            return
+        }
         applyScreenshotPolicy(securityManager)
         // Follow the device orientation by default — rotate with the phone.
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
@@ -519,7 +530,8 @@ class PlayerActivity : AppCompatActivity() {
         currentSource = source
         exo.setMediaItem(buildMediaItem(sourceUri(source)))
         exo.playWhenReady = true
-        if (resumeMs > 0) exo.seekTo(resumeMs)
+        // Always start a clip from the beginning; the saved position is intentionally
+        // ignored so reopening a clip replays it rather than resuming mid-way.
         exo.setPlaybackSpeed(speeds[speedIndex])
         exo.prepare()
 

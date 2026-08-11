@@ -31,6 +31,16 @@ class VideoPagingAdapter(
     /** Column count of the staggered grid; used to size cards by aspect ratio. */
     private var spanCount: Int = 3
 
+    /** Names (normalised) of protected categories rendered with a blurred cover. */
+    private var obscuredCategories: Set<String> = emptySet()
+
+    fun setObscuredCategories(cats: Set<String>) {
+        if (cats != obscuredCategories) {
+            obscuredCategories = cats
+            notifyDataSetChanged()
+        }
+    }
+
     fun setSpanCount(count: Int) {
         val c = count.coerceAtLeast(1)
         if (c != spanCount) {
@@ -114,7 +124,7 @@ class VideoPagingAdapter(
             }
             // While obscured, hide every cue that could reveal the clip.
             binding.favoriteIcon.isVisible = !obscured
-            binding.lockIcon.isVisible = video.isLocked || obscured
+            binding.lockIcon.isVisible = obscured
             binding.linkBadge.isVisible = video.isLinkOnly && !obscured
             binding.duration.isVisible = video.duration > 0 && !obscured
             if (obscured) binding.category.isVisible = false else bindCategory(binding.category, video)
@@ -157,7 +167,7 @@ class VideoPagingAdapter(
                 it.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
                 onFavorite(video)
             }
-            binding.lockIcon.isVisible = video.isLocked || obscured
+            binding.lockIcon.isVisible = obscured
             binding.linkBadge.isVisible = video.isLinkOnly && !obscured
             binding.duration.isVisible = video.duration > 0 && !obscured
             binding.size.isVisible = !video.isLinkOnly && !obscured
@@ -254,11 +264,18 @@ class VideoPagingAdapter(
         obscured: Boolean = false
     ) {
         if (obscured) {
-            // Never even load the real cover while locked — cancel any pending load
-            // and show the padlock placeholder instead.
-            Glide.with(imageView).clear(imageView)
+            // OBSCURED mode: show the real cover heavily blurred, kept at the same
+            // size, so the clip is unrecognisable until the category is unlocked.
             imageView.scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
-            imageView.setImageResource(R.drawable.ic_private_cover)
+            Glide.with(imageView)
+                .load(video.thumbnailPath ?: video.localPath)
+                .placeholder(R.drawable.ic_private_cover)
+                .error(R.drawable.ic_private_cover)
+                .transform(
+                    com.bumptech.glide.load.resource.bitmap.CenterCrop(),
+                    com.myvideolibrary.app.util.BlurCoverTransformation()
+                )
+                .into(imageView)
             return
         }
         val model: Any = video.thumbnailPath ?: video.localPath
@@ -270,9 +287,15 @@ class VideoPagingAdapter(
             .into(imageView)
     }
 
-    /** True when a clip's cover/title must stay hidden (private + vault still locked). */
-    private fun isObscured(video: VideoEntity): Boolean =
-        video.isPrivate && !com.myvideolibrary.app.security.PrivateVaultSession.unlocked
+    /**
+     * True when a clip's cover/title must stay hidden: it belongs to a
+     * password-protected category that hasn't been unlocked this session.
+     */
+    private fun isObscured(video: VideoEntity): Boolean {
+        val cat = video.category?.trim()?.lowercase() ?: return false
+        return cat in obscuredCategories &&
+            !com.myvideolibrary.app.security.ProtectedCategoriesSession.isUnlocked(video.category)
+    }
 
     companion object {
         private const val TYPE_GRID = 0

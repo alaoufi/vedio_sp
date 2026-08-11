@@ -336,8 +336,8 @@ class MainActivity : AppCompatActivity() {
         val pos = rv.getChildAdapterPosition(child)
         if (pos == RecyclerView.NO_POSITION) return
         val video = adapter.peekAt(pos) ?: return
-        // Never animate-preview an extra-private clip while the vault is locked.
-        if (video.isPrivate && !com.myvideolibrary.app.security.PrivateVaultSession.unlocked) return
+        // Never animate-preview a clip whose protected category is still locked.
+        if (isCategoryLocked(video)) return
         if (video.isLinkOnly ||
             video.mediaType != com.myvideolibrary.app.data.model.MediaType.VIDEO.id ||
             video.localPath.isBlank() || video.localPath.startsWith("content://")
@@ -628,6 +628,7 @@ class MainActivity : AppCompatActivity() {
                 viewModel.uiState.collectLatest { state ->
                     applyLayoutManager(state.viewMode)
                     adapter.setSelection(state.selectionMode, state.selectedIds)
+                    adapter.setObscuredCategories(state.obscuredCategories)
                     renderStats(state)
                     renderFilterChip(state)
                     renderSelectionBar(state)
@@ -754,13 +755,6 @@ class MainActivity : AppCompatActivity() {
     private fun renderFilterChip(state: LibraryUiState) {
         val group = binding.filterChips
         group.removeAllViews()
-        if (state.protectedMode) {
-            group.addView(
-                quickFilterChip(getString(R.string.protected_videos)) {
-                    viewModel.setProtectedMode(false)
-                }
-            )
-        }
         if (state.favoritesOnly) {
             group.addView(
                 quickFilterChip(getString(R.string.action_favorites)) {
@@ -858,11 +852,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun renderProtectedTitle(state: LibraryUiState) {
-        supportActionBar?.title = if (state.protectedMode) {
-            getString(R.string.protected_title, state.videoCount)
-        } else {
-            getString(R.string.app_name)
-        }
+        supportActionBar?.title = getString(R.string.app_name)
     }
 
     private fun renderSelectionBar(state: LibraryUiState) {
@@ -878,90 +868,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun toggleProtected() {
-        if (viewModel.uiState.value.protectedMode) {
-            viewModel.setProtectedMode(false) // leaving the private view is free
-            return
-        }
-        authenticateForPrivate { viewModel.setProtectedMode(true) }
-    }
-
-    /**
-     * Always require the device fingerprint (with screen-lock fallback) before
-     * revealing the private view — so private videos never show without it.
-     */
-    private fun authenticateForPrivate(onSuccess: () -> Unit) {
-        val authenticators = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK or
-                androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
-        } else {
-            androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK
-        }
-        val canAuth = androidx.biometric.BiometricManager.from(this)
-            .canAuthenticate(authenticators) == androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
-
-        when {
-            canAuth -> {
-                val info = androidx.biometric.BiometricPrompt.PromptInfo.Builder()
-                    .setTitle(getString(R.string.protected_videos))
-                    .setSubtitle(getString(R.string.unlock_biometric_subtitle))
-                    .setAllowedAuthenticators(authenticators)
-                if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.R) {
-                    info.setNegativeButtonText(getString(R.string.cancel))
-                }
-                androidx.biometric.BiometricPrompt(
-                    this, androidx.core.content.ContextCompat.getMainExecutor(this),
-                    object : androidx.biometric.BiometricPrompt.AuthenticationCallback() {
-                        override fun onAuthenticationSucceeded(
-                            result: androidx.biometric.BiometricPrompt.AuthenticationResult
-                        ) { onSuccess() }
-                    }
-                ).authenticate(info.build())
-            }
-            // No device biometric/lock available, but an app PIN exists → use it.
-            securityManager.isLockConfigured -> promptAppPin(onSuccess)
-            // Nothing to authenticate with — keep the private view locked and guide
-            // the user to set up a fingerprint / screen lock first.
-            else -> android.widget.Toast.makeText(
-                this, R.string.protected_need_lock, android.widget.Toast.LENGTH_LONG
-            ).show()
-        }
-    }
-
-    private fun promptAppPin(onSuccess: () -> Unit) {
-        val input = EditText(this).apply {
-            inputType = android.text.InputType.TYPE_CLASS_NUMBER or
-                android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD
-            hint = getString(R.string.pin_hint)
-        }
-        AlertDialog.Builder(this)
-            .setTitle(R.string.protected_videos)
-            .setView(input)
-            .setPositiveButton(R.string.unlock) { _, _ ->
-                if (securityManager.verifyPin(input.text.toString())) onSuccess()
-                else android.widget.Toast.makeText(this, R.string.wrong_pin, android.widget.Toast.LENGTH_SHORT).show()
-            }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
-    }
 
     private fun onVideoClick(video: VideoEntity) {
         val state = viewModel.uiState.value
         when {
             state.selectionMode -> viewModel.toggleSelected(video.id)
-            // Extra-private clip with the vault still locked: ask for the vault
-            // password first, then re-open once unlocked.
-            video.isPrivate && !com.myvideolibrary.app.security.PrivateVaultSession.unlocked ->
-                promptVaultUnlock { onVideoClick(video) }
+            // A clip in a protected category (blurred or visible): ask for the
+            // category password first, then re-open once unlocked.
+            isCategoryLocked(video) -> promptCategoryUnlock(video.category) { onVideoClick(video) }
             // A downloaded cover image opens in an image viewer, not the player.
             video.mediaType == "image" -> openImage(video)
-            // Private videos only appear in the already-unlocked private view, so
-            // they play normally from there (no separate "locked" block).
             else -> {
                 // Queue the videos currently in view (in order) so playback
                 // continues to the next clip automatically when this one ends.
+                // Exclude clips in still-locked categories so swiping up/down in the
+                // player can't reach a protected clip without its password.
                 val queue = adapter.snapshot().items
-                    .filter { it.mediaType != "image" }
+                    .filter { it.mediaType != "image" && !isCategoryLocked(it) }
                     .map { it.id }
                 val index = queue.indexOf(video.id)
                 if (queue.size > 1 && index >= 0) {
@@ -996,10 +919,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showVideoMenu(video: VideoEntity, anchor: android.view.View) {
-        // An obscured private clip's menu (preview/trim/open source…) could leak it,
-        // so require the vault password before showing it.
-        if (video.isPrivate && !com.myvideolibrary.app.security.PrivateVaultSession.unlocked) {
-            promptVaultUnlock { showVideoMenu(video, anchor) }
+        // A protected clip's menu (preview/trim/open source…) could leak it,
+        // so require the category password before showing it.
+        if (isCategoryLocked(video)) {
+            promptCategoryUnlock(video.category) { showVideoMenu(video, anchor) }
             return
         }
         val popup = android.widget.PopupMenu(this, anchor)
@@ -1012,16 +935,6 @@ class MainActivity : AppCompatActivity() {
         // Saved links can be downloaded to a local file on demand.
         if (video.isLinkOnly) popup.menu.add(0, 7, 2, getString(R.string.download))
         popup.menu.add(0, 2, 3, getString(R.string.action_share))
-        // A single "Private" toggle: checked means the clip is in the private view.
-        popup.menu.add(0, 3, 4, getString(R.string.lock_video)).apply {
-            isCheckable = true
-            isChecked = video.isLocked
-        }
-        // Extra privacy: obscured cover + a separate vault password to open.
-        popup.menu.add(0, 17, 4, getString(R.string.private_video)).apply {
-            isCheckable = true
-            isChecked = video.isPrivate
-        }
         popup.menu.add(0, 4, 5, getString(R.string.set_category))
         popup.menu.add(0, 14, 5, getString(R.string.add_to_playlist))
         popup.menu.add(0, 5, 6, getString(R.string.edit_info))
@@ -1047,11 +960,9 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 1 -> { onVideoClick(video); true }
                 2 -> { shareVideo(video); true }
-                3 -> { protectVideo(video); true }
                 4 -> { promptSetCategory(video); true }
                 5 -> { promptEditInfo(video); true }
                 16 -> { promptEditTags(video); true }
-                17 -> { promptTogglePrivate(video); true }
                 6 -> { confirmDeleteSingle(video); true }
                 8 -> { openSource(video); true }
                 9 -> { viewModel.toggleFavorite(video); true }
@@ -1202,20 +1113,6 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    /** Protects/unprotects a video; when protecting without a lock, points to Settings. */
-    private fun protectVideo(video: VideoEntity) {
-        viewModel.toggleLock(video)
-        // video.isLocked is the state *before* the toggle: false => we just protected it.
-        if (!video.isLocked) {
-            val msg = if (securityManager.isLockConfigured) {
-                R.string.protected_moved_hint
-            } else {
-                R.string.protected_set_pin_hint
-            }
-            android.widget.Toast.makeText(this, msg, android.widget.Toast.LENGTH_LONG).show()
-        }
-    }
-
     /** Opens the video's original page (TikTok/YouTube) in an external app or browser. */
     private fun openSource(video: VideoEntity) {
         val url = video.sourceUrl
@@ -1322,7 +1219,17 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    // ---- Extra-privacy (obscured cover + separate vault password) ----
+    // ---- Protected-category covers (obscured until the category password is entered) ----
+
+    /**
+     * True when a clip is in a protected category (VISIBLE or OBSCURED) that hasn't
+     * been unlocked this session — so opening it, or its menu, must ask the password.
+     */
+    private fun isCategoryLocked(video: VideoEntity): Boolean {
+        val cat = video.category?.trim()?.lowercase() ?: return false
+        return cat in viewModel.uiState.value.lockedCategories &&
+            !com.myvideolibrary.app.security.ProtectedCategoriesSession.isUnlocked(video.category)
+    }
 
     /** Password EditText inside a padded container, matching the edit dialogs. */
     private fun passwordField(hintRes: Int): Pair<android.widget.LinearLayout, EditText> {
@@ -1341,75 +1248,18 @@ class MainActivity : AppCompatActivity() {
         return container to input
     }
 
-    /** Toggles a clip's extra-privacy flag, setting up the vault password if needed. */
-    private fun promptTogglePrivate(video: VideoEntity) {
-        if (video.isPrivate) {
-            // Turning it off must prove vault access first.
-            ensureVaultUnlocked { viewModel.setPrivate(video.id, false) }
-        } else {
-            ensureVaultPasswordSet {
-                viewModel.setPrivate(video.id, true)
-                // The owner just marked it — keep it visible to them this session.
-                com.myvideolibrary.app.security.PrivateVaultSession.unlock()
-            }
-        }
-    }
-
-    /** Runs [onReady] once a vault password exists (creating one on first use). */
-    private fun ensureVaultPasswordSet(onReady: () -> Unit) {
-        if (viewModel.uiState.value.privateVaultHash != null) onReady()
-        else promptCreateVaultPassword(onReady)
-    }
-
-    /** Runs [onSuccess] once the vault is unlocked in this session. */
-    private fun ensureVaultUnlocked(onSuccess: () -> Unit) {
-        if (com.myvideolibrary.app.security.PrivateVaultSession.unlocked) onSuccess()
-        else promptVaultUnlock(onSuccess)
-    }
-
-    private fun promptCreateVaultPassword(onDone: () -> Unit) {
-        val (container, first) = passwordField(R.string.vault_password_hint)
-        val confirm = EditText(this).apply {
-            hint = getString(R.string.vault_confirm_hint)
-            setSingleLine(true)
-            inputType = android.text.InputType.TYPE_CLASS_TEXT or
-                android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-        }
-        container.addView(confirm)
+    /** Prompts for a protected category's password; on success unlocks it this session. */
+    private fun promptCategoryUnlock(category: String?, onSuccess: () -> Unit) {
+        val name = category?.trim().orEmpty()
+        if (name.isEmpty()) { onSuccess(); return }
+        val store = viewModel.uiState.value.categoryPasswordsRaw
+        val (container, input) = passwordField(R.string.enter_password)
         AlertDialog.Builder(this)
-            .setTitle(R.string.create_vault_password)
-            .setMessage(R.string.vault_password_explain)
-            .setView(container)
-            .setPositiveButton(R.string.save) { _, _ ->
-                val pw = first.text.toString()
-                when {
-                    pw.length < 4 ->
-                        Toast.makeText(this, R.string.vault_password_too_short, Toast.LENGTH_SHORT).show()
-                    pw != confirm.text.toString() ->
-                        Toast.makeText(this, R.string.vault_passwords_mismatch, Toast.LENGTH_SHORT).show()
-                    else -> { viewModel.setVaultPassword(pw); onDone() }
-                }
-            }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
-    }
-
-    private fun promptVaultUnlock(onSuccess: () -> Unit) {
-        val hash = viewModel.uiState.value.privateVaultHash
-        if (hash == null) { // no password yet — set one, then proceed
-            promptCreateVaultPassword {
-                com.myvideolibrary.app.security.PrivateVaultSession.unlock()
-                refreshCovers(); onSuccess()
-            }
-            return
-        }
-        val (container, input) = passwordField(R.string.vault_password_hint)
-        AlertDialog.Builder(this)
-            .setTitle(R.string.enter_vault_password)
+            .setTitle(R.string.locked_section_title)
             .setView(container)
             .setPositiveButton(R.string.unlock) { _, _ ->
-                if (com.myvideolibrary.app.util.CategorySecurity.verifyHash(hash, input.text.toString())) {
-                    com.myvideolibrary.app.security.PrivateVaultSession.unlock()
+                if (com.myvideolibrary.app.util.CategorySecurity.verify(store, name, input.text.toString())) {
+                    com.myvideolibrary.app.security.ProtectedCategoriesSession.unlock(category)
                     refreshCovers()
                     onSuccess()
                 } else {
@@ -1420,7 +1270,7 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    /** Rebinds the grid so obscured covers re-evaluate after the vault unlocks. */
+    /** Rebinds the grid so obscured covers re-evaluate after a category unlocks. */
     private fun refreshCovers() = adapter.refresh()
 
     private fun confirmDeleteSingle(video: VideoEntity) {
@@ -1473,6 +1323,18 @@ class MainActivity : AppCompatActivity() {
 
     // ---- Options menu ----
 
+    override fun onRestart() {
+        super.onRestart()
+        // Returning here after another screen (e.g. the player) re-locks extra-private
+        // covers, so a private clip is obscured again right after you finish with it.
+        // onRestart fires only after the activity was stopped — not on dialogs, and
+        // not on first launch — so an in-place unlock+play flow isn't cut short.
+        if (com.myvideolibrary.app.security.ProtectedCategoriesSession.anyUnlocked()) {
+            com.myvideolibrary.app.security.ProtectedCategoriesSession.lockAll()
+            refreshCovers()
+        }
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         (menu.findItem(R.id.action_search)?.actionView as? androidx.appcompat.widget.SearchView)
@@ -1497,7 +1359,7 @@ class MainActivity : AppCompatActivity() {
         // Search and view-toggle work on both tabs; the rest are library-only.
         for (id in intArrayOf(
             R.id.action_filter, R.id.action_favorites, R.id.action_sort,
-            R.id.action_protected, R.id.action_manage_categories, R.id.action_stats,
+            R.id.action_manage_categories, R.id.action_stats,
             R.id.action_playlists, R.id.action_duplicates
         )) menu.findItem(id)?.isVisible = !youtubeTab
         return super.onPrepareOptionsMenu(menu)
@@ -1550,7 +1412,6 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent(this, com.myvideolibrary.app.ui.help.HelpActivity::class.java))
                 true
             }
-            R.id.action_protected -> { toggleProtected(); true }
             R.id.action_settings -> {
                 startActivity(Intent(this, com.myvideolibrary.app.ui.settings.SettingsActivity::class.java))
                 true
@@ -1613,7 +1474,6 @@ class MainActivity : AppCompatActivity() {
         when {
             youtubeTab -> showYouTubeTab(false) // back returns to the library tab
             state.selectionMode -> viewModel.clearSelection()
-            state.protectedMode -> viewModel.setProtectedMode(false)
             // Back first returns to the full, unfiltered library.
             state.categoryFilters.isNotEmpty() -> viewModel.setCategoryFilters(emptySet())
             state.favoritesOnly -> viewModel.setFavoritesOnly(false)

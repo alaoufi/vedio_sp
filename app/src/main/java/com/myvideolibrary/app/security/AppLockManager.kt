@@ -19,7 +19,10 @@ class AppLockManager @Inject constructor(
     private var authenticated = false
 
     /** True when the lock screen must be shown before content. */
-    fun shouldLock(): Boolean = securityManager.isLockConfigured && !authenticated
+    fun shouldLock(): Boolean = ExternalEntryPolicy.requiresUnlock(
+        lockConfigured = securityManager.isLockConfigured,
+        authenticated = authenticated
+    )
 
     fun markAuthenticated() { authenticated = true }
 
@@ -28,7 +31,7 @@ class AppLockManager @Inject constructor(
     // ProcessLifecycleOwner callbacks: re-lock as soon as the app is backgrounded.
     override fun onStop(owner: LifecycleOwner) {
         authenticated = false
-        // Also re-obscure extra-private covers until the vault is unlocked again.
-        PrivateVaultSession.lock()
+        // Also re-obscure protected-category covers until unlocked again.
+        ProtectedCategoriesSession.lockAll()
     }
 }

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.myvideolibrary.app.data.repository.SettingsRepository
 import com.myvideolibrary.app.data.repository.VideoRepository
 import com.myvideolibrary.app.util.CategoryOrder
+import com.myvideolibrary.app.util.CategoryProtectionMode
 import com.myvideolibrary.app.util.CategorySecurity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,7 +19,9 @@ import javax.inject.Inject
 data class CategoryItem(
     val name: String,
     val hidden: Boolean,
-    val hasPassword: Boolean
+    val hasPassword: Boolean,
+    /** How the category behaves when protected; null when it isn't protected. */
+    val mode: CategoryProtectionMode? = null
 )
 
 @HiltViewModel
@@ -33,10 +36,13 @@ class CategoriesViewModel @Inject constructor(
         settingsRepository.observeSettings()
     ) { present, settings ->
         CategoryOrder.apply(present, settings.categoryOrder).map { name ->
+            val mode = CategorySecurity.modeOf(settings.categoryPasswords, name)
             CategoryItem(
                 name = name,
-                hidden = CategorySecurity.isHidden(settings.hiddenCategories, name),
-                hasPassword = CategorySecurity.hasPassword(settings.categoryPasswords, name)
+                hidden = mode == CategoryProtectionMode.HIDDEN ||
+                    CategorySecurity.isHidden(settings.hiddenCategories, name),
+                hasPassword = mode != null,
+                mode = mode
             )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -55,15 +61,16 @@ class CategoriesViewModel @Inject constructor(
 
     /**
      * Applies an edit from the single edit dialog in one atomic settings write:
-     * optional rename, the hidden flag, and the section password.
+     * optional rename plus the section's protection ([mode] + password).
      *
+     * @param mode the chosen protection mode, or null when protection is off
      * @param newPassword non-null/blank sets or changes the section password
-     * @param clearPassword removes the section password (overrides [newPassword])
+     * @param clearPassword removes the section protection (overrides [mode]/[newPassword])
      */
     fun applyEdit(
         oldName: String,
         newName: String,
-        hidden: Boolean,
+        mode: CategoryProtectionMode?,
         newPassword: String?,
         clearPassword: Boolean
     ) = viewModelScope.launch {
@@ -81,12 +88,18 @@ class CategoriesViewModel @Inject constructor(
         // Carry any existing metadata over to the (possibly new) name first.
         var hiddenStr = CategorySecurity.renameHidden(current.hiddenCategories, oldName, finalName)
         var pwStr = CategorySecurity.renamePassword(current.categoryPasswords, oldName, finalName)
-        hiddenStr = CategorySecurity.toggleHidden(hiddenStr, finalName, hidden)
-        pwStr = when {
-            clearPassword -> CategorySecurity.setPassword(pwStr, finalName, null)
-            !newPassword.isNullOrEmpty() -> CategorySecurity.setPassword(pwStr, finalName, newPassword)
-            else -> pwStr // keep whatever password already exists
+
+        val protect = mode != null && !clearPassword
+        pwStr = if (protect) {
+            CategorySecurity.setProtection(pwStr, finalName, newPassword, mode!!)
+        } else {
+            CategorySecurity.removeProtection(pwStr, finalName)
         }
+        // Only "hidden" mode drops the category from the library; keep the legacy
+        // hiddenCategories list in sync so the library query keeps working.
+        hiddenStr = CategorySecurity.toggleHidden(
+            hiddenStr, finalName, protect && mode == CategoryProtectionMode.HIDDEN
+        )
 
         settingsRepository.update {
             it.copy(

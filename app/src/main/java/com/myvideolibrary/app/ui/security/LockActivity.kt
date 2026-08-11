@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
+import androidx.core.content.IntentCompat
 import androidx.core.view.isVisible
 import com.myvideolibrary.app.R
 import com.myvideolibrary.app.databinding.ActivityLockBinding
@@ -28,6 +29,10 @@ class LockActivity : AppCompatActivity() {
     @Inject lateinit var appLockManager: AppLockManager
     @Inject lateinit var licenseManager: com.myvideolibrary.app.security.LicenseManager
     @Inject lateinit var billingManager: com.myvideolibrary.app.security.BillingManager
+
+    private val resumeIntent: Intent? by lazy {
+        IntentCompat.getParcelableExtra(intent, EXTRA_RESUME_INTENT, Intent::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,12 +78,23 @@ class LockActivity : AppCompatActivity() {
     }
 
     private fun submitPin() {
+        val retryAfter = securityManager.pinRetryAfterMs()
+        if (retryAfter > 0) {
+            binding.errorText.isVisible = true
+            binding.errorText.text = getString(R.string.pin_retry_later, (retryAfter + 999) / 1000)
+            return
+        }
         val pin = binding.pinInput.text?.toString().orEmpty()
         if (securityManager.verifyPin(pin)) {
+            securityManager.recordSuccessfulPin()
             proceed()
         } else {
+            securityManager.recordFailedPin()
             binding.errorText.isVisible = true
-            binding.errorText.setText(R.string.wrong_pin)
+            val delay = securityManager.pinRetryAfterMs()
+            binding.errorText.text = if (delay > 0) {
+                getString(R.string.pin_retry_later, (delay + 999) / 1000)
+            } else getString(R.string.wrong_pin)
             binding.pinInput.text?.clear()
         }
     }
@@ -109,7 +125,14 @@ class LockActivity : AppCompatActivity() {
 
     private fun proceed() {
         appLockManager.markAuthenticated()
-        startActivity(Intent(this, com.myvideolibrary.app.ui.main.MainActivity::class.java))
+        startActivity(resumeIntent ?: Intent(this, com.myvideolibrary.app.ui.main.MainActivity::class.java))
         finish()
+    }
+
+    companion object {
+        private const val EXTRA_RESUME_INTENT = "resume_intent"
+
+        fun intent(context: android.content.Context, resumeIntent: Intent): Intent =
+            Intent(context, LockActivity::class.java).putExtra(EXTRA_RESUME_INTENT, resumeIntent)
     }
 }

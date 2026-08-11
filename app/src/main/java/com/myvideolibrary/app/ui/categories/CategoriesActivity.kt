@@ -187,14 +187,22 @@ class CategoriesActivity : AppCompatActivity() {
         val dialogBinding = DialogEditCategoryBinding.inflate(layoutInflater)
         dialogBinding.nameInput.setText(item.name)
         dialogBinding.nameInput.setSelection(item.name.length)
-        dialogBinding.hideSwitch.isChecked = item.hidden
         dialogBinding.protectSwitch.isChecked = item.hasPassword
-        dialogBinding.passwordLayout.isVisible = item.hasPassword
+        dialogBinding.protectOptions.isVisible = item.hasPassword
         dialogBinding.passwordLayout.hint = getString(
             if (item.hasPassword) R.string.section_password_change_hint else R.string.section_password_hint
         )
+        // Pre-select the current mode, defaulting a freshly-protected section to blur.
+        when (item.mode ?: com.myvideolibrary.app.util.CategoryProtectionMode.OBSCURED) {
+            com.myvideolibrary.app.util.CategoryProtectionMode.VISIBLE ->
+                dialogBinding.modeVisible.isChecked = true
+            com.myvideolibrary.app.util.CategoryProtectionMode.HIDDEN ->
+                dialogBinding.modeHidden.isChecked = true
+            com.myvideolibrary.app.util.CategoryProtectionMode.OBSCURED ->
+                dialogBinding.modeObscured.isChecked = true
+        }
         dialogBinding.protectSwitch.setOnCheckedChangeListener { _, checked ->
-            dialogBinding.passwordLayout.isVisible = checked
+            dialogBinding.protectOptions.isVisible = checked
         }
 
         AlertDialog.Builder(this)
@@ -202,15 +210,21 @@ class CategoriesActivity : AppCompatActivity() {
             .setView(dialogBinding.root)
             .setPositiveButton(R.string.save) { _, _ ->
                 val newName = dialogBinding.nameInput.text?.toString().orEmpty()
-                val hidden = dialogBinding.hideSwitch.isChecked
                 val protect = dialogBinding.protectSwitch.isChecked
                 val pw = dialogBinding.passwordInput.text?.toString().orEmpty()
+                val mode = when (dialogBinding.modeGroup.checkedRadioButtonId) {
+                    R.id.modeVisible -> com.myvideolibrary.app.util.CategoryProtectionMode.VISIBLE
+                    R.id.modeHidden -> com.myvideolibrary.app.util.CategoryProtectionMode.HIDDEN
+                    else -> com.myvideolibrary.app.util.CategoryProtectionMode.OBSCURED
+                }
 
                 // Enabling protection needs a password (new or already set).
                 val needsButMissing = protect && pw.isBlank() && !item.hasPassword
                 val clearPassword = !protect || needsButMissing
                 val newPassword = if (protect && pw.isNotBlank()) pw else null
-                viewModel.applyEdit(item.name, newName, hidden, newPassword, clearPassword)
+                viewModel.applyEdit(
+                    item.name, newName, if (protect) mode else null, newPassword, clearPassword
+                )
                 if (needsButMissing) toast(R.string.enter_new_password)
             }
             .setNegativeButton(R.string.cancel, null)

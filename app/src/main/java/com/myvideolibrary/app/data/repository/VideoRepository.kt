@@ -72,4 +72,6 @@ interface VideoRepository {
     suspend fun findDuplicates(): List<List<VideoEntity>>
 
     suspend fun existsByPath(path: String): Boolean
+
+    suspend fun allVideos(): List<VideoEntity>
 }

@@ -52,8 +52,12 @@ data class LibraryUiState(
     val folders: List<FolderEntity> = emptyList(),
     val selectionMode: Boolean = false,
     val selectedIds: Set<Long> = emptySet(),
-    /** SHA-256 hash of the private-vault password, or null if none is set yet. */
-    val privateVaultHash: String? = null
+    /** Category names (normalised) whose covers are blurred (OBSCURED mode). */
+    val obscuredCategories: Set<String> = emptySet(),
+    /** Category names (normalised) that require a password to open (VISIBLE ∪ OBSCURED). */
+    val lockedCategories: Set<String> = emptySet(),
+    /** Raw "name\thash\tmode" password store, for verifying a category unlock. */
+    val categoryPasswordsRaw: String? = null
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -71,14 +75,17 @@ class LibraryViewModel @Inject constructor(
 
     /** Recently-played videos still in progress, for the "Continue watching" row. */
     val continueWatching: StateFlow<List<VideoEntity>> =
-        videoRepository.observeRecentlyPlayed(20)
-            .map { list ->
-                list.filter { v ->
-                    v.mediaType != "image" &&
-                        // Extra-private clips never surface in the Continue row.
-                        !v.isPrivate &&
-                        v.lastPlayedPosition > 3_000 &&
-                        (v.duration <= 0 || v.lastPlayedPosition < v.duration * 95 / 100)
+        combine(
+            videoRepository.observeRecentlyPlayed(20),
+            settingsRepository.observeSettings()
+        ) { list, settings ->
+            val protectedCats = allProtectedCategories(settings)
+            list.filter { v ->
+                v.mediaType != "image" &&
+                    // Clips in any protected category never surface here.
+                    v.category?.trim()?.lowercase() !in protectedCats &&
+                    v.lastPlayedPosition > 3_000 &&
+                    (v.duration <= 0 || v.lastPlayedPosition < v.duration * 95 / 100)
                 }.take(10)
             }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -172,9 +179,34 @@ class LibraryViewModel @Inject constructor(
     }
 
     /** Names of hidden ∪ password-protected categories, from the settings row. */
+    // Only *hidden* categories are dropped from the library. Password-protected
+    // categories now stay visible but with obscured covers (see protectedCategories),
+    // so they are no longer excluded here.
     private fun excludedCategories(settings: SettingsEntity): Set<String> =
-        com.myvideolibrary.app.util.CategorySecurity.parseHidden(settings.hiddenCategories) +
-            com.myvideolibrary.app.util.CategorySecurity.protectedNames(settings.categoryPasswords)
+        com.myvideolibrary.app.util.CategorySecurity.parseHidden(settings.hiddenCategories)
+
+    /** Every protected category name, normalised (trimmed, lower-cased). */
+    private fun allProtectedCategories(settings: SettingsEntity): Set<String> =
+        com.myvideolibrary.app.util.CategorySecurity.protectedNames(settings.categoryPasswords)
+            .map { it.trim().lowercase() }.toSet()
+
+    /** Categories whose covers are blurred (OBSCURED mode), normalised. */
+    private fun obscuredCategories(settings: SettingsEntity): Set<String> =
+        com.myvideolibrary.app.util.CategorySecurity.namesWithMode(
+            settings.categoryPasswords, com.myvideolibrary.app.util.CategoryProtectionMode.OBSCURED
+        ).map { it.trim().lowercase() }.toSet()
+
+    /** Categories shown in the library that need a password to open (VISIBLE ∪ OBSCURED). */
+    private fun lockedCategories(settings: SettingsEntity): Set<String> {
+        val pw = settings.categoryPasswords
+        val visible = com.myvideolibrary.app.util.CategorySecurity.namesWithMode(
+            pw, com.myvideolibrary.app.util.CategoryProtectionMode.VISIBLE
+        )
+        val obscured = com.myvideolibrary.app.util.CategorySecurity.namesWithMode(
+            pw, com.myvideolibrary.app.util.CategoryProtectionMode.OBSCURED
+        )
+        return (visible + obscured).map { it.trim().lowercase() }.toSet()
+    }
 
     // Active filter selections.
     private val filters = combine(
@@ -203,7 +235,9 @@ class LibraryViewModel @Inject constructor(
             folders = m.folders,
             selectionMode = selection.active,
             selectedIds = selection.ids,
-            privateVaultHash = m.settings.privateVaultPassword
+            obscuredCategories = obscuredCategories(m.settings),
+            lockedCategories = lockedCategories(m.settings),
+            categoryPasswordsRaw = m.settings.categoryPasswords
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), LibraryUiState())
 
@@ -270,16 +304,6 @@ class LibraryViewModel @Inject constructor(
         videoRepository.setTags(id, rawTags)
     }
 
-    /** Marks a video as extra-private (obscured cover + vault password) or clears it. */
-    fun setPrivate(id: Long, isPrivate: Boolean) = viewModelScope.launch {
-        videoRepository.setPrivate(id, isPrivate)
-    }
-
-    /** Sets (or changes) the private-vault password, storing only its SHA-256 hash. */
-    fun setVaultPassword(rawPassword: String) = viewModelScope.launch {
-        val hash = com.myvideolibrary.app.util.CategorySecurity.hashPassword(rawPassword)
-        settingsRepository.update { it.copy(privateVaultPassword = hash) }
-    }
 
     /** Saves the current filter + sort state under [name] (replacing a same-named one). */
     fun saveCurrentSearch(name: String) = viewModelScope.launch {

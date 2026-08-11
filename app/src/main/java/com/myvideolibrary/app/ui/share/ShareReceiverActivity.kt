@@ -16,6 +16,7 @@ import com.myvideolibrary.app.data.model.VideoSource
 import com.myvideolibrary.app.data.repository.VideoRepository
 import com.myvideolibrary.app.util.StorageManager
 import com.myvideolibrary.app.util.ThumbnailGenerator
+import com.myvideolibrary.app.security.AppLockManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,9 +35,17 @@ class ShareReceiverActivity : AppCompatActivity() {
     @Inject lateinit var videoRepository: VideoRepository
     @Inject lateinit var thumbnailGenerator: ThumbnailGenerator
     @Inject lateinit var storageManager: StorageManager
+    @Inject lateinit var appLockManager: AppLockManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (appLockManager.shouldLock()) {
+            startActivity(
+                com.myvideolibrary.app.ui.security.LockActivity.intent(this, Intent(intent))
+            )
+            finish()
+            return
+        }
         setContentView(
             FrameLayout(this).apply {
                 addView(

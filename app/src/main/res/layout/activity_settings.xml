@@ -185,6 +185,13 @@
                     </LinearLayout>
                 </LinearLayout>
 
+                <LinearLayout android:id="@+id/libraryHealthRow" style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/library_health" />
+                        <TextView style="@style/SettingsSubtitle" android:text="@string/library_health_desc" />
+                    </LinearLayout>
+                </LinearLayout>
+
                 <LinearLayout android:id="@+id/backupRow" style="@style/SettingsRow">
                     <LinearLayout style="@style/SettingsRowText">
                         <TextView style="@style/SettingsTitle" android:text="@string/backup" />
@@ -230,6 +237,13 @@
                         <TextView style="@style/SettingsTitle" android:text="@string/check_updates" />
                         <TextView android:id="@+id/checkUpdateValue" style="@style/SettingsSubtitle"
                             android:text="@string/check_updates_desc" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout android:id="@+id/releaseNotesRow" style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/release_notes" />
+                        <TextView style="@style/SettingsSubtitle" android:text="@string/release_notes_desc" />
                     </LinearLayout>
                 </LinearLayout>
 

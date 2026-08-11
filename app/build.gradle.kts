@@ -16,8 +16,8 @@ android {
         targetSdk = 35
         // Overridable from CI (e.g. -PversionCode=42 -PversionName=1.0.42) so each
         // auto-built APK carries a distinct, visible version.
-        versionCode = (project.findProperty("versionCode") as String?)?.toIntOrNull() ?: 1
-        versionName = (project.findProperty("versionName") as String?) ?: "1.0.0"
+        versionCode = (project.findProperty("versionCode") as String?)?.toIntOrNull() ?: 173
+        versionName = (project.findProperty("versionName") as String?) ?: "1.0.173"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
