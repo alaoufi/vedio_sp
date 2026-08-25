@@ -80,8 +80,23 @@ class DownloadManager @Inject constructor(
             com.myvideolibrary.app.data.model.DownloadKind.FULL
     ): Long {
         val imageKind = com.myvideolibrary.app.data.model.DownloadKind.IMAGE_ONLY
-        // A photo/slideshow post: rebuild it into a single video (images + music).
+        // A photo/slideshow post.
         if (resolved.isSlideshow && resolved.imageUrls.isNotEmpty()) {
+            // A single-picture photo post is just an image: save it directly
+            // instead of building a one-frame "slideshow" video on-device — the
+            // MediaCodec encode is fragile and fails on many OEMs, which is why
+            // these posts often didn't download at all.
+            if (resolved.imageUrls.size == 1) {
+                return enqueue(
+                    title = resolved.title,
+                    source = resolved.source.id,
+                    sourceUrl = resolved.sourceUrl,
+                    directUrl = resolved.imageUrls.first(),
+                    thumbnailUrl = resolved.thumbnailUrl ?: resolved.imageUrls.first(),
+                    kind = imageKind
+                )
+            }
+            // Multiple pictures: rebuild the slideshow into one video (images + music).
             return enqueue(
                 title = resolved.title,
                 source = resolved.source.id,
