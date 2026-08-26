@@ -8,12 +8,10 @@ data class ReleaseNotesEntry(
 /** Keeps the in-app page focused on the newest released version only. */
 object ReleaseNotes {
     fun latest(): ReleaseNotesEntry = ReleaseNotesEntry(
-        version = "1.0.173",
+        version = "1.0.174",
         changes = listOf(
-            "Latest changes are available in Settings.",
-            "External entry points now respect the app lock.",
-            "Unsupported HLS playlist downloads are filtered out.",
-            "Backup restore now runs as one atomic operation."
+            "TikTok download retries now clearly explain when the link is refreshed.",
+            "Failed TikTok downloads retain a visible retry option."
         )
     )
 }

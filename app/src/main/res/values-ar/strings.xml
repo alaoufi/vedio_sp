@@ -157,6 +157,8 @@
     <string name="action_pause">إيقاف مؤقت</string>
     <string name="action_retry">إعادة المحاولة</string>
     <string name="status_waiting">في الانتظار…</string>
+    <string name="status_refreshing_tiktok">جارٍ تحديث رابط تيك توك وإعادة المحاولة…</string>
+    <string name="status_retrying_download">جارٍ إعادة محاولة التنزيل…</string>
     <string name="status_downloading">%1$d%% · %2$s</string>
     <string name="status_processing">جارٍ المعالجة…</string>
     <string name="status_paused">متوقف مؤقتًا</string>
@@ -215,13 +217,9 @@
     <string name="release_notes">ما الجديد</string>
     <string name="release_notes_desc">عرض تعديلات الإصدار الأخير</string>
     <string name="release_notes_version">الإصدار %1$s</string>
-    <string name="release_notes_changes">• صفحة جديدة «ما الجديد» داخل الإعدادات تعرض تعديلات آخر إصدار.
+    <string name="release_notes_changes">• أصبحت إعادة محاولة تنزيلات تيك توك توضح عند تحديث الرابط المؤقت.
 
-• فتح الملفات والمشاركة من التطبيقات الأخرى يحترمان قفل التطبيق.
-
-• لم تعد قوائم بث HLS غير المدعومة تظهر كخيارات تنزيل.
-
-• الاستعادة من النسخة الاحتياطية تكتمل بالكامل أو لا تُجري أي تغيير.</string>
+• تنزيلات تيك توك الفاشلة تبقي زر إعادة المحاولة ظاهراً.</string>
     <string name="action_settings">الإعدادات</string>
     <string name="section_appearance">المظهر</string>
     <string name="section_downloads">التحميلات</string>

@@ -45,7 +45,7 @@ class DownloadsAdapter(
             if (!indeterminate) binding.progressBar.progress = item.progress
 
             binding.statusText.text = when (status) {
-                DownloadStatus.WAITING -> ctx.getString(R.string.status_waiting)
+                DownloadStatus.WAITING -> item.errorMessage ?: ctx.getString(R.string.status_waiting)
                 DownloadStatus.DOWNLOADING -> ctx.getString(
                     R.string.status_downloading,
                     item.progress,
