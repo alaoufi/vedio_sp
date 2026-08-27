@@ -67,6 +67,7 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun bindActions() {
         setupSection(binding.headerAppearance, binding.bodyAppearance, binding.chevAppearance)
+        setupSection(binding.headerAudio, binding.bodyAudio, binding.chevAudio)
         setupSection(binding.headerDownloads, binding.bodyDownloads, binding.chevDownloads)
         setupSection(binding.headerSecurity, binding.bodySecurity, binding.chevSecurity)
         setupSection(binding.headerStorage, binding.bodyStorage, binding.chevStorage)
@@ -88,6 +89,18 @@ class SettingsActivity : AppCompatActivity() {
             viewModel.setWifiOnly(binding.wifiOnlySwitch.isChecked)
         }
         binding.maxConcurrentRow.setOnClickListener { showMaxConcurrentDialog() }
+        binding.audioVolumeSlider.addOnChangeListener { _, value, fromUser ->
+            if (fromUser) viewModel.setAudioVolumePercent(value.toInt())
+        }
+        binding.audioBassBoostSwitch.setOnClickListener {
+            viewModel.setAudioBassBoostEnabled(binding.audioBassBoostSwitch.isChecked)
+        }
+        binding.audioSurroundSwitch.setOnClickListener {
+            viewModel.setAudioSurroundEnabled(binding.audioSurroundSwitch.isChecked)
+        }
+        binding.audioSpeechClaritySwitch.setOnClickListener {
+            viewModel.setAudioSpeechClarityEnabled(binding.audioSpeechClaritySwitch.isChecked)
+        }
 
         binding.appLockSwitch.setOnClickListener {
             if (binding.appLockSwitch.isChecked) showSetPinDialog() else viewModel.disableLock()
@@ -129,6 +142,14 @@ class SettingsActivity : AppCompatActivity() {
         binding.wifiOnlySwitch.isChecked = state.wifiOnly
         binding.maxConcurrentValue.text = state.maxConcurrent.toString()
         binding.endActionValue.text = getString(endActionLabel(state.endOfClipAction))
+        val audioVolume = state.audioVolumePercent.toFloat()
+        if (binding.audioVolumeSlider.value != audioVolume) {
+            binding.audioVolumeSlider.value = audioVolume
+        }
+        binding.audioVolumeValue.text = getString(R.string.audio_volume_percent, state.audioVolumePercent)
+        binding.audioBassBoostSwitch.isChecked = state.audioBassBoostEnabled
+        binding.audioSurroundSwitch.isChecked = state.audioSurroundEnabled
+        binding.audioSpeechClaritySwitch.isChecked = state.audioSpeechClarityEnabled
         binding.appLockSwitch.isChecked = state.appLockEnabled && state.hasPin
         binding.changePinRow.isEnabled = state.hasPin
         binding.biometricSwitch.isChecked = state.biometricEnabled

@@ -34,6 +34,10 @@ data class SettingsUiState(
     val saveLocation: String? = null,
     val endOfClipAction: com.myvideolibrary.app.data.model.EndOfClipAction =
         com.myvideolibrary.app.data.model.EndOfClipAction.NEXT,
+    val audioVolumePercent: Int = 100,
+    val audioBassBoostEnabled: Boolean = false,
+    val audioSurroundEnabled: Boolean = false,
+    val audioSpeechClarityEnabled: Boolean = false,
     val message: String? = null,
     val exportedFile: java.io.File? = null
 )
@@ -70,7 +74,11 @@ class SettingsViewModel @Inject constructor(
                 storageUsed = used,
                 saveLocation = settings.storagePath,
                 endOfClipAction = com.myvideolibrary.app.data.model.EndOfClipAction
-                    .fromId(settings.endOfClipAction)
+                    .fromId(settings.endOfClipAction),
+                audioVolumePercent = settings.audioVolumePercent,
+                audioBassBoostEnabled = settings.audioBassBoostEnabled,
+                audioSurroundEnabled = settings.audioSurroundEnabled,
+                audioSpeechClarityEnabled = settings.audioSpeechClarityEnabled
             )
         }
     }
@@ -106,6 +114,38 @@ class SettingsViewModel @Inject constructor(
             settingsRepository.update { it.copy(maxConcurrentDownloads = clamped) }
         }
         _state.value = _state.value.copy(maxConcurrent = clamped)
+    }
+
+    fun setAudioVolumePercent(value: Int) {
+        val clamped = value.coerceIn(
+            com.myvideolibrary.app.ui.player.AudioGainPolicy.MIN_PERCENT,
+            com.myvideolibrary.app.ui.player.AudioGainPolicy.MAX_PERCENT
+        )
+        viewModelScope.launch {
+            settingsRepository.update { it.copy(audioVolumePercent = clamped) }
+        }
+        _state.value = _state.value.copy(audioVolumePercent = clamped)
+    }
+
+    fun setAudioBassBoostEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.update { it.copy(audioBassBoostEnabled = enabled) }
+        }
+        _state.value = _state.value.copy(audioBassBoostEnabled = enabled)
+    }
+
+    fun setAudioSurroundEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.update { it.copy(audioSurroundEnabled = enabled) }
+        }
+        _state.value = _state.value.copy(audioSurroundEnabled = enabled)
+    }
+
+    fun setAudioSpeechClarityEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.update { it.copy(audioSpeechClarityEnabled = enabled) }
+        }
+        _state.value = _state.value.copy(audioSpeechClarityEnabled = enabled)
     }
 
     // ---- Security ----

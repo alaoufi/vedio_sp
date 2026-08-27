@@ -62,6 +62,71 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <!-- ===== Audio ===== -->
+            <LinearLayout android:id="@+id/headerAudio" style="@style/SettingsSectionHeader">
+                <TextView style="@style/SettingsSectionTitle" android:text="@string/section_audio" />
+                <ImageView android:id="@+id/chevAudio" style="@style/SettingsSectionChevron"
+                    android:src="@drawable/ic_expand_more" android:contentDescription="@null" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/bodyAudio"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout style="@style/SettingsRow"
+                    android:orientation="vertical">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical">
+                        <LinearLayout style="@style/SettingsRowText">
+                            <TextView style="@style/SettingsTitle" android:text="@string/audio_volume" />
+                            <TextView style="@style/SettingsSubtitle" android:text="@string/audio_volume_desc" />
+                        </LinearLayout>
+                        <TextView android:id="@+id/audioVolumeValue" style="@style/SettingsValue"
+                            tools:text="100%" />
+                    </LinearLayout>
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/audioVolumeSlider"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:valueFrom="0"
+                        android:valueTo="200"
+                        android:stepSize="1"
+                        android:value="100" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/audio_bass_boost" />
+                        <TextView style="@style/SettingsSubtitle" android:text="@string/audio_bass_boost_desc" />
+                    </LinearLayout>
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/audioBassBoostSwitch"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/audio_surround" />
+                        <TextView style="@style/SettingsSubtitle" android:text="@string/audio_surround_desc" />
+                    </LinearLayout>
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/audioSurroundSwitch"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/audio_speech_clarity" />
+                        <TextView style="@style/SettingsSubtitle" android:text="@string/audio_speech_clarity_desc" />
+                    </LinearLayout>
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/audioSpeechClaritySwitch"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+
             <!-- ===== Downloads ===== -->
             <LinearLayout android:id="@+id/headerDownloads" style="@style/SettingsSectionHeader">
                 <TextView style="@style/SettingsSectionTitle" android:text="@string/section_downloads" />

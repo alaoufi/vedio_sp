@@ -521,4 +521,15 @@
         <item quantity="other">%d مقطع</item>
     </plurals>
     <string name="continue_watching">متابعة المشاهدة</string>
+    <string name="section_audio">الصوت والمؤثرات</string>
+    <string name="audio_settings">الصوت والمؤثرات</string>
+    <string name="audio_volume">قوة الصوت</string>
+    <string name="audio_volume_percent">%1$d%%</string>
+    <string name="audio_volume_desc">الرفع فوق 100٪ قد يسبب تشويشاً لبعض المقاطع.</string>
+    <string name="audio_bass_boost">تعزيز الجهير</string>
+    <string name="audio_bass_boost_desc">يزيد عمق الصوت عندما يدعم جهازك ذلك.</string>
+    <string name="audio_surround">الصوت المحيطي</string>
+    <string name="audio_surround_desc">يوسّع مجال الصوت عندما يدعمه جهازك.</string>
+    <string name="audio_speech_clarity">وضوح الكلام</string>
+    <string name="audio_speech_clarity_desc">يُبرز الأصوات البشرية عندما يكون مدعوماً.</string>
 </resources>
