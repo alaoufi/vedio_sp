@@ -54,12 +54,17 @@ class PlayerActivity : AppCompatActivity() {
     @javax.inject.Inject
     lateinit var videoRepository: com.myvideolibrary.app.data.repository.VideoRepository
 
+    @javax.inject.Inject
+    lateinit var settingsRepository: com.myvideolibrary.app.data.repository.SettingsRepository
+
     // Sleep timer + loop state.
     private var sleepRunnable: Runnable? = null
     private val sleepHandler = android.os.Handler(android.os.Looper.getMainLooper())
     private var looping = false
 
     private var player: ExoPlayer? = null
+    private val audioEffects = PlayerAudioEffects()
+    private var audioSettings = PlayerAudioSettings()
     private var controlsLocked = false
     private var backgroundPlayback = false
     private var videoId = -1L
@@ -175,6 +180,20 @@ class PlayerActivity : AppCompatActivity() {
             }
         }
 
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settingsRepository.observeSettings().collectLatest { settings ->
+                    audioSettings = PlayerAudioSettings(
+                        volumePercent = settings.audioVolumePercent,
+                        bassBoostEnabled = settings.audioBassBoostEnabled,
+                        surroundEnabled = settings.audioSurroundEnabled,
+                        speechClarityEnabled = settings.audioSpeechClarityEnabled
+                    )
+                    player?.let { audioEffects.applyVolume(it, audioSettings) }
+                }
+            }
+        }
+
         // Reflect the favourite state on the heart button.
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -277,6 +296,7 @@ class PlayerActivity : AppCompatActivity() {
             isChecked = backgroundPlayback
         }
         if (supportsPip() && !isAudioTrack) m.add(0, 4, 9, getString(R.string.cd_pip))
+        m.add(0, 13, 10, getString(R.string.audio_settings))
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 1 -> { toggleRotationLock(); true }
@@ -303,6 +323,10 @@ class PlayerActivity : AppCompatActivity() {
                 10 -> { showSleepTimerMenu(anchor); true }
                 11 -> { toggleLoop(); true }
                 12 -> { captureFrame(); true }
+                13 -> {
+                    startActivity(Intent(this, com.myvideolibrary.app.ui.settings.SettingsActivity::class.java))
+                    true
+                }
                 else -> false
             }
         }
@@ -526,6 +550,7 @@ class PlayerActivity : AppCompatActivity() {
             .build()
         val exo = ExoPlayer.Builder(this).setLoadControl(loadControl).build()
         binding.playerView.player = exo
+        audioEffects.applyVolume(exo, audioSettings)
 
         currentSource = source
         exo.setMediaItem(buildMediaItem(sourceUri(source)))
@@ -536,6 +561,10 @@ class PlayerActivity : AppCompatActivity() {
         exo.prepare()
 
         exo.addListener(object : Player.Listener {
+            override fun onAudioSessionIdChanged(audioSessionId: Int) {
+                audioEffects.applyToSession(exo, audioSessionId, audioSettings)
+            }
+
             override fun onPlaybackStateChanged(playbackState: Int) {
                 // Show the spinner while buffering so it's clear playback is loading.
                 binding.loadingBar.isVisible = playbackState == Player.STATE_BUFFERING
@@ -794,6 +823,7 @@ class PlayerActivity : AppCompatActivity() {
         // Closing the PiP window (its X) finishes the activity — release the player
         // so audio actually stops, even when background playback is enabled.
         if (isFinishing) {
+            audioEffects.release()
             player?.release()
             player = null
             return
@@ -808,6 +838,7 @@ class PlayerActivity : AppCompatActivity() {
         super.onDestroy()
         cancelSleep()
         savePosition()
+        audioEffects.release()
         player?.release()
         player = null
     }
