@@ -91,7 +91,20 @@ data class SettingsEntity(
 
     /** [com.myvideolibrary.app.data.model.EndOfClipAction.id] — stop/repeat/next. */
     @ColumnInfo(name = "end_of_clip_action")
-    val endOfClipAction: String = "next"
+    val endOfClipAction: String = "next",
+
+    // ---- Playback audio preferences ----
+    @ColumnInfo(name = "audio_volume_percent")
+    val audioVolumePercent: Int = 100,
+
+    @ColumnInfo(name = "audio_bass_boost_enabled")
+    val audioBassBoostEnabled: Boolean = false,
+
+    @ColumnInfo(name = "audio_surround_enabled")
+    val audioSurroundEnabled: Boolean = false,
+
+    @ColumnInfo(name = "audio_speech_clarity_enabled")
+    val audioSpeechClarityEnabled: Boolean = false
 ) {
     companion object {
         const val SINGLETON_ID = 1

@@ -26,7 +26,7 @@ import com.myvideolibrary.app.data.local.entity.VideoEntity
         PlaylistVideoEntity::class,
         SavedSearchEntity::class
     ],
-    version = 15,
+    version = 16,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {

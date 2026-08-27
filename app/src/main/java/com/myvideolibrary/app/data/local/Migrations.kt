@@ -134,3 +134,13 @@ val MIGRATION_14_15 = object : Migration(14, 15) {
         db.execSQL("ALTER TABLE settings ADD COLUMN private_vault_password TEXT")
     }
 }
+
+/** Adds saved playback volume and opt-in audio effect preferences. */
+val MIGRATION_15_16 = object : Migration(15, 16) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE settings ADD COLUMN audio_volume_percent INTEGER NOT NULL DEFAULT 100")
+        db.execSQL("ALTER TABLE settings ADD COLUMN audio_bass_boost_enabled INTEGER NOT NULL DEFAULT 0")
+        db.execSQL("ALTER TABLE settings ADD COLUMN audio_surround_enabled INTEGER NOT NULL DEFAULT 0")
+        db.execSQL("ALTER TABLE settings ADD COLUMN audio_speech_clarity_enabled INTEGER NOT NULL DEFAULT 0")
+    }
+}
