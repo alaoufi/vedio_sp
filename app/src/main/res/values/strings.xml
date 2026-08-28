@@ -298,8 +298,10 @@
     <string name="auto_backup_failed">Backup failed: %1$s</string>
     <string name="recover_storage">Recover clips from storage</string>
     <string name="recover_storage_desc">Rebuild the library from video files still on the device</string>
-    <string name="recover_storage_confirm">This scans the app\'s storage and re-adds any video files that aren\'t in your library. Use it if the library looks empty but the files are still on the device.</string>
+    <string name="recover_storage_confirm">Re-adds video files that aren\'t in your library. Pick the folder where your clips are saved (e.g. your vedio_sp folder) so their names and covers come back, or just scan the app\'s own storage.</string>
     <string name="recover_storage_run">Recover</string>
+    <string name="recover_storage_pick_folder">Pick clips folder</string>
+    <string name="recover_storage_app_only">Scan app storage</string>
     <string name="recover_storage_running">Scanning storage…</string>
     <string name="recover_storage_done">Recovered %1$d clip(s). Pull down to refresh the library.</string>
     <string name="recover_storage_summary">Recovered %1$d, removed %2$d, scanned %3$d, already %4$d, in library %5$d. Pull down to refresh.</string>

@@ -261,8 +261,10 @@
     <string name="auto_backup_failed">فشل النسخ: %1$s</string>
     <string name="recover_storage">استرجاع المقاطع من التخزين</string>
     <string name="recover_storage_desc">إعادة بناء المكتبة من ملفات الفيديو الموجودة على الجهاز</string>
-    <string name="recover_storage_confirm">يفحص هذا تخزين التطبيق ويعيد إضافة أي ملفات فيديو غير موجودة في مكتبتك. استخدمه إذا بدت المكتبة فارغة لكن الملفات ما زالت على الجهاز.</string>
+    <string name="recover_storage_confirm">يعيد إضافة ملفات الفيديو غير الموجودة في مكتبتك. اختر المجلد الذي حُفظت فيه مقاطعك (مثل مجلد vedio_sp) لترجع بأسمائها وأغلفتها، أو افحص تخزين التطبيق فقط.</string>
     <string name="recover_storage_run">استرجاع</string>
+    <string name="recover_storage_pick_folder">اختر مجلد المقاطع</string>
+    <string name="recover_storage_app_only">افحص تخزين التطبيق</string>
     <string name="recover_storage_running">جارٍ فحص التخزين…</string>
     <string name="recover_storage_done">تم استرجاع %1$d مقطعًا. اسحب للأسفل لتحديث المكتبة.</string>
     <string name="recover_storage_summary">استُرجع %1$d؛ أُزيل %2$d؛ فُحص %3$d؛ موجود مسبقًا %4$d؛ في المكتبة %5$d. اسحب للأسفل.</string>

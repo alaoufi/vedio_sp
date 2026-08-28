@@ -47,7 +47,12 @@ class RecoveryManager @Inject constructor(
         val libraryCount: Int
     )
 
-    suspend fun recoverFromStorage(): Result = withContext(Dispatchers.IO) {
+    /**
+     * @param folderUri optional SAF tree the user just picked (e.g. their vedio_sp
+     * folder). Falls back to the saved save-location. Both are scanned along with
+     * the app's private folders.
+     */
+    suspend fun recoverFromStorage(folderUri: String? = null): Result = withContext(Dispatchers.IO) {
         val removed = purgeBrokenEntries()
         val all = videoDao.getAllOnce()
         val known = all
@@ -90,9 +95,11 @@ class RecoveryManager @Inject constructor(
             }
         }
 
-        // 1) The user's chosen save folder first — its copies have readable names.
-        val treeUri = settingsRepository.getSettings().storagePath
-        if (!treeUri.isNullOrBlank()) {
+        // 1) External folders first — their copies have readable names. Scan the
+        //    folder the user just picked and any saved save-location (deduped).
+        val externalTrees = listOfNotNull(folderUri, settingsRepository.getSettings().storagePath)
+            .map { it.trim() }.filter { it.isNotEmpty() }.distinct()
+        for (treeUri in externalTrees) {
             runCatching {
                 DocumentFile.fromTreeUri(context, Uri.parse(treeUri))?.listFiles()?.forEach { doc ->
                     val name = doc.name

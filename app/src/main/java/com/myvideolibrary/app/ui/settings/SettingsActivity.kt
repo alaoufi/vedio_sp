@@ -36,6 +36,22 @@ class SettingsActivity : AppCompatActivity() {
         ActivityResultContracts.OpenDocument()
     ) { uri -> uri?.let { promptRestorePassword(it) } }
 
+    /** Picks the folder to scan when recovering clips (e.g. the user's vedio_sp folder). */
+    private val recoveryFolderPicker = registerForActivityResult(
+        ActivityResultContracts.OpenDocumentTree()
+    ) { uri ->
+        if (uri != null) {
+            runCatching {
+                contentResolver.takePersistableUriPermission(
+                    uri,
+                    android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                        android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+            }
+            runRecovery(uri.toString())
+        }
+    }
+
     /** Picks the external folder that automatic backups are written to. */
     private val backupFolderPicker = registerForActivityResult(
         ActivityResultContracts.OpenDocumentTree()
@@ -134,28 +150,34 @@ class SettingsActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle(R.string.recover_storage)
             .setMessage(R.string.recover_storage_confirm)
-            .setPositiveButton(R.string.recover_storage_run) { _, _ ->
-                Toast.makeText(this, R.string.recover_storage_running, Toast.LENGTH_SHORT).show()
-                lifecycleScope.launch {
-                    val result = runCatching { recoveryManager.recoverFromStorage() }.getOrNull()
-                    val msg = if (result == null) {
-                        getString(R.string.recover_storage_failed)
-                    } else {
-                        getString(
-                            R.string.recover_storage_summary,
-                            result.recovered, result.removedBroken, result.filesScanned,
-                            result.alreadyPresent, result.libraryCount
-                        )
-                    }
-                    AlertDialog.Builder(this@SettingsActivity)
-                        .setTitle(R.string.recover_storage)
-                        .setMessage(msg)
-                        .setPositiveButton(android.R.string.ok, null)
-                        .show()
-                }
+            .setPositiveButton(R.string.recover_storage_pick_folder) { _, _ ->
+                runCatching { recoveryFolderPicker.launch(null) }
+                    .onFailure { runRecovery(null) }
             }
+            .setNeutralButton(R.string.recover_storage_app_only) { _, _ -> runRecovery(null) }
             .setNegativeButton(R.string.cancel, null)
             .show()
+    }
+
+    private fun runRecovery(folderUri: String?) {
+        Toast.makeText(this, R.string.recover_storage_running, Toast.LENGTH_SHORT).show()
+        lifecycleScope.launch {
+            val result = runCatching { recoveryManager.recoverFromStorage(folderUri) }.getOrNull()
+            val msg = if (result == null) {
+                getString(R.string.recover_storage_failed)
+            } else {
+                getString(
+                    R.string.recover_storage_summary,
+                    result.recovered, result.removedBroken, result.filesScanned,
+                    result.alreadyPresent, result.libraryCount
+                )
+            }
+            AlertDialog.Builder(this@SettingsActivity)
+                .setTitle(R.string.recover_storage)
+                .setMessage(msg)
+                .setPositiveButton(android.R.string.ok, null)
+                .show()
+        }
     }
 
     // ---- Automatic external backup ----
