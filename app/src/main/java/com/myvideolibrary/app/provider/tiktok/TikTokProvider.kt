@@ -70,8 +70,18 @@ class TikTokProvider @Inject constructor(
                 }
             }
         }
-        val resolved = root ?: throw (lastError
-            ?: ProviderException(ProviderErrorType.EXTRACTION_FAILED, "Could not extract the video"))
+        val resolved = root ?: run {
+            // Last resort when every resolver host failed (rate-limits, transient
+            // errors): some TikTok pages expose og:video to bot user-agents, so try
+            // reading it straight off the canonical page before giving up.
+            val ogTarget = candidates.firstOrNull() ?: url
+            runCatching {
+                return@withContext com.myvideolibrary.app.provider.web.OpenGraphResolver
+                    .resolve(client, ogTarget, VideoSource.TIKTOK, "TikTok video")
+            }
+            throw (lastError
+                ?: ProviderException(ProviderErrorType.EXTRACTION_FAILED, "Could not extract the video"))
+        }
 
         val data = resolved.obj("data")
             ?: throw ProviderException(ProviderErrorType.EXTRACTION_FAILED, "No data")

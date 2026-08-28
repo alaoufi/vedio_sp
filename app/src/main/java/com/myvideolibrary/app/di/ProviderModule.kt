@@ -1,6 +1,8 @@
 package com.myvideolibrary.app.di
 
 import com.myvideolibrary.app.provider.VideoProvider
+import com.myvideolibrary.app.provider.instagram.InstagramProvider
+import com.myvideolibrary.app.provider.snapchat.SnapchatProvider
 import com.myvideolibrary.app.provider.tiktok.TikTokProvider
 import com.myvideolibrary.app.provider.youtube.YouTubeProvider
 import dagger.Binds
@@ -24,7 +26,12 @@ abstract class ProviderModule {
     @Binds
     @IntoSet
     abstract fun bindYouTubeProvider(provider: YouTubeProvider): VideoProvider
-    // Instagram and Snapchat removed: their public extraction was unreliable and
-    // rarely worked, so they no longer appear in search or link download. Their
-    // sites can still be captured through the in-app browser's media sniffer.
+
+    @Binds
+    @IntoSet
+    abstract fun bindInstagramProvider(provider: InstagramProvider): VideoProvider
+
+    @Binds
+    @IntoSet
+    abstract fun bindSnapchatProvider(provider: SnapchatProvider): VideoProvider
 }
