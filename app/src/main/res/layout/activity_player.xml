@@ -75,6 +75,15 @@
             app:tint="@color/white"
             android:contentDescription="@string/action_share" />
 
+        <ImageButton
+            android:id="@+id/boostButton"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_volume_up"
+            app:tint="@color/white"
+            android:contentDescription="@string/volume_boost" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/speedButton"
             style="@style/Widget.Material3.Button.TextButton"

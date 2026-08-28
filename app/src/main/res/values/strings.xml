@@ -145,6 +145,16 @@
 
     <!-- Player -->
     <string name="speed_format">%.2f×</string>
+    <string name="volume_boost">Volume boost</string>
+    <string name="volume_boost_value">Volume: %1$d%%</string>
+    <string name="audio_effects">Sound effects</string>
+    <string name="effect_none">None</string>
+    <string name="effect_bass">Bass boost</string>
+    <string name="effect_surround">Surround</string>
+    <string name="effect_hall">Hall (echo)</string>
+    <string name="effect_concert">Concert</string>
+    <string name="done">Done</string>
+    <string name="reset">Reset</string>
     <string name="playback_error">Unable to play this video</string>
     <string name="brightness_label">Brightness %1$d%%</string>
     <string name="seek_forward">⏩ +10s</string>

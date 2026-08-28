@@ -108,6 +108,16 @@
 
     <!-- Player -->
     <string name="speed_format">%.2f×</string>
+    <string name="volume_boost">رفع الصوت</string>
+    <string name="volume_boost_value">الصوت: %1$d%%</string>
+    <string name="audio_effects">المؤثرات الصوتية</string>
+    <string name="effect_none">بدون</string>
+    <string name="effect_bass">تعزيز الجهير</string>
+    <string name="effect_surround">محيطي</string>
+    <string name="effect_hall">قاعة (صدى)</string>
+    <string name="effect_concert">حفلة</string>
+    <string name="done">تم</string>
+    <string name="reset">إعادة تعيين</string>
     <string name="playback_error">تعذّر تشغيل هذا الفيديو</string>
     <string name="brightness_label">السطوع %1$d%%</string>
     <string name="seek_forward">⏩ +10 ثانية</string>

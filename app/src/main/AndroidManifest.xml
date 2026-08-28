@@ -4,6 +4,8 @@
 
     <!-- Network access for provider search / downloads (used in later phases). -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Player audio effects (bass/surround/reverb/loudness boost). -->
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <!-- Post notifications (Android 13+) for download progress. -->

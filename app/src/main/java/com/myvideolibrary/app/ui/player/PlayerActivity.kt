@@ -17,6 +17,7 @@ import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -71,6 +72,13 @@ class PlayerActivity : AppCompatActivity() {
 
     private val speeds = floatArrayOf(0.5f, 0.75f, 1f, 1.25f, 1.5f, 2f)
     private var speedIndex = 2
+
+    // Real volume boost (PCM gain, can exceed 100%) + optional audio effects.
+    private val gainProcessor = com.myvideolibrary.app.util.GainAudioProcessor()
+    private var audioEffects: com.myvideolibrary.app.util.PlayerAudioEffects? = null
+    /** Boost as a percentage: 100 = normal, up to 500%. Kept across clips this session. */
+    private var boostPercent = 100
+    private var effectPreset = com.myvideolibrary.app.util.PlayerAudioEffects.Preset.NONE
 
     // Currently playing source and an optional user-chosen subtitle sidecar file.
     private var currentSource: String? = null
@@ -224,6 +232,7 @@ class PlayerActivity : AppCompatActivity() {
     private fun setupControls() {
         binding.speedButton.text = getString(R.string.speed_format, speeds[speedIndex])
         binding.speedButton.setOnClickListener { cycleSpeed() }
+        binding.boostButton.setOnClickListener { showBoostDialog() }
         binding.backButton.setOnClickListener { finish() }
         binding.moreButton.setOnClickListener { showPlayerMenu(it) }
 
@@ -513,7 +522,34 @@ class PlayerActivity : AppCompatActivity() {
                 1000
             )
             .build()
-        val exo = ExoPlayer.Builder(this).setLoadControl(loadControl).build()
+        // Custom renderers factory whose audio sink runs our gain processor, so the
+        // volume can truly exceed 100% (ExoPlayer's own volume is capped at 1.0).
+        val renderersFactory = object :
+            androidx.media3.exoplayer.DefaultRenderersFactory(this) {
+            override fun buildAudioSink(
+                context: android.content.Context,
+                enableFloatOutput: Boolean,
+                enableAudioTrackPlaybackParams: Boolean
+            ): androidx.media3.exoplayer.audio.AudioSink =
+                androidx.media3.exoplayer.audio.DefaultAudioSink.Builder(context)
+                    .setEnableFloatOutput(enableFloatOutput)
+                    .setEnableAudioTrackPlaybackParams(enableAudioTrackPlaybackParams)
+                    .setAudioProcessors(
+                        arrayOf<androidx.media3.common.audio.AudioProcessor>(gainProcessor)
+                    )
+                    .build()
+        }
+        gainProcessor.gain = boostPercent / 100f
+
+        val exo = ExoPlayer.Builder(this, renderersFactory)
+            .setLoadControl(loadControl).build()
+        // Fix the audio session up front so the effects can attach to it.
+        val sessionId = (getSystemService(AUDIO_SERVICE) as android.media.AudioManager)
+            .generateAudioSessionId()
+        exo.setAudioSessionId(sessionId)
+        audioEffects?.release()
+        audioEffects = com.myvideolibrary.app.util.PlayerAudioEffects(sessionId)
+            .also { it.apply(effectPreset) }
         binding.playerView.player = exo
 
         currentSource = source
@@ -585,6 +621,82 @@ class PlayerActivity : AppCompatActivity() {
         speedIndex = (speedIndex + 1) % speeds.size
         player?.setPlaybackSpeed(speeds[speedIndex])
         binding.speedButton.text = getString(R.string.speed_format, speeds[speedIndex])
+    }
+
+    /** Volume-boost + audio-effects sheet: a slider (100–500%) and effect presets. */
+    private fun showBoostDialog() {
+        val density = resources.displayMetrics.density
+        val pad = (20 * density).toInt()
+        val container = android.widget.LinearLayout(this).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding(pad, pad / 2, pad, 0)
+        }
+
+        val valueLabel = android.widget.TextView(this).apply {
+            text = getString(R.string.volume_boost_value, boostPercent)
+            textSize = 16f
+        }
+        container.addView(valueLabel)
+
+        // 0..400 maps to 100%..500% in 10% steps.
+        val slider = android.widget.SeekBar(this).apply {
+            max = 400
+            progress = (boostPercent - 100).coerceIn(0, 400)
+            setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(sb: android.widget.SeekBar, value: Int, fromUser: Boolean) {
+                    val pct = 100 + (value / 10) * 10
+                    boostPercent = pct
+                    gainProcessor.gain = pct / 100f
+                    valueLabel.text = getString(R.string.volume_boost_value, pct)
+                }
+                override fun onStartTrackingTouch(sb: android.widget.SeekBar) {}
+                override fun onStopTrackingTouch(sb: android.widget.SeekBar) {}
+            })
+        }
+        container.addView(slider)
+
+        val effectsLabel = android.widget.TextView(this).apply {
+            text = getString(R.string.audio_effects)
+            setPadding(0, pad / 2, 0, 0)
+            textSize = 16f
+        }
+        container.addView(effectsLabel)
+
+        val presets = listOf(
+            com.myvideolibrary.app.util.PlayerAudioEffects.Preset.NONE to R.string.effect_none,
+            com.myvideolibrary.app.util.PlayerAudioEffects.Preset.BASS to R.string.effect_bass,
+            com.myvideolibrary.app.util.PlayerAudioEffects.Preset.SURROUND to R.string.effect_surround,
+            com.myvideolibrary.app.util.PlayerAudioEffects.Preset.HALL to R.string.effect_hall,
+            com.myvideolibrary.app.util.PlayerAudioEffects.Preset.CONCERT to R.string.effect_concert
+        )
+        val group = android.widget.RadioGroup(this)
+        presets.forEachIndexed { index, (preset, labelRes) ->
+            group.addView(
+                com.google.android.material.radiobutton.MaterialRadioButton(this).apply {
+                    id = index
+                    text = getString(labelRes)
+                    isChecked = preset == effectPreset
+                }
+            )
+        }
+        group.setOnCheckedChangeListener { _, checkedId ->
+            val preset = presets.getOrNull(checkedId)?.first ?: return@setOnCheckedChangeListener
+            effectPreset = preset
+            audioEffects?.apply(preset)
+        }
+        container.addView(group)
+
+        AlertDialog.Builder(this)
+            .setTitle(R.string.volume_boost)
+            .setView(container)
+            .setPositiveButton(R.string.done, null)
+            .setNeutralButton(R.string.reset) { _, _ ->
+                boostPercent = 100
+                gainProcessor.gain = 1f
+                effectPreset = com.myvideolibrary.app.util.PlayerAudioEffects.Preset.NONE
+                audioEffects?.apply(effectPreset)
+            }
+            .show()
     }
 
     // ---- Autoplay queue (library ids or stream URLs) ----
@@ -783,6 +895,8 @@ class PlayerActivity : AppCompatActivity() {
         // Closing the PiP window (its X) finishes the activity — release the player
         // so audio actually stops, even when background playback is enabled.
         if (isFinishing) {
+            audioEffects?.release()
+            audioEffects = null
             player?.release()
             player = null
             return
@@ -797,6 +911,8 @@ class PlayerActivity : AppCompatActivity() {
         super.onDestroy()
         cancelSleep()
         savePosition()
+        audioEffects?.release()
+        audioEffects = null
         player?.release()
         player = null
     }
