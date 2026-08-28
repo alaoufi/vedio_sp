@@ -302,6 +302,7 @@
     <string name="recover_storage_run">Recover</string>
     <string name="recover_storage_running">Scanning storage…</string>
     <string name="recover_storage_done">Recovered %1$d clip(s). Pull down to refresh the library.</string>
+    <string name="recover_storage_summary">Recovered %1$d clip(s); removed %2$d broken. Pull down to refresh.</string>
     <string name="recover_storage_nothing">Nothing to recover — every file on disk is already in your library.</string>
     <string name="recover_storage_no_files">No media files were found in the app\'s storage.</string>
     <string name="recover_storage_failed">Recovery failed.</string>

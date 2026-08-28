@@ -140,7 +140,8 @@ class SettingsActivity : AppCompatActivity() {
                     val result = runCatching { recoveryManager.recoverFromStorage() }.getOrNull()
                     val msg = when {
                         result == null -> getString(R.string.recover_storage_failed)
-                        result.recovered > 0 -> getString(R.string.recover_storage_done, result.recovered)
+                        result.recovered > 0 || result.removedBroken > 0 ->
+                            getString(R.string.recover_storage_summary, result.recovered, result.removedBroken)
                         result.filesScanned == 0 -> getString(R.string.recover_storage_no_files)
                         else -> getString(R.string.recover_storage_nothing)
                     }

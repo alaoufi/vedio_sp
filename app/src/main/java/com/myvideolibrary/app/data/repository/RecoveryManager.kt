@@ -13,14 +13,15 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Rebuilds the library from the media files still on disk.
+ * Rebuilds the library from the media files still on disk, and cleans up broken
+ * entries.
  *
- * The clips, downloads and imports are stored as real files under the app's private
- * folders. If the database is ever reset (e.g. an encryption-key failure that made
- * the library look empty) while an in-place update kept those files, this scans them
- * and re-adds any file that isn't already in the database — so the videos come back
- * even when their original metadata is gone. Recovered items get the file name as a
- * title and fresh metadata/thumbnails read from the file itself.
+ * Clips are stored as real files under the app's private folders. If the database
+ * is ever reset while an in-place update kept the files, this re-adds any *playable*
+ * file that isn't already in the database. It also removes entries that can only
+ * fail to play — a file that is gone, empty, or an interrupted parallel download
+ * (a full-size but corrupt `.mp4` left next to a `.parts` marker). Recovered items
+ * get the file name as a title and fresh metadata/thumbnails read from the file.
  */
 @Singleton
 class RecoveryManager @Inject constructor(
@@ -29,16 +30,24 @@ class RecoveryManager @Inject constructor(
     private val thumbnailGenerator: ThumbnailGenerator
 ) {
 
-    data class Result(val recovered: Int, val alreadyPresent: Int, val filesScanned: Int)
+    data class Result(
+        val recovered: Int,
+        val removedBroken: Int,
+        val alreadyPresent: Int,
+        val filesScanned: Int
+    )
 
     suspend fun recoverFromStorage(): Result = withContext(Dispatchers.IO) {
+        val removed = purgeBrokenEntries()
+
         val known = videoDao.getAllOnce()
             .mapNotNull { it.localPath.takeIf { p -> p.isNotBlank() } }
             .toHashSet()
 
-        val files = listOf(storageManager.videosDir, storageManager.downloadsDir)
-            .flatMap { dir -> dir.walkTopDown().filter { it.isFile } }
-            .filter { it.length() > 0 && mediaType(it.name) != null }
+        // Only completed clips live here; interrupted downloads are skipped below.
+        val files = storageManager.videosDir.walkTopDown()
+            .filter { it.isFile && it.length() > 0 && mediaType(it.name) != null && !isIncomplete(it) }
+            .toList()
 
         var recovered = 0
         var already = 0
@@ -50,6 +59,10 @@ class RecoveryManager @Inject constructor(
             val meta = if (type != MediaType.IMAGE) {
                 runCatching { thumbnailGenerator.readMetadata(path) }.getOrNull()
             } else null
+            // A video/audio with no readable metadata or zero duration is corrupt or
+            // incomplete — importing it would just reproduce "can't play this video".
+            if (type != MediaType.IMAGE && (meta == null || meta.durationMs <= 0L)) continue
+
             val thumb = when (type) {
                 MediaType.VIDEO -> runCatching { thumbnailGenerator.generateThumbnail(path) }.getOrNull()
                 MediaType.IMAGE -> path
@@ -71,8 +84,35 @@ class RecoveryManager @Inject constructor(
             )
             if (runCatching { videoDao.insert(entity) }.isSuccess) recovered++
         }
-        Result(recovered = recovered, alreadyPresent = already, filesScanned = files.size)
+        Result(recovered = recovered, removedBroken = removed, alreadyPresent = already, filesScanned = files.size)
     }
+
+    /**
+     * Removes library rows that can only fail to play: a local file that is missing,
+     * empty, or an interrupted parallel download (has a `.parts` sidecar). Leaves
+     * link-only rows and non-file (content://) sources untouched, and deletes the
+     * junk files themselves.
+     */
+    private suspend fun purgeBrokenEntries(): Int {
+        val broken = videoDao.getAllOnce().filter { v ->
+            if (v.isLinkOnly) return@filter false
+            val path = v.localPath
+            if (!path.startsWith("/")) return@filter false // content:// etc. — leave alone
+            val file = File(path)
+            !file.exists() || file.length() == 0L || File(path + PARTS_SUFFIX).exists()
+        }
+        if (broken.isEmpty()) return 0
+        broken.forEach { v ->
+            runCatching { File(v.localPath).delete() }
+            runCatching { File(v.localPath + PARTS_SUFFIX).delete() }
+        }
+        videoDao.deleteByIds(broken.map { it.id })
+        return broken.size
+    }
+
+    /** True when a full-size file is really an interrupted parallel download. */
+    private fun isIncomplete(file: File): Boolean =
+        File(file.absolutePath + PARTS_SUFFIX).exists()
 
     private fun mediaType(name: String): MediaType? =
         when (name.substringAfterLast('.', "").lowercase()) {
@@ -81,4 +121,8 @@ class RecoveryManager @Inject constructor(
             "jpg", "jpeg", "png", "webp", "gif", "bmp" -> MediaType.IMAGE
             else -> null
         }
+
+    private companion object {
+        const val PARTS_SUFFIX = ".parts"
+    }
 }
