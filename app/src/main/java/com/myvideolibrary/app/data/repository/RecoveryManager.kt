@@ -44,10 +44,13 @@ class RecoveryManager @Inject constructor(
             .mapNotNull { it.localPath.takeIf { p -> p.isNotBlank() } }
             .toHashSet()
 
-        // Only completed clips live here; interrupted downloads are skipped below.
-        val files = storageManager.videosDir.walkTopDown()
-            .filter { it.isFile && it.length() > 0 && mediaType(it.name) != null && !isIncomplete(it) }
-            .toList()
+        // Scan every folder that can hold real media. Skip only files that are truly
+        // incomplete (a leftover ".parts" marker) — NOT files whose metadata can't be
+        // read: MediaMetadataRetriever fails on perfectly playable files on some OEMs
+        // (e.g. Huawei), so rejecting those would drop the user's real videos.
+        val files = listOf(storageManager.videosDir, storageManager.downloadsDir)
+            .flatMap { dir -> dir.walkTopDown().filter { it.isFile } }
+            .filter { it.length() > 0 && mediaType(it.name) != null && !isIncomplete(it) }
 
         var recovered = 0
         var already = 0
@@ -56,13 +59,11 @@ class RecoveryManager @Inject constructor(
             if (path in known) { already++; continue }
             val type = mediaType(file.name) ?: continue
 
+            // Metadata + thumbnail are best-effort; a failure just means the item
+            // still imports with unknown duration and no cover — it can still play.
             val meta = if (type != MediaType.IMAGE) {
                 runCatching { thumbnailGenerator.readMetadata(path) }.getOrNull()
             } else null
-            // A video/audio with no readable metadata or zero duration is corrupt or
-            // incomplete — importing it would just reproduce "can't play this video".
-            if (type != MediaType.IMAGE && (meta == null || meta.durationMs <= 0L)) continue
-
             val thumb = when (type) {
                 MediaType.VIDEO -> runCatching { thumbnailGenerator.generateThumbnail(path) }.getOrNull()
                 MediaType.IMAGE -> path

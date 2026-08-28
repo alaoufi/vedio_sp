@@ -265,7 +265,7 @@
     <string name="recover_storage_run">استرجاع</string>
     <string name="recover_storage_running">جارٍ فحص التخزين…</string>
     <string name="recover_storage_done">تم استرجاع %1$d مقطعًا. اسحب للأسفل لتحديث المكتبة.</string>
-    <string name="recover_storage_summary">استُرجع %1$d مقطعًا؛ وأُزيل %2$d تالفًا. اسحب للأسفل للتحديث.</string>
+    <string name="recover_storage_summary">استُرجع %1$d؛ أُزيل %2$d تالفًا؛ فُحص %3$d ملفًا. اسحب للأسفل للتحديث.</string>
     <string name="recover_storage_nothing">لا شيء للاسترجاع — كل ملف على القرص موجود في مكتبتك.</string>
     <string name="recover_storage_no_files">لم يُعثر على ملفات وسائط في تخزين التطبيق.</string>
     <string name="recover_storage_failed">فشل الاسترجاع.</string>

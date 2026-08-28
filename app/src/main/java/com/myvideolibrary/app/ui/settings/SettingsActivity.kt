@@ -138,12 +138,13 @@ class SettingsActivity : AppCompatActivity() {
                 Toast.makeText(this, R.string.recover_storage_running, Toast.LENGTH_SHORT).show()
                 lifecycleScope.launch {
                     val result = runCatching { recoveryManager.recoverFromStorage() }.getOrNull()
-                    val msg = when {
-                        result == null -> getString(R.string.recover_storage_failed)
-                        result.recovered > 0 || result.removedBroken > 0 ->
-                            getString(R.string.recover_storage_summary, result.recovered, result.removedBroken)
-                        result.filesScanned == 0 -> getString(R.string.recover_storage_no_files)
-                        else -> getString(R.string.recover_storage_nothing)
+                    val msg = if (result == null) {
+                        getString(R.string.recover_storage_failed)
+                    } else {
+                        getString(
+                            R.string.recover_storage_summary,
+                            result.recovered, result.removedBroken, result.filesScanned
+                        )
                     }
                     AlertDialog.Builder(this@SettingsActivity)
                         .setTitle(R.string.recover_storage)
