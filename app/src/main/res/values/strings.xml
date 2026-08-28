@@ -296,6 +296,15 @@
     <string name="auto_backup_running">Backing up…</string>
     <string name="auto_backup_done">Backup saved</string>
     <string name="auto_backup_failed">Backup failed: %1$s</string>
+    <string name="recover_storage">Recover clips from storage</string>
+    <string name="recover_storage_desc">Rebuild the library from video files still on the device</string>
+    <string name="recover_storage_confirm">This scans the app\'s storage and re-adds any video files that aren\'t in your library. Use it if the library looks empty but the files are still on the device.</string>
+    <string name="recover_storage_run">Recover</string>
+    <string name="recover_storage_running">Scanning storage…</string>
+    <string name="recover_storage_done">Recovered %1$d clip(s). Pull down to refresh the library.</string>
+    <string name="recover_storage_nothing">Nothing to recover — every file on disk is already in your library.</string>
+    <string name="recover_storage_no_files">No media files were found in the app\'s storage.</string>
+    <string name="recover_storage_failed">Recovery failed.</string>
     <string name="set_pin">Set PIN</string>
     <string name="save">Save</string>
     <string name="pin_length_error">PIN must be 4–12 digits</string>

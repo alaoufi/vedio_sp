@@ -259,6 +259,15 @@
     <string name="auto_backup_running">جارٍ النسخ…</string>
     <string name="auto_backup_done">تم حفظ النسخة الاحتياطية</string>
     <string name="auto_backup_failed">فشل النسخ: %1$s</string>
+    <string name="recover_storage">استرجاع المقاطع من التخزين</string>
+    <string name="recover_storage_desc">إعادة بناء المكتبة من ملفات الفيديو الموجودة على الجهاز</string>
+    <string name="recover_storage_confirm">يفحص هذا تخزين التطبيق ويعيد إضافة أي ملفات فيديو غير موجودة في مكتبتك. استخدمه إذا بدت المكتبة فارغة لكن الملفات ما زالت على الجهاز.</string>
+    <string name="recover_storage_run">استرجاع</string>
+    <string name="recover_storage_running">جارٍ فحص التخزين…</string>
+    <string name="recover_storage_done">تم استرجاع %1$d مقطعًا. اسحب للأسفل لتحديث المكتبة.</string>
+    <string name="recover_storage_nothing">لا شيء للاسترجاع — كل ملف على القرص موجود في مكتبتك.</string>
+    <string name="recover_storage_no_files">لم يُعثر على ملفات وسائط في تخزين التطبيق.</string>
+    <string name="recover_storage_failed">فشل الاسترجاع.</string>
     <string name="set_pin">تعيين رمز PIN</string>
     <string name="save">حفظ</string>
     <string name="pin_length_error">يجب أن يكون رمز PIN من 4 إلى 12 رقمًا</string>

@@ -205,6 +205,13 @@
                             tools:text="Off" />
                     </LinearLayout>
                 </LinearLayout>
+
+                <LinearLayout android:id="@+id/recoverRow" style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/recover_storage" />
+                        <TextView style="@style/SettingsSubtitle" android:text="@string/recover_storage_desc" />
+                    </LinearLayout>
+                </LinearLayout>
             </LinearLayout>
 
             <!-- ===== About ===== -->

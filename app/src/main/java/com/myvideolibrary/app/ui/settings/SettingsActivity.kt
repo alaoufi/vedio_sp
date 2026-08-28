@@ -30,6 +30,7 @@ class SettingsActivity : AppCompatActivity() {
     @javax.inject.Inject lateinit var licenseManager: com.myvideolibrary.app.security.LicenseManager
     @javax.inject.Inject lateinit var okHttpClient: okhttp3.OkHttpClient
     @javax.inject.Inject lateinit var autoBackupManager: com.myvideolibrary.app.data.backup.AutoBackupManager
+    @javax.inject.Inject lateinit var recoveryManager: com.myvideolibrary.app.data.repository.RecoveryManager
 
     private val restorePicker = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
@@ -124,7 +125,34 @@ class SettingsActivity : AppCompatActivity() {
             restorePicker.launch(arrayOf("*/*"))
         }
         binding.autoBackupRow.setOnClickListener { showAutoBackupDialog() }
+        binding.recoverRow.setOnClickListener { confirmRecoverFromStorage() }
         renderAutoBackup()
+    }
+
+    /** Rebuilds the library from media files still on disk (e.g. after a DB reset). */
+    private fun confirmRecoverFromStorage() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.recover_storage)
+            .setMessage(R.string.recover_storage_confirm)
+            .setPositiveButton(R.string.recover_storage_run) { _, _ ->
+                Toast.makeText(this, R.string.recover_storage_running, Toast.LENGTH_SHORT).show()
+                lifecycleScope.launch {
+                    val result = runCatching { recoveryManager.recoverFromStorage() }.getOrNull()
+                    val msg = when {
+                        result == null -> getString(R.string.recover_storage_failed)
+                        result.recovered > 0 -> getString(R.string.recover_storage_done, result.recovered)
+                        result.filesScanned == 0 -> getString(R.string.recover_storage_no_files)
+                        else -> getString(R.string.recover_storage_nothing)
+                    }
+                    AlertDialog.Builder(this@SettingsActivity)
+                        .setTitle(R.string.recover_storage)
+                        .setMessage(msg)
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show()
+                }
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     // ---- Automatic external backup ----
