@@ -29,10 +29,27 @@ class SettingsActivity : AppCompatActivity() {
 
     @javax.inject.Inject lateinit var licenseManager: com.myvideolibrary.app.security.LicenseManager
     @javax.inject.Inject lateinit var okHttpClient: okhttp3.OkHttpClient
+    @javax.inject.Inject lateinit var autoBackupManager: com.myvideolibrary.app.data.backup.AutoBackupManager
 
     private val restorePicker = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri -> uri?.let { promptRestorePassword(it) } }
+
+    /** Picks the external folder that automatic backups are written to. */
+    private val backupFolderPicker = registerForActivityResult(
+        ActivityResultContracts.OpenDocumentTree()
+    ) { uri ->
+        if (uri != null) {
+            runCatching {
+                contentResolver.takePersistableUriPermission(
+                    uri,
+                    android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                        android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+            }
+            promptEnableAutoBackup(uri)
+        }
+    }
 
     private val folderPicker = registerForActivityResult(
         ActivityResultContracts.OpenDocumentTree()
@@ -105,6 +122,90 @@ class SettingsActivity : AppCompatActivity() {
         binding.backupRow.setOnClickListener { promptBackupPassword() }
         binding.restoreRow.setOnClickListener {
             restorePicker.launch(arrayOf("*/*"))
+        }
+        binding.autoBackupRow.setOnClickListener { showAutoBackupDialog() }
+        renderAutoBackup()
+    }
+
+    // ---- Automatic external backup ----
+
+    /** Updates the auto-backup row's subtitle with its current state. */
+    private fun renderAutoBackup() {
+        binding.autoBackupValue.text = if (!autoBackupManager.isEnabled) {
+            getString(R.string.auto_backup_off)
+        } else {
+            val folder = autoBackupManager.folderUri
+                ?.let { runCatching { folderLabel(it) }.getOrNull() } ?: "—"
+            val last = autoBackupManager.lastBackupAt
+                .takeIf { it > 0 }?.let { Formatters.dateTime(it) }
+                ?: getString(R.string.auto_backup_never)
+            getString(R.string.auto_backup_on_format, folder, last)
+        }
+    }
+
+    private fun showAutoBackupDialog() {
+        if (!autoBackupManager.isEnabled) {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.auto_backup)
+                .setMessage(R.string.auto_backup_intro)
+                .setPositiveButton(R.string.auto_backup_choose_folder) { _, _ ->
+                    runCatching { backupFolderPicker.launch(null) }
+                        .onFailure { Toast.makeText(this, R.string.error_unknown, Toast.LENGTH_SHORT).show() }
+                }
+                .setNegativeButton(R.string.cancel, null)
+                .show()
+            return
+        }
+        val actions = arrayOf(
+            getString(R.string.auto_backup_now),
+            getString(R.string.auto_backup_change_folder),
+            getString(R.string.auto_backup_disable)
+        )
+        AlertDialog.Builder(this)
+            .setTitle(R.string.auto_backup)
+            .setItems(actions) { _, which ->
+                when (which) {
+                    0 -> runBackupNow()
+                    1 -> runCatching { backupFolderPicker.launch(null) }
+                    2 -> {
+                        autoBackupManager.disable()
+                        renderAutoBackup()
+                        Toast.makeText(this, R.string.auto_backup_disabled, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            .show()
+    }
+
+    /** After a folder is chosen, ask for the encryption password and turn it on. */
+    private fun promptEnableAutoBackup(treeUri: Uri) {
+        val input = passwordField()
+        AlertDialog.Builder(this)
+            .setTitle(R.string.auto_backup)
+            .setMessage(R.string.backup_encrypt_message)
+            .setView(input)
+            .setPositiveButton(R.string.enable) { _, _ ->
+                val pw = input.text.toString()
+                if (pw.length < 6) {
+                    Toast.makeText(this, R.string.password_too_short, Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                autoBackupManager.enable(treeUri, pw)
+                renderAutoBackup()
+                runBackupNow()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun runBackupNow() {
+        Toast.makeText(this, R.string.auto_backup_running, Toast.LENGTH_SHORT).show()
+        lifecycleScope.launch {
+            val result = autoBackupManager.backupNow()
+            renderAutoBackup()
+            val msg = if (result.isSuccess) getString(R.string.auto_backup_done)
+            else getString(R.string.auto_backup_failed, autoBackupManager.lastResult ?: "")
+            Toast.makeText(this@SettingsActivity, msg, Toast.LENGTH_LONG).show()
         }
     }
 

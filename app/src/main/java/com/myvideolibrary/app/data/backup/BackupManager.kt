@@ -46,19 +46,21 @@ class BackupManager @Inject constructor(
     private val gson: Gson
 ) {
 
-    /** Exports an encrypted backup file and returns it. */
-    suspend fun export(password: String): File = withContext(Dispatchers.IO) {
+    /** Builds the encrypted backup payload (used for both file and folder exports). */
+    suspend fun exportBytes(password: String): ByteArray = withContext(Dispatchers.IO) {
         val data = BackupData(
             exportedAt = System.currentTimeMillis(),
             videos = database.videoDao().getAllOnce(),
             folders = database.folderDao().getAllOnce(),
             settings = database.settingsDao().get()
         )
+        encrypt(gson.toJson(data).toByteArray(Charsets.UTF_8), password)
+    }
 
-        val json = gson.toJson(data).toByteArray(Charsets.UTF_8)
-        val encrypted = encrypt(json, password)
-
-        val outFile = File(storageManager.backupsDir, "mvl_backup_${data.exportedAt}.mvlbak")
+    /** Exports an encrypted backup file and returns it. */
+    suspend fun export(password: String): File = withContext(Dispatchers.IO) {
+        val encrypted = exportBytes(password)
+        val outFile = File(storageManager.backupsDir, "mvl_backup_${System.currentTimeMillis()}.mvlbak")
         outFile.writeBytes(encrypted)
         outFile
     }

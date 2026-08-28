@@ -197,6 +197,14 @@
                         <TextView style="@style/SettingsTitle" android:text="@string/restore" />
                     </LinearLayout>
                 </LinearLayout>
+
+                <LinearLayout android:id="@+id/autoBackupRow" style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/auto_backup" />
+                        <TextView android:id="@+id/autoBackupValue" style="@style/SettingsSubtitle"
+                            tools:text="Off" />
+                    </LinearLayout>
+                </LinearLayout>
             </LinearLayout>
 
             <!-- ===== About ===== -->

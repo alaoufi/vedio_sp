@@ -6,6 +6,10 @@ import java.util.concurrent.TimeUnit
 /** Formatting helpers for durations, file sizes, speeds and dates. */
 object Formatters {
 
+    /** Formats an epoch-millis timestamp as a short local date + time. */
+    fun dateTime(millis: Long): String =
+        java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(java.util.Date(millis))
+
     /** Formats a millisecond duration as H:MM:SS or M:SS. */
     fun duration(millis: Long): String {
         if (millis <= 0) return "0:00"
