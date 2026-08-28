@@ -143,7 +143,8 @@ class SettingsActivity : AppCompatActivity() {
                     } else {
                         getString(
                             R.string.recover_storage_summary,
-                            result.recovered, result.removedBroken, result.filesScanned
+                            result.recovered, result.removedBroken, result.filesScanned,
+                            result.alreadyPresent, result.libraryCount
                         )
                     }
                     AlertDialog.Builder(this@SettingsActivity)

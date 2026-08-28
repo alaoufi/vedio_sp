@@ -42,12 +42,15 @@ class RecoveryManager @Inject constructor(
         val recovered: Int,
         val removedBroken: Int,
         val alreadyPresent: Int,
-        val filesScanned: Int
+        val filesScanned: Int,
+        /** Total video rows in the database after this run — tells display-bug from loss. */
+        val libraryCount: Int
     )
 
     suspend fun recoverFromStorage(): Result = withContext(Dispatchers.IO) {
         val removed = purgeBrokenEntries()
-        val known = videoDao.getAllOnce()
+        val all = videoDao.getAllOnce()
+        val known = all
             .mapNotNull { it.localPath.takeIf { p -> p.isNotBlank() } }
             .toHashSet()
 
@@ -111,7 +114,13 @@ class RecoveryManager @Inject constructor(
                 }
             }
 
-        Result(recovered = recovered, removedBroken = removed, alreadyPresent = already, filesScanned = scanned)
+        Result(
+            recovered = recovered,
+            removedBroken = removed,
+            alreadyPresent = already,
+            filesScanned = scanned,
+            libraryCount = all.size + recovered
+        )
     }
 
     /**
