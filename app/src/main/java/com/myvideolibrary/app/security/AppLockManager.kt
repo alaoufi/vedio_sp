@@ -19,7 +19,10 @@ class AppLockManager @Inject constructor(
     private var authenticated = false
 
     /** True when the lock screen must be shown before content. */
-    fun shouldLock(): Boolean = securityManager.isLockConfigured && !authenticated
+    fun shouldLock(): Boolean = ExternalEntryPolicy.requiresUnlock(
+        lockConfigured = securityManager.isLockConfigured,
+        authenticated = authenticated
+    )
 
     fun markAuthenticated() { authenticated = true }
 

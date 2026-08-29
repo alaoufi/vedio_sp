@@ -134,6 +134,8 @@ class VideoRepositoryImpl @Inject constructor(
     override suspend fun existsByPath(path: String): Boolean =
         videoDao.getByLocalPath(path) != null
 
+    override suspend fun allVideos(): List<VideoEntity> = videoDao.getAllOnce()
+
     companion object {
         private const val PAGE_SIZE = 30
     }

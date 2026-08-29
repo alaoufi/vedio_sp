@@ -97,6 +97,9 @@ class SettingsActivity : AppCompatActivity() {
         binding.guideRow.setOnClickListener {
             startActivity(android.content.Intent(this, com.myvideolibrary.app.ui.help.HelpActivity::class.java))
         }
+        binding.releaseNotesRow.setOnClickListener {
+            startActivity(android.content.Intent(this, ReleaseNotesActivity::class.java))
+        }
         binding.checkUpdateRow.setOnClickListener { checkForUpdates() }
         binding.crashLogRow.setOnClickListener { showCrashLog() }
         binding.wifiOnlySwitch.setOnClickListener {
@@ -120,6 +123,7 @@ class SettingsActivity : AppCompatActivity() {
 
         binding.saveLocationRow.setOnClickListener { showSaveLocationDialog() }
         binding.clearCacheRow.setOnClickListener { viewModel.clearCache() }
+        binding.libraryHealthRow.setOnClickListener { viewModel.checkLibraryHealth() }
         binding.backupRow.setOnClickListener { promptBackupPassword() }
         binding.restoreRow.setOnClickListener {
             restorePicker.launch(arrayOf("*/*"))

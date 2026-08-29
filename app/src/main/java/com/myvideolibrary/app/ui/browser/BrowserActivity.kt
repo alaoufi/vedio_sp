@@ -15,6 +15,7 @@ import com.myvideolibrary.app.R
 import com.myvideolibrary.app.data.model.DownloadKind
 import com.myvideolibrary.app.databinding.ActivityBrowserBinding
 import com.myvideolibrary.app.download.DownloadManager
+import com.myvideolibrary.app.download.DownloadUrlPolicy
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -138,7 +139,7 @@ class BrowserActivity : AppCompatActivity() {
         val isMedia = ext != null ||
             url.contains("mime=video", true) || url.contains("mime=audio", true) ||
             url.contains("videoplayback", true) || url.contains(".m3u8", true)
-        if (!isMedia) return
+        if (!isMedia || !DownloadUrlPolicy.isDirectMedia(url)) return
         // Dedup by the URL without its query, so the same file seen with a rotating
         // token isn't listed many times; keep the freshest full URL for downloading.
         val key = url.substringBefore('?')
@@ -219,7 +220,7 @@ class BrowserActivity : AppCompatActivity() {
         fun intent(context: android.content.Context, url: String): android.content.Intent =
             android.content.Intent(context, BrowserActivity::class.java).putExtra(EXTRA_URL, url)
 
-        val MEDIA_EXT = listOf(".mp4", ".webm", ".mkv", ".mov", ".m4v", ".m3u8",
+        val MEDIA_EXT = listOf(".mp4", ".webm", ".mkv", ".mov", ".m4v",
             ".mp3", ".m4a", ".aac", ".ogg", ".opus", ".wav")
         val AUDIO_EXT = listOf(".mp3", ".m4a", ".aac", ".ogg", ".opus", ".wav")
 

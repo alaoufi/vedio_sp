@@ -129,6 +129,11 @@ class DownloadWorker @AssistedInject constructor(
                 // are short-lived). Re-resolve the source so the retry gets fresh
                 // URLs instead of hammering the dead one.
                 refreshUrls(downloadId)
+                downloadRepository.setStatus(
+                    downloadId,
+                    DownloadStatus.WAITING,
+                    applicationContext.getString(DownloadRetryFeedback.messageResFor(download.source))
+                )
                 downloadRepository.updateProgress(
                     downloadId, DownloadStatus.WAITING, download.progress,
                     download.downloadedBytes, download.totalBytes, 0

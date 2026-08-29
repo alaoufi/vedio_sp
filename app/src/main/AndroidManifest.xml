@@ -119,6 +119,11 @@
             android:exported="false"
             android:parentActivityName=".ui.settings.SettingsActivity" />
 
+        <activity
+            android:name=".ui.settings.ReleaseNotesActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.settings.SettingsActivity" />
+
         <!-- Library statistics dashboard. -->
         <activity
             android:name=".ui.stats.StatsActivity"

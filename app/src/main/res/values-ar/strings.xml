@@ -167,6 +167,8 @@
     <string name="action_pause">إيقاف مؤقت</string>
     <string name="action_retry">إعادة المحاولة</string>
     <string name="status_waiting">في الانتظار…</string>
+    <string name="status_refreshing_tiktok">جارٍ تحديث رابط تيك توك وإعادة المحاولة…</string>
+    <string name="status_retrying_download">جارٍ إعادة محاولة التنزيل…</string>
     <string name="status_downloading">%1$d%% · %2$s</string>
     <string name="status_processing">جارٍ المعالجة…</string>
     <string name="status_paused">متوقف مؤقتًا</string>
@@ -213,6 +215,7 @@
     <string name="unlock">فتح</string>
     <string name="pin_hint">أدخل رمز PIN</string>
     <string name="wrong_pin">رمز PIN غير صحيح</string>
+    <string name="pin_retry_later">أعد المحاولة بعد %1$d ثانية</string>
     <string name="use_biometric">استخدم البصمة</string>
     <string name="use_pin">استخدم رمز PIN</string>
     <string name="unlock_biometric_subtitle">استوثق لفتح مكتبتك</string>
@@ -221,6 +224,12 @@
     <string name="settings_title">الإعدادات</string>
     <string name="section_about">حول</string>
     <string name="version">الإصدار</string>
+    <string name="release_notes">ما الجديد</string>
+    <string name="release_notes_desc">عرض تعديلات الإصدار الأخير</string>
+    <string name="release_notes_version">الإصدار %1$s</string>
+    <string name="release_notes_changes">• أصبحت إعادة محاولة تنزيلات تيك توك توضح عند تحديث الرابط المؤقت.
+
+• تنزيلات تيك توك الفاشلة تبقي زر إعادة المحاولة ظاهراً.</string>
     <string name="action_settings">الإعدادات</string>
     <string name="section_appearance">المظهر</string>
     <string name="section_downloads">التحميلات</string>
@@ -272,7 +281,10 @@
     <string name="save">حفظ</string>
     <string name="pin_length_error">يجب أن يكون رمز PIN من 4 إلى 12 رقمًا</string>
     <string name="backup_encrypt_title">تشفير النسخة الاحتياطية</string>
-    <string name="backup_encrypt_message">اختر كلمة مرور. ستحتاجها للاستعادة.</string>
+    <string name="backup_encrypt_message">اختر كلمة مرور. ستحتاجها للاستعادة. تحفظ النسخة بيانات المكتبة والإعدادات، ولا تحفظ ملفات الفيديو نفسها.</string>
+    <string name="library_health">فحص سلامة المكتبة</string>
+    <string name="library_health_desc">التحقق من الفيديوهات غير المتاحة</string>
+    <string name="library_health_result">الفيديوهات غير المتاحة: %1$d</string>
     <string name="backup_password_hint">كلمة المرور</string>
     <string name="export">تصدير</string>
     <string name="password_too_short">يجب ألا تقل كلمة المرور عن 6 أحرف</string>

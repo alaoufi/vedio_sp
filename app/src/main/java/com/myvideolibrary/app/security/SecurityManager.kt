@@ -73,6 +73,8 @@ class SecurityManager @Inject constructor(
         prefs.edit()
             .remove(KEY_PIN_SALT)
             .remove(KEY_PIN_HASH)
+            .remove(KEY_FAILED_PIN_ATTEMPTS)
+            .remove(KEY_PIN_LOCK_UNTIL)
             .putBoolean(KEY_LOCK_ENABLED, false)
             .putBoolean(KEY_BIOMETRIC, false)
             .apply()
@@ -82,6 +84,21 @@ class SecurityManager @Inject constructor(
         val saltHex = prefs.getString(KEY_PIN_SALT, null) ?: return false
         val expected = prefs.getString(KEY_PIN_HASH, null) ?: return false
         return hash(pin, saltHex.fromHex()) == expected
+    }
+
+    fun pinRetryAfterMs(now: Long = System.currentTimeMillis()): Long =
+        (prefs.getLong(KEY_PIN_LOCK_UNTIL, 0L) - now).coerceAtLeast(0L)
+
+    fun recordFailedPin(now: Long = System.currentTimeMillis()) {
+        val attempts = prefs.getInt(KEY_FAILED_PIN_ATTEMPTS, 0) + 1
+        prefs.edit()
+            .putInt(KEY_FAILED_PIN_ATTEMPTS, attempts)
+            .putLong(KEY_PIN_LOCK_UNTIL, now + PinRetryPolicy.lockDurationMs(attempts))
+            .apply()
+    }
+
+    fun recordSuccessfulPin() {
+        prefs.edit().remove(KEY_FAILED_PIN_ATTEMPTS).remove(KEY_PIN_LOCK_UNTIL).apply()
     }
 
     private fun hash(pin: String, salt: ByteArray): String {
@@ -103,6 +120,8 @@ class SecurityManager @Inject constructor(
         private const val KEY_HIDE_RECENTS = "hide_recents"
         private const val KEY_PIN_HASH = "pin_hash"
         private const val KEY_PIN_SALT = "pin_salt"
+        private const val KEY_FAILED_PIN_ATTEMPTS = "failed_pin_attempts"
+        private const val KEY_PIN_LOCK_UNTIL = "pin_lock_until"
         private const val SALT_SIZE = 16
     }
 }

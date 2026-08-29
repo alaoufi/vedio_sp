@@ -1,6 +1,7 @@
 package com.myvideolibrary.app.data.backup
 
 import android.net.Uri
+import androidx.room.withTransaction
 import com.google.gson.Gson
 import com.myvideolibrary.app.data.local.AppDatabase
 import com.myvideolibrary.app.data.local.entity.FolderEntity
@@ -71,21 +72,24 @@ class BackupManager @Inject constructor(
             ?: throw IllegalArgumentException("Cannot read backup file")
         val json = decrypt(encrypted, password)
         val data = gson.fromJson(String(json, Charsets.UTF_8), BackupData::class.java)
+        require(data.version == BACKUP_VERSION) { "Unsupported backup version" }
 
         // Restore folders first and remember old→new id mapping so video folder
         // references stay valid (they are foreign keys).
-        val folderIdMap = HashMap<Long, Long>()
-        data.folders.forEach { folder ->
-            val newId = database.folderDao().insert(folder.copy(id = 0))
-            folderIdMap[folder.id] = newId
-        }
-        data.videos.forEach { video ->
-            val remappedFolder = video.folderId?.let { folderIdMap[it] }
-            database.videoDao().insert(video.copy(id = 0, folderId = remappedFolder))
-        }
-        data.settings?.let {
-            database.settingsDao().insert(it)
-            database.settingsDao().update(it)
+        database.withTransaction {
+            val folderIdMap = HashMap<Long, Long>()
+            data.folders.forEach { folder ->
+                val newId = database.folderDao().insert(folder.copy(id = 0))
+                folderIdMap[folder.id] = newId
+            }
+            data.videos.forEach { video ->
+                val remappedFolder = video.folderId?.let { folderIdMap[it] }
+                database.videoDao().insert(video.copy(id = 0, folderId = remappedFolder))
+            }
+            data.settings?.let {
+                database.settingsDao().insert(it)
+                database.settingsDao().update(it)
+            }
         }
         data.videos.size
     }
@@ -135,5 +139,6 @@ class BackupManager @Inject constructor(
         private const val TAG_BITS = 128
         private const val KEY_BITS = 256
         private const val PBKDF2_ITERS = 120_000
+        private const val BACKUP_VERSION = 1
     }
 }
