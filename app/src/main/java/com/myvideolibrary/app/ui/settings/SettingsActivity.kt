@@ -172,11 +172,10 @@ class SettingsActivity : AppCompatActivity() {
                     result.alreadyPresent, result.libraryCount
                 )
             }
-            AlertDialog.Builder(this@SettingsActivity)
-                .setTitle(R.string.recover_storage)
-                .setMessage(msg)
-                .setPositiveButton(android.R.string.ok, null)
-                .show()
+            // Show the result as a Toast, not a dialog: the scan can outlast the
+            // screen being foregrounded, and adding a dialog window to a stopped
+            // activity throws BadTokenException.
+            Toast.makeText(this@SettingsActivity, msg, Toast.LENGTH_LONG).show()
         }
     }
 

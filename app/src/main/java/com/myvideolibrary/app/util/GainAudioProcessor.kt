@@ -25,11 +25,14 @@ class GainAudioProcessor : BaseAudioProcessor() {
     var gain: Float = 1f
 
     override fun onConfigure(inputAudioFormat: AudioProcessor.AudioFormat): AudioProcessor.AudioFormat {
-        if (inputAudioFormat.encoding != C.ENCODING_PCM_16BIT) {
-            throw AudioProcessor.UnhandledAudioFormatException(inputAudioFormat)
+        // Only 16-bit PCM is scaled. For any other encoding (float output, passthrough,
+        // etc.) stay INACTIVE by returning NOT_SET — never throw, or the whole audio
+        // sink fails to initialise and every clip reports "can't play this video".
+        return if (inputAudioFormat.encoding == C.ENCODING_PCM_16BIT) {
+            inputAudioFormat
+        } else {
+            AudioProcessor.AudioFormat.NOT_SET
         }
-        // Same PCM format out as in — we only scale amplitudes.
-        return inputAudioFormat
     }
 
     override fun queueInput(inputBuffer: ByteBuffer) {

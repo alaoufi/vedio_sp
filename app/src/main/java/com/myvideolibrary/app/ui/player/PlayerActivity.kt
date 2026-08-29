@@ -79,6 +79,8 @@ class PlayerActivity : AppCompatActivity() {
     /** Boost as a percentage: 100 = normal, up to 500%. Kept across clips this session. */
     private var boostPercent = 100
     private var effectPreset = com.myvideolibrary.app.util.PlayerAudioEffects.Preset.NONE
+    /** Whether the current player was built with the custom (boost/effects) audio sink. */
+    private var usingCustomAudio = false
 
     // Currently playing source and an optional user-chosen subtitle sidecar file.
     private var currentSource: String? = null
@@ -522,34 +524,43 @@ class PlayerActivity : AppCompatActivity() {
                 1000
             )
             .build()
-        // Custom renderers factory whose audio sink runs our gain processor, so the
-        // volume can truly exceed 100% (ExoPlayer's own volume is capped at 1.0).
-        val renderersFactory = object :
-            androidx.media3.exoplayer.DefaultRenderersFactory(this) {
-            override fun buildAudioSink(
-                context: android.content.Context,
-                enableFloatOutput: Boolean,
-                enableAudioTrackPlaybackParams: Boolean
-            ): androidx.media3.exoplayer.audio.AudioSink =
-                androidx.media3.exoplayer.audio.DefaultAudioSink.Builder(context)
-                    .setEnableFloatOutput(enableFloatOutput)
-                    .setEnableAudioTrackPlaybackParams(enableAudioTrackPlaybackParams)
-                    .setAudioProcessors(
-                        arrayOf<androidx.media3.common.audio.AudioProcessor>(gainProcessor)
-                    )
-                    .build()
-        }
-        gainProcessor.gain = boostPercent / 100f
+        // Only build the custom audio sink (gain processor + effects) when the user
+        // actually turned boost or an effect on. By default use the STOCK player for
+        // maximum device compatibility — the custom sink broke playback on some OEMs.
+        usingCustomAudio = boostPercent != 100 ||
+            effectPreset != com.myvideolibrary.app.util.PlayerAudioEffects.Preset.NONE
 
-        val exo = ExoPlayer.Builder(this, renderersFactory)
-            .setLoadControl(loadControl).build()
-        // Fix the audio session up front so the effects can attach to it.
-        val sessionId = (getSystemService(AUDIO_SERVICE) as android.media.AudioManager)
-            .generateAudioSessionId()
-        exo.setAudioSessionId(sessionId)
-        audioEffects?.release()
-        audioEffects = com.myvideolibrary.app.util.PlayerAudioEffects(sessionId)
-            .also { it.apply(effectPreset) }
+        val exo = if (usingCustomAudio) {
+            val renderersFactory = object :
+                androidx.media3.exoplayer.DefaultRenderersFactory(this) {
+                override fun buildAudioSink(
+                    context: android.content.Context,
+                    enableFloatOutput: Boolean,
+                    enableAudioTrackPlaybackParams: Boolean
+                ): androidx.media3.exoplayer.audio.AudioSink =
+                    androidx.media3.exoplayer.audio.DefaultAudioSink.Builder(context)
+                        .setEnableFloatOutput(enableFloatOutput)
+                        .setEnableAudioTrackPlaybackParams(enableAudioTrackPlaybackParams)
+                        .setAudioProcessors(
+                            arrayOf<androidx.media3.common.audio.AudioProcessor>(gainProcessor)
+                        )
+                        .build()
+            }
+            gainProcessor.gain = boostPercent / 100f
+            ExoPlayer.Builder(this, renderersFactory).setLoadControl(loadControl).build().also { p ->
+                // Fix the audio session up front so the effects can attach to it.
+                val sessionId = (getSystemService(AUDIO_SERVICE) as android.media.AudioManager)
+                    .generateAudioSessionId()
+                p.setAudioSessionId(sessionId)
+                audioEffects?.release()
+                audioEffects = com.myvideolibrary.app.util.PlayerAudioEffects(sessionId)
+                    .also { it.apply(effectPreset) }
+            }
+        } else {
+            audioEffects?.release()
+            audioEffects = null
+            ExoPlayer.Builder(this).setLoadControl(loadControl).build()
+        }
         binding.playerView.player = exo
 
         currentSource = source
@@ -696,7 +707,34 @@ class PlayerActivity : AppCompatActivity() {
                 effectPreset = com.myvideolibrary.app.util.PlayerAudioEffects.Preset.NONE
                 audioEffects?.apply(effectPreset)
             }
+            // When the dialog closes, switch the player into/out of the custom audio
+            // sink if the boost/effect state now needs it (the default player has none).
+            .setOnDismissListener { syncAudioMode() }
             .show()
+    }
+
+    /** Rebuilds the player if the boost/effect state no longer matches the audio sink. */
+    private fun syncAudioMode() {
+        val needsCustom = boostPercent != 100 ||
+            effectPreset != com.myvideolibrary.app.util.PlayerAudioEffects.Preset.NONE
+        if (needsCustom == usingCustomAudio) {
+            // Already in the right mode — just push the live values through.
+            if (usingCustomAudio) {
+                gainProcessor.gain = boostPercent / 100f
+                audioEffects?.apply(effectPreset)
+            }
+            return
+        }
+        val src = currentSource ?: return
+        val pos = player?.currentPosition ?: 0L
+        val playing = player?.playWhenReady ?: true
+        audioEffects?.release()
+        audioEffects = null
+        player?.release()
+        player = null
+        preparePlayer(src, 0)
+        player?.seekTo(pos)
+        player?.playWhenReady = playing
     }
 
     // ---- Autoplay queue (library ids or stream URLs) ----
