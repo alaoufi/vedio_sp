@@ -115,13 +115,15 @@ class TikTokProvider @Inject constructor(
             )
         }
 
-        // hdplay / play are both watermark-free; prefer HD.
+        // hdplay / play are both watermark-free; prefer HD. Never fall back to the
+        // cover image here: that made a real video download as a still picture when
+        // the resolver momentarily returned no video URL. Fail (retryable) instead.
         val play = data.str("hdplay")?.takeIf { it.isNotBlank() }
             ?: data.str("play")?.takeIf { it.isNotBlank() }
-            ?: cleanImage
+            ?: data.str("wmplay")?.takeIf { it.isNotBlank() }
             ?: throw ProviderException(
                 ProviderErrorType.EXTRACTION_FAILED,
-                "No watermark-free URL returned"
+                "No video URL returned — the resolver may be busy, try again"
             )
 
         ResolvedVideo(
