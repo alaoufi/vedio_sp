@@ -29,7 +29,8 @@ import javax.inject.Singleton
 @Singleton
 class AutoBackupManager @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val backupManager: BackupManager
+    private val backupManager: BackupManager,
+    private val videoDao: com.myvideolibrary.app.data.local.dao.VideoDao
 ) {
 
     private val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -76,6 +77,27 @@ class AutoBackupManager @Inject constructor(
 
     private fun password(): String? =
         runCatching { secure?.getString(K_PASSWORD, null) }.getOrNull()
+
+    /**
+     * Self-heal after a wipe: if auto-backup is on and the library is EMPTY but the
+     * external folder still holds a backup, restore the newest one automatically so
+     * categories, titles and settings come back without the user doing anything.
+     * A no-op when data is present or the backup can't be read. Returns true if it
+     * restored something.
+     */
+    suspend fun autoRestoreIfEmpty(): Boolean {
+        if (!isEnabled) return false
+        val tree = folderUri ?: return false
+        val pw = password() ?: return false
+        return runCatching {
+            if (videoDao.getAllOnce().isNotEmpty()) return@runCatching false
+            val dir = DocumentFile.fromTreeUri(context, tree) ?: return@runCatching false
+            val newest = dir.listFiles()
+                .filter { it.isFile && it.name?.endsWith(".mvlbak") == true }
+                .maxByOrNull { it.lastModified() } ?: return@runCatching false
+            backupManager.restore(newest.uri, pw) > 0
+        }.getOrDefault(false)
+    }
 
     /** Writes one encrypted backup into the chosen folder, rotating old ones. */
     suspend fun backupNow(): kotlin.Result<Unit> = kotlin.runCatching {

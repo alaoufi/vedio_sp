@@ -147,6 +147,9 @@
     <string name="speed_format">%.2f×</string>
     <string name="volume_boost">Volume boost</string>
     <string name="volume_boost_value">Volume: %1$d%%</string>
+    <string name="volume_boost_off">Off (normal volume)</string>
+    <string name="volume_boost_summary">%1$d%% · %2$s</string>
+    <string name="volume_boost_saved">Default volume saved</string>
     <string name="audio_effects">Sound effects</string>
     <string name="effect_none">None</string>
     <string name="effect_bass">Bass boost</string>

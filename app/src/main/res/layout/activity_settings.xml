@@ -60,6 +60,14 @@
                             tools:text="Play next" />
                     </LinearLayout>
                 </LinearLayout>
+
+                <LinearLayout android:id="@+id/volumeBoostRow" style="@style/SettingsRow">
+                    <LinearLayout style="@style/SettingsRowText">
+                        <TextView style="@style/SettingsTitle" android:text="@string/volume_boost" />
+                        <TextView android:id="@+id/volumeBoostValue" style="@style/SettingsSubtitle"
+                            tools:text="100%" />
+                    </LinearLayout>
+                </LinearLayout>
             </LinearLayout>
 
             <!-- ===== Downloads ===== -->

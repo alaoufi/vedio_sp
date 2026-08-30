@@ -107,6 +107,10 @@ class PlayerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyScreenshotPolicy(securityManager)
+        // Start from the user's saved global boost/effect (Settings). The in-player
+        // control still adjusts the current clip live.
+        boostPercent = com.myvideolibrary.app.util.AudioPrefs.boost(this)
+        effectPreset = com.myvideolibrary.app.util.AudioPrefs.effect(this)
         // Follow the device orientation by default — rotate with the phone.
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
         binding = ActivityPlayerBinding.inflate(layoutInflater)

@@ -110,6 +110,9 @@
     <string name="speed_format">%.2f×</string>
     <string name="volume_boost">رفع الصوت</string>
     <string name="volume_boost_value">الصوت: %1$d%%</string>
+    <string name="volume_boost_off">معطّل (صوت عادي)</string>
+    <string name="volume_boost_summary">%1$d%% · %2$s</string>
+    <string name="volume_boost_saved">حُفظ مستوى الصوت الافتراضي</string>
     <string name="audio_effects">المؤثرات الصوتية</string>
     <string name="effect_none">بدون</string>
     <string name="effect_bass">تعزيز الجهير</string>

@@ -109,6 +109,8 @@ class SettingsActivity : AppCompatActivity() {
         binding.themeRow.setOnClickListener { showThemeDialog() }
         binding.languageRow.setOnClickListener { showLanguageDialog() }
         binding.endActionRow.setOnClickListener { showEndActionDialog() }
+        binding.volumeBoostRow.setOnClickListener { showVolumeBoostDialog() }
+        renderVolumeBoost()
         binding.languageValue.text = currentLanguageLabel()
         binding.guideRow.setOnClickListener {
             startActivity(android.content.Intent(this, com.myvideolibrary.app.ui.help.HelpActivity::class.java))
@@ -177,6 +179,103 @@ class SettingsActivity : AppCompatActivity() {
             // activity throws BadTokenException.
             Toast.makeText(this@SettingsActivity, msg, Toast.LENGTH_LONG).show()
         }
+    }
+
+    // ---- Global default volume boost + effect ----
+
+    private fun renderVolumeBoost() {
+        val boost = com.myvideolibrary.app.util.AudioPrefs.boost(this)
+        val effect = com.myvideolibrary.app.util.AudioPrefs.effect(this)
+        val effectLabel = getString(effectLabelRes(effect))
+        binding.volumeBoostValue.text = if (boost == 100 &&
+            effect == com.myvideolibrary.app.util.PlayerAudioEffects.Preset.NONE) {
+            getString(R.string.volume_boost_off)
+        } else {
+            getString(R.string.volume_boost_summary, boost, effectLabel)
+        }
+    }
+
+    private fun effectLabelRes(preset: com.myvideolibrary.app.util.PlayerAudioEffects.Preset): Int =
+        when (preset) {
+            com.myvideolibrary.app.util.PlayerAudioEffects.Preset.NONE -> R.string.effect_none
+            com.myvideolibrary.app.util.PlayerAudioEffects.Preset.BASS -> R.string.effect_bass
+            com.myvideolibrary.app.util.PlayerAudioEffects.Preset.SURROUND -> R.string.effect_surround
+            com.myvideolibrary.app.util.PlayerAudioEffects.Preset.HALL -> R.string.effect_hall
+            com.myvideolibrary.app.util.PlayerAudioEffects.Preset.CONCERT -> R.string.effect_concert
+        }
+
+    /** A slider + effect picker that saves the GLOBAL default applied to every clip. */
+    private fun showVolumeBoostDialog() {
+        val density = resources.displayMetrics.density
+        val pad = (20 * density).toInt()
+        val container = android.widget.LinearLayout(this).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding(pad, pad / 2, pad, 0)
+        }
+
+        var boost = com.myvideolibrary.app.util.AudioPrefs.boost(this)
+        var effect = com.myvideolibrary.app.util.AudioPrefs.effect(this)
+
+        val valueLabel = android.widget.TextView(this).apply {
+            text = getString(R.string.volume_boost_value, boost)
+            textSize = 16f
+        }
+        container.addView(valueLabel)
+
+        val slider = android.widget.SeekBar(this).apply {
+            max = 400
+            progress = (boost - 100).coerceIn(0, 400)
+            setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(sb: android.widget.SeekBar, value: Int, fromUser: Boolean) {
+                    boost = 100 + (value / 10) * 10
+                    valueLabel.text = getString(R.string.volume_boost_value, boost)
+                }
+                override fun onStartTrackingTouch(sb: android.widget.SeekBar) {}
+                override fun onStopTrackingTouch(sb: android.widget.SeekBar) {}
+            })
+        }
+        container.addView(slider)
+
+        container.addView(android.widget.TextView(this).apply {
+            text = getString(R.string.audio_effects)
+            setPadding(0, pad / 2, 0, 0)
+            textSize = 16f
+        })
+
+        val presets = com.myvideolibrary.app.util.PlayerAudioEffects.Preset.entries
+        val group = android.widget.RadioGroup(this)
+        presets.forEachIndexed { index, preset ->
+            group.addView(
+                com.google.android.material.radiobutton.MaterialRadioButton(this).apply {
+                    id = index
+                    text = getString(effectLabelRes(preset))
+                    isChecked = preset == effect
+                }
+            )
+        }
+        group.setOnCheckedChangeListener { _, checkedId ->
+            presets.getOrNull(checkedId)?.let { effect = it }
+        }
+        container.addView(group)
+
+        AlertDialog.Builder(this)
+            .setTitle(R.string.volume_boost)
+            .setView(container)
+            .setPositiveButton(R.string.save) { _, _ ->
+                com.myvideolibrary.app.util.AudioPrefs.setBoost(this, boost)
+                com.myvideolibrary.app.util.AudioPrefs.setEffect(this, effect)
+                renderVolumeBoost()
+                Toast.makeText(this, R.string.volume_boost_saved, Toast.LENGTH_SHORT).show()
+            }
+            .setNeutralButton(R.string.reset) { _, _ ->
+                com.myvideolibrary.app.util.AudioPrefs.setBoost(this, 100)
+                com.myvideolibrary.app.util.AudioPrefs.setEffect(
+                    this, com.myvideolibrary.app.util.PlayerAudioEffects.Preset.NONE
+                )
+                renderVolumeBoost()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     // ---- Automatic external backup ----

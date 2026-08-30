@@ -36,6 +36,9 @@ class MyVideoLibraryApp : Application(), Configuration.Provider {
     @Inject
     lateinit var settingsRepository: SettingsRepository
 
+    @Inject
+    lateinit var autoBackupManager: com.myvideolibrary.app.data.backup.AutoBackupManager
+
     private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onCreate() {
@@ -47,6 +50,9 @@ class MyVideoLibraryApp : Application(), Configuration.Provider {
         // Re-lock the app whenever it is sent to the background.
         ProcessLifecycleOwner.get().lifecycle.addObserver(appLockManager)
         normalizeDownloadDefaultsOnce()
+        // Self-heal: if the library was wiped but an external auto-backup exists,
+        // restore it automatically so categories/titles/settings come back.
+        appScope.launch { runCatching { autoBackupManager.autoRestoreIfEmpty() } }
         // Register the Direct Share target so the app appears in the share sheet's top row.
         com.myvideolibrary.app.ui.share.ShareShortcuts.publish(this)
     }
