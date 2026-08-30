@@ -50,6 +50,8 @@ class MyVideoLibraryApp : Application(), Configuration.Provider {
         // Re-lock the app whenever it is sent to the background.
         ProcessLifecycleOwner.get().lifecycle.addObserver(appLockManager)
         normalizeDownloadDefaultsOnce()
+        // Keep the daily auto-backup job armed across app updates / OEM work drops.
+        runCatching { autoBackupManager.ensureScheduledIfEnabled() }
         // Self-heal: if the library was wiped but an external auto-backup exists,
         // restore it automatically so categories/titles/settings come back.
         appScope.launch { runCatching { autoBackupManager.autoRestoreIfEmpty() } }

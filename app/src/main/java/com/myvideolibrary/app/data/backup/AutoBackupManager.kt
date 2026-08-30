@@ -54,17 +54,31 @@ class AutoBackupManager @Inject constructor(
 
     /** Turns on automatic backups to [treeUri], encrypted with [password]. */
     fun enable(treeUri: Uri, password: String) {
+        // commit() (synchronous) rather than apply(): on OEMs that kill the process
+        // aggressively an async write can be lost before it flushes, so the flag would
+        // read back false and the toggle would appear to "turn itself off".
         prefs.edit()
             .putBoolean(K_ENABLED, true)
             .putString(K_TREE, treeUri.toString())
-            .apply()
-        runCatching { secure?.edit()?.putString(K_PASSWORD, password)?.apply() }
-        schedule()
+            .commit()
+        runCatching { secure?.edit()?.putString(K_PASSWORD, password)?.commit() }
+        // Scheduling must never be able to undo the enable: if WorkManager throws, the
+        // setting still persists and the daily job is (re)scheduled on next launch.
+        runCatching { schedule() }
     }
 
     fun disable() {
-        prefs.edit().putBoolean(K_ENABLED, false).apply()
+        prefs.edit().putBoolean(K_ENABLED, false).commit()
         runCatching { WorkManager.getInstance(context).cancelUniqueWork(WORK) }
+    }
+
+    /**
+     * Re-arms the periodic job on launch when the setting is on. Cheap and idempotent
+     * ([ExistingPeriodicWorkPolicy.UPDATE]); it recovers from a WorkManager failure that
+     * happened during [enable] and from OEMs that drop scheduled work on app update.
+     */
+    fun ensureScheduledIfEnabled() {
+        if (isEnabled) runCatching { schedule() }
     }
 
     private fun schedule() {
