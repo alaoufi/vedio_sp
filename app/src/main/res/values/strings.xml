@@ -299,6 +299,10 @@
     <string name="auto_backup_running">Backing up…</string>
     <string name="auto_backup_done">Backup saved</string>
     <string name="auto_backup_failed">Backup failed: %1$s</string>
+    <string name="backup_reminder_title">Protect your library from loss</string>
+    <string name="backup_reminder_message">Automatic backup is off. Some devices can wipe the app\'s data on an update, clearing your clips, categories and settings. Turn on automatic backup to an external folder so everything can be restored automatically if that happens.</string>
+    <string name="backup_reminder_enable">Protect now</string>
+    <string name="backup_reminder_never">Don\'t remind me</string>
     <string name="recover_storage">Recover clips from storage</string>
     <string name="recover_storage_desc">Rebuild the library from video files still on the device</string>
     <string name="recover_storage_confirm">Re-adds video files that aren\'t in your library. Pick the folder where your clips are saved (e.g. your vedio_sp folder) so their names and covers come back, or just scan the app\'s own storage.</string>

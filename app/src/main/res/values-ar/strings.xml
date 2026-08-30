@@ -262,6 +262,10 @@
     <string name="auto_backup_running">جارٍ النسخ…</string>
     <string name="auto_backup_done">تم حفظ النسخة الاحتياطية</string>
     <string name="auto_backup_failed">فشل النسخ: %1$s</string>
+    <string name="backup_reminder_title">احمِ مكتبتك من الفقدان</string>
+    <string name="backup_reminder_message">النسخ الاحتياطي التلقائي غير مُفعّل. بعض الأجهزة قد تمسح بيانات التطبيق عند التحديث، فتضيع المقاطع والتصنيفات والإعدادات. فعّل النسخ الاحتياطي التلقائي إلى مجلّد خارجي حتى يُسترجع كل شيء تلقائياً إذا حدث ذلك.</string>
+    <string name="backup_reminder_enable">فعّل الحماية الآن</string>
+    <string name="backup_reminder_never">لا تُذكّرني</string>
     <string name="recover_storage">استرجاع المقاطع من التخزين</string>
     <string name="recover_storage_desc">إعادة بناء المكتبة من ملفات الفيديو الموجودة على الجهاز</string>
     <string name="recover_storage_confirm">يعيد إضافة ملفات الفيديو غير الموجودة في مكتبتك. اختر المجلد الذي حُفظت فيه مقاطعك (مثل مجلد vedio_sp) لترجع بأسمائها وأغلفتها، أو افحص تخزين التطبيق فقط.</string>

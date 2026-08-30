@@ -97,6 +97,12 @@ class SettingsActivity : AppCompatActivity() {
 
         bindActions()
         observe()
+
+        // Deep link from the home-screen backup reminder: open straight into the
+        // auto-backup setup so enabling it is a single tap away.
+        if (intent?.getBooleanExtra(EXTRA_OPEN_AUTO_BACKUP, false) == true) {
+            binding.root.post { showAutoBackupDialog() }
+        }
     }
 
     private fun bindActions() {
@@ -666,5 +672,15 @@ class SettingsActivity : AppCompatActivity() {
     private fun passwordField(): EditText = EditText(this).apply {
         inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
         hint = getString(R.string.backup_password_hint)
+    }
+
+    companion object {
+        /** When true, Settings opens straight into the auto-backup setup dialog. */
+        const val EXTRA_OPEN_AUTO_BACKUP = "open_auto_backup"
+
+        /** Intent that opens Settings directly on the auto-backup setup. */
+        fun autoBackupIntent(context: android.content.Context) =
+            android.content.Intent(context, SettingsActivity::class.java)
+                .putExtra(EXTRA_OPEN_AUTO_BACKUP, true)
     }
 }

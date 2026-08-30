@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity() {
     @javax.inject.Inject lateinit var securityManager: SecurityManager
     @javax.inject.Inject lateinit var okHttpClient: okhttp3.OkHttpClient
     @javax.inject.Inject lateinit var thumbnailGenerator: com.myvideolibrary.app.util.ThumbnailGenerator
+    @javax.inject.Inject lateinit var autoBackupManager: com.myvideolibrary.app.data.backup.AutoBackupManager
 
     private lateinit var adapter: VideoPagingAdapter
     private lateinit var continueAdapter: ContinueAdapter
@@ -99,6 +100,43 @@ class MainActivity : AppCompatActivity() {
         requestNotificationPermissionIfNeeded()
         maybeOnboard()
         maybeCheckForUpdate()
+        maybeRemindAutoBackup()
+    }
+
+    /**
+     * Nudges the user to turn on the external auto-backup that protects the library
+     * from the OEM "wipe on update" failure. Shown only after onboarding, only while
+     * auto-backup is off, throttled to at most once every few days, and dismissable
+     * for good via "don't remind me". Tapping "Protect now" jumps straight into the
+     * auto-backup setup in Settings.
+     */
+    private fun maybeRemindAutoBackup() {
+        // Don't stack on top of first-launch onboarding / the guide prompt.
+        val ob = getSharedPreferences("onboarding", MODE_PRIVATE)
+        if (!ob.getBoolean("done", false) || ob.getBoolean("guide_pending", false)) return
+        if (autoBackupManager.isEnabled) return
+
+        val prefs = getSharedPreferences("backup_reminder", MODE_PRIVATE)
+        if (prefs.getBoolean("never", false)) return
+        val now = System.currentTimeMillis()
+        val gap = 3L * 24 * 60 * 60 * 1000 // at most once every 3 days
+        if (now - prefs.getLong("last_shown", 0L) < gap) return
+        prefs.edit().putLong("last_shown", now).apply()
+
+        if (isFinishing || isDestroyed) return
+        AlertDialog.Builder(this)
+            .setTitle(R.string.backup_reminder_title)
+            .setMessage(R.string.backup_reminder_message)
+            .setPositiveButton(R.string.backup_reminder_enable) { _, _ ->
+                startActivity(
+                    com.myvideolibrary.app.ui.settings.SettingsActivity.autoBackupIntent(this)
+                )
+            }
+            .setNeutralButton(R.string.backup_reminder_never) { _, _ ->
+                prefs.edit().putBoolean("never", true).apply()
+            }
+            .setNegativeButton(R.string.later, null)
+            .show()
     }
 
     private fun observeDownloads() {
