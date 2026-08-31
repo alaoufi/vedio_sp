@@ -144,10 +144,10 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun export(password: String) {
+    fun export() {
         viewModelScope.launch {
             try {
-                val file = backupManager.export(password)
+                val file = backupManager.export()
                 _state.value = _state.value.copy(
                     message = context.getString(
                         com.myvideolibrary.app.R.string.backup_exported, file.name
@@ -160,10 +160,10 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun restore(uri: Uri, password: String) {
+    fun restore(uri: Uri) {
         viewModelScope.launch {
             try {
-                val count = backupManager.restore(uri, password)
+                val count = backupManager.restore(uri)
                 postMessage(context.getString(
                     com.myvideolibrary.app.R.string.backup_restored, count
                 ))

@@ -34,7 +34,7 @@ class SettingsActivity : AppCompatActivity() {
 
     private val restorePicker = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
-    ) { uri -> uri?.let { promptRestorePassword(it) } }
+    ) { uri -> uri?.let { confirmRestore(it) } }
 
     /** Picks the folder to scan when recovering clips (e.g. the user's vedio_sp folder). */
     private val recoveryFolderPicker = registerForActivityResult(
@@ -144,7 +144,7 @@ class SettingsActivity : AppCompatActivity() {
 
         binding.saveLocationRow.setOnClickListener { showSaveLocationDialog() }
         binding.clearCacheRow.setOnClickListener { viewModel.clearCache() }
-        binding.backupRow.setOnClickListener { promptBackupPassword() }
+        binding.backupRow.setOnClickListener { viewModel.export() }
         binding.restoreRow.setOnClickListener {
             restorePicker.launch(arrayOf("*/*"))
         }
@@ -334,25 +334,11 @@ class SettingsActivity : AppCompatActivity() {
             .show()
     }
 
-    /** After a folder is chosen, ask for the encryption password and turn it on. */
+    /** After a folder is chosen, turn on automatic backups (no password needed). */
     private fun promptEnableAutoBackup(treeUri: Uri) {
-        val input = passwordField()
-        AlertDialog.Builder(this)
-            .setTitle(R.string.auto_backup)
-            .setMessage(R.string.backup_encrypt_message)
-            .setView(input)
-            .setPositiveButton(R.string.enable) { _, _ ->
-                val pw = input.text.toString()
-                if (pw.length < 6) {
-                    Toast.makeText(this, R.string.password_too_short, Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
-                }
-                autoBackupManager.enable(treeUri, pw)
-                renderAutoBackup()
-                runBackupNow()
-            }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
+        autoBackupManager.enable(treeUri)
+        renderAutoBackup()
+        runBackupNow()
     }
 
     private fun runBackupNow() {
@@ -641,37 +627,14 @@ class SettingsActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun promptBackupPassword() {
-        val input = passwordField()
-        AlertDialog.Builder(this)
-            .setTitle(R.string.backup_encrypt_title)
-            .setMessage(R.string.backup_encrypt_message)
-            .setView(input)
-            .setPositiveButton(R.string.export) { _, _ ->
-                val pw = input.text.toString()
-                if (pw.length >= 6) viewModel.export(pw)
-                else Toast.makeText(this, R.string.password_too_short, Toast.LENGTH_SHORT).show()
-            }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
-    }
-
-    private fun promptRestorePassword(uri: Uri) {
-        val input = passwordField()
+    /** Confirms then restores a chosen backup file (no password required). */
+    private fun confirmRestore(uri: Uri) {
         AlertDialog.Builder(this)
             .setTitle(R.string.restore_title)
             .setMessage(R.string.restore_message)
-            .setView(input)
-            .setPositiveButton(R.string.restore) { _, _ ->
-                viewModel.restore(uri, input.text.toString())
-            }
+            .setPositiveButton(R.string.restore) { _, _ -> viewModel.restore(uri) }
             .setNegativeButton(R.string.cancel, null)
             .show()
-    }
-
-    private fun passwordField(): EditText = EditText(this).apply {
-        inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-        hint = getString(R.string.backup_password_hint)
     }
 
     companion object {

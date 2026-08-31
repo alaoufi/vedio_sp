@@ -31,12 +31,14 @@ data class BackupData(
 )
 
 /**
- * Manual, password-encrypted local backup and restore.
+ * Local backup and restore.
  *
  * The backup contains the library's logical records (metadata, folders, settings)
- * as JSON, encrypted with AES-256-GCM using a key derived from the user's password
- * via PBKDF2. There is no cloud component — the file stays on the device unless the
- * user explicitly shares it.
+ * as JSON, encrypted with AES-256-GCM (a key derived via PBKDF2). By default no
+ * user password is required — a fixed built-in passphrase is used so backup and
+ * restore are one tap, while the file still isn't plain text. A caller may still
+ * pass a custom password for a stronger, personally-keyed backup. There is no
+ * cloud component — the file stays on the device unless the user shares it.
  */
 @Singleton
 class BackupManager @Inject constructor(
@@ -47,7 +49,7 @@ class BackupManager @Inject constructor(
 ) {
 
     /** Builds the encrypted backup payload (used for both file and folder exports). */
-    suspend fun exportBytes(password: String): ByteArray = withContext(Dispatchers.IO) {
+    suspend fun exportBytes(password: String = DEFAULT_PASSWORD): ByteArray = withContext(Dispatchers.IO) {
         val data = BackupData(
             exportedAt = System.currentTimeMillis(),
             videos = database.videoDao().getAllOnce(),
@@ -58,7 +60,7 @@ class BackupManager @Inject constructor(
     }
 
     /** Exports an encrypted backup file and returns it. */
-    suspend fun export(password: String): File = withContext(Dispatchers.IO) {
+    suspend fun export(password: String = DEFAULT_PASSWORD): File = withContext(Dispatchers.IO) {
         val encrypted = exportBytes(password)
         val outFile = File(storageManager.backupsDir, "mvl_backup_${System.currentTimeMillis()}.mvlbak")
         outFile.writeBytes(encrypted)
@@ -66,10 +68,13 @@ class BackupManager @Inject constructor(
     }
 
     /** Restores from an encrypted backup [uri]; returns the number of videos imported. */
-    suspend fun restore(uri: Uri, password: String): Int = withContext(Dispatchers.IO) {
+    suspend fun restore(uri: Uri, password: String = DEFAULT_PASSWORD): Int = withContext(Dispatchers.IO) {
         val encrypted = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
             ?: throw IllegalArgumentException("Cannot read backup file")
-        val json = decrypt(encrypted, password)
+        // Password-free backups use the built-in passphrase; if that doesn't decrypt
+        // (e.g. an older file made with a custom password), fall back to the one given.
+        val json = runCatching { decrypt(encrypted, DEFAULT_PASSWORD) }
+            .getOrElse { decrypt(encrypted, password) }
         val data = gson.fromJson(String(json, Charsets.UTF_8), BackupData::class.java)
 
         // Restore folders first and remember old→new id mapping so video folder
@@ -128,6 +133,13 @@ class BackupManager @Inject constructor(
     }
 
     companion object {
+        /**
+         * Built-in passphrase for password-free backups. It keeps the backup file
+         * from being plain text (and keeps the format unchanged), but is not a
+         * secret from anyone with the app — the point is convenience, not secrecy.
+         */
+        const val DEFAULT_PASSWORD = "mvl-default-backup-key-v1"
+
         private val MAGIC = "MVLBAK01".toByteArray(Charsets.US_ASCII)
         private const val TRANSFORMATION = "AES/GCM/NoPadding"
         private const val SALT_LEN = 16

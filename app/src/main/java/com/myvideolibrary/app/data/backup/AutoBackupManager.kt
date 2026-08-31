@@ -3,8 +3,6 @@ package com.myvideolibrary.app.data.backup
 import android.content.Context
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
@@ -35,25 +33,13 @@ class AutoBackupManager @Inject constructor(
 
     private val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
-    private val secure by lazy {
-        runCatching {
-            val master = MasterKey.Builder(context)
-                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build()
-            EncryptedSharedPreferences.create(
-                context, SECURE_PREFS, master,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            )
-        }.getOrNull()
-    }
-
     val isEnabled: Boolean get() = prefs.getBoolean(K_ENABLED, false)
     val folderUri: Uri? get() = prefs.getString(K_TREE, null)?.let(Uri::parse)
     val lastBackupAt: Long get() = prefs.getLong(K_LAST, 0L)
     val lastResult: String? get() = prefs.getString(K_RESULT, null)
 
-    /** Turns on automatic backups to [treeUri], encrypted with [password]. */
-    fun enable(treeUri: Uri, password: String) {
+    /** Turns on automatic backups to [treeUri]. No password: uses the built-in key. */
+    fun enable(treeUri: Uri) {
         // commit() (synchronous) rather than apply(): on OEMs that kill the process
         // aggressively an async write can be lost before it flushes, so the flag would
         // read back false and the toggle would appear to "turn itself off".
@@ -61,7 +47,6 @@ class AutoBackupManager @Inject constructor(
             .putBoolean(K_ENABLED, true)
             .putString(K_TREE, treeUri.toString())
             .commit()
-        runCatching { secure?.edit()?.putString(K_PASSWORD, password)?.commit() }
         // Scheduling must never be able to undo the enable: if WorkManager throws, the
         // setting still persists and the daily job is (re)scheduled on next launch.
         runCatching { schedule() }
@@ -89,9 +74,6 @@ class AutoBackupManager @Inject constructor(
             .enqueueUniquePeriodicWork(WORK, ExistingPeriodicWorkPolicy.UPDATE, request)
     }
 
-    private fun password(): String? =
-        runCatching { secure?.getString(K_PASSWORD, null) }.getOrNull()
-
     /**
      * Self-heal after a wipe: if auto-backup is on and the library is EMPTY but the
      * external folder still holds a backup, restore the newest one automatically so
@@ -102,25 +84,23 @@ class AutoBackupManager @Inject constructor(
     suspend fun autoRestoreIfEmpty(): Boolean {
         if (!isEnabled) return false
         val tree = folderUri ?: return false
-        val pw = password() ?: return false
         return runCatching {
             if (videoDao.getAllOnce().isNotEmpty()) return@runCatching false
             val dir = DocumentFile.fromTreeUri(context, tree) ?: return@runCatching false
             val newest = dir.listFiles()
                 .filter { it.isFile && it.name?.endsWith(".mvlbak") == true }
                 .maxByOrNull { it.lastModified() } ?: return@runCatching false
-            backupManager.restore(newest.uri, pw) > 0
+            backupManager.restore(newest.uri) > 0
         }.getOrDefault(false)
     }
 
     /** Writes one encrypted backup into the chosen folder, rotating old ones. */
     suspend fun backupNow(): kotlin.Result<Unit> = kotlin.runCatching {
         val tree = folderUri ?: error("No backup folder chosen")
-        val pw = password() ?: error("No backup password set")
         val dir = DocumentFile.fromTreeUri(context, tree) ?: error("Backup folder unavailable")
         if (!dir.canWrite()) error("Backup folder is not writable")
 
-        val bytes = backupManager.exportBytes(pw)
+        val bytes = backupManager.exportBytes()
         val name = "mvl_backup_${System.currentTimeMillis()}.mvlbak"
         val file = dir.createFile(MIME, name) ?: error("Could not create the backup file")
         context.contentResolver.openOutputStream(file.uri)?.use { it.write(bytes) }
@@ -150,11 +130,9 @@ class AutoBackupManager @Inject constructor(
         private const val KEEP = 5
         private const val MIME = "application/octet-stream"
         private const val PREFS = "mvl_backup_prefs"
-        private const val SECURE_PREFS = "mvl_backup_secure"
         private const val K_ENABLED = "enabled"
         private const val K_TREE = "tree_uri"
         private const val K_LAST = "last_backup_at"
         private const val K_RESULT = "last_result"
-        private const val K_PASSWORD = "password"
     }
 }
