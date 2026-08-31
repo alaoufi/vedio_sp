@@ -585,4 +585,7 @@
         <item quantity="other">%d videos</item>
     </plurals>
     <string name="continue_watching">Continue watching</string>
+    <string name="shelf_recently_added">Recently added</string>
+    <string name="shelf_most_played">Most played</string>
+    <string name="shelf_not_watched">Not watched</string>
 </resources>

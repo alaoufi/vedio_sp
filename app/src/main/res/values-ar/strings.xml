@@ -552,4 +552,7 @@
         <item quantity="other">%d مقطع</item>
     </plurals>
     <string name="continue_watching">متابعة المشاهدة</string>
+    <string name="shelf_recently_added">أُضيف حديثاً</string>
+    <string name="shelf_most_played">الأكثر مشاهدة</string>
+    <string name="shelf_not_watched">لم يُشاهد بعد</string>
 </resources>

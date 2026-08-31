@@ -126,6 +126,12 @@ class VideoRepositoryImpl @Inject constructor(
     override fun observeRecentlyPlayed(limit: Int): Flow<List<VideoEntity>> =
         videoDao.observeRecentlyPlayed(limit)
 
+    override fun observeRecentlyAdded(limit: Int): Flow<List<VideoEntity>> =
+        videoDao.observeRecentlyAdded(limit)
+
+    override fun observeNotWatched(limit: Int): Flow<List<VideoEntity>> =
+        videoDao.observeNotWatched(limit)
+
     override suspend fun findDuplicates(): List<List<VideoEntity>> =
         videoDao.findDuplicateGroups().mapNotNull { group ->
             videoDao.getByContentHash(group.contentHash).takeIf { it.size > 1 }

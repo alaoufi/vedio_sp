@@ -170,6 +170,14 @@ interface VideoDao {
     @Query("SELECT * FROM videos WHERE last_played_date IS NOT NULL ORDER BY last_played_date DESC LIMIT :limit")
     fun observeRecentlyPlayed(limit: Int): Flow<List<VideoEntity>>
 
+    /** Newest additions first — backs the "Recently added" home shelf. */
+    @Query("SELECT * FROM videos WHERE is_link_only = 0 ORDER BY created_date DESC LIMIT :limit")
+    fun observeRecentlyAdded(limit: Int): Flow<List<VideoEntity>>
+
+    /** Never-played clips, newest first — backs the "Not watched yet" home shelf. */
+    @Query("SELECT * FROM videos WHERE is_link_only = 0 AND play_count = 0 ORDER BY created_date DESC LIMIT :limit")
+    fun observeNotWatched(limit: Int): Flow<List<VideoEntity>>
+
     // ---- Duplicate detection ----
 
     // Fingerprint = the stored content_hash, or (for legacy rows that never got one,

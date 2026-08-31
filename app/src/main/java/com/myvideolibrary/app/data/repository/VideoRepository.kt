@@ -68,6 +68,10 @@ interface VideoRepository {
 
     fun observeRecentlyPlayed(limit: Int): Flow<List<VideoEntity>>
 
+    fun observeRecentlyAdded(limit: Int): Flow<List<VideoEntity>>
+
+    fun observeNotWatched(limit: Int): Flow<List<VideoEntity>>
+
     /** Groups of videos sharing a content fingerprint, i.e. likely duplicates. */
     suspend fun findDuplicates(): List<List<VideoEntity>>
 

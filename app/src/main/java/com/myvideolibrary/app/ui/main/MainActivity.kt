@@ -54,6 +54,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var adapter: VideoPagingAdapter
     private lateinit var continueAdapter: ContinueAdapter
+    private lateinit var discoverAdapter: ContinueAdapter
+    /** Whether the home is showing an unfiltered library (shelves only appear then). */
+    private var discoverAllowed = true
     /** Runs the animated preview on the centred grid card; one at a time. */
     private var previewJob: Job? = null
     private lateinit var youtubeAdapter: com.myvideolibrary.app.ui.search.SearchResultAdapter
@@ -205,6 +208,7 @@ class MainActivity : AppCompatActivity() {
         binding.swipeRefresh.isVisible = !youtube
         binding.fabImport.isVisible = !youtube
         binding.continueSection.isVisible = !youtube && continueAdapter.itemCount > 0
+        renderDiscoverVisibility()
         if (youtube) binding.emptyState.isVisible = false
         supportActionBar?.title =
             getString(if (youtube) R.string.tab_youtube else R.string.app_name)
@@ -341,6 +345,38 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        setupDiscoverShelf()
+    }
+
+    /** The switchable "Recently added / Most played / Not watched" home shelf. */
+    private fun setupDiscoverShelf() {
+        discoverAdapter = ContinueAdapter { startActivity(PlayerActivity.intent(this, it.id)) }
+        binding.discoverRecycler.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.discoverRecycler.adapter = discoverAdapter
+        binding.discoverChips.setOnCheckedStateChangeListener { _, checkedIds ->
+            val shelf = when (checkedIds.firstOrNull()) {
+                R.id.chipMostPlayed -> DiscoverShelf.MOST_PLAYED
+                R.id.chipNotWatched -> DiscoverShelf.NOT_WATCHED
+                else -> DiscoverShelf.RECENTLY_ADDED
+            }
+            viewModel.setShelf(shelf)
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.discoverItems.collectLatest { list ->
+                    discoverAdapter.submitList(list)
+                    renderDiscoverVisibility()
+                }
+            }
+        }
+    }
+
+    /** Shelves show only on the unfiltered library tab and when the row has items. */
+    private fun renderDiscoverVisibility() {
+        binding.discoverSection.isVisible =
+            !youtubeTab && discoverAllowed && discoverAdapter.itemCount > 0
     }
 
     override fun onStop() {
@@ -671,6 +707,12 @@ class MainActivity : AppCompatActivity() {
                     renderFilterChip(state)
                     renderSelectionBar(state)
                     renderProtectedTitle(state)
+                    // Shelves belong on the clean, unfiltered home only.
+                    discoverAllowed = state.search.isBlank() && !state.favoritesOnly &&
+                        !state.selectionMode && state.folderId == null &&
+                        state.sourceFilters.isEmpty() && state.categoryFilters.isEmpty() &&
+                        state.mediaTypeFilters.isEmpty() && state.tagFilters.isEmpty()
+                    renderDiscoverVisibility()
                     invalidateOptionsMenu()
                 }
             }
