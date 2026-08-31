@@ -87,7 +87,10 @@ class RecoveryManager @Inject constructor(
                 width = meta?.width ?: 0,
                 height = meta?.height ?: 0,
                 quality = meta?.qualityLabel,
-                createdDate = lastModified.takeIf { it > 0 } ?: System.currentTimeMillis()
+                createdDate = lastModified.takeIf { it > 0 } ?: System.currentTimeMillis(),
+                // Same fingerprint scheme as the downloader/importer (size_duration) so
+                // recovered clips take part in duplicate detection alongside downloads.
+                contentHash = "${size}_${meta?.durationMs ?: 0L}"
             )
             if (runCatching { videoDao.insert(entity) }.isSuccess) {
                 recovered++

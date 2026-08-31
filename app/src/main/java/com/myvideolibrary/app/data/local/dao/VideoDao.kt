@@ -172,12 +172,23 @@ interface VideoDao {
 
     // ---- Duplicate detection ----
 
+    // Fingerprint = the stored content_hash, or (for legacy rows that never got one,
+    // e.g. recovered clips) a size_duration key computed the same way downloads/imports
+    // build theirs — so downloaded and recovered copies of one clip still group together.
+    // Link-only rows and zero-size rows are excluded (nothing on disk to reclaim).
     @Query(
-        "SELECT content_hash AS contentHash, COUNT(*) AS copies FROM videos " +
-            "WHERE content_hash IS NOT NULL GROUP BY content_hash HAVING COUNT(*) > 1"
+        "SELECT COALESCE(content_hash, file_size || '_' || duration) AS contentHash, " +
+            "COUNT(*) AS copies FROM videos " +
+            "WHERE is_link_only = 0 AND file_size > 0 " +
+            "GROUP BY COALESCE(content_hash, file_size || '_' || duration) HAVING COUNT(*) > 1"
     )
     suspend fun findDuplicateGroups(): List<DuplicateGroup>
 
-    @Query("SELECT * FROM videos WHERE content_hash = :hash ORDER BY created_date ASC")
+    @Query(
+        "SELECT * FROM videos " +
+            "WHERE is_link_only = 0 AND file_size > 0 " +
+            "AND COALESCE(content_hash, file_size || '_' || duration) = :hash " +
+            "ORDER BY created_date ASC"
+    )
     suspend fun getByContentHash(hash: String): List<VideoEntity>
 }
