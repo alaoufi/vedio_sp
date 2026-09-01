@@ -34,7 +34,8 @@ import androidx.room.PrimaryKey
         Index(value = ["source"]),
         Index(value = ["media_type"]),
         Index(value = ["play_count"]),
-        Index(value = ["last_played_date"])
+        Index(value = ["last_played_date"]),
+        Index(value = ["sort_index"])
     ]
 )
 data class VideoEntity(
@@ -130,6 +131,14 @@ data class VideoEntity(
 
     @ColumnInfo(name = "play_count")
     val playCount: Int = 0,
+
+    /**
+     * User-defined order weight for the "Custom" sort (drag-to-arrange). Larger
+     * sits earlier. Seeded from [createdDate] on migration so custom order starts
+     * as newest-first until the user rearranges.
+     */
+    @ColumnInfo(name = "sort_index")
+    val sortIndex: Long = 0,
 
     /**
      * Cheap fingerprint used for duplicate detection

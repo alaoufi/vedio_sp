@@ -132,6 +132,19 @@ class VideoRepositoryImpl @Inject constructor(
     override fun observeNotWatched(limit: Int): Flow<List<VideoEntity>> =
         videoDao.observeNotWatched(limit)
 
+    override suspend fun clipsForReorder(limit: Int): List<VideoEntity> =
+        videoDao.getForReorder(limit)
+
+    override suspend fun saveCustomOrder(orderedTopFirst: List<VideoEntity>) {
+        // Anchor above any created_date-seeded value so the arranged clips keep their
+        // exact order at the top; spacing lets later single moves slot between them.
+        val base = System.currentTimeMillis()
+        val updated = orderedTopFirst.mapIndexed { i, v ->
+            v.copy(sortIndex = base + (orderedTopFirst.size - i).toLong())
+        }
+        videoDao.updateAll(updated)
+    }
+
     override suspend fun findDuplicates(): List<List<VideoEntity>> =
         videoDao.findDuplicateGroups().mapNotNull { group ->
             videoDao.getByContentHash(group.contentHash).takeIf { it.size > 1 }

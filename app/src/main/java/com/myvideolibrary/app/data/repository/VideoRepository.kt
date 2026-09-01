@@ -72,6 +72,12 @@ interface VideoRepository {
 
     fun observeNotWatched(limit: Int): Flow<List<VideoEntity>>
 
+    /** Clips loaded for the drag-to-arrange screen, in current custom order. */
+    suspend fun clipsForReorder(limit: Int): List<VideoEntity>
+
+    /** Persists a new custom order (list is top-first). */
+    suspend fun saveCustomOrder(orderedTopFirst: List<VideoEntity>)
+
     /** Groups of videos sharing a content fingerprint, i.e. likely duplicates. */
     suspend fun findDuplicates(): List<List<VideoEntity>>
 

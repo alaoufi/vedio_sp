@@ -1484,6 +1484,10 @@ class MainActivity : AppCompatActivity() {
                 startActivity(com.myvideolibrary.app.ui.duplicates.DuplicatesActivity.intent(this))
                 true
             }
+            R.id.action_arrange -> {
+                startActivity(com.myvideolibrary.app.ui.reorder.ReorderActivity.intent(this))
+                true
+            }
             R.id.action_playlists -> {
                 startActivity(com.myvideolibrary.app.ui.playlists.PlaylistsActivity.intent(this))
                 true
@@ -1510,14 +1514,15 @@ class MainActivity : AppCompatActivity() {
             getString(R.string.sort_duration_short),
             getString(R.string.sort_size_large),
             getString(R.string.sort_size_small),
-            getString(R.string.sort_category)
+            getString(R.string.sort_category),
+            getString(R.string.sort_custom)
         )
         val orders = arrayOf(
             SortOrder.DATE_ADDED_DESC, SortOrder.DATE_ADDED_ASC,
             SortOrder.NAME_ASC, SortOrder.NAME_DESC,
             SortOrder.DURATION_DESC, SortOrder.DURATION_ASC,
             SortOrder.SIZE_DESC, SortOrder.SIZE_ASC,
-            SortOrder.CATEGORY_ASC
+            SortOrder.CATEGORY_ASC, SortOrder.CUSTOM
         )
         val current = orders.indexOf(viewModel.uiState.value.sortOrder).coerceAtLeast(0)
         AlertDialog.Builder(this)

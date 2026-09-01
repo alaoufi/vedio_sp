@@ -110,6 +110,12 @@ data class LibraryQuery(
             SortOrder.CATEGORY_ASC ->
                 "ORDER BY (category IS NULL OR TRIM(category) = '') ASC, " +
                     "category COLLATE NOCASE ASC, title COLLATE NOCASE ASC"
+            // User-defined drag order. Rows never arranged (sort_index 0, e.g. clips
+            // added after the last arrange) fall back to their added-date so new
+            // downloads still surface near the top instead of sinking to the bottom.
+            SortOrder.CUSTOM ->
+                "ORDER BY (CASE WHEN sort_index = 0 THEN created_date ELSE sort_index END) DESC, " +
+                    "created_date DESC"
         }
 
         val sql = "SELECT * FROM videos $where $orderBy"

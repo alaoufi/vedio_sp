@@ -130,6 +130,11 @@
             android:exported="false"
             android:parentActivityName=".ui.main.MainActivity" />
 
+        <activity
+            android:name=".ui.reorder.ReorderActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.main.MainActivity" />
+
         <!-- In-app browser with media detection (generic downloader). -->
         <activity
             android:name=".ui.browser.BrowserActivity"

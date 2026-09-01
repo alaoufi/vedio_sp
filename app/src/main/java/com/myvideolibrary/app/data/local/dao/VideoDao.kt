@@ -48,6 +48,18 @@ interface VideoDao {
     @Update
     suspend fun update(video: VideoEntity)
 
+    /** Bulk update — used to persist a new custom order in one transaction. */
+    @Update
+    suspend fun updateAll(videos: List<VideoEntity>)
+
+    /** Clips for the drag-to-arrange screen, in the current custom order. */
+    @Query(
+        "SELECT * FROM videos WHERE is_link_only = 0 " +
+            "ORDER BY (CASE WHEN sort_index = 0 THEN created_date ELSE sort_index END) DESC, " +
+            "created_date DESC LIMIT :limit"
+    )
+    suspend fun getForReorder(limit: Int): List<VideoEntity>
+
     @Delete
     suspend fun delete(video: VideoEntity)
 

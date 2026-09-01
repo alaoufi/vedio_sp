@@ -134,3 +134,13 @@ val MIGRATION_14_15 = object : Migration(14, 15) {
         db.execSQL("ALTER TABLE settings ADD COLUMN private_vault_password TEXT")
     }
 }
+
+/** Adds the user-defined custom order column, seeded from the added-date. */
+val MIGRATION_15_16 = object : Migration(15, 16) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE videos ADD COLUMN sort_index INTEGER NOT NULL DEFAULT 0")
+        // Seed so custom order starts as newest-first until the user rearranges.
+        db.execSQL("UPDATE videos SET sort_index = created_date")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_videos_sort_index ON videos (sort_index)")
+    }
+}

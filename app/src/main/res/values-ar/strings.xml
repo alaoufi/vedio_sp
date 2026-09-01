@@ -48,6 +48,10 @@
     <string name="sort_size_large">الحجم (الأكبر)</string>
     <string name="sort_size_small">الحجم (الأصغر)</string>
     <string name="sort_category">التصنيف</string>
+    <string name="sort_custom">مخصص (يدوي)</string>
+    <string name="arrange_manually">ترتيب يدوي بالسحب</string>
+    <string name="arrange_hint">اسحب المقبض لإعادة الترتيب. يُحفظ ترتيبك ويظهر عند فرز المكتبة حسب «مخصص».</string>
+    <string name="arrange_empty">لا توجد مقاطع للترتيب بعد.</string>
 
     <!-- Folders -->
     <string name="new_folder">مجلد جديد</string>

@@ -45,7 +45,8 @@ enum class SortOrder(val id: String) {
     DURATION_ASC("duration_asc"),
     SIZE_DESC("size_desc"),
     SIZE_ASC("size_asc"),
-    CATEGORY_ASC("category_asc");
+    CATEGORY_ASC("category_asc"),
+    CUSTOM("custom");
 
     companion object {
         fun fromId(id: String?): SortOrder =
