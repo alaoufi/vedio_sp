@@ -37,6 +37,8 @@ object SlideshowEncoder {
     // even on weak devices. FPS here is just the container's nominal rate hint.
     private const val FPS = 1
     private const val BITRATE = 4_000_000
+    /** Cap for how long a single-picture post is held to match its music. */
+    private const val MAX_SINGLE_IMAGE_US = 60_000_000L
     private const val TIMEOUT_US = 10_000L
 
     private class Yuv(val y: ByteArray, val u: ByteArray, val v: ByteArray)
@@ -51,7 +53,8 @@ object SlideshowEncoder {
     ): String? {
         if (frames.isEmpty()) return "no images"
         // Each picture is shown for this long, controlled purely by timestamps.
-        val perImageUs = perImageMs * 1000L
+        // For a single-picture post this is stretched to the music length below.
+        var perImageUs = perImageMs * 1000L
         val imageCount = frames.size
 
         var encoder: MediaCodec? = null
@@ -95,6 +98,18 @@ object SlideshowEncoder {
                     }
                 }
                 if (audioExtractor == null) ex.release()
+            }
+
+            // A single-picture photo post should play for the length of its music
+            // (like TikTok's photo mode), not a fixed 2.5s. Hold the one frame for the
+            // audio duration, capped. Multi-image slideshows keep the per-image time.
+            if (imageCount == 1) {
+                val audioDurUs = audioFormat
+                    ?.takeIf { it.containsKey(MediaFormat.KEY_DURATION) }
+                    ?.getLong(MediaFormat.KEY_DURATION)?.takeIf { it > 0 }
+                if (audioDurUs != null) {
+                    perImageUs = audioDurUs.coerceIn(perImageUs, MAX_SINGLE_IMAGE_US)
+                }
             }
 
             val info = MediaCodec.BufferInfo()

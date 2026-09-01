@@ -114,9 +114,24 @@ class DownloadWorker @AssistedInject constructor(
             Result.success(workDataOf(KEY_DOWNLOAD_ID to downloadId))
         } catch (e: Exception) {
             coroutineContext.ensureActive()
-            // A slideshow build can't be fixed by retrying the same device encoder,
-            // so surface the real reason immediately instead of looping.
+            // A slideshow build can't be fixed by retrying the same device encoder.
+            // Rather than fail outright, fall back to saving the first picture so the
+            // post still downloads (as an image) on devices whose encoder can't build
+            // the video.
             if (kind == com.myvideolibrary.app.data.model.DownloadKind.SLIDESHOW) {
+                val firstImage = download.imageUrls
+                    ?.split("\n")?.map { it.trim() }?.firstOrNull { it.isNotEmpty() }
+                val savedImage = firstImage != null &&
+                    withContext(Dispatchers.IO) { fetchToFile(firstImage, destFile) }
+                if (savedImage) {
+                    markProcessing(downloadId)
+                    finalize(
+                        downloadId, download.title, destFile,
+                        com.myvideolibrary.app.data.model.DownloadKind.IMAGE_ONLY
+                    )
+                    notifier.showComplete(notificationId, download.title, true)
+                    return Result.success(workDataOf(KEY_DOWNLOAD_ID to downloadId))
+                }
                 downloadRepository.setStatus(
                     downloadId, DownloadStatus.FAILED, e.message ?: "Slideshow build failed"
                 )
