@@ -36,9 +36,12 @@ object OpenGraphResolver {
         val video = meta(html, "og:video:secure_url")
             ?: meta(html, "og:video:url")
             ?: meta(html, "og:video")
+            ?: meta(html, "twitter:player:stream")
             ?: json(html, "video_url")
             ?: json(html, "videoUrl")
             ?: json(html, "playbackUrl")
+            // Schema.org VideoObject (Snapchat Spotlight and others embed this).
+            ?: json(html, "contentUrl")
             ?: throw ProviderException(
                 ProviderErrorType.EXTRACTION_FAILED,
                 "No downloadable media found — the post may be private or login-only"
