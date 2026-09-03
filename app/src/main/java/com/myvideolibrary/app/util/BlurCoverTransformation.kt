@@ -14,8 +14,10 @@ import java.security.MessageDigest
  * extra dependency.
  */
 class BlurCoverTransformation(
-    private val sampling: Int = 14,
-    private val passes: Int = 2
+    private val sampling: Int = 48,
+    private val passes: Int = 3,
+    /** Multiplies brightness (<1 = darker veil) so features can't be made out. */
+    private val dim: Float = 0.55f
 ) : BitmapTransformation() {
 
     override fun transform(
@@ -27,13 +29,32 @@ class BlurCoverTransformation(
         val w = toTransform.width
         val h = toTransform.height
         if (w <= 0 || h <= 0) return toTransform
+        // Downscale hard (destroys detail), blur, darken, then scale back up so the
+        // card keeps its size but the content is an unrecognisable dim smear.
         val sw = (w / sampling).coerceAtLeast(1)
         val sh = (h / sampling).coerceAtLeast(1)
         val small = Bitmap.createScaledBitmap(toTransform, sw, sh, true)
         boxBlur(small, passes)
+        darken(small, dim)
         val result = Bitmap.createScaledBitmap(small, w, h, true)
         if (small !== result) small.recycle()
         return result
+    }
+
+    /** Applies a uniform dim veil so even colour blocks read as "hidden". */
+    private fun darken(bitmap: Bitmap, factor: Float) {
+        val w = bitmap.width
+        val h = bitmap.height
+        val pixels = IntArray(w * h)
+        bitmap.getPixels(pixels, 0, w, 0, 0, w, h)
+        for (i in pixels.indices) {
+            val c = pixels[i]
+            val r = (((c shr 16) and 0xFF) * factor).toInt().coerceIn(0, 255)
+            val g = (((c shr 8) and 0xFF) * factor).toInt().coerceIn(0, 255)
+            val b = ((c and 0xFF) * factor).toInt().coerceIn(0, 255)
+            pixels[i] = (0xFF shl 24) or (r shl 16) or (g shl 8) or b
+        }
+        bitmap.setPixels(pixels, 0, w, 0, 0, w, h)
     }
 
     /** A few 3×3 box-blur passes (separable H then V) over a small bitmap. */
@@ -77,13 +98,14 @@ class BlurCoverTransformation(
     }
 
     override fun updateDiskCacheKey(messageDigest: MessageDigest) {
-        messageDigest.update("$ID:$sampling:$passes".toByteArray(com.bumptech.glide.load.Key.CHARSET))
+        messageDigest.update("$ID:$sampling:$passes:$dim".toByteArray(com.bumptech.glide.load.Key.CHARSET))
     }
 
     override fun equals(other: Any?): Boolean =
-        other is BlurCoverTransformation && other.sampling == sampling && other.passes == passes
+        other is BlurCoverTransformation && other.sampling == sampling &&
+            other.passes == passes && other.dim == dim
 
-    override fun hashCode(): Int = ID.hashCode() + sampling * 31 + passes
+    override fun hashCode(): Int = ID.hashCode() + sampling * 31 + passes * 7 + dim.hashCode()
 
     private companion object {
         const val ID = "com.myvideolibrary.app.util.BlurCoverTransformation"

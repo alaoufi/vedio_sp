@@ -1452,14 +1452,17 @@ class MainActivity : AppCompatActivity() {
             refreshCovers()
             return
         }
-        if (viewModel.uiState.value.obscurePasswordHash.isNullOrEmpty()) {
-            promptSetObscurePassword {
-                viewModel.setClipObscured(video.id, true)
-                refreshCovers()
-            }
-        } else {
+        val apply = {
             viewModel.setClipObscured(video.id, true)
+            // Lock the session so the clip obscures at once — not only after the app
+            // is backgrounded or the clip is opened once.
+            com.myvideolibrary.app.security.ObscuredClipsSession.lockAll()
             refreshCovers()
+        }
+        if (viewModel.uiState.value.obscurePasswordHash.isNullOrEmpty()) {
+            promptSetObscurePassword(apply)
+        } else {
+            apply()
         }
     }
 
@@ -1498,8 +1501,6 @@ class MainActivity : AppCompatActivity() {
                     return@setPositiveButton
                 }
                 viewModel.setObscurePassword(com.myvideolibrary.app.util.CategorySecurity.hashPassword(pw))
-                // Unlock for this session so the just-obscured clip stays visible to its owner.
-                com.myvideolibrary.app.security.ObscuredClipsSession.unlock()
                 onSet()
             }
             .setNegativeButton(R.string.cancel, null)
