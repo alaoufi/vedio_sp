@@ -16,6 +16,7 @@
     <string name="filter_source">المصدر</string>
     <string name="filter_folder">المجلد</string>
     <string name="filter_type">النوع</string>
+    <string name="type_all">الكل</string>
     <string name="type_video">فيديو</string>
     <string name="type_audio">صوت</string>
     <string name="type_image">صورة</string>
@@ -455,6 +456,11 @@
     <string name="password_set">تم حماية التصنيف</string>
     <string name="password_removed">تمت إزالة كلمة المرور</string>
     <string name="wrong_password">كلمة المرور غير صحيحة</string>
+    <string name="obscure_clip">تعتيم هذا المقطع</string>
+    <string name="unobscure_clip">إلغاء التعتيم</string>
+    <string name="obscured_clip_title">مقطع مُعتَّم</string>
+    <string name="set_obscure_password">تعيين كلمة مرور التعتيم</string>
+    <string name="set_obscure_password_desc">كلمة مرور مشتركة تكشف المقاطع المُعتَّمة خلال الجلسة. احتفظ بها — لا يمكن استرجاعها.</string>
 
     <!-- Content descriptions -->
     <string name="cd_thumbnail">مصغّرة الفيديو</string>

@@ -60,7 +60,9 @@ data class LibraryUiState(
     /** Category names (normalised) that require a password to open (VISIBLE ∪ OBSCURED). */
     val lockedCategories: Set<String> = emptySet(),
     /** Raw "name\thash\tmode" password store, for verifying a category unlock. */
-    val categoryPasswordsRaw: String? = null
+    val categoryPasswordsRaw: String? = null,
+    /** SHA-256 hash of the shared password that reveals per-clip obscured items. */
+    val obscurePasswordHash: String? = null
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -346,7 +348,8 @@ class LibraryViewModel @Inject constructor(
             selectedIds = selection.ids,
             obscuredCategories = obscuredCategories(m.settings),
             lockedCategories = lockedCategories(m.settings),
-            categoryPasswordsRaw = m.settings.categoryPasswords
+            categoryPasswordsRaw = m.settings.categoryPasswords,
+            obscurePasswordHash = m.settings.privateVaultPassword
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), LibraryUiState())
 
@@ -525,6 +528,16 @@ class LibraryViewModel @Inject constructor(
 
     fun setCategory(id: Long, category: String?) = viewModelScope.launch {
         videoRepository.setCategory(listOf(id), category)
+    }
+
+    /** Marks a single clip obscured (blurred cover, gated) or clears it. */
+    fun setClipObscured(id: Long, obscured: Boolean) = viewModelScope.launch {
+        videoRepository.setPrivate(id, obscured)
+    }
+
+    /** Stores the shared password (hash) that reveals per-clip obscured items. */
+    fun setObscurePassword(hash: String) = viewModelScope.launch {
+        settingsRepository.update { it.copy(privateVaultPassword = hash) }
     }
 
     /** Downloads a saved link on demand, resolving its best quality first. */

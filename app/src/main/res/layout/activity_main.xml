@@ -18,6 +18,54 @@
             android:layout_height="?attr/actionBarSize"
             app:title="@string/app_name" />
 
+        <!-- Media-type quick filter: All / Videos / Images / Audio. -->
+        <HorizontalScrollView
+            android:id="@+id/mediaTypeScroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginBottom="2dp"
+            android:scrollbars="none">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/mediaTypeChips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:singleLine="true"
+                app:singleSelection="true"
+                app:selectionRequired="true">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipTypeAll"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="@string/type_all" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipTypeVideos"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/type_video" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipTypeImages"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/type_image" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipTypeAudio"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/type_audio" />
+            </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
+
         <!-- Active quick-filters (favourites / categories): each removable chip's ×
              clears that filter and returns toward the full library. -->
         <HorizontalScrollView

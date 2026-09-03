@@ -16,6 +16,7 @@
     <string name="filter_source">Source</string>
     <string name="filter_folder">Folder</string>
     <string name="filter_type">Type</string>
+    <string name="type_all">All</string>
     <string name="type_video">Video</string>
     <string name="type_audio">Audio</string>
     <string name="type_image">Image</string>
@@ -492,6 +493,11 @@
     <string name="password_set">Category protected</string>
     <string name="password_removed">Password removed</string>
     <string name="wrong_password">Wrong password</string>
+    <string name="obscure_clip">Obscure this clip</string>
+    <string name="unobscure_clip">Remove obscure</string>
+    <string name="obscured_clip_title">Obscured clip</string>
+    <string name="set_obscure_password">Set obscure password</string>
+    <string name="set_obscure_password_desc">A shared password that reveals obscured clips this session. Keep it safe — it can\'t be recovered.</string>
 
     <!-- Content descriptions -->
     <string name="cd_thumbnail">Video thumbnail</string>

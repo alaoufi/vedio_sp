@@ -292,6 +292,11 @@ class VideoPagingAdapter(
      * password-protected category that hasn't been unlocked this session.
      */
     private fun isObscured(video: VideoEntity): Boolean {
+        // Per-clip obscure: this individual clip is marked and not unlocked this session.
+        if (video.isPrivate &&
+            !com.myvideolibrary.app.security.ObscuredClipsSession.isUnlocked()
+        ) return true
+        // Category obscure: the clip is in a protected/blurred category not yet unlocked.
         val cat = video.category?.trim()?.lowercase() ?: return false
         return cat in obscuredCategories &&
             !com.myvideolibrary.app.security.ProtectedCategoriesSession.isUnlocked(video.category)

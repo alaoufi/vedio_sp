@@ -227,6 +227,7 @@ class MainActivity : AppCompatActivity() {
         binding.swipeRefresh.isVisible = !youtube
         binding.fabImport.isVisible = !youtube
         binding.continueSection.isVisible = !youtube && continueAdapter.itemCount > 0
+        binding.mediaTypeScroll.isVisible = !youtube
         renderDiscoverVisibility()
         if (youtube) binding.emptyState.isVisible = false
         supportActionBar?.title =
@@ -366,6 +367,36 @@ class MainActivity : AppCompatActivity() {
         }
 
         setupDiscoverShelf()
+        setupMediaTypeChips()
+    }
+
+    /** Quick media-type filter: All / Videos / Images / Audio (single-select). */
+    private fun setupMediaTypeChips() {
+        binding.mediaTypeChips.setOnCheckedStateChangeListener { _, checkedIds ->
+            val types = when (checkedIds.firstOrNull()) {
+                R.id.chipTypeVideos -> setOf("video")
+                R.id.chipTypeImages -> setOf("image")
+                R.id.chipTypeAudio -> setOf("audio")
+                else -> emptySet()
+            }
+            if (types != viewModel.uiState.value.mediaTypeFilters) {
+                viewModel.setMediaTypeFilters(types)
+            }
+        }
+    }
+
+    /** Reflects the current media-type filter onto the chip row without looping. */
+    private fun renderMediaTypeChips(state: LibraryUiState) {
+        val targetId = when (state.mediaTypeFilters.singleOrNull()) {
+            "video" -> R.id.chipTypeVideos
+            "image" -> R.id.chipTypeImages
+            "audio" -> R.id.chipTypeAudio
+            else -> R.id.chipTypeAll
+        }
+        if (binding.mediaTypeChips.checkedChipId != targetId) {
+            binding.mediaTypeChips.check(targetId)
+        }
+        binding.mediaTypeScroll.isVisible = !youtubeTab
     }
 
     /** The switchable "Recently added / Most played / Not watched" home shelf. */
@@ -429,8 +460,8 @@ class MainActivity : AppCompatActivity() {
         val pos = rv.getChildAdapterPosition(child)
         if (pos == RecyclerView.NO_POSITION) return
         val video = adapter.peekAt(pos) ?: return
-        // Never animate-preview a clip whose protected category is still locked.
-        if (isCategoryLocked(video)) return
+        // Never animate-preview a clip that's obscured (per-clip) or in a locked category.
+        if (isClipObscured(video) || isCategoryLocked(video)) return
         if (video.isLinkOnly ||
             video.mediaType != com.myvideolibrary.app.data.model.MediaType.VIDEO.id ||
             video.localPath.isBlank() || video.localPath.startsWith("content://")
@@ -727,6 +758,7 @@ class MainActivity : AppCompatActivity() {
                     adapter.setObscuredCategories(state.obscuredCategories)
                     renderStats(state)
                     renderFilterChip(state)
+                    renderMediaTypeChips(state)
                     renderSelectionBar(state)
                     renderProtectedTitle(state)
                     // Shelves belong on the clean, unfiltered home only.
@@ -990,6 +1022,8 @@ class MainActivity : AppCompatActivity() {
         val state = viewModel.uiState.value
         when {
             state.selectionMode -> viewModel.toggleSelected(video.id)
+            // An individually-obscured clip: ask for the obscure password first.
+            isClipObscured(video) -> promptClipUnlock { onVideoClick(video) }
             // A clip in a protected category (blurred or visible): ask for the
             // category password first, then re-open once unlocked.
             isCategoryLocked(video) -> promptCategoryUnlock(video.category) { onVideoClick(video) }
@@ -998,10 +1032,10 @@ class MainActivity : AppCompatActivity() {
             else -> {
                 // Queue the videos currently in view (in order) so playback
                 // continues to the next clip automatically when this one ends.
-                // Exclude clips in still-locked categories so swiping up/down in the
-                // player can't reach a protected clip without its password.
+                // Exclude clips in still-locked categories, and obscured clips, so
+                // swiping up/down in the player can't reach a protected clip.
                 val queue = adapter.snapshot().items
-                    .filter { it.mediaType != "image" && !isCategoryLocked(it) }
+                    .filter { it.mediaType != "image" && !isCategoryLocked(it) && !isClipObscured(it) }
                     .map { it.id }
                 val index = queue.indexOf(video.id)
                 if (queue.size > 1 && index >= 0) {
@@ -1036,6 +1070,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showVideoMenu(video: VideoEntity, anchor: android.view.View) {
+        // An obscured clip's menu could leak it, so require its password first.
+        if (isClipObscured(video)) {
+            promptClipUnlock { showVideoMenu(video, anchor) }
+            return
+        }
         // A protected clip's menu (preview/trim/open source…) could leak it,
         // so require the category password before showing it.
         if (isCategoryLocked(video)) {
@@ -1071,11 +1110,17 @@ class MainActivity : AppCompatActivity() {
         if (video.mediaType == com.myvideolibrary.app.data.model.MediaType.IMAGE.id) {
             popup.menu.add(0, 11, 8, getString(R.string.edit_image))
         }
+        // Per-clip obscure toggle (works for video / image / audio alike).
+        popup.menu.add(
+            0, 17, 9,
+            getString(if (video.isPrivate) R.string.unobscure_clip else R.string.obscure_clip)
+        )
         popup.menu.add(0, 10, 9, getString(R.string.file_info))
         popup.menu.add(0, 6, 10, getString(R.string.delete))
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 1 -> { onVideoClick(video); true }
+                17 -> { toggleObscure(video); true }
                 2 -> { shareVideo(video); true }
                 4 -> { promptSetCategory(video); true }
                 5 -> { promptEditInfo(video); true }
@@ -1390,6 +1435,77 @@ class MainActivity : AppCompatActivity() {
     /** Rebinds the grid so obscured covers re-evaluate after a category unlocks. */
     private fun refreshCovers() = adapter.refresh()
 
+    // ---- Per-clip obscure ----
+
+    /** True when this clip is individually obscured and not unlocked this session. */
+    private fun isClipObscured(video: VideoEntity): Boolean =
+        video.isPrivate && !com.myvideolibrary.app.security.ObscuredClipsSession.isUnlocked()
+
+    /**
+     * Turns per-clip obscure on/off. Enabling for the first time asks the user to set
+     * a shared obscure password (stored only as a hash). The menu that reaches here is
+     * already gated by [promptClipUnlock], so disabling needs no extra prompt.
+     */
+    private fun toggleObscure(video: VideoEntity) {
+        if (video.isPrivate) {
+            viewModel.setClipObscured(video.id, false)
+            refreshCovers()
+            return
+        }
+        if (viewModel.uiState.value.obscurePasswordHash.isNullOrEmpty()) {
+            promptSetObscurePassword {
+                viewModel.setClipObscured(video.id, true)
+                refreshCovers()
+            }
+        } else {
+            viewModel.setClipObscured(video.id, true)
+            refreshCovers()
+        }
+    }
+
+    /** Prompts for the shared obscure password; on success reveals obscured clips. */
+    private fun promptClipUnlock(onSuccess: () -> Unit) {
+        val hash = viewModel.uiState.value.obscurePasswordHash
+        if (hash.isNullOrEmpty()) { onSuccess(); return }
+        val (container, input) = passwordField(R.string.enter_password)
+        AlertDialog.Builder(this)
+            .setTitle(R.string.obscured_clip_title)
+            .setView(container)
+            .setPositiveButton(R.string.unlock) { _, _ ->
+                if (com.myvideolibrary.app.util.CategorySecurity.verifyHash(hash, input.text.toString())) {
+                    com.myvideolibrary.app.security.ObscuredClipsSession.unlock()
+                    refreshCovers()
+                    onSuccess()
+                } else {
+                    Toast.makeText(this, R.string.wrong_password, Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    /** First-time setup of the shared obscure password (min 4 chars). */
+    private fun promptSetObscurePassword(onSet: () -> Unit) {
+        val (container, input) = passwordField(R.string.set_obscure_password)
+        AlertDialog.Builder(this)
+            .setTitle(R.string.set_obscure_password)
+            .setMessage(R.string.set_obscure_password_desc)
+            .setView(container)
+            .setPositiveButton(R.string.save) { _, _ ->
+                val pw = input.text.toString()
+                if (pw.length < 4) {
+                    Toast.makeText(this, R.string.password_too_short, Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                viewModel.setObscurePassword(com.myvideolibrary.app.util.CategorySecurity.hashPassword(pw))
+                // Unlock for this session so the just-obscured clip stays visible to its owner.
+                com.myvideolibrary.app.security.ObscuredClipsSession.unlock()
+                onSet()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
     private fun confirmDeleteSingle(video: VideoEntity) {
         AlertDialog.Builder(this)
             .setTitle(R.string.delete_videos_title)
@@ -1446,10 +1562,16 @@ class MainActivity : AppCompatActivity() {
         // covers, so a private clip is obscured again right after you finish with it.
         // onRestart fires only after the activity was stopped — not on dialogs, and
         // not on first launch — so an in-place unlock+play flow isn't cut short.
+        var relocked = false
         if (com.myvideolibrary.app.security.ProtectedCategoriesSession.anyUnlocked()) {
             com.myvideolibrary.app.security.ProtectedCategoriesSession.lockAll()
-            refreshCovers()
+            relocked = true
         }
+        if (com.myvideolibrary.app.security.ObscuredClipsSession.isUnlocked()) {
+            com.myvideolibrary.app.security.ObscuredClipsSession.lockAll()
+            relocked = true
+        }
+        if (relocked) refreshCovers()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
