@@ -24,6 +24,16 @@
         android:textAppearance="?attr/textAppearanceTitleMedium"
         android:textStyle="bold" />
 
+    <!-- Add a photo/video straight from the device (copied into the library). -->
+    <LinearLayout android:id="@+id/rowPickDevice" style="@style/AddSheetRow">
+        <ImageView style="@style/AddSheetIcon" android:src="@drawable/ic_add"
+            android:contentDescription="@null" />
+        <LinearLayout style="@style/AddSheetText">
+            <TextView style="@style/AddSheetTitle" android:text="@string/add_from_device" />
+            <TextView style="@style/AddSheetDesc" android:text="@string/add_from_device_desc" />
+        </LinearLayout>
+    </LinearLayout>
+
     <!-- Reusable row: icon badge + title + subtitle -->
     <LinearLayout android:id="@+id/rowBrowser" style="@style/AddSheetRow">
         <ImageView style="@style/AddSheetIcon" android:src="@drawable/ic_public"

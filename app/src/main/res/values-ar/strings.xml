@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">مكتبة الفيديو</string>
+    <string name="app_name">مكتبة الوسائط</string>
 
     <!-- Tabs / YouTube -->
     <string name="tab_library">المكتبة</string>
@@ -106,7 +106,10 @@
     <string name="import_select_all">تحديد الكل</string>
     <string name="import_selected_count">استيراد (%1$d)</string>
     <string name="import_item_meta">%1$s · %2$s</string>
-    <string name="import_done">تم استيراد %1$d فيديو</string>
+    <string name="import_done">تم استيراد %1$d عنصر</string>
+    <string name="importing">جارٍ الاستيراد…</string>
+    <string name="add_from_device">أضف من الجهاز</string>
+    <string name="add_from_device_desc">اختر صورة أو فيديو من هاتفك</string>
     <string name="import_empty">لا توجد فيديوهات جديدة على هذا الجهاز</string>
     <string name="permission_denied_media">إذن الوسائط مطلوب لاستيراد الفيديوهات.</string>
 

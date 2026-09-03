@@ -173,6 +173,25 @@ class MainActivity : AppCompatActivity() {
         androidx.activity.result.contract.ActivityResultContracts.RequestPermission()
     ) { /* progress notifications are best-effort; downloads run regardless */ }
 
+    /** Picks images/videos from the device (no permission needed) to add to the library. */
+    private val devicePicker = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.PickMultipleVisualMedia(20)
+    ) { uris ->
+        if (uris.isNotEmpty()) {
+            Toast.makeText(this, R.string.importing, Toast.LENGTH_SHORT).show()
+            viewModel.importDeviceMedia(uris)
+        }
+    }
+
+    private fun pickFromDevice() {
+        devicePicker.launch(
+            androidx.activity.result.PickVisualMediaRequest(
+                androidx.activity.result.contract.ActivityResultContracts
+                    .PickVisualMedia.ImageAndVideo
+            )
+        )
+    }
+
     /** Opening a (possibly hidden/locked) category from the management screen filters to it. */
     private val manageCategoriesLauncher = registerForActivityResult(
         androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
@@ -678,6 +697,9 @@ class MainActivity : AppCompatActivity() {
         val view = layoutInflater.inflate(R.layout.sheet_add, null)
         sheet.setContentView(view)
         fun go(intent: Intent) { sheet.dismiss(); startActivity(intent) }
+        view.findViewById<android.view.View>(R.id.rowPickDevice).setOnClickListener {
+            sheet.dismiss(); pickFromDevice()
+        }
         view.findViewById<android.view.View>(R.id.rowBrowser).setOnClickListener {
             go(Intent(this, com.myvideolibrary.app.ui.browser.BrowserActivity::class.java))
         }
@@ -723,6 +745,21 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.videos.collectLatest { adapter.submitData(it) }
+            }
+        }
+        // Toast the outcome of a device-media import.
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.importResult.collectLatest { count ->
+                    if (count != null) {
+                        Toast.makeText(
+                            this@MainActivity,
+                            getString(R.string.import_done, count),
+                            Toast.LENGTH_LONG
+                        ).show()
+                        viewModel.consumeImportResult()
+                    }
+                }
             }
         }
     }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Video Library</string>
+    <string name="app_name">Media Library</string>
 
     <!-- Tabs / YouTube -->
     <string name="tab_library">Library</string>
@@ -143,7 +143,10 @@
     <string name="import_select_all">Select all</string>
     <string name="import_selected_count">Import (%1$d)</string>
     <string name="import_item_meta">%1$s · %2$s</string>
-    <string name="import_done">Imported %1$d videos</string>
+    <string name="import_done">Imported %1$d items</string>
+    <string name="importing">Importing…</string>
+    <string name="add_from_device">Add from device</string>
+    <string name="add_from_device_desc">Pick a photo or video from your phone</string>
     <string name="import_empty">No new videos found on this device</string>
     <string name="permission_denied_media">Media permission is required to import videos.</string>
 

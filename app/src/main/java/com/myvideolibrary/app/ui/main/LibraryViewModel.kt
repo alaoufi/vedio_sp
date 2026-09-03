@@ -73,8 +73,91 @@ class LibraryViewModel @Inject constructor(
     private val downloadManager: com.myvideolibrary.app.download.DownloadManager,
     private val providerRegistry: com.myvideolibrary.app.provider.ProviderRegistry,
     private val playlistDao: com.myvideolibrary.app.data.local.dao.PlaylistDao,
-    private val savedSearchDao: com.myvideolibrary.app.data.local.dao.SavedSearchDao
+    private val savedSearchDao: com.myvideolibrary.app.data.local.dao.SavedSearchDao,
+    @dagger.hilt.android.qualifiers.ApplicationContext
+    private val appContext: android.content.Context,
+    private val storageManager: com.myvideolibrary.app.util.StorageManager,
+    private val thumbnailGenerator: com.myvideolibrary.app.util.ThumbnailGenerator
 ) : ViewModel() {
+
+    /** One-shot: number of device items imported (null when consumed). */
+    private val _importResult = MutableStateFlow<Int?>(null)
+    val importResult: StateFlow<Int?> = _importResult.asStateFlow()
+    fun consumeImportResult() { _importResult.value = null }
+
+    /**
+     * Imports images/videos the user picked from the device. Each file is COPIED into
+     * app storage (the picker's content URIs aren't durable), so the clip plays
+     * offline and is included in backups. New rows appear in the library automatically.
+     */
+    fun importDeviceMedia(uris: List<android.net.Uri>) {
+        if (uris.isEmpty()) return
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            var count = 0
+            for (uri in uris) {
+                if (runCatching { importOneUri(uri) }.getOrDefault(false)) count++
+            }
+            _importResult.value = count
+        }
+    }
+
+    private fun importOneUri(uri: android.net.Uri): Boolean {
+        val resolver = appContext.contentResolver
+        val mime = resolver.getType(uri).orEmpty()
+        val type = when {
+            mime.startsWith("image/") -> com.myvideolibrary.app.data.model.MediaType.IMAGE
+            mime.startsWith("audio/") -> com.myvideolibrary.app.data.model.MediaType.AUDIO
+            else -> com.myvideolibrary.app.data.model.MediaType.VIDEO
+        }
+        val ext = when (type) {
+            com.myvideolibrary.app.data.model.MediaType.IMAGE ->
+                mime.substringAfter('/', "jpg").substringBefore(';')
+                    .ifBlank { "jpg" }.let { if (it == "jpeg") "jpg" else it }
+            com.myvideolibrary.app.data.model.MediaType.AUDIO -> "m4a"
+            else -> "mp4"
+        }
+        val dest = storageManager.newVideoFile(ext)
+        val copied = runCatching {
+            resolver.openInputStream(uri)?.use { input ->
+                dest.outputStream().use { input.copyTo(it) }
+            } != null
+        }.getOrDefault(false)
+        if (!copied || dest.length() == 0L) { runCatching { dest.delete() }; return false }
+
+        val meta = if (type == com.myvideolibrary.app.data.model.MediaType.IMAGE) null
+        else runCatching { thumbnailGenerator.readMetadata(dest.absolutePath) }.getOrNull()
+        val thumb = when (type) {
+            com.myvideolibrary.app.data.model.MediaType.IMAGE -> dest.absolutePath
+            com.myvideolibrary.app.data.model.MediaType.AUDIO -> null
+            else -> runCatching { thumbnailGenerator.generateThumbnail(dest.absolutePath) }.getOrNull()
+        }
+        val title = (queryDisplayName(uri) ?: dest.name).substringBeforeLast('.').ifBlank { "media" }
+        videoRepository.addVideo(
+            VideoEntity(
+                title = title,
+                thumbnailPath = thumb,
+                localPath = dest.absolutePath,
+                source = com.myvideolibrary.app.data.model.VideoSource.LOCAL_IMPORT.id,
+                mediaType = type.id,
+                duration = meta?.durationMs ?: 0,
+                fileSize = dest.length(),
+                width = meta?.width ?: 0,
+                height = meta?.height ?: 0,
+                quality = meta?.qualityLabel,
+                createdDate = System.currentTimeMillis(),
+                contentHash = "${dest.length()}_${meta?.durationMs ?: 0}"
+            )
+        )
+        return true
+    }
+
+    private fun queryDisplayName(uri: android.net.Uri): String? = runCatching {
+        appContext.contentResolver.query(
+            uri, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME), null, null, null
+        )?.use { c ->
+            if (c.moveToFirst()) c.getString(0) else null
+        }
+    }.getOrNull()
 
     /** Recently-played videos still in progress, for the "Continue watching" row. */
     val continueWatching: StateFlow<List<VideoEntity>> =
