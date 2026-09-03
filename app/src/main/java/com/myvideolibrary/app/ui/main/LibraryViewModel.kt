@@ -101,7 +101,7 @@ class LibraryViewModel @Inject constructor(
         }
     }
 
-    private fun importOneUri(uri: android.net.Uri): Boolean {
+    private suspend fun importOneUri(uri: android.net.Uri): Boolean {
         val resolver = appContext.contentResolver
         val mime = resolver.getType(uri).orEmpty()
         val type = when {
