@@ -239,6 +239,8 @@
     <string name="theme_dark">داكن</string>
     <string name="wifi_only">التحميل عبر Wi-Fi فقط</string>
     <string name="wifi_only_desc">التحميل فقط على شبكة غير محدودة</string>
+    <string name="social_browser_title">فتح انستقرام/سناب في المتصفح</string>
+    <string name="social_browser_desc">هذه المواقع تتطلب تسجيل الدخول؛ المتصفح داخل التطبيق يلتقط الفيديو وأنت مسجّل الدخول. أوقفه لتجربة فكّ الرابط أولاً.</string>
     <string name="max_concurrent">أقصى عدد تحميلات متزامنة</string>
     <string name="app_lock">قفل التطبيق</string>
     <string name="app_lock_desc">طلب رمز PIN لفتح التطبيق</string>

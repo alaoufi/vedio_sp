@@ -23,6 +23,7 @@ data class SettingsUiState(
     val theme: AppTheme = AppTheme.SYSTEM,
     val wifiOnly: Boolean = true,
     val maxConcurrent: Int = 2,
+    val socialOpenInBrowser: Boolean = true,
     val appLockEnabled: Boolean = false,
     val hasPin: Boolean = false,
     val biometricEnabled: Boolean = false,
@@ -60,6 +61,7 @@ class SettingsViewModel @Inject constructor(
                 theme = themeManager.theme,
                 wifiOnly = settings.wifiOnlyDownloads,
                 maxConcurrent = settings.maxConcurrentDownloads,
+                socialOpenInBrowser = settings.socialOpenInBrowser,
                 appLockEnabled = securityManager.appLockEnabled,
                 hasPin = securityManager.hasPin,
                 biometricEnabled = securityManager.biometricEnabled,
@@ -96,6 +98,11 @@ class SettingsViewModel @Inject constructor(
     fun setWifiOnly(value: Boolean) {
         viewModelScope.launch { settingsRepository.update { it.copy(wifiOnlyDownloads = value) } }
         _state.value = _state.value.copy(wifiOnly = value)
+    }
+
+    fun setSocialOpenInBrowser(value: Boolean) {
+        viewModelScope.launch { settingsRepository.update { it.copy(socialOpenInBrowser = value) } }
+        _state.value = _state.value.copy(socialOpenInBrowser = value)
     }
 
     fun setMaxConcurrent(value: Int) {

@@ -126,6 +126,9 @@ class SettingsActivity : AppCompatActivity() {
         binding.wifiOnlySwitch.setOnClickListener {
             viewModel.setWifiOnly(binding.wifiOnlySwitch.isChecked)
         }
+        binding.socialBrowserSwitch.setOnClickListener {
+            viewModel.setSocialOpenInBrowser(binding.socialBrowserSwitch.isChecked)
+        }
         binding.maxConcurrentRow.setOnClickListener { showMaxConcurrentDialog() }
 
         binding.appLockSwitch.setOnClickListener {
@@ -367,6 +370,7 @@ class SettingsActivity : AppCompatActivity() {
             AppTheme.DARK -> getString(R.string.theme_dark)
         }
         binding.wifiOnlySwitch.isChecked = state.wifiOnly
+        binding.socialBrowserSwitch.isChecked = state.socialOpenInBrowser
         binding.maxConcurrentValue.text = state.maxConcurrent.toString()
         binding.endActionValue.text = getString(endActionLabel(state.endOfClipAction))
         binding.appLockSwitch.isChecked = state.appLockEnabled && state.hasPin

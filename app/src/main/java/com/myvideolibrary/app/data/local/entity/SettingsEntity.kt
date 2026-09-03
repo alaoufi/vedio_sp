@@ -32,6 +32,14 @@ data class SettingsEntity(
     @ColumnInfo(name = "max_concurrent_downloads")
     val maxConcurrentDownloads: Int = 2,
 
+    /**
+     * Open Instagram/Snapchat links straight in the in-app browser (which captures
+     * the video while you're logged in) instead of trying the flaky link resolver
+     * first. On by default because these platforms gate media behind login.
+     */
+    @ColumnInfo(name = "social_open_in_browser")
+    val socialOpenInBrowser: Boolean = true,
+
     // ---- Library preferences ----
     /** [com.myvideolibrary.app.data.model.LibraryViewMode.id]. */
     @ColumnInfo(name = "view_mode")

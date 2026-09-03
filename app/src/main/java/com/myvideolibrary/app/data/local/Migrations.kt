@@ -144,3 +144,10 @@ val MIGRATION_15_16 = object : Migration(15, 16) {
         db.execSQL("CREATE INDEX IF NOT EXISTS index_videos_sort_index ON videos (sort_index)")
     }
 }
+
+/** Adds the "open Instagram/Snapchat in the in-app browser" preference (default on). */
+val MIGRATION_16_17 = object : Migration(16, 17) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE settings ADD COLUMN social_open_in_browser INTEGER NOT NULL DEFAULT 1")
+    }
+}

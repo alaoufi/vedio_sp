@@ -276,6 +276,8 @@
     <string name="theme_dark">Dark</string>
     <string name="wifi_only">Wi-Fi only downloads</string>
     <string name="wifi_only_desc">Download only on an unmetered network</string>
+    <string name="social_browser_title">Open Instagram/Snapchat in browser</string>
+    <string name="social_browser_desc">These sites need login; the in-app browser captures the video while you\'re signed in. Turn off to try the link resolver first.</string>
     <string name="max_concurrent">Max simultaneous downloads</string>
     <string name="app_lock">App lock</string>
     <string name="app_lock_desc">Require a PIN to open the app</string>

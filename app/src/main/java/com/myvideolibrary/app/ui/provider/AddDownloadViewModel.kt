@@ -19,17 +19,24 @@ data class AddDownloadUiState(
     val resolved: ResolvedVideo? = null,
     val errorType: ProviderErrorType? = null,
     val errorMessage: String? = null,
-    val enqueued: Boolean = false
+    val enqueued: Boolean = false,
+    /** When set, the Activity should open this URL in the in-app browser instead. */
+    val openInBrowserUrl: String? = null
 )
 
 @HiltViewModel
 class AddDownloadViewModel @Inject constructor(
     private val providerRegistry: ProviderRegistry,
-    private val downloadManager: DownloadManager
+    private val downloadManager: DownloadManager,
+    private val settingsRepository: com.myvideolibrary.app.data.repository.SettingsRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddDownloadUiState())
     val state: StateFlow<AddDownloadUiState> = _state.asStateFlow()
+
+    private fun isSocialLink(url: String): Boolean = url.lowercase().let {
+        it.contains("instagram.com") || it.contains("instagr.am") || it.contains("snapchat.com")
+    }
 
     fun resolve(url: String) {
         val trimmed = url.trim()
@@ -46,6 +53,14 @@ class AddDownloadViewModel @Inject constructor(
 
         _state.value = AddDownloadUiState(resolving = true)
         viewModelScope.launch {
+            // Optional shortcut: for login-walled platforms (Instagram/Snapchat), skip
+            // the flaky resolver and let the in-app browser capture the video instead.
+            if (isSocialLink(trimmed) &&
+                runCatching { settingsRepository.getSettings().socialOpenInBrowser }.getOrDefault(true)
+            ) {
+                _state.value = AddDownloadUiState(openInBrowserUrl = trimmed)
+                return@launch
+            }
             try {
                 val resolved = provider.resolve(trimmed)
                 _state.value = AddDownloadUiState(resolved = resolved)
@@ -81,6 +96,10 @@ class AddDownloadViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    fun consumeOpenInBrowser() {
+        _state.value = _state.value.copy(openInBrowserUrl = null)
     }
 
     fun reset() {

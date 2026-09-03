@@ -94,6 +94,15 @@ class AddDownloadActivity : AppCompatActivity() {
     }
 
     private fun render(state: AddDownloadUiState) {
+        // Setting-driven shortcut: open Instagram/Snapchat straight in the in-app
+        // browser (reliable while logged in) instead of the flaky resolver.
+        state.openInBrowserUrl?.let { url ->
+            viewModel.consumeOpenInBrowser()
+            startActivity(com.myvideolibrary.app.ui.browser.BrowserActivity.intent(this, url))
+            finish()
+            return
+        }
+
         binding.progressBar.isVisible = state.resolving
         binding.resolveButton.isEnabled = !state.resolving
 
