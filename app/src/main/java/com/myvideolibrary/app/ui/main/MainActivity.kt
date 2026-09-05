@@ -399,20 +399,12 @@ class MainActivity : AppCompatActivity() {
         binding.mediaTypeScroll.isVisible = !youtubeTab
     }
 
-    /** The switchable "Recently added / Most played / Not watched" home shelf. */
+    /** The "Not watched yet" home shelf. */
     private fun setupDiscoverShelf() {
         discoverAdapter = ContinueAdapter { startActivity(PlayerActivity.intent(this, it.id)) }
         binding.discoverRecycler.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.discoverRecycler.adapter = discoverAdapter
-        binding.discoverChips.setOnCheckedStateChangeListener { _, checkedIds ->
-            val shelf = when (checkedIds.firstOrNull()) {
-                R.id.chipMostPlayed -> DiscoverShelf.MOST_PLAYED
-                R.id.chipNotWatched -> DiscoverShelf.NOT_WATCHED
-                else -> DiscoverShelf.RECENTLY_ADDED
-            }
-            viewModel.setShelf(shelf)
-        }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.discoverItems.collectLatest { list ->

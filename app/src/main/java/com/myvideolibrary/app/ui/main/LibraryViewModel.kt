@@ -30,9 +30,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/** Which auto-shelf the home "discover" row is showing. */
-enum class DiscoverShelf { RECENTLY_ADDED, MOST_PLAYED, NOT_WATCHED }
-
 /** Snapshot of everything the library screen renders. */
 data class LibraryUiState(
     val viewMode: LibraryViewMode = LibraryViewMode.GRID,
@@ -178,27 +175,19 @@ class LibraryViewModel @Inject constructor(
             }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    // ---- Smart "discover" shelf: one row whose contents switch by selected chip ----
+    // ---- "Not watched yet" home shelf ----
 
-    private val selectedShelf = MutableStateFlow(DiscoverShelf.RECENTLY_ADDED)
-    val shelf: StateFlow<DiscoverShelf> = selectedShelf.asStateFlow()
-    fun setShelf(s: DiscoverShelf) { selectedShelf.value = s }
-
-    /** Items for the currently-selected shelf, minus images and protected-category clips. */
+    /** Never-played clips, minus images and protected-category clips. */
     val discoverItems: StateFlow<List<VideoEntity>> =
-        selectedShelf.flatMapLatest { shelf ->
-            val source = when (shelf) {
-                DiscoverShelf.RECENTLY_ADDED -> videoRepository.observeRecentlyAdded(40)
-                DiscoverShelf.MOST_PLAYED -> videoRepository.observeMostPlayed(40)
-                DiscoverShelf.NOT_WATCHED -> videoRepository.observeNotWatched(40)
-            }
-            combine(source, settingsRepository.observeSettings()) { list, settings ->
-                val protectedCats = allProtectedCategories(settings)
-                list.filter { v ->
-                    v.mediaType != "image" &&
-                        v.category?.trim()?.lowercase() !in protectedCats
-                }.take(15)
-            }
+        combine(
+            videoRepository.observeNotWatched(40),
+            settingsRepository.observeSettings()
+        ) { list, settings ->
+            val protectedCats = allProtectedCategories(settings)
+            list.filter { v ->
+                v.mediaType != "image" &&
+                    v.category?.trim()?.lowercase() !in protectedCats
+            }.take(15)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     /** All playlists (with counts), for the "add to playlist" picker. */

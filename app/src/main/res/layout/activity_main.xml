@@ -115,8 +115,7 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
         </LinearLayout>
 
-        <!-- Smart "discover" shelf: one horizontal row whose contents switch between
-             Recently added / Most played / Not watched via the chip selector. -->
+        <!-- "Not watched yet" shelf: a horizontal row of never-played clips. -->
         <LinearLayout
             android:id="@+id/discoverSection"
             android:layout_width="match_parent"
@@ -126,38 +125,15 @@
             android:visibility="gone"
             tools:visibility="visible">
 
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/discoverChips"
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="12dp"
-                android:paddingTop="4dp"
-                app:singleLine="true"
-                app:singleSelection="true"
-                app:selectionRequired="true">
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipRecentlyAdded"
-                    style="@style/Widget.Material3.Chip.Filter"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:text="@string/shelf_recently_added" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipMostPlayed"
-                    style="@style/Widget.Material3.Chip.Filter"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/shelf_most_played" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipNotWatched"
-                    style="@style/Widget.Material3.Chip.Filter"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/shelf_not_watched" />
-            </com.google.android.material.chip.ChipGroup>
+                android:paddingHorizontal="16dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="4dp"
+                android:text="@string/shelf_not_watched"
+                android:textAppearance="?attr/textAppearanceTitleSmall"
+                android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/discoverRecycler"
