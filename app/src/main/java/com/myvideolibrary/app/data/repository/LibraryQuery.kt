@@ -122,6 +122,9 @@ data class LibraryQuery(
             SortOrder.CATEGORY_ASC ->
                 "ORDER BY (category IS NULL OR TRIM(category) = '') ASC, " +
                     "category COLLATE NOCASE ASC, title COLLATE NOCASE ASC"
+            // Most-recently-watched first; never-played clips fall to the bottom.
+            SortOrder.LAST_PLAYED_DESC ->
+                "ORDER BY (last_played_date IS NULL) ASC, last_played_date DESC, created_date DESC"
             // User-defined drag order. Rows never arranged (sort_index 0, e.g. clips
             // added after the last arrange) fall back to their added-date so new
             // downloads still surface near the top instead of sinking to the bottom.

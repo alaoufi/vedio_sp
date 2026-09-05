@@ -1618,6 +1618,7 @@ class MainActivity : AppCompatActivity() {
             getString(R.string.sort_size_large),
             getString(R.string.sort_size_small),
             getString(R.string.sort_category),
+            getString(R.string.sort_last_played),
             getString(R.string.sort_custom)
         )
         val orders = arrayOf(
@@ -1625,7 +1626,7 @@ class MainActivity : AppCompatActivity() {
             SortOrder.NAME_ASC, SortOrder.NAME_DESC,
             SortOrder.DURATION_DESC, SortOrder.DURATION_ASC,
             SortOrder.SIZE_DESC, SortOrder.SIZE_ASC,
-            SortOrder.CATEGORY_ASC, SortOrder.CUSTOM
+            SortOrder.CATEGORY_ASC, SortOrder.LAST_PLAYED_DESC, SortOrder.CUSTOM
         )
         val current = orders.indexOf(viewModel.uiState.value.sortOrder).coerceAtLeast(0)
         AlertDialog.Builder(this)

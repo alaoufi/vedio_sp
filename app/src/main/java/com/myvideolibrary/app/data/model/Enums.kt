@@ -46,6 +46,7 @@ enum class SortOrder(val id: String) {
     SIZE_DESC("size_desc"),
     SIZE_ASC("size_asc"),
     CATEGORY_ASC("category_asc"),
+    LAST_PLAYED_DESC("last_played_desc"),
     CUSTOM("custom");
 
     companion object {

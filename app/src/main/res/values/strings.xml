@@ -49,6 +49,7 @@
     <string name="sort_size_large">Size (largest)</string>
     <string name="sort_size_small">Size (smallest)</string>
     <string name="sort_category">Category</string>
+    <string name="sort_last_played">Last watched</string>
     <string name="sort_custom">Custom (manual)</string>
     <string name="arrange_manually">Arrange manually</string>
     <string name="arrange_hint">Drag the handle to reorder. Your order is saved and shown when the library is sorted by \"Custom\".</string>
