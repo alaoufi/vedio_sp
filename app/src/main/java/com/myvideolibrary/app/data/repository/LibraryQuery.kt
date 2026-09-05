@@ -32,7 +32,7 @@ data class LibraryQuery(
     val tags: Set<String> = emptySet(),
     /** When true, show only in-progress clips (Continue watching), newest first. */
     val continueOnly: Boolean = false,
-    val sortOrder: SortOrder = SortOrder.DATE_ADDED_DESC
+    val sortOrder: SortOrder = SortOrder.LAST_PLAYED_DESC
 ) {
 
     /** Builds a safe, parameter-bound query for [VideoDao.pagingSource]. */

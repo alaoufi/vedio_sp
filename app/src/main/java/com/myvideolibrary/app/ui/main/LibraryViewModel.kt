@@ -33,7 +33,7 @@ import javax.inject.Inject
 /** Snapshot of everything the library screen renders. */
 data class LibraryUiState(
     val viewMode: LibraryViewMode = LibraryViewMode.GRID,
-    val sortOrder: SortOrder = SortOrder.DATE_ADDED_DESC,
+    val sortOrder: SortOrder = SortOrder.LAST_PLAYED_DESC,
     val search: String = "",
     val folderId: Long? = null,
     val favoritesOnly: Boolean = false,

@@ -50,6 +50,7 @@ class MyVideoLibraryApp : Application(), Configuration.Provider {
         // Re-lock the app whenever it is sent to the background.
         ProcessLifecycleOwner.get().lifecycle.addObserver(appLockManager)
         normalizeDownloadDefaultsOnce()
+        applyDefaultSortOnce()
         // Keep the daily auto-backup job armed across app updates / OEM work drops.
         runCatching { autoBackupManager.ensureScheduledIfEnabled() }
         // Self-heal: if the library was wiped but an external auto-backup exists,
@@ -69,6 +70,22 @@ class MyVideoLibraryApp : Application(), Configuration.Provider {
         appScope.launch {
             settingsRepository.update { it.copy(wifiOnlyDownloads = false) }
             prefs.edit().putBoolean("wifi_only_reset_done", true).apply()
+        }
+    }
+
+    /**
+     * One-time switch of existing installs to the new default sort ("last watched"),
+     * but only when the sort is still the previous default (date-added, newest) — so a
+     * user who deliberately picked another order keeps it. Runs once.
+     */
+    private fun applyDefaultSortOnce() {
+        val prefs = getSharedPreferences("mvl_flags", MODE_PRIVATE)
+        if (prefs.getBoolean("default_sort_last_played_done", false)) return
+        appScope.launch {
+            settingsRepository.update {
+                if (it.sortOrder == "date_desc") it.copy(sortOrder = "last_played_desc") else it
+            }
+            prefs.edit().putBoolean("default_sort_last_played_done", true).apply()
         }
     }
 

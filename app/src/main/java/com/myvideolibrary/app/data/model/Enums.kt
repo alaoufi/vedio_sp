@@ -51,7 +51,7 @@ enum class SortOrder(val id: String) {
 
     companion object {
         fun fromId(id: String?): SortOrder =
-            entries.firstOrNull { it.id == id } ?: DATE_ADDED_DESC
+            entries.firstOrNull { it.id == id } ?: LAST_PLAYED_DESC
     }
 }
 

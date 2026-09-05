@@ -47,7 +47,7 @@ data class SettingsEntity(
 
     /** [com.myvideolibrary.app.data.model.SortOrder.id]. */
     @ColumnInfo(name = "sort_order")
-    val sortOrder: String = "date_desc",
+    val sortOrder: String = "last_played_desc",
 
     // ---- Security preferences (used by the security phase) ----
     @ColumnInfo(name = "app_lock_enabled")
