@@ -45,6 +45,8 @@ data class LibraryUiState(
     val categories: List<String> = emptyList(),
     /** Selected media types ("video"/"audio"/"image"); empty means all types. */
     val mediaTypeFilters: Set<String> = emptySet(),
+    /** When true, the grid is showing in-progress "Continue watching" clips. */
+    val continueOnly: Boolean = false,
     /** Selected tags; empty means no tag filter. */
     val tagFilters: Set<String> = emptySet(),
     val videoCount: Int = 0,
@@ -158,38 +160,6 @@ class LibraryViewModel @Inject constructor(
         }
     }.getOrNull()
 
-    /** Recently-played videos still in progress, for the "Continue watching" row. */
-    val continueWatching: StateFlow<List<VideoEntity>> =
-        combine(
-            videoRepository.observeRecentlyPlayed(20),
-            settingsRepository.observeSettings()
-        ) { list, settings ->
-            val protectedCats = allProtectedCategories(settings)
-            list.filter { v ->
-                v.mediaType != "image" &&
-                    // Clips in any protected category never surface here.
-                    v.category?.trim()?.lowercase() !in protectedCats &&
-                    v.lastPlayedPosition > 3_000 &&
-                    (v.duration <= 0 || v.lastPlayedPosition < v.duration * 95 / 100)
-                }.take(10)
-            }
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
-    // ---- "Not watched yet" home shelf ----
-
-    /** Never-played clips, minus images and protected-category clips. */
-    val discoverItems: StateFlow<List<VideoEntity>> =
-        combine(
-            videoRepository.observeNotWatched(40),
-            settingsRepository.observeSettings()
-        ) { list, settings ->
-            val protectedCats = allProtectedCategories(settings)
-            list.filter { v ->
-                v.mediaType != "image" &&
-                    v.category?.trim()?.lowercase() !in protectedCats
-            }.take(15)
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
     /** All playlists (with counts), for the "add to playlist" picker. */
     val playlists: StateFlow<List<com.myvideolibrary.app.data.local.entity.PlaylistWithCount>> =
         playlistDao.observePlaylists()
@@ -237,13 +207,17 @@ class LibraryViewModel @Inject constructor(
     private val _categoryFilters = MutableStateFlow<Set<String>>(emptySet())
     private val _mediaTypeFilters = MutableStateFlow<Set<String>>(emptySet())
     private val _tagFilters = MutableStateFlow<Set<String>>(emptySet())
+    private val _continueOnly = MutableStateFlow(false)
 
-    /** Merged source + protected + category + type + tags, one flow for combine arity. */
+    /** Merged source + protected + category + type + tags (+ continue), one flow. */
     private val extraFilters = combine(
-        _sourceFilters, _protectedMode, _categoryFilters, _mediaTypeFilters, _tagFilters
-    ) { sources, protectedMode, categories, mediaTypes, tags ->
-        ExtraFilters(sources, protectedMode, categories, mediaTypes, tags)
-    }
+        combine(
+            _sourceFilters, _protectedMode, _categoryFilters, _mediaTypeFilters, _tagFilters
+        ) { sources, protectedMode, categories, mediaTypes, tags ->
+            ExtraFilters(sources, protectedMode, categories, mediaTypes, tags)
+        },
+        _continueOnly
+    ) { extra, continueOnly -> extra.copy(continueOnly = continueOnly) }
 
     /** Distinct tags currently in use, for the tag filter picker. */
     val allTags: StateFlow<List<String>> =
@@ -329,6 +303,7 @@ class LibraryViewModel @Inject constructor(
             categoryFilters = f.extra.categories,
             categories = m.categories,
             mediaTypeFilters = f.extra.mediaTypes,
+            continueOnly = f.extra.continueOnly,
             tagFilters = f.extra.tags,
             videoCount = m.count,
             totalSize = m.size,
@@ -362,6 +337,7 @@ class LibraryViewModel @Inject constructor(
                     protectedOnly = extra.protectedMode,
                     mediaTypes = extra.mediaTypes,
                     tags = extra.tags,
+                    continueOnly = extra.continueOnly,
                     sortOrder = SortOrder.fromId(settings.sortOrder)
                 )
             }.collect { queryState.value = it }
@@ -396,7 +372,16 @@ class LibraryViewModel @Inject constructor(
 
     fun setCategoryFilters(categories: Set<String>) { _categoryFilters.value = categories }
 
-    fun setMediaTypeFilters(types: Set<String>) { _mediaTypeFilters.value = types }
+    fun setMediaTypeFilters(types: Set<String>) {
+        _mediaTypeFilters.value = types
+        if (types.isNotEmpty()) _continueOnly.value = false
+    }
+
+    /** Continue-watching quick view (mutually exclusive with a media-type filter). */
+    fun setContinueOnly(on: Boolean) {
+        _continueOnly.value = on
+        if (on) _mediaTypeFilters.value = emptySet()
+    }
 
     fun setTagFilters(tags: Set<String>) { _tagFilters.value = tags }
 
@@ -567,7 +552,8 @@ class LibraryViewModel @Inject constructor(
         val protectedMode: Boolean,
         val categories: Set<String>,
         val mediaTypes: Set<String>,
-        val tags: Set<String>
+        val tags: Set<String>,
+        val continueOnly: Boolean = false
     )
 
     private data class LibraryFilters(

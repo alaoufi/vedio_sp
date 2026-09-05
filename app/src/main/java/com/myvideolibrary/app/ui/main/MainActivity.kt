@@ -53,10 +53,6 @@ class MainActivity : AppCompatActivity() {
     @javax.inject.Inject lateinit var autoBackupManager: com.myvideolibrary.app.data.backup.AutoBackupManager
 
     private lateinit var adapter: VideoPagingAdapter
-    private lateinit var continueAdapter: ContinueAdapter
-    private lateinit var discoverAdapter: ContinueAdapter
-    /** Whether the home is showing an unfiltered library (shelves only appear then). */
-    private var discoverAllowed = true
     /** Runs the animated preview on the centred grid card; one at a time. */
     private var previewJob: Job? = null
     private lateinit var youtubeAdapter: com.myvideolibrary.app.ui.search.SearchResultAdapter
@@ -226,9 +222,7 @@ class MainActivity : AppCompatActivity() {
         binding.youtubePanel.isVisible = youtube
         binding.swipeRefresh.isVisible = !youtube
         binding.fabImport.isVisible = !youtube
-        binding.continueSection.isVisible = !youtube && continueAdapter.itemCount > 0
         binding.mediaTypeScroll.isVisible = !youtube
-        renderDiscoverVisibility()
         if (youtube) binding.emptyState.isVisible = false
         supportActionBar?.title =
             getString(if (youtube) R.string.tab_youtube else R.string.app_name)
@@ -353,72 +347,35 @@ class MainActivity : AppCompatActivity() {
             binding.emptyState.isVisible = empty
         }
 
-        continueAdapter = ContinueAdapter { startActivity(PlayerActivity.intent(this, it.id)) }
-        binding.continueRecycler.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        binding.continueRecycler.adapter = continueAdapter
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.continueWatching.collectLatest { list ->
-                    continueAdapter.submitList(list)
-                    binding.continueSection.isVisible = list.isNotEmpty() && !youtubeTab
-                }
-            }
-        }
-
-        setupDiscoverShelf()
         setupMediaTypeChips()
     }
 
-    /** Quick media-type filter: All / Videos / Images / Audio (single-select). */
+    /** Quick filter row: All / Continue watching / Videos / Images / Audio. */
     private fun setupMediaTypeChips() {
         binding.mediaTypeChips.setOnCheckedStateChangeListener { _, checkedIds ->
-            val types = when (checkedIds.firstOrNull()) {
-                R.id.chipTypeVideos -> setOf("video")
-                R.id.chipTypeImages -> setOf("image")
-                R.id.chipTypeAudio -> setOf("audio")
-                else -> emptySet()
-            }
-            if (types != viewModel.uiState.value.mediaTypeFilters) {
-                viewModel.setMediaTypeFilters(types)
+            when (checkedIds.firstOrNull()) {
+                R.id.chipTypeContinue -> viewModel.setContinueOnly(true)
+                R.id.chipTypeVideos -> viewModel.setMediaTypeFilters(setOf("video"))
+                R.id.chipTypeImages -> viewModel.setMediaTypeFilters(setOf("image"))
+                R.id.chipTypeAudio -> viewModel.setMediaTypeFilters(setOf("audio"))
+                else -> { viewModel.setContinueOnly(false); viewModel.setMediaTypeFilters(emptySet()) }
             }
         }
     }
 
-    /** Reflects the current media-type filter onto the chip row without looping. */
+    /** Reflects the current quick filter onto the chip row without looping. */
     private fun renderMediaTypeChips(state: LibraryUiState) {
-        val targetId = when (state.mediaTypeFilters.singleOrNull()) {
-            "video" -> R.id.chipTypeVideos
-            "image" -> R.id.chipTypeImages
-            "audio" -> R.id.chipTypeAudio
+        val targetId = when {
+            state.continueOnly -> R.id.chipTypeContinue
+            state.mediaTypeFilters.singleOrNull() == "video" -> R.id.chipTypeVideos
+            state.mediaTypeFilters.singleOrNull() == "image" -> R.id.chipTypeImages
+            state.mediaTypeFilters.singleOrNull() == "audio" -> R.id.chipTypeAudio
             else -> R.id.chipTypeAll
         }
         if (binding.mediaTypeChips.checkedChipId != targetId) {
             binding.mediaTypeChips.check(targetId)
         }
         binding.mediaTypeScroll.isVisible = !youtubeTab
-    }
-
-    /** The "Not watched yet" home shelf. */
-    private fun setupDiscoverShelf() {
-        discoverAdapter = ContinueAdapter { startActivity(PlayerActivity.intent(this, it.id)) }
-        binding.discoverRecycler.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        binding.discoverRecycler.adapter = discoverAdapter
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.discoverItems.collectLatest { list ->
-                    discoverAdapter.submitList(list)
-                    renderDiscoverVisibility()
-                }
-            }
-        }
-    }
-
-    /** Shelves show only on the unfiltered library tab and when the row has items. */
-    private fun renderDiscoverVisibility() {
-        binding.discoverSection.isVisible =
-            !youtubeTab && discoverAllowed && discoverAdapter.itemCount > 0
     }
 
     override fun onStop() {
@@ -753,12 +710,6 @@ class MainActivity : AppCompatActivity() {
                     renderMediaTypeChips(state)
                     renderSelectionBar(state)
                     renderProtectedTitle(state)
-                    // Shelves belong on the clean, unfiltered home only.
-                    discoverAllowed = state.search.isBlank() && !state.favoritesOnly &&
-                        !state.selectionMode && state.folderId == null &&
-                        state.sourceFilters.isEmpty() && state.categoryFilters.isEmpty() &&
-                        state.mediaTypeFilters.isEmpty() && state.tagFilters.isEmpty()
-                    renderDiscoverVisibility()
                     invalidateOptionsMenu()
                 }
             }

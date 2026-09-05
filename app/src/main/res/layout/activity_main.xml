@@ -44,6 +44,13 @@
                     android:text="@string/type_all" />
 
                 <com.google.android.material.chip.Chip
+                    android:id="@+id/chipTypeContinue"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/continue_watching" />
+
+                <com.google.android.material.chip.Chip
                     android:id="@+id/chipTypeVideos"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
@@ -84,66 +91,6 @@
                 android:layout_height="wrap_content"
                 app:singleLine="true" />
         </HorizontalScrollView>
-
-        <!-- Continue watching: recently-played, still-in-progress videos. -->
-        <LinearLayout
-            android:id="@+id/continueSection"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="4dp"
-            android:visibility="gone"
-            tools:visibility="visible">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="16dp"
-                android:paddingTop="6dp"
-                android:paddingBottom="4dp"
-                android:text="@string/continue_watching"
-                android:textAppearance="?attr/textAppearanceTitleSmall"
-                android:textStyle="bold" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/continueRecycler"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                android:paddingHorizontal="12dp"
-                android:orientation="horizontal"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-        </LinearLayout>
-
-        <!-- "Not watched yet" shelf: a horizontal row of never-played clips. -->
-        <LinearLayout
-            android:id="@+id/discoverSection"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="4dp"
-            android:visibility="gone"
-            tools:visibility="visible">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="16dp"
-                android:paddingTop="6dp"
-                android:paddingBottom="4dp"
-                android:text="@string/shelf_not_watched"
-                android:textAppearance="?attr/textAppearanceTitleSmall"
-                android:textStyle="bold" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/discoverRecycler"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                android:paddingHorizontal="12dp"
-                android:orientation="horizontal"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-        </LinearLayout>
 
         <!-- Active-download banner: tap to open the Downloads screen. -->
         <com.google.android.material.card.MaterialCardView

@@ -30,6 +30,8 @@ data class LibraryQuery(
     val mediaTypes: Set<String> = emptySet(),
     /** Show videos carrying any of these tags; empty means no tag filter. */
     val tags: Set<String> = emptySet(),
+    /** When true, show only in-progress clips (Continue watching), newest first. */
+    val continueOnly: Boolean = false,
     val sortOrder: SortOrder = SortOrder.DATE_ADDED_DESC
 ) {
 
@@ -79,6 +81,13 @@ data class LibraryQuery(
             where.append(" AND ($clauses)")
             cleanTags.forEach { args.add("%,$it,%") }
         }
+        // Continue watching: only clips that were started but not (nearly) finished.
+        if (continueOnly) {
+            where.append(
+                " AND media_type != 'image' AND last_played_position > 3000 " +
+                    "AND (duration <= 0 OR last_played_position < duration * 95 / 100)"
+            )
+        }
         // Multi-select source: OR the chosen buckets together. Empty = all sources.
         if (sourceFilters.isNotEmpty()) {
             val clauses = mutableListOf<String>()
@@ -97,7 +106,10 @@ data class LibraryQuery(
             }
         }
 
-        val orderBy = when (sortOrder) {
+        val orderBy = if (continueOnly) {
+            // Most recently watched first.
+            "ORDER BY last_played_date DESC"
+        } else when (sortOrder) {
             SortOrder.NAME_ASC -> "ORDER BY title COLLATE NOCASE ASC"
             SortOrder.NAME_DESC -> "ORDER BY title COLLATE NOCASE DESC"
             SortOrder.DATE_ADDED_DESC -> "ORDER BY created_date DESC"
