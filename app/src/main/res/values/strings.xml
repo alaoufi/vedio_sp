@@ -8,6 +8,15 @@
     <string name="hide_shorts">Hide Shorts</string>
     <string name="youtube_search_hint">Search YouTube</string>
     <string name="youtube_tab_hint">Search YouTube — play ad-free or download. Shorts are hidden.</string>
+    <string name="yt_cat_trending">Trending</string>
+    <string name="yt_cat_music">Music</string>
+    <string name="yt_cat_gaming">Gaming</string>
+    <string name="yt_cat_news">News</string>
+    <string name="yt_cat_sports">Sports</string>
+    <string name="yt_cat_movies">Movies</string>
+    <string name="yt_cat_learn">Education</string>
+    <string name="yt_cat_tech">Technology</string>
+    <string name="yt_cat_cooking">Cooking</string>
 
     <!-- Library -->
     <string name="library_stats">%1$d videos · %2$s</string>

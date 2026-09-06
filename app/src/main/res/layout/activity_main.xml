@@ -229,6 +229,62 @@
             android:checked="true"
             android:text="@string/hide_shorts" />
 
+        <!-- Category feeds: Trending + topic browsing like the YouTube app. -->
+        <HorizontalScrollView
+            android:id="@+id/ytCategoryScroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginTop="2dp"
+            android:scrollbars="none">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/ytCategoryChips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:singleLine="true"
+                app:singleSelection="true"
+                app:selectionRequired="true">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/ytCatTrending" style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:checked="true" android:text="@string/yt_cat_trending" />
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/ytCatMusic" style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/yt_cat_music" />
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/ytCatGaming" style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/yt_cat_gaming" />
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/ytCatNews" style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/yt_cat_news" />
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/ytCatSports" style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/yt_cat_sports" />
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/ytCatMovies" style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/yt_cat_movies" />
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/ytCatLearn" style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/yt_cat_learn" />
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/ytCatTech" style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/yt_cat_tech" />
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/ytCatCooking" style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/yt_cat_cooking" />
+            </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
+
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"

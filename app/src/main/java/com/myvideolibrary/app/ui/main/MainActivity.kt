@@ -250,11 +250,31 @@ class MainActivity : AppCompatActivity() {
         binding.hideShortsSwitch.setOnCheckedChangeListener { _, _ ->
             renderYouTube(youtubeViewModel.state.value)
         }
+        binding.ytCategoryChips.setOnCheckedStateChangeListener { _, checkedIds ->
+            loadYouTubeCategory(checkedIds.firstOrNull())
+        }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 youtubeViewModel.state.collectLatest { renderYouTube(it) }
             }
         }
+    }
+
+    /** Loads a YouTube category feed: Trending, or a topic search that browses it. */
+    private fun loadYouTubeCategory(chipId: Int?) {
+        val query = when (chipId) {
+            R.id.ytCatMusic -> getString(R.string.yt_cat_music)
+            R.id.ytCatGaming -> getString(R.string.yt_cat_gaming)
+            R.id.ytCatNews -> getString(R.string.yt_cat_news)
+            R.id.ytCatSports -> getString(R.string.yt_cat_sports)
+            R.id.ytCatMovies -> getString(R.string.yt_cat_movies)
+            R.id.ytCatLearn -> getString(R.string.yt_cat_learn)
+            R.id.ytCatTech -> getString(R.string.yt_cat_tech)
+            R.id.ytCatCooking -> getString(R.string.yt_cat_cooking)
+            else -> null // Trending
+        }
+        youtubeViewModel.setSource(com.myvideolibrary.app.data.model.VideoSource.YOUTUBE)
+        if (query == null) youtubeViewModel.loadTrending() else youtubeViewModel.search(query)
     }
 
     private fun applyYouTubeLayout() {

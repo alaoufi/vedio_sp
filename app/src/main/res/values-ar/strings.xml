@@ -8,6 +8,15 @@
     <string name="hide_shorts">إخفاء Shorts</string>
     <string name="youtube_search_hint">ابحث في يوتيوب</string>
     <string name="youtube_tab_hint">ابحث في يوتيوب — شغّل بلا إعلانات أو حمّل. مقاطع Shorts مخفية.</string>
+    <string name="yt_cat_trending">رائج</string>
+    <string name="yt_cat_music">موسيقى</string>
+    <string name="yt_cat_gaming">ألعاب</string>
+    <string name="yt_cat_news">أخبار</string>
+    <string name="yt_cat_sports">رياضة</string>
+    <string name="yt_cat_movies">أفلام</string>
+    <string name="yt_cat_learn">تعليم</string>
+    <string name="yt_cat_tech">تقنية</string>
+    <string name="yt_cat_cooking">طبخ</string>
 
     <!-- Library -->
     <string name="library_stats">%1$d فيديو · %2$s</string>
