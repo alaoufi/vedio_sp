@@ -17,6 +17,12 @@
     <string name="yt_cat_learn">تعليم</string>
     <string name="yt_cat_tech">تقنية</string>
     <string name="yt_cat_cooking">طبخ</string>
+    <string name="yt_related">مقاطع ذات صلة</string>
+    <string name="yt_channel">القناة</string>
+    <string name="yt_views">%1$s مشاهدة</string>
+    <string name="yt_subscribers">%1$s مشترك</string>
+    <string name="yt_subscribe">اشتراك</string>
+    <string name="yt_subscribed">مشترك</string>
 
     <!-- Library -->
     <string name="library_stats">%1$d فيديو · %2$s</string>

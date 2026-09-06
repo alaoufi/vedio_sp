@@ -17,6 +17,12 @@
     <string name="yt_cat_learn">Education</string>
     <string name="yt_cat_tech">Technology</string>
     <string name="yt_cat_cooking">Cooking</string>
+    <string name="yt_related">Related videos</string>
+    <string name="yt_channel">Channel</string>
+    <string name="yt_views">%1$s views</string>
+    <string name="yt_subscribers">%1$s subscribers</string>
+    <string name="yt_subscribe">Subscribe</string>
+    <string name="yt_subscribed">Subscribed</string>
 
     <!-- Library -->
     <string name="library_stats">%1$d videos · %2$s</string>

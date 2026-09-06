@@ -23,6 +23,23 @@ object Formatters {
         }
     }
 
+    /** Compact large-number count, e.g. "1.2M", "845K", "999". Negative → empty. */
+    fun count(n: Long): String {
+        if (n < 0) return ""
+        return when {
+            n >= 1_000_000_000 -> trim(n / 1_000_000_000.0) + "B"
+            n >= 1_000_000 -> trim(n / 1_000_000.0) + "M"
+            n >= 1_000 -> trim(n / 1_000.0) + "K"
+            else -> n.toString()
+        }
+    }
+
+    /** One decimal, but drop a trailing ".0" (1.0K → "1K", 1.2K stays). */
+    private fun trim(value: Double): String {
+        val s = String.format(Locale.US, "%.1f", value)
+        return if (s.endsWith(".0")) s.dropLast(2) else s
+    }
+
     /** Human-readable byte count, e.g. "1.4 GB". */
     fun fileSize(bytes: Long): String {
         if (bytes <= 0) return "0 B"

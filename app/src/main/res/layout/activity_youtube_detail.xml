@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:title="@string/tab_youtube" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scroll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="24dp">
+
+                <!-- Poster with a play affordance. -->
+                <FrameLayout
+                    android:id="@+id/posterFrame"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/thumbnail"
+                        android:layout_width="match_parent"
+                        android:layout_height="210dp"
+                        android:background="#20000000"
+                        android:contentDescription="@string/cd_thumbnail"
+                        android:scaleType="centerCrop"
+                        tools:src="@drawable/ic_video_placeholder" />
+
+                    <ImageView
+                        android:id="@+id/playOverlay"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:layout_gravity="center"
+                        android:alpha="0.95"
+                        android:background="@drawable/bg_play_badge"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_play_arrow"
+                        app:tint="@android:color/white"
+                        android:contentDescription="@string/play" />
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="12dp"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    tools:text="Sample video title that can span up to two lines" />
+
+                <TextView
+                    android:id="@+id/meta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="4dp"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:textSize="13sp"
+                    tools:text="1.2M views · 3 days ago" />
+
+                <!-- Channel row: tap opens the channel. -->
+                <LinearLayout
+                    android:id="@+id/channelRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="12dp">
+
+                    <ImageView
+                        android:id="@+id/channelAvatar"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="#20000000"
+                        android:contentDescription="@string/yt_channel"
+                        android:scaleType="centerCrop" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/channelName"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:textAppearance="?attr/textAppearanceBodyLarge"
+                            tools:text="Channel name" />
+
+                        <TextView
+                            android:id="@+id/channelSubs"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="?android:attr/textColorSecondary"
+                            android:textSize="12sp"
+                            tools:text="1.2M subscribers" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Actions. -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="12dp"
+                    android:paddingBottom="4dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnPlay"
+                        style="@style/Widget.Material3.Button"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="4dp"
+                        android:layout_weight="1"
+                        android:text="@string/play"
+                        app:icon="@drawable/ic_play_arrow" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnDownload"
+                        style="@style/Widget.Material3.Button.TonalButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="4dp"
+                        android:layout_weight="1"
+                        android:text="@string/download"
+                        app:icon="@drawable/ic_download" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSaveLink"
+                        style="@style/Widget.Material3.Button.OutlinedButton.Icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="4dp"
+                        app:icon="@drawable/ic_link"
+                        android:contentDescription="@string/save_link" />
+                </LinearLayout>
+
+                <!-- Description (tap to expand / collapse). -->
+                <TextView
+                    android:id="@+id/description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:ellipsize="end"
+                    android:maxLines="3"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="10dp"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?android:attr/textColorSecondary"
+                    tools:text="Video description goes here and can be quite long, so it is collapsed to a few lines and expands on tap." />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="4dp"
+                    android:background="?android:attr/listDivider" />
+
+                <TextView
+                    android:id="@+id/relatedHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="14dp"
+                    android:paddingBottom="6dp"
+                    android:text="@string/yt_related"
+                    android:textAppearance="?attr/textAppearanceTitleSmall" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/relatedRecycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/errorText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingHorizontal="24dp"
+            android:textColor="?android:attr/textColorSecondary"
+            android:visibility="gone"
+            tools:text="Something went wrong" />
+    </FrameLayout>
+</LinearLayout>

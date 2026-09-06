@@ -135,6 +135,18 @@
             android:exported="false"
             android:parentActivityName=".ui.main.MainActivity" />
 
+        <!-- YouTube-style video detail page (description, related, channel). -->
+        <activity
+            android:name=".ui.youtube.YouTubeDetailActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.main.MainActivity" />
+
+        <!-- Channel browsing: an uploader's videos with local subscribe. -->
+        <activity
+            android:name=".ui.youtube.ChannelActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.main.MainActivity" />
+
         <!-- In-app browser with media detection (generic downloader). -->
         <activity
             android:name=".ui.browser.BrowserActivity"

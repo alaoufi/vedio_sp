@@ -236,7 +236,10 @@ class MainActivity : AppCompatActivity() {
     private fun setupYouTubeTab() {
         youtubeViewModel.setSource(com.myvideolibrary.app.data.model.VideoSource.YOUTUBE)
         youtubeAdapter = com.myvideolibrary.app.ui.search.SearchResultAdapter(
-            onPlay = { item -> playStreamQueue(youtubeItems, item) },
+            // Tap a card → open its YouTube-style detail page (description, related, channel).
+            onPlay = { item ->
+                com.myvideolibrary.app.ui.youtube.YouTubeDetailActivity.start(this, item.url, item.title)
+            },
             onSaveLink = { item -> youtubeViewModel.saveLink(item) },
             onDownload = { item, anchor ->
                 com.myvideolibrary.app.ui.provider.DownloadKindDialog.show(anchor) { kind ->
