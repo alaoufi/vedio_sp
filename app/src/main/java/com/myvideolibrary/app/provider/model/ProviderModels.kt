@@ -66,6 +66,38 @@ data class ProviderSearchItem(
     val isShort: Boolean = false
 )
 
+/**
+ * Full detail for one video, powering a YouTube-style detail page: the clip's
+ * own metadata plus its uploader and a list of related ("up next") videos.
+ */
+data class ProviderVideoDetail(
+    val source: VideoSource,
+    val url: String,
+    val title: String,
+    val thumbnailUrl: String? = null,
+    val description: String? = null,
+    val author: String? = null,
+    val channelUrl: String? = null,
+    val channelAvatarUrl: String? = null,
+    val subscriberCount: Long = -1,
+    val viewCount: Long = -1,
+    val likeCount: Long = -1,
+    val uploadDate: String? = null,
+    val durationMs: Long = 0,
+    /** Related / up-next videos to show under the player. */
+    val related: List<ProviderSearchItem> = emptyList()
+)
+
+/** One page of a channel's uploads, with an opaque continuation for more. */
+data class ProviderChannelPage(
+    val name: String,
+    val avatarUrl: String? = null,
+    val bannerUrl: String? = null,
+    val subscriberCount: Long = -1,
+    val items: List<ProviderSearchItem> = emptyList(),
+    val continuation: Any? = null
+)
+
 /** Categorised, user-presentable failure reasons for provider operations. */
 enum class ProviderErrorType {
     INVALID_LINK,

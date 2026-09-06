@@ -1,8 +1,10 @@
 package com.myvideolibrary.app.provider
 
 import com.myvideolibrary.app.data.model.VideoSource
+import com.myvideolibrary.app.provider.model.ProviderChannelPage
 import com.myvideolibrary.app.provider.model.ProviderFeedPage
 import com.myvideolibrary.app.provider.model.ProviderSearchItem
+import com.myvideolibrary.app.provider.model.ProviderVideoDetail
 import com.myvideolibrary.app.provider.model.ResolvedVideo
 import com.myvideolibrary.app.provider.model.StreamSource
 
@@ -48,6 +50,22 @@ interface VideoProvider {
      */
     suspend fun feedMore(continuation: Any?): ProviderFeedPage =
         ProviderFeedPage(emptyList(), null)
+
+    /**
+     * Full detail for one video (description, uploader, related list) powering a
+     * detail page. Returns null for providers that don't support it.
+     */
+    suspend fun details(url: String): ProviderVideoDetail? = null
+
+    /**
+     * First page of a channel/uploader's videos, for channel browsing. [channelUrl]
+     * is the uploader URL carried on a [ProviderVideoDetail] or search item.
+     * Returns null for providers that don't support it.
+     */
+    suspend fun channel(channelUrl: String): ProviderChannelPage? = null
+
+    /** Next page of a channel's videos given a continuation from [channel]/[channelMore]. */
+    suspend fun channelMore(channelUrl: String, continuation: Any?): ProviderChannelPage? = null
 
     /**
      * Resolves [url] into a single, directly-playable progressive stream for

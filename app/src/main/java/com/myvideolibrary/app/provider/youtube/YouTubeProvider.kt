@@ -6,6 +6,7 @@ import com.myvideolibrary.app.data.model.VideoSource
 import com.myvideolibrary.app.provider.VideoProvider
 import com.myvideolibrary.app.provider.model.ProviderErrorType
 import com.myvideolibrary.app.provider.model.ProviderException
+import com.myvideolibrary.app.provider.model.ProviderFeedPage
 import com.myvideolibrary.app.provider.model.ProviderSearchItem
 import com.myvideolibrary.app.provider.model.ResolvedVideo
 import com.myvideolibrary.app.provider.model.StreamSource
@@ -333,9 +334,152 @@ class YouTubeProvider @Inject constructor(
         val items = page.items
             .filterIsInstance<org.schabi.newpipe.extractor.stream.StreamInfoItem>()
             .map(::mapStreamItem)
-        val next = if (page.hasNextPage()) NewPipeCont(extractor, page.nextPage) else null
+        val nextPage = page.nextPage
+        val next = if (page.hasNextPage() && nextPage != null) NewPipeCont(extractor, nextPage) else null
         return ProviderFeedPage(items, next)
     }
+
+    // ---- Video detail + related ("up next") ----
+
+    override suspend fun details(url: String): com.myvideolibrary.app.provider.model.ProviderVideoDetail? =
+        withContext(Dispatchers.IO) {
+            ensureInitialised()
+            runCatching { detailsViaNewPipe(url) }.getOrNull()
+                ?: detailsViaPiped(url)
+        }
+
+    private fun detailsViaNewPipe(url: String): com.myvideolibrary.app.provider.model.ProviderVideoDetail {
+        val info = StreamInfo.getInfo(ServiceList.YouTube, url)
+        val related = info.relatedItems
+            .filterIsInstance<org.schabi.newpipe.extractor.stream.StreamInfoItem>()
+            .map(::mapStreamItem)
+        return com.myvideolibrary.app.provider.model.ProviderVideoDetail(
+            source = VideoSource.YOUTUBE,
+            url = url,
+            title = info.name ?: "YouTube video",
+            thumbnailUrl = info.thumbnails.lastOrNull()?.url,
+            description = info.description?.content,
+            author = info.uploaderName,
+            channelUrl = info.uploaderUrl,
+            channelAvatarUrl = info.uploaderAvatars.lastOrNull()?.url,
+            subscriberCount = info.uploaderSubscriberCount,
+            viewCount = info.viewCount,
+            likeCount = info.likeCount,
+            uploadDate = info.textualUploadDate,
+            durationMs = info.duration * 1000,
+            related = related
+        )
+    }
+
+    private fun detailsViaPiped(url: String): com.myvideolibrary.app.provider.model.ProviderVideoDetail? {
+        val id = videoId(url) ?: return null
+        val root = fetchPiped(id) ?: return null
+        val related = root.arr("relatedStreams").mapNotNull { o ->
+            val itemUrl = o.str("url") ?: return@mapNotNull null
+            if (!itemUrl.contains("/watch")) return@mapNotNull null
+            val vid = itemUrl.substringAfter("v=", "").ifBlank { return@mapNotNull null }
+            ProviderSearchItem(
+                source = VideoSource.YOUTUBE,
+                url = "https://www.youtube.com/watch?v=$vid",
+                title = o.str("title") ?: "",
+                thumbnailUrl = o.str("thumbnail"),
+                author = o.str("uploaderName"),
+                durationMs = (o.long("duration") ?: 0L) * 1000
+            )
+        }
+        return com.myvideolibrary.app.provider.model.ProviderVideoDetail(
+            source = VideoSource.YOUTUBE,
+            url = url,
+            title = root.str("title") ?: "YouTube video",
+            thumbnailUrl = root.str("thumbnailUrl"),
+            description = root.str("description"),
+            author = root.str("uploader"),
+            channelUrl = root.str("uploaderUrl")?.let { normaliseChannelUrl(it) },
+            channelAvatarUrl = root.str("uploaderAvatar"),
+            subscriberCount = root.long("uploaderSubscriberCount") ?: -1,
+            viewCount = root.long("views") ?: -1,
+            likeCount = root.long("likes") ?: -1,
+            uploadDate = root.str("uploadDate"),
+            durationMs = (root.long("duration") ?: 0L) * 1000,
+            related = related
+        )
+    }
+
+    // ---- Channel browsing ----
+
+    private class ChannelCont(
+        val extractor: org.schabi.newpipe.extractor.channel.ChannelExtractor,
+        val tabExtractor: org.schabi.newpipe.extractor.channel.tabs.ChannelTabExtractor,
+        val nextPage: org.schabi.newpipe.extractor.Page
+    )
+
+    override suspend fun channel(channelUrl: String): com.myvideolibrary.app.provider.model.ProviderChannelPage? =
+        withContext(Dispatchers.IO) {
+            ensureInitialised()
+            runCatching { channelViaNewPipe(channelUrl) }.getOrNull()
+        }
+
+    override suspend fun channelMore(
+        channelUrl: String,
+        continuation: Any?
+    ): com.myvideolibrary.app.provider.model.ProviderChannelPage? =
+        withContext(Dispatchers.IO) {
+            val cont = continuation as? ChannelCont ?: return@withContext null
+            ensureInitialised()
+            runCatching {
+                val page = cont.tabExtractor.getPage(cont.nextPage)
+                val items = page.items
+                    .filterIsInstance<org.schabi.newpipe.extractor.stream.StreamInfoItem>()
+                    .map(::mapStreamItem)
+                val nextPage = page.nextPage
+                val next = if (page.hasNextPage() && nextPage != null) {
+                    ChannelCont(cont.extractor, cont.tabExtractor, nextPage)
+                } else null
+                com.myvideolibrary.app.provider.model.ProviderChannelPage(
+                    name = cont.extractor.name ?: "",
+                    avatarUrl = cont.extractor.avatars.lastOrNull()?.url,
+                    bannerUrl = cont.extractor.banners.lastOrNull()?.url,
+                    subscriberCount = cont.extractor.subscriberCount,
+                    items = items,
+                    continuation = next
+                )
+            }.getOrNull()
+        }
+
+    private fun channelViaNewPipe(channelUrl: String): com.myvideolibrary.app.provider.model.ProviderChannelPage {
+        val extractor = ServiceList.YouTube.getChannelExtractor(channelUrl)
+        extractor.fetchPage()
+        // Pick the "Videos" tab (first tab that lists videos).
+        val videosTab = extractor.tabs.firstOrNull {
+            it.contentFilters.contains(org.schabi.newpipe.extractor.channel.tabs.ChannelTabs.VIDEOS)
+        } ?: extractor.tabs.firstOrNull()
+        var items = emptyList<ProviderSearchItem>()
+        var next: ChannelCont? = null
+        if (videosTab != null) {
+            val tabExtractor = ServiceList.YouTube.getChannelTabExtractor(videosTab)
+            tabExtractor.fetchPage()
+            val page = tabExtractor.initialPage
+            items = page.items
+                .filterIsInstance<org.schabi.newpipe.extractor.stream.StreamInfoItem>()
+                .map(::mapStreamItem)
+            val nextPage = page.nextPage
+            if (page.hasNextPage() && nextPage != null) {
+                next = ChannelCont(extractor, tabExtractor, nextPage)
+            }
+        }
+        return com.myvideolibrary.app.provider.model.ProviderChannelPage(
+            name = extractor.name ?: "",
+            avatarUrl = extractor.avatars.lastOrNull()?.url,
+            bannerUrl = extractor.banners.lastOrNull()?.url,
+            subscriberCount = extractor.subscriberCount,
+            items = items,
+            continuation = next
+        )
+    }
+
+    /** Piped returns "/channel/UCxxxx"; make it a full YouTube URL NewPipe understands. */
+    private fun normaliseChannelUrl(path: String): String =
+        if (path.startsWith("http")) path else "https://www.youtube.com$path"
 
     private fun trendingViaPiped(): List<ProviderSearchItem> {
         for (base in PIPED_INSTANCES) {
