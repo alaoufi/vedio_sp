@@ -246,6 +246,20 @@ class MainActivity : AppCompatActivity() {
         )
         binding.ytRecyclerView.adapter = youtubeAdapter
         binding.ytRecyclerView.setHasFixedSize(true)
+        // Infinite scroll: load the next page as the user nears the end.
+        binding.ytRecyclerView.addOnScrollListener(
+            object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+                override fun onScrolled(rv: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
+                    if (dy <= 0) return
+                    val lm = rv.layoutManager as? androidx.recyclerview.widget.LinearLayoutManager ?: return
+                    val total = lm.itemCount
+                    val lastVisible = lm.findLastVisibleItemPosition()
+                    if (total > 0 && lastVisible >= total - 4) {
+                        youtubeViewModel.loadMore()
+                    }
+                }
+            }
+        )
         applyYouTubeLayout()
         binding.hideShortsSwitch.setOnCheckedChangeListener { _, _ ->
             renderYouTube(youtubeViewModel.state.value)

@@ -277,6 +277,66 @@ class YouTubeProvider @Inject constructor(
             }
         }
 
+    // ---- Infinite-scroll feed (paged) ----
+
+    /**
+     * Holds a live NewPipe list extractor and the token for its next page so
+     * [feedMore] can continue exactly where [feed] stopped. Opaque to the UI.
+     */
+    private class NewPipeCont(
+        val extractor: org.schabi.newpipe.extractor.ListExtractor<out org.schabi.newpipe.extractor.InfoItem>,
+        val nextPage: org.schabi.newpipe.extractor.Page
+    )
+
+    override suspend fun feed(query: String?): ProviderFeedPage =
+        withContext(Dispatchers.IO) {
+            ensureInitialised()
+            try {
+                val extractor: org.schabi.newpipe.extractor.ListExtractor<out org.schabi.newpipe.extractor.InfoItem> =
+                    if (query.isNullOrBlank()) {
+                        ServiceList.YouTube.kioskList.defaultKioskExtractor
+                    } else {
+                        ServiceList.YouTube.getSearchExtractor(query, emptyList(), "")
+                    }
+                extractor.fetchPage()
+                pageToFeed(extractor, extractor.initialPage)
+            } catch (e: Exception) {
+                // NewPipe broke — fall back to a single Piped page (no continuation).
+                val items = if (query.isNullOrBlank()) trendingViaPiped() else searchViaPiped(query)
+                if (items.isEmpty() && !query.isNullOrBlank()) {
+                    throw ProviderException(
+                        ProviderErrorType.EXTRACTION_FAILED, "YouTube search failed", e
+                    )
+                }
+                ProviderFeedPage(items, null)
+            }
+        }
+
+    override suspend fun feedMore(continuation: Any?): ProviderFeedPage =
+        withContext(Dispatchers.IO) {
+            val cont = continuation as? NewPipeCont
+                ?: return@withContext ProviderFeedPage(emptyList(), null)
+            ensureInitialised()
+            try {
+                val page = cont.extractor.getPage(cont.nextPage)
+                pageToFeed(cont.extractor, page)
+            } catch (e: Exception) {
+                ProviderFeedPage(emptyList(), null)
+            }
+        }
+
+    /** Maps one NewPipe page to a feed page, carrying a continuation when more remain. */
+    private fun pageToFeed(
+        extractor: org.schabi.newpipe.extractor.ListExtractor<out org.schabi.newpipe.extractor.InfoItem>,
+        page: org.schabi.newpipe.extractor.ListExtractor.InfoItemsPage<out org.schabi.newpipe.extractor.InfoItem>
+    ): ProviderFeedPage {
+        val items = page.items
+            .filterIsInstance<org.schabi.newpipe.extractor.stream.StreamInfoItem>()
+            .map(::mapStreamItem)
+        val next = if (page.hasNextPage()) NewPipeCont(extractor, page.nextPage) else null
+        return ProviderFeedPage(items, next)
+    }
+
     private fun trendingViaPiped(): List<ProviderSearchItem> {
         for (base in PIPED_INSTANCES) {
             val body = runCatching {

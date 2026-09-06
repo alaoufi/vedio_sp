@@ -25,6 +25,8 @@ data class StreamRequest(val sourceUrl: String, val title: String)
 data class SearchUiState(
     val source: VideoSource = VideoSource.YOUTUBE,
     val loading: Boolean = false,
+    val loadingMore: Boolean = false,
+    val canLoadMore: Boolean = false,
     val results: List<ProviderSearchItem> = emptyList(),
     val searchSupported: Boolean = true,
     val error: String? = null,
@@ -44,6 +46,12 @@ class SearchViewModel @Inject constructor(
     private val _state = MutableStateFlow(SearchUiState())
     val state: StateFlow<SearchUiState> = _state.asStateFlow()
 
+    /** Opaque continuation for the current feed; null means no more pages. */
+    private var feedContinuation: Any? = null
+
+    /** The active feed query (null = trending/home). */
+    private var currentQuery: String? = null
+
     /** Active (waiting/downloading) jobs, so the screen can show a live banner. */
     val activeDownloads: StateFlow<List<com.myvideolibrary.app.data.local.entity.DownloadEntity>> =
         downloadRepository.observeActive()
@@ -62,36 +70,38 @@ class SearchViewModel @Inject constructor(
     }
 
     /** Loads YouTube's trending feed (shown when the YouTube tab opens with no query). */
-    fun loadTrending() {
-        val provider = providerRegistry.providerForSource(VideoSource.YOUTUBE) ?: return
-        _state.value = _state.value.copy(loading = true, error = null, results = emptyList())
-        viewModelScope.launch {
-            try {
-                val results = provider.trending()
-                _state.value = _state.value.copy(loading = false, results = results)
-            } catch (e: Throwable) {
-                _state.value = _state.value.copy(loading = false, error = e.message)
-            }
-        }
-    }
+    fun loadTrending() = loadFeed(null)
 
     fun search(query: String) {
         val q = query.trim()
         if (q.isEmpty()) return
-        val source = _state.value.source
 
         // If the user pasted a link, resolve it directly regardless of source.
         if (q.startsWith("http")) {
             downloadLink(q)
             return
         }
+        loadFeed(q)
+    }
 
-        val provider = providerRegistry.providerForSource(source) ?: return
-        _state.value = _state.value.copy(loading = true, error = null, results = emptyList())
+    /** Loads the first page of a feed (trending when [query] is null) with pagination. */
+    private fun loadFeed(query: String?) {
+        val provider = providerRegistry.providerForSource(_state.value.source) ?: return
+        currentQuery = query
+        feedContinuation = null
+        _state.value = _state.value.copy(
+            loading = true, loadingMore = false, canLoadMore = false,
+            error = null, results = emptyList()
+        )
         viewModelScope.launch {
             try {
-                val results = provider.search(q)
-                _state.value = _state.value.copy(loading = false, results = results)
+                val page = provider.feed(query)
+                feedContinuation = page.continuation
+                _state.value = _state.value.copy(
+                    loading = false,
+                    results = page.items,
+                    canLoadMore = page.continuation != null
+                )
             } catch (e: ProviderException) {
                 _state.value = _state.value.copy(loading = false, error = e.message)
             } catch (e: Throwable) {
@@ -99,6 +109,30 @@ class SearchViewModel @Inject constructor(
                     loading = false,
                     error = "${e.javaClass.simpleName}: ${e.message ?: "no message"}"
                 )
+            }
+        }
+    }
+
+    /** Loads the next page of the current feed and appends it (infinite scroll). */
+    fun loadMore() {
+        val cont = feedContinuation ?: return
+        val s = _state.value
+        if (s.loading || s.loadingMore) return
+        val provider = providerRegistry.providerForSource(s.source) ?: return
+        _state.value = s.copy(loadingMore = true)
+        viewModelScope.launch {
+            try {
+                val page = provider.feedMore(cont)
+                feedContinuation = page.continuation
+                _state.value = _state.value.copy(
+                    loadingMore = false,
+                    results = _state.value.results + page.items,
+                    canLoadMore = page.continuation != null
+                )
+            } catch (e: Throwable) {
+                // Stop paging quietly on error; the results already shown remain.
+                feedContinuation = null
+                _state.value = _state.value.copy(loadingMore = false, canLoadMore = false)
             }
         }
     }

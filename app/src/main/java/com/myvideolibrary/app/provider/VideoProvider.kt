@@ -1,6 +1,7 @@
 package com.myvideolibrary.app.provider
 
 import com.myvideolibrary.app.data.model.VideoSource
+import com.myvideolibrary.app.provider.model.ProviderFeedPage
 import com.myvideolibrary.app.provider.model.ProviderSearchItem
 import com.myvideolibrary.app.provider.model.ResolvedVideo
 import com.myvideolibrary.app.provider.model.StreamSource
@@ -30,6 +31,23 @@ interface VideoProvider {
 
     /** Optional trending/popular feed. Providers that don't support it return empty. */
     suspend fun trending(): List<ProviderSearchItem> = emptyList()
+
+    /**
+     * First page of a feed for infinite scroll. When [query] is null this is the
+     * trending/home feed; otherwise it is a keyword search. The returned
+     * [ProviderFeedPage.continuation] is passed back to [feedMore] to load the
+     * next page. The default delegates to [search]/[trending] with no
+     * continuation (single page); providers override to support pagination.
+     */
+    suspend fun feed(query: String?): ProviderFeedPage =
+        ProviderFeedPage(if (query.isNullOrBlank()) trending() else search(query), null)
+
+    /**
+     * Loads the next page of a feed given a [continuation] previously returned by
+     * [feed] or [feedMore]. The default returns an empty, terminal page.
+     */
+    suspend fun feedMore(continuation: Any?): ProviderFeedPage =
+        ProviderFeedPage(emptyList(), null)
 
     /**
      * Resolves [url] into a single, directly-playable progressive stream for
