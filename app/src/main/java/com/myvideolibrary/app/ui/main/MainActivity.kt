@@ -1298,13 +1298,27 @@ class MainActivity : AppCompatActivity() {
                 )
             }
             val share = Intent(Intent.ACTION_SEND).apply {
-                type = "video/*"
+                // Use the real type (image/audio/video), or apps like WhatsApp reject it.
+                type = shareMimeType(video)
                 putExtra(Intent.EXTRA_STREAM, uri)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
             startActivity(Intent.createChooser(share, getString(R.string.action_share)))
         } catch (e: Exception) {
             android.widget.Toast.makeText(this, R.string.share_failed, android.widget.Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /** MIME type for sharing: from the file extension when known, else the media category. */
+    private fun shareMimeType(video: VideoEntity): String {
+        val ext = video.localPath.substringAfterLast('.', "").lowercase()
+        android.webkit.MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext)
+            ?.takeIf { it.isNotBlank() }
+            ?.let { return it }
+        return when (video.mediaType) {
+            "image" -> "image/*"
+            "audio" -> "audio/*"
+            else -> "video/*"
         }
     }
 
