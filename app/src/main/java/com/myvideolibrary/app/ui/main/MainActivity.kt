@@ -57,6 +57,9 @@ class MainActivity : AppCompatActivity() {
     private var previewJob: Job? = null
     private lateinit var youtubeAdapter: com.myvideolibrary.app.ui.search.SearchResultAdapter
 
+    /** Retained options menu so icons update in place without re-inflating (keeps search focus). */
+    private var optionsMenu: Menu? = null
+
     /** The YouTube results currently on screen, used to build a swipe-able queue. */
     private var youtubeItems: List<com.myvideolibrary.app.provider.model.ProviderSearchItem> = emptyList()
 
@@ -749,7 +752,10 @@ class MainActivity : AppCompatActivity() {
                     renderMediaTypeChips(state)
                     renderSelectionBar(state)
                     renderProtectedTitle(state)
-                    invalidateOptionsMenu()
+                    // Update the two dynamic icons in place — never invalidateOptionsMenu
+                    // here, or the (re-inflated) search field would lose focus/text on
+                    // every state emission, letting the user type only one character.
+                    updateMenuIcons()
                 }
             }
         }
@@ -1559,9 +1565,28 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
+        optionsMenu = menu
         (menu.findItem(R.id.action_search)?.actionView as? androidx.appcompat.widget.SearchView)
             ?.let { setupSearchView(it) }
         return true
+    }
+
+    /**
+     * Updates just the two state-driven toolbar icons (favorites, grid/list) on the
+     * retained menu, without re-inflating it — so the expanded search field keeps its
+     * focus and text. Full [invalidateOptionsMenu] is only for tab switches.
+     */
+    private fun updateMenuIcons() {
+        val menu = optionsMenu ?: return
+        val favoritesOnly = viewModel.uiState.value.favoritesOnly
+        menu.findItem(R.id.action_favorites)?.setIcon(
+            if (favoritesOnly) R.drawable.ic_favorite else R.drawable.ic_favorite_border
+        )
+        val gridNow = if (youtubeTab) youtubeGrid
+        else viewModel.uiState.value.viewMode == LibraryViewMode.GRID
+        menu.findItem(R.id.action_toggle_view)?.setIcon(
+            if (gridNow) R.drawable.ic_view_list else R.drawable.ic_grid_view
+        )
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
