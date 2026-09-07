@@ -71,7 +71,8 @@ class YouTubeDetailActivity : AppCompatActivity() {
         binding.description.setOnClickListener { toggleDescription() }
         binding.playOverlay.setOnClickListener { startInlinePlayback() }
         binding.btnPlay.setOnClickListener { startInlinePlayback() }
-        binding.fullscreenButton.setOnClickListener { openFullscreen() }
+        // The controller's own fullscreen button (properly placed, no overlap).
+        binding.playerView.setFullscreenButtonClickListener { openFullscreen() }
         binding.btnDownload.setOnClickListener {
             DownloadKindDialog.show(binding.btnDownload) { kind -> viewModel.download(kind) }
         }
@@ -204,7 +205,6 @@ class YouTubeDetailActivity : AppCompatActivity() {
             }
             binding.thumbnail.isVisible = false
             binding.playerView.isVisible = true
-            binding.fullscreenButton.isVisible = true
             preparePlayer(stream)
         }
     }
@@ -249,7 +249,6 @@ class YouTubeDetailActivity : AppCompatActivity() {
         playerStarted = false
         // Return to the poster state so replay works when coming back.
         binding.playerView.isVisible = false
-        binding.fullscreenButton.isVisible = false
         binding.playerLoading.isVisible = false
         binding.thumbnail.isVisible = true
         binding.playOverlay.isVisible = true

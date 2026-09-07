@@ -10,8 +10,9 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="48dp"
         app:navigationIcon="@drawable/ic_arrow_back"
+        app:titleTextAppearance="@style/TextAppearance.App.ToolbarTitle.Compact"
         app:title="@string/tab_youtube" />
 
     <FrameLayout
@@ -47,7 +48,9 @@
                         android:scaleType="centerCrop"
                         tools:src="@drawable/ic_video_placeholder" />
 
-                    <!-- Inline player (hidden until the user taps play), like YouTube. -->
+                    <!-- Inline player (hidden until the user taps play), like YouTube.
+                         Uses the controller's own fullscreen button so it never
+                         overlaps the seek bar / time. -->
                     <androidx.media3.ui.PlayerView
                         android:id="@+id/playerView"
                         android:layout_width="match_parent"
@@ -76,19 +79,6 @@
                         app:tint="@android:color/white"
                         android:contentDescription="@string/play" />
 
-                    <!-- Optional enlarge: opens the full-screen player. -->
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/fullscreenButton"
-                        style="@style/Widget.Material3.Button.IconButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_gravity="bottom|end"
-                        android:layout_margin="6dp"
-                        android:visibility="gone"
-                        app:icon="@drawable/ic_fullscreen"
-                        app:iconSize="22dp"
-                        app:iconTint="@android:color/white"
-                        android:contentDescription="@string/yt_fullscreen" />
                 </FrameLayout>
 
                 <TextView
@@ -96,10 +86,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
+                    android:lineSpacingMultiplier="1.0"
                     android:maxLines="2"
-                    android:paddingHorizontal="16dp"
-                    android:paddingTop="10dp"
-                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    android:paddingHorizontal="14dp"
+                    android:paddingTop="8dp"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
                     tools:text="Sample video title that can span up to two lines" />
 
                 <TextView
@@ -108,10 +100,10 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:paddingHorizontal="16dp"
-                    android:paddingTop="2dp"
+                    android:paddingHorizontal="14dp"
+                    android:paddingTop="1dp"
                     android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="13sp"
+                    android:textSize="12sp"
                     tools:text="1.2M views · 3 days ago" />
 
                 <!-- Channel row: tap opens the channel. -->
@@ -122,13 +114,13 @@
                     android:background="?attr/selectableItemBackground"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="16dp"
-                    android:paddingVertical="8dp">
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="6dp">
 
                     <ImageView
                         android:id="@+id/channelAvatar"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
                         android:background="#20000000"
                         android:contentDescription="@string/yt_channel"
                         android:scaleType="centerCrop" />
@@ -136,7 +128,7 @@
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
+                        android:layout_marginStart="10dp"
                         android:layout_weight="1"
                         android:orientation="vertical">
 
@@ -146,7 +138,7 @@
                             android:layout_height="wrap_content"
                             android:ellipsize="end"
                             android:maxLines="1"
-                            android:textAppearance="?attr/textAppearanceBodyLarge"
+                            android:textSize="14sp"
                             tools:text="Channel name" />
 
                         <TextView
@@ -154,7 +146,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:textColor="?android:attr/textColorSecondary"
-                            android:textSize="12sp"
+                            android:textSize="11sp"
                             tools:text="1.2M subscribers" />
                     </LinearLayout>
                 </LinearLayout>
@@ -224,12 +216,12 @@
                     android:layout_height="wrap_content"
                     android:background="?attr/selectableItemBackground"
                     android:ellipsize="end"
-                    android:lineSpacingMultiplier="1.05"
+                    android:lineSpacingMultiplier="1.0"
                     android:maxLines="2"
-                    android:paddingHorizontal="16dp"
-                    android:paddingVertical="8dp"
-                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="6dp"
                     android:textColor="?android:attr/textColorSecondary"
+                    android:textSize="13sp"
                     tools:text="Video description goes here and can be quite long, so it is collapsed to a few lines and expands on tap." />
 
                 <View
@@ -241,11 +233,12 @@
                     android:id="@+id/relatedHeader"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingHorizontal="16dp"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="4dp"
+                    android:paddingHorizontal="14dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="2dp"
                     android:text="@string/yt_related"
-                    android:textAppearance="?attr/textAppearanceTitleSmall" />
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/relatedRecycler"

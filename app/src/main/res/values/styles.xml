@@ -18,6 +18,11 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <!-- Compact toolbar title for content pages (video detail) where space is tight. -->
+    <style name="TextAppearance.App.ToolbarTitle.Compact" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <!-- Rows in the "+" add sheet: icon badge + title + subtitle. -->
     <style name="AddSheetRow">
         <item name="android:layout_width">match_parent</item>
