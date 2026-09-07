@@ -63,8 +63,10 @@
                     android:id="@+id/title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="2"
                     android:paddingHorizontal="16dp"
-                    android:paddingTop="12dp"
+                    android:paddingTop="10dp"
                     android:textAppearance="?attr/textAppearanceTitleMedium"
                     tools:text="Sample video title that can span up to two lines" />
 
@@ -72,8 +74,10 @@
                     android:id="@+id/meta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
                     android:paddingHorizontal="16dp"
-                    android:paddingTop="4dp"
+                    android:paddingTop="2dp"
                     android:textColor="?android:attr/textColorSecondary"
                     android:textSize="13sp"
                     tools:text="1.2M views · 3 days ago" />
@@ -87,12 +91,12 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingHorizontal="16dp"
-                    android:paddingVertical="12dp">
+                    android:paddingVertical="8dp">
 
                     <ImageView
                         android:id="@+id/channelAvatar"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
                         android:background="#20000000"
                         android:contentDescription="@string/yt_channel"
                         android:scaleType="centerCrop" />
@@ -123,12 +127,13 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Actions. -->
+                <!-- Actions: compact single-line buttons so labels never wrap. -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:paddingHorizontal="12dp"
+                    android:paddingTop="2dp"
                     android:paddingBottom="4dp">
 
                     <com.google.android.material.button.MaterialButton
@@ -138,8 +143,16 @@
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="4dp"
                         android:layout_weight="1"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:maxLines="1"
+                        android:paddingHorizontal="8dp"
                         android:text="@string/play"
-                        app:icon="@drawable/ic_play_arrow" />
+                        android:textSize="14sp"
+                        app:icon="@drawable/ic_play_arrow"
+                        app:iconGravity="textStart"
+                        app:iconPadding="4dp"
+                        app:iconSize="18dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnDownload"
@@ -148,8 +161,16 @@
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="4dp"
                         android:layout_weight="1"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:maxLines="1"
+                        android:paddingHorizontal="8dp"
                         android:text="@string/download"
-                        app:icon="@drawable/ic_download" />
+                        android:textSize="14sp"
+                        app:icon="@drawable/ic_download"
+                        app:iconGravity="textStart"
+                        app:iconPadding="4dp"
+                        app:iconSize="18dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnSaveLink"
@@ -157,7 +178,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="4dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
                         app:icon="@drawable/ic_link"
+                        app:iconSize="18dp"
                         android:contentDescription="@string/save_link" />
                 </LinearLayout>
 
@@ -168,9 +192,10 @@
                     android:layout_height="wrap_content"
                     android:background="?attr/selectableItemBackground"
                     android:ellipsize="end"
-                    android:maxLines="3"
+                    android:lineSpacingMultiplier="1.05"
+                    android:maxLines="2"
                     android:paddingHorizontal="16dp"
-                    android:paddingVertical="10dp"
+                    android:paddingVertical="8dp"
                     android:textAppearance="?attr/textAppearanceBodyMedium"
                     android:textColor="?android:attr/textColorSecondary"
                     tools:text="Video description goes here and can be quite long, so it is collapsed to a few lines and expands on tap." />
@@ -178,7 +203,6 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginTop="4dp"
                     android:background="?android:attr/listDivider" />
 
                 <TextView
@@ -186,8 +210,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="16dp"
-                    android:paddingTop="14dp"
-                    android:paddingBottom="6dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="4dp"
                     android:text="@string/yt_related"
                     android:textAppearance="?attr/textAppearanceTitleSmall" />
 

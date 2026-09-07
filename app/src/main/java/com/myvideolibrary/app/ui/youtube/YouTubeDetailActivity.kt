@@ -129,12 +129,23 @@ class YouTubeDetailActivity : AppCompatActivity() {
 
     private fun metaLine(detail: ProviderVideoDetail): String = listOfNotNull(
         detail.viewCount.takeIf { it >= 0 }?.let { getString(R.string.yt_views, Formatters.count(it)) },
-        detail.uploadDate?.takeIf { it.isNotBlank() }
+        cleanDate(detail.uploadDate)
     ).joinToString(" · ")
+
+    /**
+     * Some backends give a relative date ("3 years ago"); others an ISO timestamp
+     * ("2020-03-20T13:50:27-07:00") whose time part just clutters an RTL line — so
+     * keep only the calendar day from an ISO value, and pass anything else through.
+     */
+    private fun cleanDate(raw: String?): String? {
+        val s = raw?.trim().orEmpty()
+        if (s.isEmpty()) return null
+        return if (s.length >= 10 && s[4] == '-' && s[7] == '-') s.substring(0, 10) else s
+    }
 
     private fun toggleDescription() {
         descriptionExpanded = !descriptionExpanded
-        binding.description.maxLines = if (descriptionExpanded) Int.MAX_VALUE else 3
+        binding.description.maxLines = if (descriptionExpanded) Int.MAX_VALUE else 2
     }
 
     private fun playCurrent() {
