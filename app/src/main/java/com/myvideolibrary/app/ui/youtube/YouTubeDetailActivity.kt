@@ -131,7 +131,7 @@ class YouTubeDetailActivity : AppCompatActivity() {
         }
 
         binding.description.isVisible = !detail.description.isNullOrBlank()
-        binding.description.text = detail.description.orEmpty()
+        binding.description.text = renderDescription(detail.description)
 
         binding.relatedHeader.isVisible = detail.related.isNotEmpty()
         relatedAdapter.submitList(detail.related)
@@ -151,6 +151,23 @@ class YouTubeDetailActivity : AppCompatActivity() {
         val s = raw?.trim().orEmpty()
         if (s.isEmpty()) return null
         return if (s.length >= 10 && s[4] == '-' && s[7] == '-') s.substring(0, 10) else s
+    }
+
+    /**
+     * Some backends return the description as HTML (with <a>, <br>, entities). Render
+     * it to readable text instead of showing raw tags; pass plain text through as-is.
+     */
+    private fun renderDescription(raw: String?): CharSequence {
+        val s = raw.orEmpty()
+        if (s.isEmpty()) return ""
+        return if (s.contains('<') && s.contains('>')) {
+            androidx.core.text.HtmlCompat
+                .fromHtml(s, androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT)
+                .toString()
+                .trim()
+        } else {
+            s
+        }
     }
 
     private fun toggleDescription() {
@@ -175,8 +192,8 @@ class YouTubeDetailActivity : AppCompatActivity() {
         binding.playOverlay.isVisible = false
         binding.playerLoading.isVisible = true
         lifecycleScope.launch {
-            val streamUrl = viewModel.resolveStreamUrl()
-            if (streamUrl.isNullOrBlank()) {
+            val stream = viewModel.resolveStreamSource()
+            if (stream == null || stream.streamUrl.isBlank()) {
                 binding.playerLoading.isVisible = false
                 binding.playOverlay.isVisible = true
                 playerStarted = false
@@ -188,11 +205,11 @@ class YouTubeDetailActivity : AppCompatActivity() {
             binding.thumbnail.isVisible = false
             binding.playerView.isVisible = true
             binding.fullscreenButton.isVisible = true
-            preparePlayer(streamUrl)
+            preparePlayer(stream)
         }
     }
 
-    private fun preparePlayer(streamUrl: String) {
+    private fun preparePlayer(stream: com.myvideolibrary.app.provider.model.StreamSource) {
         // Start playing after ~0.5s buffered (not the default 2.5s) for a fast start.
         val loadControl = DefaultLoadControl.Builder()
             .setBufferDurationsMs(
@@ -205,7 +222,11 @@ class YouTubeDetailActivity : AppCompatActivity() {
         val exo = ExoPlayer.Builder(this).setLoadControl(loadControl).build()
         player = exo
         binding.playerView.player = exo
-        exo.setMediaItem(MediaItem.fromUri(streamUrl))
+        val item = MediaItem.Builder()
+            .setUri(stream.streamUrl)
+            .apply { if (stream.isHls) setMimeType(androidx.media3.common.MimeTypes.APPLICATION_M3U8) }
+            .build()
+        exo.setMediaItem(item)
         exo.playWhenReady = true
         exo.prepare()
         exo.addListener(object : Player.Listener {

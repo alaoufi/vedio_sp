@@ -49,7 +49,11 @@ data class StreamSource(
     val sourceUrl: String,
     val title: String,
     val streamUrl: String,
-    val thumbnailUrl: String? = null
+    val thumbnailUrl: String? = null,
+    /** True when [streamUrl] is an HLS (.m3u8) playlist — e.g. a live stream. */
+    val isHls: Boolean = false,
+    /** True for a live broadcast (no fixed duration). */
+    val isLive: Boolean = false
 )
 
 /** Lightweight search result (used by providers that support search). */

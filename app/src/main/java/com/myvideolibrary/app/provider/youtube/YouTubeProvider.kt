@@ -123,6 +123,25 @@ class YouTubeProvider @Inject constructor(
     private fun resolveStreamViaNewPipe(url: String): StreamSource {
         ensureInitialised()
         val info = StreamInfo.getInfo(ServiceList.YouTube, url)
+
+        // Live broadcasts have no progressive stream — play their HLS manifest instead.
+        val isLive = info.streamType == org.schabi.newpipe.extractor.stream.StreamType.LIVE_STREAM ||
+            info.streamType == org.schabi.newpipe.extractor.stream.StreamType.AUDIO_LIVE_STREAM
+        val hls = info.hlsUrl
+        if ((isLive || !hls.isNullOrBlank()) && !hls.isNullOrBlank() &&
+            info.videoStreams.none { !it.isVideoOnly && !it.content.isNullOrBlank() }
+        ) {
+            return StreamSource(
+                source = VideoSource.YOUTUBE,
+                sourceUrl = url,
+                title = info.name ?: "YouTube live",
+                streamUrl = hls,
+                thumbnailUrl = info.thumbnails.lastOrNull()?.url,
+                isHls = true,
+                isLive = isLive
+            )
+        }
+
         val muxed = info.videoStreams
             .filter { !it.isVideoOnly && !it.content.isNullOrBlank() }
             .maxByOrNull { resolutionValue(it.getResolution()) }
@@ -155,9 +174,10 @@ class YouTubeProvider @Inject constructor(
             }.getOrNull() ?: continue
             val obj = runCatching { gson.fromJson(json, JsonObject::class.java) }.getOrNull()
                 ?: continue
-            // A usable response has at least one video stream.
+            // Usable if it has a progressive stream, or an HLS manifest (live stream).
             val count = obj.get("videoStreams")?.takeIf { it.isJsonArray }?.asJsonArray?.size() ?: 0
-            if (count > 0) return obj
+            val hasHls = !obj.str("hls").isNullOrBlank()
+            if (count > 0 || hasHls) return obj
         }
         return null
     }
@@ -214,7 +234,23 @@ class YouTubeProvider @Inject constructor(
         val root = fetchPiped(id) ?: return null
         val muxed = root.arr("videoStreams")
             .filter { !it.bool("videoOnly") && !it.str("url").isNullOrBlank() }
-            .maxByOrNull { pipedRes(it) } ?: return null
+            .maxByOrNull { pipedRes(it) }
+        if (muxed == null) {
+            // Live stream: Piped exposes an HLS manifest instead of progressive streams.
+            val hls = root.str("hls")
+            if (!hls.isNullOrBlank()) {
+                return StreamSource(
+                    source = VideoSource.YOUTUBE,
+                    sourceUrl = url,
+                    title = root.str("title") ?: "YouTube live",
+                    streamUrl = hls,
+                    thumbnailUrl = root.str("thumbnailUrl"),
+                    isHls = true,
+                    isLive = root.bool("livestream")
+                )
+            }
+            return null
+        }
         return StreamSource(
             source = VideoSource.YOUTUBE,
             sourceUrl = url,
