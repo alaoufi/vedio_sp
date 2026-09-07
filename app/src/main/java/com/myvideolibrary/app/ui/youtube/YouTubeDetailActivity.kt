@@ -9,10 +9,13 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.DefaultLoadControl
+import androidx.media3.exoplayer.ExoPlayer
 import com.bumptech.glide.Glide
 import com.myvideolibrary.app.R
 import com.myvideolibrary.app.databinding.ActivityYoutubeDetailBinding
-import com.myvideolibrary.app.provider.model.ProviderSearchItem
 import com.myvideolibrary.app.provider.model.ProviderVideoDetail
 import com.myvideolibrary.app.ui.player.PlayerActivity
 import com.myvideolibrary.app.ui.provider.DownloadKindDialog
@@ -37,6 +40,11 @@ class YouTubeDetailActivity : AppCompatActivity() {
     private var url: String = ""
     private var descriptionExpanded = false
 
+    /** Inline player state (YouTube-style playback inside this page). */
+    private var player: ExoPlayer? = null
+    private var playerStarted = false
+    private var posterLoaded = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityYoutubeDetailBinding.inflate(layoutInflater)
@@ -46,9 +54,12 @@ class YouTubeDetailActivity : AppCompatActivity() {
         url = intent.getStringExtra(EXTRA_URL).orEmpty()
         val title = intent.getStringExtra(EXTRA_TITLE)
         if (!title.isNullOrBlank()) binding.title.text = title
+        // Show the poster and page immediately (fast transition) — details fill in after.
+        binding.scroll.isVisible = true
+        loadPoster(intent.getStringExtra(EXTRA_THUMB))
 
         relatedAdapter = SearchResultAdapter(
-            onPlay = { item -> start(this, item.url, item.title); finishAfterOpening() },
+            onPlay = { item -> start(this, item.url, item.title, item.thumbnailUrl) },
             onSaveLink = { item -> viewModel.saveLinkItem(item) },
             onDownload = { item, anchor ->
                 DownloadKindDialog.show(anchor) { kind -> viewModel.downloadItem(item, kind) }
@@ -58,8 +69,9 @@ class YouTubeDetailActivity : AppCompatActivity() {
         binding.relatedRecycler.adapter = relatedAdapter
 
         binding.description.setOnClickListener { toggleDescription() }
-        binding.playOverlay.setOnClickListener { playCurrent() }
-        binding.btnPlay.setOnClickListener { playCurrent() }
+        binding.playOverlay.setOnClickListener { startInlinePlayback() }
+        binding.btnPlay.setOnClickListener { startInlinePlayback() }
+        binding.fullscreenButton.setOnClickListener { openFullscreen() }
         binding.btnDownload.setOnClickListener {
             DownloadKindDialog.show(binding.btnDownload) { kind -> viewModel.download(kind) }
         }
@@ -75,9 +87,9 @@ class YouTubeDetailActivity : AppCompatActivity() {
     }
 
     private fun render(state: DetailUiState) {
+        // Only a subtle top spinner while details load; the page is already visible.
         binding.progress.isVisible = state.loading && state.detail == null
         val detail = state.detail
-        binding.scroll.isVisible = detail != null
         binding.errorText.isVisible = state.error != null && detail == null
         state.error?.let { if (detail == null) binding.errorText.text = it }
 
@@ -96,11 +108,9 @@ class YouTubeDetailActivity : AppCompatActivity() {
     private fun bind(detail: ProviderVideoDetail) {
         binding.title.text = detail.title
         binding.meta.text = metaLine(detail)
-        Glide.with(this)
-            .load(detail.thumbnailUrl)
-            .placeholder(R.drawable.ic_video_placeholder)
-            .centerCrop()
-            .into(binding.thumbnail)
+        // Load the detail thumbnail only if we didn't already show one from the intent
+        // (avoids a flash), and never while the inline player is on screen.
+        if (!posterLoaded && !playerStarted) loadPoster(detail.thumbnailUrl)
 
         binding.channelRow.isVisible = !detail.author.isNullOrBlank()
         binding.channelName.text = detail.author.orEmpty()
@@ -148,26 +158,101 @@ class YouTubeDetailActivity : AppCompatActivity() {
         binding.description.maxLines = if (descriptionExpanded) Int.MAX_VALUE else 2
     }
 
-    private fun playCurrent() {
-        val detail = viewModel.state.value.detail
-        val title = detail?.title ?: binding.title.text?.toString().orEmpty()
+    private fun loadPoster(thumbUrl: String?) {
+        if (thumbUrl.isNullOrBlank()) return
+        posterLoaded = true
+        Glide.with(this)
+            .load(thumbUrl)
+            .placeholder(R.drawable.ic_video_placeholder)
+            .centerCrop()
+            .into(binding.thumbnail)
+    }
+
+    /** Starts inline playback in the poster area, like YouTube's mini player. */
+    private fun startInlinePlayback() {
+        if (playerStarted || url.isBlank()) return
+        playerStarted = true
+        binding.playOverlay.isVisible = false
+        binding.playerLoading.isVisible = true
+        lifecycleScope.launch {
+            val streamUrl = viewModel.resolveStreamUrl()
+            if (streamUrl.isNullOrBlank()) {
+                binding.playerLoading.isVisible = false
+                binding.playOverlay.isVisible = true
+                playerStarted = false
+                android.widget.Toast.makeText(
+                    this@YouTubeDetailActivity, R.string.yt_play_failed, android.widget.Toast.LENGTH_SHORT
+                ).show()
+                return@launch
+            }
+            binding.thumbnail.isVisible = false
+            binding.playerView.isVisible = true
+            binding.fullscreenButton.isVisible = true
+            preparePlayer(streamUrl)
+        }
+    }
+
+    private fun preparePlayer(streamUrl: String) {
+        // Start playing after ~0.5s buffered (not the default 2.5s) for a fast start.
+        val loadControl = DefaultLoadControl.Builder()
+            .setBufferDurationsMs(
+                DefaultLoadControl.DEFAULT_MIN_BUFFER_MS,
+                DefaultLoadControl.DEFAULT_MAX_BUFFER_MS,
+                500,
+                1000
+            )
+            .build()
+        val exo = ExoPlayer.Builder(this).setLoadControl(loadControl).build()
+        player = exo
+        binding.playerView.player = exo
+        exo.setMediaItem(MediaItem.fromUri(streamUrl))
+        exo.playWhenReady = true
+        exo.prepare()
+        exo.addListener(object : Player.Listener {
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                binding.playerLoading.isVisible = playbackState == Player.STATE_BUFFERING
+            }
+        })
+    }
+
+    /** Optional enlarge: hand off to the full-screen player. */
+    private fun openFullscreen() {
+        val title = viewModel.state.value.detail?.title ?: binding.title.text?.toString().orEmpty()
         startActivity(PlayerActivity.streamIntent(this, url, title))
     }
 
-    /** After opening another detail page from a related tap, close this one is optional. */
-    private fun finishAfterOpening() { /* keep back-stack: do nothing */ }
+    private fun releasePlayer() {
+        player?.release()
+        player = null
+        binding.playerView.player = null
+        playerStarted = false
+        // Return to the poster state so replay works when coming back.
+        binding.playerView.isVisible = false
+        binding.fullscreenButton.isVisible = false
+        binding.playerLoading.isVisible = false
+        binding.thumbnail.isVisible = true
+        binding.playOverlay.isVisible = true
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // Free the codec when leaving (also when opening full-screen), avoiding two players.
+        releasePlayer()
+    }
 
     companion object {
         private const val EXTRA_URL = "extra_url"
         private const val EXTRA_TITLE = "extra_title"
+        private const val EXTRA_THUMB = "extra_thumb"
 
-        fun intent(context: Context, url: String, title: String?): Intent =
+        fun intent(context: Context, url: String, title: String?, thumbnailUrl: String? = null): Intent =
             Intent(context, YouTubeDetailActivity::class.java)
                 .putExtra(EXTRA_URL, url)
                 .putExtra(EXTRA_TITLE, title)
+                .putExtra(EXTRA_THUMB, thumbnailUrl)
 
-        fun start(context: Context, url: String, title: String?) {
-            context.startActivity(intent(context, url, title))
+        fun start(context: Context, url: String, title: String?, thumbnailUrl: String? = null) {
+            context.startActivity(intent(context, url, title, thumbnailUrl))
         }
     }
 }

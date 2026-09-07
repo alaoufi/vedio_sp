@@ -23,6 +23,8 @@
     <string name="yt_subscribers">%1$s subscribers</string>
     <string name="yt_subscribe">Subscribe</string>
     <string name="yt_subscribed">Subscribed</string>
+    <string name="yt_fullscreen">Fullscreen</string>
+    <string name="yt_play_failed">Couldn\'t play this video</string>
 
     <!-- Library -->
     <string name="library_stats">%1$d videos · %2$s</string>

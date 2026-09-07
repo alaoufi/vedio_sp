@@ -69,6 +69,19 @@ class YouTubeDetailViewModel @Inject constructor(
         load(u)
     }
 
+    /**
+     * Resolves a single directly-playable (muxed) stream URL for inline playback.
+     * Runs the provider's own IO work; returns null if it can't be resolved.
+     */
+    suspend fun resolveStreamUrl(): String? {
+        val u = url ?: return null
+        val provider = providerRegistry.providerForUrl(u) ?: return null
+        return runCatching { provider.resolveStream(u).streamUrl }.getOrNull()
+    }
+
+    /** The URL currently loaded, for handing off to the full-screen player. */
+    fun currentUrl(): String? = url
+
     /** Resolves the current video and enqueues a download. */
     fun download(kind: DownloadKind = DownloadKind.FULL) {
         val u = url ?: return

@@ -23,6 +23,8 @@
     <string name="yt_subscribers">%1$s مشترك</string>
     <string name="yt_subscribe">اشتراك</string>
     <string name="yt_subscribed">مشترك</string>
+    <string name="yt_fullscreen">ملء الشاشة</string>
+    <string name="yt_play_failed">تعذّر تشغيل هذا المقطع</string>
 
     <!-- Library -->
     <string name="library_stats">%1$d فيديو · %2$s</string>

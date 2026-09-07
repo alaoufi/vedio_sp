@@ -43,7 +43,7 @@ class ChannelActivity : AppCompatActivity() {
         channelName?.let { binding.channelName.text = it }
 
         adapter = SearchResultAdapter(
-            onPlay = { item -> YouTubeDetailActivity.start(this, item.url, item.title) },
+            onPlay = { item -> YouTubeDetailActivity.start(this, item.url, item.title, item.thumbnailUrl) },
             onSaveLink = { item -> viewModel.saveLinkItem(item) },
             onDownload = { item, anchor ->
                 DownloadKindDialog.show(anchor) { kind -> viewModel.downloadItem(item, kind) }

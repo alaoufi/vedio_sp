@@ -31,20 +31,38 @@
                 android:orientation="vertical"
                 android:paddingBottom="24dp">
 
-                <!-- Poster with a play affordance. -->
+                <!-- Poster with a play affordance; becomes an inline player on tap. -->
                 <FrameLayout
                     android:id="@+id/posterFrame"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="210dp"
+                    android:background="#000000">
 
                     <ImageView
                         android:id="@+id/thumbnail"
                         android:layout_width="match_parent"
-                        android:layout_height="210dp"
+                        android:layout_height="match_parent"
                         android:background="#20000000"
                         android:contentDescription="@string/cd_thumbnail"
                         android:scaleType="centerCrop"
                         tools:src="@drawable/ic_video_placeholder" />
+
+                    <!-- Inline player (hidden until the user taps play), like YouTube. -->
+                    <androidx.media3.ui.PlayerView
+                        android:id="@+id/playerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="gone"
+                        app:resize_mode="fit"
+                        app:use_controller="true" />
+
+                    <ProgressBar
+                        android:id="@+id/playerLoading"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:indeterminateTint="@android:color/white"
+                        android:visibility="gone" />
 
                     <ImageView
                         android:id="@+id/playOverlay"
@@ -57,6 +75,20 @@
                         android:src="@drawable/ic_play_arrow"
                         app:tint="@android:color/white"
                         android:contentDescription="@string/play" />
+
+                    <!-- Optional enlarge: opens the full-screen player. -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/fullscreenButton"
+                        style="@style/Widget.Material3.Button.IconButton"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="bottom|end"
+                        android:layout_margin="6dp"
+                        android:visibility="gone"
+                        app:icon="@drawable/ic_fullscreen"
+                        app:iconSize="22dp"
+                        app:iconTint="@android:color/white"
+                        android:contentDescription="@string/yt_fullscreen" />
                 </FrameLayout>
 
                 <TextView
