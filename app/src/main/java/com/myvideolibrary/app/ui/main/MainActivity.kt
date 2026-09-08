@@ -948,9 +948,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun promptSetCategory(video: VideoEntity) {
-        // Offer the same categories shown in "Manage categories", in the same
-        // managed order, so the two match.
-        val existing = viewModel.uiState.value.categories
+        // Include hidden categories here so a clip can be assigned to one; the
+        // category still stays hidden from the home view afterwards.
+        val existing = viewModel.allCategories.value
         val labels = existing + getString(R.string.category_none) + getString(R.string.add_category)
         // Pre-select (radio mark) the category this clip currently belongs to,
         // so it's clear which one is active — "Uncategorized" if it has none.
@@ -1531,7 +1531,8 @@ class MainActivity : AppCompatActivity() {
 
     /** Bulk-assign a category to every selected clip. */
     private fun promptSetCategoryForSelection() {
-        val existing = viewModel.uiState.value.categories
+        // Include hidden categories so clips can be assigned into them.
+        val existing = viewModel.allCategories.value
         val labels = existing + getString(R.string.category_none) + getString(R.string.add_category)
         AlertDialog.Builder(this)
             .setTitle(R.string.set_category)

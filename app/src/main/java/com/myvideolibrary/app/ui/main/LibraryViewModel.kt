@@ -226,6 +226,18 @@ class LibraryViewModel @Inject constructor(
         extra.copy(continueOnly = continueOnly, showHidden = showHidden)
     }
 
+    /**
+     * Every category in managed order, INCLUDING hidden ones — for the "assign to
+     * category" pickers, so a clip can be moved into a hidden category (which then
+     * stays hidden from home). The browseable chip list uses the filtered list.
+     */
+    val allCategories: StateFlow<List<String>> = combine(
+        videoRepository.observeCategories(),
+        settingsRepository.observeSettings()
+    ) { present, settings ->
+        com.myvideolibrary.app.util.CategoryOrder.apply(present, settings.categoryOrder)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     /** Distinct tags currently in use, for the tag filter picker. */
     val allTags: StateFlow<List<String>> =
         videoRepository.observeTags()
