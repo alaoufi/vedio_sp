@@ -21,6 +21,14 @@
             android:maxLines="1" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- Simple hide from the home view — no password needed. -->
+    <com.google.android.material.materialswitch.MaterialSwitch
+        android:id="@+id/hideSwitch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/hide_from_home" />
+
     <!-- Protect the section with a password. When on, pick how it behaves. -->
     <com.google.android.material.materialswitch.MaterialSwitch
         android:id="@+id/protectSwitch"

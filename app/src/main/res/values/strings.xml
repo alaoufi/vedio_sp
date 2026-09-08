@@ -486,6 +486,9 @@
     <!-- Category visibility & password protection -->
     <string name="edit_category">Edit category</string>
     <string name="hide_clips">Hide clips from the library</string>
+    <string name="hide_from_home">Hide from home</string>
+    <string name="show_hidden_categories">Show hidden categories</string>
+    <string name="hide_hidden_categories">Hide hidden categories</string>
     <string name="protect_section">Protect with a password</string>
     <string name="protection_mode_label">When protected, show it as:</string>
     <string name="mode_visible">Ask password to open (cover visible)</string>

@@ -72,7 +72,8 @@ class CategoriesViewModel @Inject constructor(
         newName: String,
         mode: CategoryProtectionMode?,
         newPassword: String?,
-        clearPassword: Boolean
+        clearPassword: Boolean,
+        hideFromHome: Boolean = false
     ) = viewModelScope.launch {
         val finalName = newName.trim().ifEmpty { oldName }
         if (finalName != oldName) videoRepository.renameCategory(oldName, finalName)
@@ -95,10 +96,11 @@ class CategoriesViewModel @Inject constructor(
         } else {
             CategorySecurity.removeProtection(pwStr, finalName)
         }
-        // Only "hidden" mode drops the category from the library; keep the legacy
-        // hiddenCategories list in sync so the library query keeps working.
+        // A category is hidden from home if the user turned on the simple "hide"
+        // switch, OR it is password-protected with the "hidden" mode.
         hiddenStr = CategorySecurity.toggleHidden(
-            hiddenStr, finalName, protect && mode == CategoryProtectionMode.HIDDEN
+            hiddenStr, finalName,
+            hideFromHome || (protect && mode == CategoryProtectionMode.HIDDEN)
         )
 
         settingsRepository.update {

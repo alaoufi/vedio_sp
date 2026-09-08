@@ -209,15 +209,22 @@ class LibraryViewModel @Inject constructor(
     private val _tagFilters = MutableStateFlow<Set<String>>(emptySet())
     private val _continueOnly = MutableStateFlow(false)
 
-    /** Merged source + protected + category + type + tags (+ continue), one flow. */
+    /** Session-only: reveal categories the user hid from the home view. */
+    private val _showHidden = MutableStateFlow(false)
+    val showHidden: StateFlow<Boolean> = _showHidden.asStateFlow()
+
+    /** Merged source + protected + category + type + tags (+ continue + showHidden), one flow. */
     private val extraFilters = combine(
         combine(
             _sourceFilters, _protectedMode, _categoryFilters, _mediaTypeFilters, _tagFilters
         ) { sources, protectedMode, categories, mediaTypes, tags ->
             ExtraFilters(sources, protectedMode, categories, mediaTypes, tags)
         },
-        _continueOnly
-    ) { extra, continueOnly -> extra.copy(continueOnly = continueOnly) }
+        _continueOnly,
+        _showHidden
+    ) { extra, continueOnly, showHidden ->
+        extra.copy(continueOnly = continueOnly, showHidden = showHidden)
+    }
 
     /** Distinct tags currently in use, for the tag filter picker. */
     val allTags: StateFlow<List<String>> =
@@ -236,28 +243,45 @@ class LibraryViewModel @Inject constructor(
 
     // Persisted preferences + aggregate stats.
     private val meta = combine(
-        settingsRepository.observeSettings(),
-        folderRepository.observeFolders(),
-        videoRepository.observeCount(),
-        videoRepository.observeTotalSize(),
-        videoRepository.observeCategories()
-    ) { settings, folders, count, size, categories ->
-        val ordered = com.myvideolibrary.app.util.CategoryOrder.apply(categories, settings.categoryOrder)
-        // Hidden and password-protected categories are dropped from the browseable
-        // list so their contents never surface in the general library view.
-        val excluded = excludedCategories(settings)
-        val visible = ordered.filterNot { name ->
+        combine(
+            settingsRepository.observeSettings(),
+            folderRepository.observeFolders(),
+            videoRepository.observeCount(),
+            videoRepository.observeTotalSize(),
+            videoRepository.observeCategories()
+        ) { settings, folders, count, size, categories ->
+            MetaRaw(
+                settings, folders, count, size,
+                com.myvideolibrary.app.util.CategoryOrder.apply(categories, settings.categoryOrder)
+            )
+        },
+        _showHidden
+    ) { raw, showHidden ->
+        // Hidden categories are dropped from the browseable chip list unless the user
+        // chose to reveal them (a password-protected hidden one stays hidden regardless).
+        val excluded = excludedCategories(raw.settings, showHidden)
+        val visible = raw.ordered.filterNot { name ->
             excluded.any { it.equals(name.trim(), ignoreCase = true) }
         }
-        LibraryMeta(settings, folders, count, size, visible)
+        LibraryMeta(raw.settings, raw.folders, raw.count, raw.size, visible)
     }
 
-    /** Names of hidden ∪ password-protected categories, from the settings row. */
-    // Only *hidden* categories are dropped from the library. Password-protected
-    // categories now stay visible but with obscured covers (see protectedCategories),
-    // so they are no longer excluded here.
-    private fun excludedCategories(settings: SettingsEntity): Set<String> =
-        com.myvideolibrary.app.util.CategorySecurity.parseHidden(settings.hiddenCategories)
+    /**
+     * Categories dropped from the home view. Normally every hidden category; when
+     * [showHidden] is on, the simply-hidden ones are revealed but any hidden category
+     * that is ALSO password-protected stays excluded so its contents aren't exposed.
+     */
+    private fun excludedCategories(
+        settings: SettingsEntity,
+        showHidden: Boolean = false
+    ): Set<String> {
+        val hidden = com.myvideolibrary.app.util.CategorySecurity.parseHidden(settings.hiddenCategories)
+        if (!showHidden) return hidden
+        val protected = com.myvideolibrary.app.util.CategorySecurity
+            .protectedNames(settings.categoryPasswords)
+        return hidden.filter { name -> protected.any { it.equals(name.trim(), ignoreCase = true) } }
+            .toSet()
+    }
 
     /** Every protected category name, normalised (trimmed, lower-cased). */
     private fun allProtectedCategories(settings: SettingsEntity): Set<String> =
@@ -332,7 +356,7 @@ class LibraryViewModel @Inject constructor(
                     folderId = folderId,
                     favoritesOnly = favoritesOnly,
                     categories = extra.categories,
-                    excludedCategories = excludedCategories(settings),
+                    excludedCategories = excludedCategories(settings, extra.showHidden),
                     sourceFilters = extra.sourceFilters,
                     protectedOnly = extra.protectedMode,
                     mediaTypes = extra.mediaTypes,
@@ -359,6 +383,10 @@ class LibraryViewModel @Inject constructor(
     }
 
     // ---- Filters ----
+
+    /** Reveal or re-hide the categories the user hid from the home view (session only). */
+    fun setShowHidden(show: Boolean) { _showHidden.value = show }
+    fun toggleShowHidden() { _showHidden.value = !_showHidden.value }
 
     fun setSearch(text: String) { _search.value = text }
 
@@ -547,13 +575,23 @@ class LibraryViewModel @Inject constructor(
         val categories: List<String>
     )
 
+    /** Raw meta before the show-hidden filter is applied to the category list. */
+    private data class MetaRaw(
+        val settings: SettingsEntity,
+        val folders: List<FolderEntity>,
+        val count: Int,
+        val size: Long,
+        val ordered: List<String>
+    )
+
     private data class ExtraFilters(
         val sourceFilters: Set<SourceFilter>,
         val protectedMode: Boolean,
         val categories: Set<String>,
         val mediaTypes: Set<String>,
         val tags: Set<String>,
-        val continueOnly: Boolean = false
+        val continueOnly: Boolean = false,
+        val showHidden: Boolean = false
     )
 
     private data class LibraryFilters(

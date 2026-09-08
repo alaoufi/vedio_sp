@@ -449,6 +449,9 @@
     <!-- إظهار/إخفاء التصنيف وحمايته بكلمة مرور -->
     <string name="edit_category">تعديل التصنيف</string>
     <string name="hide_clips">إخفاء المقاطع من المكتبة</string>
+    <string name="hide_from_home">إخفاء من الرئيسية</string>
+    <string name="show_hidden_categories">عرض التصنيفات المخفية</string>
+    <string name="hide_hidden_categories">إخفاء التصنيفات المخفية</string>
     <string name="protect_section">حماية بكلمة مرور</string>
     <string name="protection_mode_label">عند الحماية، اعرضه كـ:</string>
     <string name="mode_visible">يفتح بكلمة مرور مع عرضه</string>

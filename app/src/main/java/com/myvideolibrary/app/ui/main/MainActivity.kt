@@ -1620,9 +1620,14 @@ class MainActivity : AppCompatActivity() {
         // Search and view-toggle work on both tabs; the rest are library-only.
         for (id in intArrayOf(
             R.id.action_filter, R.id.action_favorites, R.id.action_sort,
-            R.id.action_manage_categories, R.id.action_stats,
+            R.id.action_manage_categories, R.id.action_show_hidden, R.id.action_stats,
             R.id.action_playlists, R.id.action_duplicates
         )) menu.findItem(id)?.isVisible = !youtubeTab
+        // The show/hide-hidden entry reflects the current state.
+        menu.findItem(R.id.action_show_hidden)?.setTitle(
+            if (viewModel.showHidden.value) R.string.hide_hidden_categories
+            else R.string.show_hidden_categories
+        )
         return super.onPrepareOptionsMenu(menu)
     }
 
@@ -1655,6 +1660,11 @@ class MainActivity : AppCompatActivity() {
                 manageCategoriesLauncher.launch(
                     com.myvideolibrary.app.ui.categories.CategoriesActivity.intent(this)
                 )
+                true
+            }
+            R.id.action_show_hidden -> {
+                viewModel.toggleShowHidden()
+                invalidateOptionsMenu() // refresh the entry's title (safe: not typing)
                 true
             }
             R.id.action_stats -> {

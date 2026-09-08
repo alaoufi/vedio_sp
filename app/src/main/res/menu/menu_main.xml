@@ -71,6 +71,12 @@
             android:icon="@drawable/ic_filter_list"
             android:title="@string/manage_categories"
             app:showAsAction="never" />
+
+        <!-- Temporarily reveal categories hidden from the home view. -->
+        <item
+            android:id="@+id/action_show_hidden"
+            android:title="@string/show_hidden_categories"
+            app:showAsAction="never" />
     </group>
 
     <!-- App info & settings -->

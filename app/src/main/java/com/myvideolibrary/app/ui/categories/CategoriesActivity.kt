@@ -187,6 +187,7 @@ class CategoriesActivity : AppCompatActivity() {
         val dialogBinding = DialogEditCategoryBinding.inflate(layoutInflater)
         dialogBinding.nameInput.setText(item.name)
         dialogBinding.nameInput.setSelection(item.name.length)
+        dialogBinding.hideSwitch.isChecked = item.hidden
         dialogBinding.protectSwitch.isChecked = item.hasPassword
         dialogBinding.protectOptions.isVisible = item.hasPassword
         dialogBinding.passwordLayout.hint = getString(
@@ -223,7 +224,8 @@ class CategoriesActivity : AppCompatActivity() {
                 val clearPassword = !protect || needsButMissing
                 val newPassword = if (protect && pw.isNotBlank()) pw else null
                 viewModel.applyEdit(
-                    item.name, newName, if (protect) mode else null, newPassword, clearPassword
+                    item.name, newName, if (protect) mode else null, newPassword, clearPassword,
+                    hideFromHome = dialogBinding.hideSwitch.isChecked
                 )
                 if (needsButMissing) toast(R.string.enter_new_password)
             }
