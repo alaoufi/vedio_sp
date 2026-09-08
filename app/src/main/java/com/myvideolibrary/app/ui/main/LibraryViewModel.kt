@@ -43,6 +43,8 @@ data class LibraryUiState(
     /** Selected category labels; empty means "all categories". */
     val categoryFilters: Set<String> = emptySet(),
     val categories: List<String> = emptyList(),
+    /** Every category incl. hidden — for the assign-to-category pickers. */
+    val allCategories: List<String> = emptyList(),
     /** Selected media types ("video"/"audio"/"image"); empty means all types. */
     val mediaTypeFilters: Set<String> = emptySet(),
     /** When true, the grid is showing in-progress "Continue watching" clips. */
@@ -226,18 +228,6 @@ class LibraryViewModel @Inject constructor(
         extra.copy(continueOnly = continueOnly, showHidden = showHidden)
     }
 
-    /**
-     * Every category in managed order, INCLUDING hidden ones — for the "assign to
-     * category" pickers, so a clip can be moved into a hidden category (which then
-     * stays hidden from home). The browseable chip list uses the filtered list.
-     */
-    val allCategories: StateFlow<List<String>> = combine(
-        videoRepository.observeCategories(),
-        settingsRepository.observeSettings()
-    ) { present, settings ->
-        com.myvideolibrary.app.util.CategoryOrder.apply(present, settings.categoryOrder)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
     /** Distinct tags currently in use, for the tag filter picker. */
     val allTags: StateFlow<List<String>> =
         videoRepository.observeTags()
@@ -275,7 +265,7 @@ class LibraryViewModel @Inject constructor(
         val visible = raw.ordered.filterNot { name ->
             excluded.any { it.equals(name.trim(), ignoreCase = true) }
         }
-        LibraryMeta(raw.settings, raw.folders, raw.count, raw.size, visible)
+        LibraryMeta(raw.settings, raw.folders, raw.count, raw.size, visible, raw.ordered)
     }
 
     /**
@@ -338,6 +328,7 @@ class LibraryViewModel @Inject constructor(
             protectedMode = f.extra.protectedMode,
             categoryFilters = f.extra.categories,
             categories = m.categories,
+            allCategories = m.allCategories,
             mediaTypeFilters = f.extra.mediaTypes,
             continueOnly = f.extra.continueOnly,
             tagFilters = f.extra.tags,
@@ -584,7 +575,9 @@ class LibraryViewModel @Inject constructor(
         val folders: List<FolderEntity>,
         val count: Int,
         val size: Long,
-        val categories: List<String>
+        val categories: List<String>,
+        /** Full list including hidden — for the assign-to-category pickers. */
+        val allCategories: List<String>
     )
 
     /** Raw meta before the show-hidden filter is applied to the category list. */
