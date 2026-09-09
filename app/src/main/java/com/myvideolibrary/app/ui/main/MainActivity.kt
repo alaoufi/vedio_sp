@@ -559,7 +559,8 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 ID_SRC_ALL -> showSourceFilterDialog(state.sourceFilters)
                 ID_TYPE_ALL -> showTypeFilterDialog(state.mediaTypeFilters)
-                ID_CAT_PICK -> showCategoryFilterDialog(state.categories, state.categoryFilters)
+                // Include hidden categories here — picking one reveals its clips.
+                ID_CAT_PICK -> showCategoryFilterDialog(state.allCategories, state.categoryFilters)
                 ID_TAG_PICK -> showTagFilterDialog(viewModel.allTags.value, state.tagFilters)
                 ID_SEARCH_SAVE -> promptSaveSearch()
                 ID_SEARCH_LIST -> showSavedSearchesDialog()

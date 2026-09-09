@@ -359,7 +359,12 @@ class LibraryViewModel @Inject constructor(
                     folderId = folderId,
                     favoritesOnly = favoritesOnly,
                     categories = extra.categories,
-                    excludedCategories = excludedCategories(settings, extra.showHidden),
+                    // Explicitly filtering on a hidden category reveals it — drop any
+                    // selected category from the exclusion set so its clips show.
+                    excludedCategories = excludedCategories(settings, extra.showHidden)
+                        .filterNot { name ->
+                            extra.categories.any { it.equals(name.trim(), ignoreCase = true) }
+                        }.toSet(),
                     sourceFilters = extra.sourceFilters,
                     protectedOnly = extra.protectedMode,
                     mediaTypes = extra.mediaTypes,
