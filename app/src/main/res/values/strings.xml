@@ -560,6 +560,14 @@
     <string name="update_download">Download</string>
     <string name="update_skip">Skip this version</string>
     <string name="later">Later</string>
+    <string name="update_required_title">Update required</string>
+    <string name="update_required_message">A newer version (%1$s) is required to continue. Update now to keep your data.</string>
+    <string name="update_now">Update now</string>
+    <string name="update_download_browser">Download via browser</string>
+    <string name="update_allow_install">Please allow installing apps, then tap \"Update now\" again.</string>
+    <string name="update_downloading">Downloading the update…</string>
+    <string name="update_downloading_pct">Downloading… %1$d%%</string>
+    <string name="update_download_failed">Download failed. Please try again.</string>
     <string name="check_updates">Check for updates</string>
     <string name="check_updates_desc">Look for a newer version</string>
     <string name="checking_updates">Checking…</string>

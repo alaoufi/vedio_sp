@@ -848,26 +848,39 @@ class MainActivity : AppCompatActivity() {
         // Stay quiet until first-launch onboarding is finished.
         val ob = getSharedPreferences("onboarding", MODE_PRIVATE)
         if (!ob.getBoolean("done", false) || ob.getBoolean("guide_pending", false)) return
-        val prefs = getSharedPreferences("updates", MODE_PRIVATE)
-        val now = System.currentTimeMillis()
-        if (now - prefs.getLong("last_check", 0L) < 6 * 60 * 60 * 1000L) return
 
         lifecycleScope.launch {
             val outcome = com.myvideolibrary.app.util.UpdateChecker.checkOutcome(
                 com.myvideolibrary.app.BuildConfig.VERSION_CODE, okHttpClient
             )
-            // A failed check (e.g. a dropped connection) must not suppress retries for
-            // 6h — only stamp the timestamp once we actually reached GitHub.
-            if (outcome is com.myvideolibrary.app.util.UpdateChecker.Outcome.Failed) return@launch
-            prefs.edit().putLong("last_check", now).apply()
+            // A failed check (no internet / API error) must never block the app.
             val result = (outcome as? com.myvideolibrary.app.util.UpdateChecker.Outcome.Available)
                 ?.result ?: return@launch
-            if (prefs.getInt("skip_build", -1) == result.latestBuild) return@launch
             if (isFinishing || isDestroyed) return@launch
-            AlertDialog.Builder(this@MainActivity)
-                .setTitle(R.string.update_available_title)
-                .setMessage(getString(R.string.update_available_message, result.latestVersion))
-                .setPositiveButton(R.string.update_download) { _, _ ->
+            showForcedUpdateDialog(result)
+        }
+    }
+
+    /**
+     * Blocking "update required" gate: a non-cancelable dialog the user can only
+     * pass by updating. "Update now" downloads and installs the APK in-app (over
+     * the current app, preserving data); a browser fallback is offered too.
+     */
+    private fun showForcedUpdateDialog(result: com.myvideolibrary.app.util.UpdateChecker.Result) {
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(R.string.update_required_title)
+            .setMessage(getString(R.string.update_required_message, result.latestVersion))
+            .setCancelable(false)
+            .setPositiveButton(R.string.update_now, null)
+            .setNeutralButton(R.string.update_download_browser, null)
+            .create()
+        // Swallow the back button so the gate can't be dismissed without updating.
+        dialog.setOnKeyListener { _, keyCode, _ -> keyCode == android.view.KeyEvent.KEYCODE_BACK }
+        dialog.setOnShowListener {
+            dialog.getButton(android.content.DialogInterface.BUTTON_POSITIVE)
+                .setOnClickListener { beginInAppUpdate() }
+            dialog.getButton(android.content.DialogInterface.BUTTON_NEUTRAL)
+                .setOnClickListener {
                     runCatching {
                         startActivity(
                             Intent(
@@ -877,11 +890,60 @@ class MainActivity : AppCompatActivity() {
                         )
                     }
                 }
-                .setNeutralButton(R.string.update_skip) { _, _ ->
-                    prefs.edit().putInt("skip_build", result.latestBuild).apply()
+        }
+        dialog.show()
+    }
+
+    /** Downloads the newest APK with a progress bar, then launches the installer. */
+    private fun beginInAppUpdate() {
+        if (!com.myvideolibrary.app.util.ApkUpdateInstaller.canInstall(this)) {
+            com.myvideolibrary.app.util.ApkUpdateInstaller.openUnknownSourcesSettings(this)
+            android.widget.Toast.makeText(this, R.string.update_allow_install, android.widget.Toast.LENGTH_LONG).show()
+            return
+        }
+        val pad = (20 * resources.displayMetrics.density).toInt()
+        val bar = android.widget.ProgressBar(
+            this, null, android.R.attr.progressBarStyleHorizontal
+        ).apply { isIndeterminate = true; max = 100 }
+        val label = android.widget.TextView(this).apply {
+            setText(R.string.update_downloading)
+            setPadding(0, 0, 0, pad / 2)
+        }
+        val container = android.widget.LinearLayout(this).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding(pad, pad, pad, pad)
+            addView(label)
+            addView(bar)
+        }
+        val progress = AlertDialog.Builder(this)
+            .setView(container)
+            .setCancelable(false)
+            .create()
+        progress.setOnKeyListener { _, keyCode, _ -> keyCode == android.view.KeyEvent.KEYCODE_BACK }
+        progress.show()
+
+        lifecycleScope.launch {
+            val file = com.myvideolibrary.app.util.ApkUpdateInstaller.download(
+                this@MainActivity, okHttpClient, com.myvideolibrary.app.util.UpdateChecker.APK_URL
+            ) { pct ->
+                runOnUiThread {
+                    if (pct < 0) {
+                        bar.isIndeterminate = true
+                    } else {
+                        bar.isIndeterminate = false
+                        bar.progress = pct
+                        label.text = getString(R.string.update_downloading_pct, pct)
+                    }
                 }
-                .setNegativeButton(R.string.later, null)
-                .show()
+            }
+            progress.dismiss()
+            if (file == null) {
+                android.widget.Toast.makeText(
+                    this@MainActivity, R.string.update_download_failed, android.widget.Toast.LENGTH_LONG
+                ).show()
+                return@launch
+            }
+            com.myvideolibrary.app.util.ApkUpdateInstaller.install(this@MainActivity, file)
         }
     }
 

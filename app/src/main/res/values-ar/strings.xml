@@ -523,6 +523,14 @@
     <string name="update_download">تنزيل</string>
     <string name="update_skip">تخطّي هذا الإصدار</string>
     <string name="later">لاحقًا</string>
+    <string name="update_required_title">التحديث مطلوب</string>
+    <string name="update_required_message">يلزم إصدار أحدث (%1$s) للمتابعة. حدِّث الآن مع الحفاظ على بياناتك.</string>
+    <string name="update_now">تحديث الآن</string>
+    <string name="update_download_browser">تنزيل عبر المتصفح</string>
+    <string name="update_allow_install">فضلًا اسمح بتثبيت التطبيقات ثم اضغط «تحديث الآن» مجددًا.</string>
+    <string name="update_downloading">جارٍ تنزيل التحديث…</string>
+    <string name="update_downloading_pct">جارٍ التنزيل… %1$d%%</string>
+    <string name="update_download_failed">فشل التنزيل. حاول مرة أخرى.</string>
     <string name="check_updates">التحقق من التحديثات</string>
     <string name="check_updates_desc">ابحث عن إصدار أحدث</string>
     <string name="checking_updates">جارٍ التحقق…</string>

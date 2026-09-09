@@ -5,4 +5,6 @@
     <!-- Downloaded/imported videos, for the per-video Share action. -->
     <files-path name="videos" path="videos/" />
     <files-path name="downloads" path="downloads/" />
+    <!-- The downloaded APK update, handed to the system installer. -->
+    <cache-path name="updates" path="updates/" />
 </paths>
