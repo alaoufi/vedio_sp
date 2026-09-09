@@ -528,6 +528,7 @@
     <string name="update_now">تحديث الآن</string>
     <string name="update_download_browser">تنزيل عبر المتصفح</string>
     <string name="update_allow_install">فضلًا اسمح بتثبيت التطبيقات ثم اضغط «تحديث الآن» مجددًا.</string>
+    <string name="update_backing_up">جارٍ أخذ نسخة احتياطية لبياناتك…</string>
     <string name="update_downloading">جارٍ تنزيل التحديث…</string>
     <string name="update_downloading_pct">جارٍ التنزيل… %1$d%%</string>
     <string name="update_download_failed">فشل التنزيل. حاول مرة أخرى.</string>

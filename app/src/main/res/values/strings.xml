@@ -565,6 +565,7 @@
     <string name="update_now">Update now</string>
     <string name="update_download_browser">Download via browser</string>
     <string name="update_allow_install">Please allow installing apps, then tap \"Update now\" again.</string>
+    <string name="update_backing_up">Backing up your data…</string>
     <string name="update_downloading">Downloading the update…</string>
     <string name="update_downloading_pct">Downloading… %1$d%%</string>
     <string name="update_download_failed">Download failed. Please try again.</string>

@@ -923,6 +923,14 @@ class MainActivity : AppCompatActivity() {
         progress.show()
 
         lifecycleScope.launch {
+            // Safety net: take a backup before updating (when auto-backup is set up),
+            // so the user can always restore even though updates preserve data.
+            if (autoBackupManager.isEnabled) {
+                bar.isIndeterminate = true
+                label.setText(R.string.update_backing_up)
+                autoBackupManager.backupNow()
+            }
+            label.setText(R.string.update_downloading)
             val file = com.myvideolibrary.app.util.ApkUpdateInstaller.download(
                 this@MainActivity, okHttpClient, com.myvideolibrary.app.util.UpdateChecker.APK_URL
             ) { pct ->
