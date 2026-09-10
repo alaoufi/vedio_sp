@@ -19,6 +19,9 @@ object UpdateChecker {
 
     private const val RELEASE_API =
         "https://api.github.com/repos/alaoufi/vedio_sp/releases/tags/apk-latest"
+    /** Authoritative version source: a tiny JSON asset rewritten on every build. */
+    private const val VERSION_JSON_URL =
+        "https://github.com/alaoufi/vedio_sp/releases/download/apk-latest/version.json"
     /** Stable direct link to the newest APK. */
     const val APK_URL =
         "https://github.com/alaoufi/vedio_sp/releases/download/apk-latest/vedio_lb.apk"
@@ -55,27 +58,52 @@ object UpdateChecker {
      */
     suspend fun checkOutcome(currentBuild: Int, client: OkHttpClient): Outcome =
         withContext(Dispatchers.IO) {
-            runCatching {
-                val request = Request.Builder()
-                    .url(RELEASE_API)
-                    .header("Accept", "application/vnd.github+json")
-                    .header("User-Agent", "VideoLibrary")
-                    .build()
-                val body = client.newCall(request).execute().use { resp ->
-                    if (!resp.isSuccessful) return@runCatching Outcome.Failed
-                    resp.body?.string()
-                } ?: return@runCatching Outcome.Failed
-
-                val root = JsonParser.parseString(body).asJsonObject
-                val name = root.get("name")?.takeIf { !it.isJsonNull }?.asString.orEmpty()
-                val latest = VERSION_RE.find(name)?.groupValues?.get(1)?.toIntOrNull()
-                    ?: return@runCatching Outcome.Failed
-
-                if (latest > currentBuild) {
-                    Outcome.Available(Result(latest, "1.0.$latest"))
-                } else {
-                    Outcome.UpToDate
-                }
-            }.getOrDefault(Outcome.Failed)
+            // Primary: the version.json asset (rewritten on every build, so it never
+            // lags behind the way a release *name* can). Fallback: the Releases API,
+            // reading the build number out of the release name. Two independent
+            // sources so a hiccup in one doesn't hide a real update.
+            latestBuildFromVersionJson(client)?.let { latest ->
+                return@withContext verdict(latest, currentBuild)
+            }
+            latestBuildFromReleaseApi(client)?.let { latest ->
+                return@withContext verdict(latest, currentBuild)
+            }
+            Outcome.Failed
         }
+
+    private fun verdict(latest: Int, currentBuild: Int): Outcome =
+        if (latest > currentBuild) Outcome.Available(Result(latest, "1.0.$latest"))
+        else Outcome.UpToDate
+
+    /** Reads the "build" number from the direct version.json asset; null on failure. */
+    private fun latestBuildFromVersionJson(client: OkHttpClient): Int? = runCatching {
+        val request = Request.Builder()
+            .url(VERSION_JSON_URL)
+            .header("User-Agent", "VideoLibrary")
+            .build()
+        val body = client.newCall(request).execute().use { resp ->
+            if (!resp.isSuccessful) return null
+            resp.body?.string()
+        } ?: return null
+        val root = JsonParser.parseString(body).asJsonObject
+        root.get("build")?.takeIf { !it.isJsonNull }?.asInt
+            ?: root.get("version")?.takeIf { !it.isJsonNull }?.asString
+                ?.let { VERSION_RE.find(it)?.groupValues?.get(1)?.toIntOrNull() }
+    }.getOrNull()
+
+    /** Reads the build number from the release NAME via the GitHub API; null on failure. */
+    private fun latestBuildFromReleaseApi(client: OkHttpClient): Int? = runCatching {
+        val request = Request.Builder()
+            .url(RELEASE_API)
+            .header("Accept", "application/vnd.github+json")
+            .header("User-Agent", "VideoLibrary")
+            .build()
+        val body = client.newCall(request).execute().use { resp ->
+            if (!resp.isSuccessful) return null
+            resp.body?.string()
+        } ?: return null
+        val root = JsonParser.parseString(body).asJsonObject
+        val name = root.get("name")?.takeIf { !it.isJsonNull }?.asString.orEmpty()
+        VERSION_RE.find(name)?.groupValues?.get(1)?.toIntOrNull()
+    }.getOrNull()
 }

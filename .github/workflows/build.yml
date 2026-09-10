@@ -54,6 +54,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Write version.json (authoritative version source for the updater)
+        if: success()
+        run: |
+          echo '{"version":"1.0.${{ github.run_number }}","build":${{ github.run_number }},"url":"https://github.com/${{ github.repository }}/releases/download/apk-latest/vedio_lb.apk"}' > version.json
+
       - name: Publish APK to a Release (direct link)
         if: success()
         uses: softprops/action-gh-release@v2
@@ -63,4 +68,6 @@ jobs:
           body: |
             Version 1.0.${{ github.run_number }} (debug), rebuilt automatically on each push.
             Direct link: https://github.com/${{ github.repository }}/releases/download/apk-latest/vedio_lb.apk
-          files: app/build/outputs/apk/debug/*.apk
+          files: |
+            app/build/outputs/apk/debug/*.apk
+            version.json
