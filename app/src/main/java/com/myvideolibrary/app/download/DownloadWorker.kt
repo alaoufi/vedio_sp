@@ -677,30 +677,38 @@ class DownloadWorker @AssistedInject constructor(
             else -> com.myvideolibrary.app.data.model.MediaType.VIDEO
         }
 
+        // An image saved to the default .mp4 destination would be shared as a broken
+        // video (WhatsApp: "couldn't send"). Give it the real extension for its bytes.
+        val file = if (mediaType == com.myvideolibrary.app.data.model.MediaType.IMAGE) {
+            ensureImageExtension(destFile)
+        } else {
+            destFile
+        }
+
         val meta = if (mediaType == com.myvideolibrary.app.data.model.MediaType.IMAGE) null
-        else thumbnailGenerator.readMetadata(destFile.absolutePath)
+        else thumbnailGenerator.readMetadata(file.absolutePath)
         val thumb = when (mediaType) {
             // The image is its own thumbnail; audio has no frame → use the cover.
-            com.myvideolibrary.app.data.model.MediaType.IMAGE -> destFile.absolutePath
+            com.myvideolibrary.app.data.model.MediaType.IMAGE -> file.absolutePath
             com.myvideolibrary.app.data.model.MediaType.AUDIO -> download?.thumbnailUrl
-            else -> thumbnailGenerator.generateThumbnail(destFile.absolutePath) ?: download?.thumbnailUrl
+            else -> thumbnailGenerator.generateThumbnail(file.absolutePath) ?: download?.thumbnailUrl
         }
 
         val videoId = videoRepository.addVideo(
             VideoEntity(
                 title = title,
                 thumbnailPath = thumb,
-                localPath = destFile.absolutePath,
+                localPath = file.absolutePath,
                 source = download?.source ?: "other",
                 mediaType = mediaType.id,
                 sourceUrl = download?.sourceUrl,
                 duration = meta?.durationMs ?: 0,
-                fileSize = destFile.length(),
+                fileSize = file.length(),
                 quality = meta?.qualityLabel,
                 width = meta?.width ?: 0,
                 height = meta?.height ?: 0,
                 createdDate = System.currentTimeMillis(),
-                contentHash = "${destFile.length()}_${meta?.durationMs ?: 0}"
+                contentHash = "${file.length()}_${meta?.durationMs ?: 0}"
             )
         )
         download?.let {
@@ -709,7 +717,7 @@ class DownloadWorker @AssistedInject constructor(
                     videoId = videoId,
                     status = DownloadStatus.COMPLETED.id,
                     progress = 100,
-                    destPath = destFile.absolutePath,
+                    destPath = file.absolutePath,
                     errorMessage = null
                 )
             )
@@ -719,9 +727,36 @@ class DownloadWorker @AssistedInject constructor(
         // in their gallery / file manager. Best-effort: never fail the download.
         val saveTree = settingsRepository.getSettings().storagePath
         if (!saveTree.isNullOrBlank()) {
-            withContext(Dispatchers.IO) { copyToUserFolder(destFile, saveTree, title) }
+            withContext(Dispatchers.IO) { copyToUserFolder(file, saveTree, title) }
         }
     }
+
+    /**
+     * Renames [file] to carry the correct image extension detected from its first
+     * bytes (magic numbers), so downstream MIME detection (share/open) is right —
+     * e.g. a TikTok photo saved as ".mp4" becomes ".jpg". Returns the (possibly
+     * renamed) file; leaves it untouched if the type can't be detected.
+     */
+    private fun ensureImageExtension(file: File): File {
+        val ext = detectImageExtension(file) ?: return file
+        if (file.extension.equals(ext, ignoreCase = true)) return file
+        val renamed = File(file.parentFile, file.nameWithoutExtension + "." + ext)
+        return if (file.renameTo(renamed)) renamed else file
+    }
+
+    private fun detectImageExtension(file: File): String? = runCatching {
+        val h = ByteArray(12)
+        val n = file.inputStream().use { it.read(h) }
+        fun b(i: Int, v: Int) = i < n && h[i] == v.toByte()
+        when {
+            b(0, 0xFF) && b(1, 0xD8) && b(2, 0xFF) -> "jpg"
+            b(0, 0x89) && b(1, 0x50) && b(2, 0x4E) && b(3, 0x47) -> "png"
+            b(0, 0x52) && b(1, 0x49) && b(2, 0x46) && b(3, 0x46) &&
+                b(8, 0x57) && b(9, 0x45) && b(10, 0x42) && b(11, 0x50) -> "webp"
+            b(0, 0x47) && b(1, 0x49) && b(2, 0x46) -> "gif"
+            else -> null
+        }
+    }.getOrNull()
 
     private fun copyToUserFolder(source: File, treeUriString: String, title: String) {
         runCatching {
@@ -730,11 +765,12 @@ class DownloadWorker @AssistedInject constructor(
             ) ?: return
             if (!tree.canWrite()) return
             val ext = source.extension.ifEmpty { "mp4" }
-            val mime = when (ext) {
-                "m4a" -> "audio/mp4"
-                "jpg", "jpeg" -> "image/jpeg"
-                else -> "video/mp4"
-            }
+            val mime = android.webkit.MimeTypeMap.getSingleton()
+                .getMimeTypeFromExtension(ext.lowercase())
+                ?: when (ext.lowercase()) {
+                    "m4a" -> "audio/mp4"
+                    else -> "video/mp4"
+                }
             val safeName = title.replace(Regex("[^\\p{L}\\p{N} ._-]"), "_")
                 .take(80).trim().ifEmpty { "video" } + ".$ext"
             // Skip if a copy with this name already exists.
