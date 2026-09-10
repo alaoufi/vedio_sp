@@ -52,6 +52,31 @@ object SlideshowEncoder {
         onProgress: (Int) -> Unit = {}
     ): String? {
         if (frames.isEmpty()) return "no images"
+        // Try each capable encoder in turn (hardware, then software, then the
+        // platform default). A single flaky encoder was the main reason a photo
+        // post fell back to a still image on many devices — this makes the video
+        // build succeed far more often.
+        var lastError: String? = null
+        for (name in candidateEncoderNames()) {
+            output.delete()
+            val err = runCatching {
+                encodeWith(name, frames, audio, output, perImageMs, stage, onProgress)
+            }.getOrElse { "${it.javaClass.simpleName}: ${it.message}" }
+            if (err == null) return null
+            lastError = err
+        }
+        return lastError ?: "no usable encoder"
+    }
+
+    private fun encodeWith(
+        encoderName0: String?,
+        frames: List<File>,
+        audio: File?,
+        output: File,
+        perImageMs: Long,
+        stage: java.util.concurrent.atomic.AtomicReference<String>?,
+        onProgress: (Int) -> Unit
+    ): String? {
         // Each picture is shown for this long, controlled purely by timestamps.
         // For a single-picture post this is stretched to the music length below.
         var perImageUs = perImageMs * 1000L
@@ -72,8 +97,9 @@ object SlideshowEncoder {
                 setInteger(MediaFormat.KEY_FRAME_RATE, FPS)
                 setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1)
             }
-            encoder = createAvcEncoder()
-            encoderName = runCatching { encoder!!.name }.getOrDefault("?")
+            encoder = if (encoderName0 != null) MediaCodec.createByCodecName(encoderName0)
+            else MediaCodec.createEncoderByType(MIME)
+            encoderName = runCatching { encoder!!.name }.getOrDefault(encoderName0 ?: "?")
             stage?.set("configure($encoderName)")
             encoder!!.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
             stage?.set("starting($encoderName)")
@@ -230,13 +256,12 @@ object SlideshowEncoder {
     }
 
     /**
-     * Picks an AVC encoder that accepts flexible YUV. Prefers the device's
-     * HARDWARE encoder — on many phones the bundled software AVC encoder
-     * (c2.android.avc.encoder) stalls and never produces output, which looked
-     * like a "timed out" hang. Falls back to a software one, then to the
-     * platform default.
+     * AVC encoders to try, in order: the device HARDWARE encoder first (the bundled
+     * software one stalls on some phones), then a software one, then the platform
+     * default (null = createEncoderByType). Each is attempted until one produces a
+     * video, so a single flaky encoder never forces a still-image fallback.
      */
-    private fun createAvcEncoder(): MediaCodec {
+    private fun candidateEncoderNames(): List<String?> {
         val flexible = MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible
         val infos = MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos
 
@@ -253,9 +278,13 @@ object SlideshowEncoder {
                 }.getOrDefault(false)
         }?.name
 
-        val name = candidate(wantSoftware = false) ?: candidate(wantSoftware = true)
-        return if (name != null) MediaCodec.createByCodecName(name)
-        else MediaCodec.createEncoderByType(MIME)
+        val hardware = candidate(wantSoftware = false)
+        val software = candidate(wantSoftware = true)
+        val ordered = ArrayList<String?>()
+        hardware?.let { ordered.add(it) }
+        software?.let { if (it != hardware) ordered.add(it) }
+        ordered.add(null) // platform default, last resort
+        return ordered
     }
 
     /** Converts an ARGB bitmap to packed I420 YUV once (BT.601), reused per frame. */
