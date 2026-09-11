@@ -14,16 +14,25 @@ object AudioPrefs {
     private const val KEY_BOOST = "default_boost"
     private const val KEY_EFFECT = "default_effect"
 
+    /**
+     * Safe upper bound for the volume boost. Kept low so amplification never clips
+     * hard enough to distort or, over time, stress the phone's tiny speaker. Any
+     * higher value saved by an older build is clamped down to this on read.
+     */
+    const val MAX_BOOST = 150
+
     private fun prefs(context: Context) =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
     /** Default boost percentage (100 = normal). */
     fun boost(context: Context): Int =
         runCatching { prefs(context).getInt(KEY_BOOST, 100) }.getOrDefault(100)
-            .coerceIn(100, 500)
+            .coerceIn(100, MAX_BOOST)
 
     fun setBoost(context: Context, percent: Int) {
-        runCatching { prefs(context).edit().putInt(KEY_BOOST, percent.coerceIn(100, 500)).apply() }
+        runCatching {
+            prefs(context).edit().putInt(KEY_BOOST, percent.coerceIn(100, MAX_BOOST)).apply()
+        }
     }
 
     /** Default effect preset name (one of PlayerAudioEffects.Preset). */

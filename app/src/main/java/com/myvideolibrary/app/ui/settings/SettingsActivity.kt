@@ -231,9 +231,10 @@ class SettingsActivity : AppCompatActivity() {
         }
         container.addView(valueLabel)
 
+        val boostRange = com.myvideolibrary.app.util.AudioPrefs.MAX_BOOST - 100
         val slider = android.widget.SeekBar(this).apply {
-            max = 400
-            progress = (boost - 100).coerceIn(0, 400)
+            max = boostRange
+            progress = (boost - 100).coerceIn(0, boostRange)
             setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(sb: android.widget.SeekBar, value: Int, fromUser: Boolean) {
                     boost = 100 + (value / 10) * 10

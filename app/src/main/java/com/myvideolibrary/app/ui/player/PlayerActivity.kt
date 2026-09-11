@@ -76,7 +76,7 @@ class PlayerActivity : AppCompatActivity() {
     // Real volume boost (PCM gain, can exceed 100%) + optional audio effects.
     private val gainProcessor = com.myvideolibrary.app.util.GainAudioProcessor()
     private var audioEffects: com.myvideolibrary.app.util.PlayerAudioEffects? = null
-    /** Boost as a percentage: 100 = normal, up to 500%. Kept across clips this session. */
+    /** Boost as a percentage: 100 = normal, up to a safe ceiling. Kept across clips this session. */
     private var boostPercent = 100
     private var effectPreset = com.myvideolibrary.app.util.PlayerAudioEffects.Preset.NONE
     /** Whether the current player was built with the custom (boost/effects) audio sink. */
@@ -638,7 +638,7 @@ class PlayerActivity : AppCompatActivity() {
         binding.speedButton.text = getString(R.string.speed_format, speeds[speedIndex])
     }
 
-    /** Volume-boost + audio-effects sheet: a slider (100–500%) and effect presets. */
+    /** Volume-boost + audio-effects sheet: a slider (100% up to a safe ceiling) and effect presets. */
     private fun showBoostDialog() {
         val density = resources.displayMetrics.density
         val pad = (20 * density).toInt()
@@ -653,10 +653,11 @@ class PlayerActivity : AppCompatActivity() {
         }
         container.addView(valueLabel)
 
-        // 0..400 maps to 100%..500% in 10% steps.
+        // Maps 0..(MAX_BOOST-100) to 100%..MAX_BOOST% in 10% steps (safe ceiling).
+        val boostRange = com.myvideolibrary.app.util.AudioPrefs.MAX_BOOST - 100
         val slider = android.widget.SeekBar(this).apply {
-            max = 400
-            progress = (boostPercent - 100).coerceIn(0, 400)
+            max = boostRange
+            progress = (boostPercent - 100).coerceIn(0, boostRange)
             setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(sb: android.widget.SeekBar, value: Int, fromUser: Boolean) {
                     val pct = 100 + (value / 10) * 10
