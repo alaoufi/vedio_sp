@@ -569,6 +569,8 @@
     <string name="update_downloading">Downloading the update…</string>
     <string name="update_downloading_pct">Downloading… %1$d%%</string>
     <string name="update_download_failed">Download failed. Please try again.</string>
+    <string name="update_open_settings">Open settings</string>
+    <string name="update_retry">Retry</string>
     <string name="check_updates">Check for updates</string>
     <string name="check_updates_desc">Look for a newer version</string>
     <string name="checking_updates">Checking…</string>

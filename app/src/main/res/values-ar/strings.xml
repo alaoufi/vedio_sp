@@ -532,6 +532,8 @@
     <string name="update_downloading">جارٍ تنزيل التحديث…</string>
     <string name="update_downloading_pct">جارٍ التنزيل… %1$d%%</string>
     <string name="update_download_failed">فشل التنزيل. حاول مرة أخرى.</string>
+    <string name="update_open_settings">فتح الإعدادات</string>
+    <string name="update_retry">إعادة المحاولة</string>
     <string name="check_updates">التحقق من التحديثات</string>
     <string name="check_updates_desc">ابحث عن إصدار أحدث</string>
     <string name="checking_updates">جارٍ التحقق…</string>
