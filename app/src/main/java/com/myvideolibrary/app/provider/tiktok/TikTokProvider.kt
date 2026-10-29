@@ -9,6 +9,10 @@ import com.myvideolibrary.app.provider.model.ProviderException
 import com.myvideolibrary.app.provider.model.ProviderSearchItem
 import com.myvideolibrary.app.provider.model.ResolvedVideo
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -55,6 +59,7 @@ class TikTokProvider @Inject constructor(
         outer@ for (target in candidates) {
             for (base in RESOLVER_BASES) {
                 val result = runCatching { fetchResolve(target, base) }
+                (result.exceptionOrNull() as? CancellationException)?.let { throw it }
                 val obj = result.getOrNull()
                 if (obj != null) {
                     val code = obj.get("code")?.takeIf { !it.isJsonNull }?.asInt ?: -1
@@ -154,14 +159,11 @@ class TikTokProvider @Inject constructor(
                     URLEncoder.encode(q, "UTF-8")
                 val request = Request.Builder().url(api).header("User-Agent", UA).build()
                 val body = try {
-                    client.newCall(request).execute().use { resp ->
-                        if (!resp.isSuccessful) return@use null
-                        resp.body?.string()
-                    }
-                } catch (e: IOException) {
-                    if (out.isEmpty()) throw ProviderException(ProviderErrorType.NETWORK, "Network error", e)
+                    fetchApiBody(request)
+                } catch (e: ProviderException) {
+                    if (out.isEmpty()) throw e
                     break
-                } ?: break
+                }
 
                 val root = runCatching { gson.fromJson(body, JsonObject::class.java) }.getOrNull() ?: break
                 if ((root.get("code")?.takeIf { !it.isJsonNull }?.asInt ?: -1) != 0) break
@@ -202,21 +204,40 @@ class TikTokProvider @Inject constructor(
     }
 
     /** Fetches and parses the tikwm resolve response, or throws a typed error. */
-    private fun fetchResolve(target: String, base: String = RESOLVER_BASE): JsonObject {
+    private suspend fun fetchResolve(target: String, base: String = RESOLVER_BASE): JsonObject {
         val api = "$base/api/?hd=1&url=" + URLEncoder.encode(target, "UTF-8")
         val request = Request.Builder().url(api).header("User-Agent", UA).build()
-        val body = try {
+        repeat(3) { attempt ->
+            val body = fetchApiBody(request)
+            val obj = runCatching { gson.fromJson(body, JsonObject::class.java) }.getOrNull()
+                ?: throw ProviderException(ProviderErrorType.EXTRACTION_FAILED, "Bad response")
+            val message = obj.str("msg").orEmpty()
+            val rateLimited = message.contains("request/second", ignoreCase = true) ||
+                message.contains("rate limit", ignoreCase = true) ||
+                message.contains("too many requests", ignoreCase = true)
+            // A 200 response can still report the shared free-tier quota. The
+            // next request waits at the same global gate rather than immediately
+            // switching hostname and consuming all URL candidates in one burst.
+            if (obj.num("code") == 0L || !rateLimited || attempt == 2) return obj
+        }
+        throw ProviderException(ProviderErrorType.EXTRACTION_FAILED, "Resolver busy")
+    }
+
+    private suspend fun fetchApiBody(request: Request): String = resolverGate.withLock {
+        nextResolverRequestNanos?.let { next ->
+            val remaining = next - System.nanoTime()
+            if (remaining > 0) delay((remaining + 999_999L) / 1_000_000L)
+        }
+        nextResolverRequestNanos = System.nanoTime() + 1_200_000_000L
+        try {
             client.newCall(request).execute().use { resp ->
-                if (!resp.isSuccessful) {
-                    throw ProviderException(ProviderErrorType.NETWORK, "HTTP ${resp.code}")
-                }
+                if (!resp.isSuccessful) throw ProviderException(ProviderErrorType.NETWORK, "HTTP ${resp.code}")
                 resp.body?.string()
+                    ?: throw ProviderException(ProviderErrorType.EXTRACTION_FAILED, "Empty response")
             }
         } catch (e: IOException) {
             throw ProviderException(ProviderErrorType.NETWORK, "Network error", e)
-        } ?: throw ProviderException(ProviderErrorType.EXTRACTION_FAILED, "Empty response")
-        return runCatching { gson.fromJson(body, JsonObject::class.java) }.getOrNull()
-            ?: throw ProviderException(ProviderErrorType.EXTRACTION_FAILED, "Bad response")
+        }
     }
 
     /** Expands a vt./vm.tiktok.com short link to its canonical URL via redirects. */
@@ -290,6 +311,9 @@ class TikTokProvider @Inject constructor(
         (firstImage() ?: str("origin_cover") ?: str("cover"))?.let { absolutize(it) }
 
     companion object {
+        // Both host aliases and search/resolve calls share one upstream quota.
+        private val resolverGate = Mutex()
+        private var nextResolverRequestNanos: Long? = null
         private const val RESOLVER_BASE = "https://www.tikwm.com"
         /** Resolver hosts tried in order; rotating recovers per-host rate limits. */
         private val RESOLVER_BASES = listOf("https://www.tikwm.com", "https://tikwm.com")
