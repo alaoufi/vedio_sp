@@ -35,7 +35,11 @@ object OpenGraphResolver {
         if (page.directVideoUrl != null) {
             return ResolvedVideo(source, url, fallbackTitle, page.directVideoUrl)
         }
-        val html = page.html
+        return resolvePage(page.html, url, source, fallbackTitle)
+    }
+
+    /** Parses a page already fetched by a provider, without a second request. */
+    fun resolvePage(html: String, url: String, source: VideoSource, fallbackTitle: String): ResolvedVideo {
 
         val video = meta(html, "og:video:secure_url")
             ?: meta(html, "og:video:url")
