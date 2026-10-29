@@ -16,6 +16,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.io.IOException
 import java.net.URLEncoder
 import javax.inject.Inject
@@ -39,9 +40,9 @@ class TikTokProvider @Inject constructor(
     override val source: VideoSource = VideoSource.TIKTOK
 
     override fun canHandle(url: String): Boolean =
-        url.lowercase().let {
-            it.contains("tiktok.com") || it.contains("vm.tiktok") || it.contains("vt.tiktok")
-        }
+        url.toHttpUrlOrNull()?.host?.let {
+            it == "tiktok.com" || it.endsWith(".tiktok.com")
+        } ?: false
 
     override suspend fun resolve(url: String): ResolvedVideo = withContext(Dispatchers.IO) {
         if (!canHandle(url)) {

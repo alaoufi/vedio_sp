@@ -31,7 +31,11 @@ object OpenGraphResolver {
         source: VideoSource,
         fallbackTitle: String
     ): ResolvedVideo {
-        val html = fetch(client, url)
+        val page = fetch(client, url)
+        if (page.directVideoUrl != null) {
+            return ResolvedVideo(source, url, fallbackTitle, page.directVideoUrl)
+        }
+        val html = page.html
 
         val video = meta(html, "og:video:secure_url")
             ?: meta(html, "og:video:url")
@@ -59,7 +63,9 @@ object OpenGraphResolver {
         )
     }
 
-    private fun fetch(client: OkHttpClient, url: String): String {
+    private data class Page(val html: String = "", val directVideoUrl: String? = null)
+
+    private fun fetch(client: OkHttpClient, url: String): Page {
         val request = Request.Builder()
             .url(url)
             .header("User-Agent", UA)
@@ -73,8 +79,14 @@ object OpenGraphResolver {
                 if (!resp.isSuccessful) {
                     throw ProviderException(ProviderErrorType.NETWORK, "HTTP ${resp.code}")
                 }
-                return resp.body?.string()
+                val body = resp.body
                     ?: throw ProviderException(ProviderErrorType.EXTRACTION_FAILED, "Empty page")
+                // A short share URL can redirect straight to the video CDN.
+                // Never load the binary video into a String to parse as HTML.
+                if (body.contentType()?.type.equals("video", ignoreCase = true)) {
+                    return Page(directVideoUrl = resp.request.url.toString())
+                }
+                return Page(html = body.string())
             }
         } catch (e: IOException) {
             throw ProviderException(ProviderErrorType.NETWORK, "Network error", e)

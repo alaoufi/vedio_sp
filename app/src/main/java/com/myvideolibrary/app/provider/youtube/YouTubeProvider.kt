@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.schabi.newpipe.extractor.MediaFormat
 import org.schabi.newpipe.extractor.NewPipe
 import org.schabi.newpipe.extractor.ServiceList
@@ -41,13 +42,7 @@ class YouTubeProvider @Inject constructor(
 
     override val source: VideoSource = VideoSource.YOUTUBE
 
-    override fun canHandle(url: String): Boolean {
-        val u = url.lowercase()
-        return u.contains("youtube.com/watch") ||
-            u.contains("youtu.be/") ||
-            u.contains("youtube.com/shorts/") ||
-            u.contains("m.youtube.com")
-    }
+    override fun canHandle(url: String): Boolean = videoId(url) != null
 
     override suspend fun resolve(url: String): ResolvedVideo = withContext(Dispatchers.IO) {
         // Primary: NewPipe (best quality when it works).
@@ -74,7 +69,7 @@ class YouTubeProvider @Inject constructor(
 
     private fun resolveViaNewPipe(url: String): ResolvedVideo {
         ensureInitialised()
-        val info = StreamInfo.getInfo(ServiceList.YouTube, url)
+        val info = StreamInfo.getInfo(ServiceList.YouTube, canonicalVideoUrl(url))
 
         val bestMuxed = info.videoStreams
             .filter { !it.isVideoOnly && !it.content.isNullOrBlank() }
@@ -122,7 +117,7 @@ class YouTubeProvider @Inject constructor(
 
     private fun resolveStreamViaNewPipe(url: String): StreamSource {
         ensureInitialised()
-        val info = StreamInfo.getInfo(ServiceList.YouTube, url)
+        val info = StreamInfo.getInfo(ServiceList.YouTube, canonicalVideoUrl(url))
 
         // Live broadcasts have no progressive stream — play their HLS manifest instead.
         val isLive = info.streamType == org.schabi.newpipe.extractor.stream.StreamType.LIVE_STREAM ||
@@ -589,15 +584,26 @@ class YouTubeProvider @Inject constructor(
 
     /** Extracts the 11-char video id from any YouTube URL form. */
     private fun videoId(url: String): String? {
-        val patterns = listOf(
-            Regex("""youtu\.be/([A-Za-z0-9_-]{11})"""),
-            Regex("""[?&]v=([A-Za-z0-9_-]{11})"""),
-            Regex("""youtube\.com/shorts/([A-Za-z0-9_-]{11})"""),
-            Regex("""youtube\.com/embed/([A-Za-z0-9_-]{11})""")
-        )
-        for (p in patterns) p.find(url)?.groupValues?.get(1)?.let { return it }
-        return null
+        val parsed = url.toHttpUrlOrNull() ?: return null
+        val host = parsed.host
+        val path = parsed.pathSegments
+        val id = when {
+            host == "youtu.be" || host == "www.youtu.be" -> path.firstOrNull()
+            host == "youtube.com" || host.endsWith(".youtube.com") ||
+                host == "youtube-nocookie.com" || host.endsWith(".youtube-nocookie.com") ->
+                when (path.firstOrNull()) {
+                    "watch" -> parsed.queryParameter("v")
+                    "shorts", "live", "embed", "v" -> path.getOrNull(1)
+                    else -> null
+                }
+            else -> null
+        }
+        return id?.takeIf { it.matches(Regex("[A-Za-z0-9_-]{11}")) }
     }
+
+    private fun canonicalVideoUrl(url: String): String = videoId(url)?.let {
+        "https://www.youtube.com/watch?v=$it"
+    } ?: throw ProviderException(ProviderErrorType.INVALID_LINK, "Not a YouTube video link")
 
     private fun resolutionValue(resolution: String?): Int =
         resolution?.takeWhile(Char::isDigit)?.toIntOrNull() ?: 0

@@ -300,7 +300,7 @@
     <string name="wifi_only">Wi-Fi only downloads</string>
     <string name="wifi_only_desc">Download only on an unmetered network</string>
     <string name="social_browser_title">Open Instagram/Snapchat in browser</string>
-    <string name="social_browser_desc">Public Instagram reels try direct download first. Use the browser when Instagram needs sign-in, and open Snapchat there directly.</string>
+    <string name="social_browser_desc">Public Instagram and Snapchat links try direct download first. Open the browser if the link cannot be resolved or needs sign-in.</string>
     <string name="max_concurrent">Max simultaneous downloads</string>
     <string name="app_lock">App lock</string>
     <string name="app_lock_desc">Require a PIN to open the app</string>

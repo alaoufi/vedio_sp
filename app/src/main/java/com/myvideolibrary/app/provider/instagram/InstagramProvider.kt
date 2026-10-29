@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.math.BigInteger
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -29,7 +30,10 @@ class InstagramProvider @Inject constructor(
     override val source: VideoSource = VideoSource.INSTAGRAM
 
     override fun canHandle(url: String): Boolean =
-        url.lowercase().let { it.contains("instagram.com") || it.contains("instagr.am") }
+        url.toHttpUrlOrNull()?.host?.let {
+            it == "instagram.com" || it.endsWith(".instagram.com") ||
+                it == "instagr.am" || it.endsWith(".instagr.am")
+        } ?: false
 
     override suspend fun resolve(url: String): ResolvedVideo = withContext(Dispatchers.IO) {
         relayResolve(url)?.let { return@withContext it }

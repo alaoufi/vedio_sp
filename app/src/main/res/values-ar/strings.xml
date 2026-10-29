@@ -263,7 +263,7 @@
     <string name="wifi_only">التحميل عبر Wi-Fi فقط</string>
     <string name="wifi_only_desc">التحميل فقط على شبكة غير محدودة</string>
     <string name="social_browser_title">فتح انستقرام/سناب في المتصفح</string>
-    <string name="social_browser_desc">روابط إنستقرام العامة تجرب التنزيل مباشرة أولاً. استخدم المتصفح عند الحاجة لتسجيل الدخول في إنستقرام، ولفتح سنابشات مباشرة.</string>
+    <string name="social_browser_desc">روابط إنستقرام وسنابشات العامة تجرب التنزيل مباشرة أولاً. افتح المتصفح إذا تعذر استخراج الرابط أو احتاج إلى تسجيل الدخول.</string>
     <string name="max_concurrent">أقصى عدد تحميلات متزامنة</string>
     <string name="app_lock">قفل التطبيق</string>
     <string name="app_lock_desc">طلب رمز PIN لفتح التطبيق</string>

@@ -34,10 +34,6 @@ class AddDownloadViewModel @Inject constructor(
     private val _state = MutableStateFlow(AddDownloadUiState())
     val state: StateFlow<AddDownloadUiState> = _state.asStateFlow()
 
-    private fun isSocialLink(url: String): Boolean = url.lowercase().let {
-        it.contains("instagram.com") || it.contains("instagr.am") || it.contains("snapchat.com")
-    }
-
     fun resolve(url: String) {
         val trimmed = url.trim()
         if (trimmed.isEmpty()) return
@@ -53,20 +49,16 @@ class AddDownloadViewModel @Inject constructor(
 
         _state.value = AddDownloadUiState(resolving = true)
         viewModelScope.launch {
-            val instagram = provider.source == com.myvideolibrary.app.data.model.VideoSource.INSTAGRAM
-            val preferBrowser = isSocialLink(trimmed) &&
+            val social = provider.source == com.myvideolibrary.app.data.model.VideoSource.INSTAGRAM ||
+                provider.source == com.myvideolibrary.app.data.model.VideoSource.SNAPCHAT
+            val preferBrowser = social &&
                 runCatching { settingsRepository.getSettings().socialOpenInBrowser }.getOrDefault(true)
-            // Public Instagram reels can resolve directly. Keep the configured
-            // browser route for login-only failures and the existing Snapchat path.
-            if (preferBrowser && !instagram) {
-                _state.value = AddDownloadUiState(openInBrowserUrl = trimmed)
-                return@launch
-            }
+            // Try public media first; the browser remains the configured fallback.
             try {
                 val resolved = provider.resolve(trimmed)
                 _state.value = AddDownloadUiState(resolved = resolved)
             } catch (e: ProviderException) {
-                if (instagram && preferBrowser) {
+                if (preferBrowser) {
                     _state.value = AddDownloadUiState(openInBrowserUrl = trimmed)
                     return@launch
                 }

@@ -7,6 +7,7 @@ import com.myvideolibrary.app.provider.web.OpenGraphResolver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -23,7 +24,9 @@ class SnapchatProvider @Inject constructor(
     override val source: VideoSource = VideoSource.SNAPCHAT
 
     override fun canHandle(url: String): Boolean =
-        url.lowercase().let { it.contains("snapchat.com") || it.contains("t.snapchat.com") }
+        url.toHttpUrlOrNull()?.host?.let {
+            it == "snapchat.com" || it.endsWith(".snapchat.com")
+        } ?: false
 
     override suspend fun resolve(url: String): ResolvedVideo = withContext(Dispatchers.IO) {
         OpenGraphResolver.resolve(client, url, source, "Snapchat video")
