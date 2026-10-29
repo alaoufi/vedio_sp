@@ -19,9 +19,8 @@ import java.nio.ByteBuffer
  * MP4 — with no Media3/Transformer and no OpenGL. This is the most portable path
  * and works where the Transformer image pipeline stalls.
  *
- * Each picture is converted to YUV exactly once (not per output frame) and the
- * frame rate is low, since the images are static — otherwise the encode is so
- * slow on weak devices that it looks like it hangs. Runs synchronously; call it
+ * Each picture is converted to YUV once and reused at a regular frame cadence.
+ * Runs synchronously; call it
  * from a background thread (MediaCodec here is in blocking mode, no Looper).
  *
  * @return null on success, else a short error message.
@@ -31,14 +30,8 @@ object SlideshowEncoder {
     private const val MIME = "video/avc"
     private const val W = 720
     private const val H = 1280
-    // One encoded frame per picture, held on screen via its presentation
-    // timestamp — NOT one frame every 1/FPS. A slideshow is therefore only
-    // (images + 1) frames total instead of hundreds, so it encodes in seconds
-    // even on weak devices. FPS here is just the container's nominal rate hint.
-    private const val FPS = 1
+    private const val FPS = 10
     private const val BITRATE = 4_000_000
-    /** Cap for how long a single-picture post is held to match its music. */
-    private const val MAX_SINGLE_IMAGE_US = 60_000_000L
     private const val TIMEOUT_US = 10_000L
 
     private class Yuv(val y: ByteArray, val u: ByteArray, val v: ByteArray)
@@ -77,9 +70,6 @@ object SlideshowEncoder {
         stage: java.util.concurrent.atomic.AtomicReference<String>?,
         onProgress: (Int) -> Unit
     ): String? {
-        // Each picture is shown for this long, controlled purely by timestamps.
-        // For a single-picture post this is stretched to the music length below.
-        var perImageUs = perImageMs * 1000L
         val imageCount = frames.size
 
         var encoder: MediaCodec? = null
@@ -117,51 +107,33 @@ object SlideshowEncoder {
                     val f = ex.getTrackFormat(i)
                     val mime = f.getString(MediaFormat.KEY_MIME).orEmpty()
                     if (mime.startsWith("audio/")) {
-                        if (mime == MediaFormat.MIMETYPE_AUDIO_AAC) {
-                            audioExtractor = ex; audioFormat = f; audioSrcTrack = i
+                        if (mime != MediaFormat.MIMETYPE_AUDIO_AAC) {
+                            ex.release()
+                            return "$encoderName: post audio must be converted to AAC"
                         }
+                        audioExtractor = ex; audioFormat = f; audioSrcTrack = i
                         break
                     }
                 }
-                if (audioExtractor == null) ex.release()
-            }
-
-            // A single-picture photo post should play for the length of its music
-            // (like TikTok's photo mode), not a fixed 2.5s. Hold the one frame for the
-            // audio duration, capped. Multi-image slideshows keep the per-image time.
-            if (imageCount == 1) {
-                val audioDurUs = audioFormat
-                    ?.takeIf { it.containsKey(MediaFormat.KEY_DURATION) }
-                    ?.getLong(MediaFormat.KEY_DURATION)?.takeIf { it > 0 }
-                if (audioDurUs != null) {
-                    perImageUs = audioDurUs.coerceIn(perImageUs, MAX_SINGLE_IMAGE_US)
+                if (audioExtractor == null) {
+                    ex.release()
+                    return "$encoderName: no audio track in post music"
                 }
             }
+
+            val audioDurationUs = audioFormat?.takeIf { it.containsKey(MediaFormat.KEY_DURATION) }
+                ?.getLong(MediaFormat.KEY_DURATION)?.takeIf { it > 0 }
+            if (audio != null && audioDurationUs == null) return "$encoderName: missing audio duration"
+            val timeline = SlideshowTimeline(imageCount, audioDurationUs, perImageMs)
 
             val info = MediaCodec.BufferInfo()
             var videoTrack = -1
             var audioDstTrack = -1
             var muxerStarted = false
 
-            var imagesFed = 0        // pictures fed so far; also the next PTS index
-            var imgIdx = 0           // next source file to try to decode
-            var lastYuv: Yuv? = null // last decoded picture, reused for the hold frame
-            var holdSent = false     // one trailing frame gives the last picture its time
-
-            fun loadNext(): Yuv? {
-                while (imgIdx < frames.size) {
-                    val bm = runCatching { BitmapFactory.decodeFile(frames[imgIdx].absolutePath) }
-                        .getOrNull()
-                    imgIdx++
-                    if (bm != null) {
-                        val yuv = bitmapToYuv(bm)
-                        bm.recycle()
-                        return yuv
-                    }
-                }
-                return null
-            }
-            var current: Yuv? = loadNext()
+            var samplesFed = 0
+            var cachedImage = -1
+            var cachedYuv: Yuv? = null
 
             var inputDone = false
             var outputDone = false
@@ -170,41 +142,27 @@ object SlideshowEncoder {
                 if (!inputDone) {
                     val inIndex = encoder!!.dequeueInputBuffer(TIMEOUT_US)
                     if (inIndex >= 0) {
-                        val yuv = current
-                        if (yuv == null) {
-                            // All pictures fed. Emit one trailing copy of the last
-                            // picture so it stays on screen for its full turn, then
-                            // end the stream.
-                            val hold = lastYuv
-                            if (!holdSent && hold != null) {
-                                val image = encoder!!.getInputImage(inIndex)
-                                    ?: return "$encoderName: encoder gave no input image"
-                                fillImage(image, hold)
-                                encoder!!.queueInputBuffer(
-                                    inIndex, 0, W * H * 3 / 2, imagesFed * perImageUs, 0
-                                )
-                                holdSent = true
-                            } else {
-                                encoder!!.queueInputBuffer(
-                                    inIndex, 0, 0, (imagesFed + 1) * perImageUs,
-                                    MediaCodec.BUFFER_FLAG_END_OF_STREAM
-                                )
-                                inputDone = true
-                            }
+                        if (samplesFed == timeline.frameCount) {
+                            encoder!!.queueInputBuffer(inIndex, 0, 0, timeline.durationUs,
+                                MediaCodec.BUFFER_FLAG_END_OF_STREAM)
+                            inputDone = true
                         } else {
+                            val imageIndex = timeline.imageIndex(samplesFed)
+                            if (imageIndex != cachedImage) {
+                                val bitmap = BitmapFactory.decodeFile(frames[imageIndex].absolutePath)
+                                    ?: return "$encoderName: couldn't decode picture ${imageIndex + 1}"
+                                try { cachedYuv = bitmapToYuv(bitmap) } finally { bitmap.recycle() }
+                                cachedImage = imageIndex
+                            }
                             val image = encoder!!.getInputImage(inIndex)
                                 ?: return "$encoderName: encoder gave no input image"
-                            fillImage(image, yuv)
-                            // PTS = position * per-image duration → the picture holds
-                            // until the next frame's timestamp.
+                            fillImage(image, cachedYuv!!)
                             encoder!!.queueInputBuffer(
-                                inIndex, 0, W * H * 3 / 2, imagesFed * perImageUs, 0
+                                inIndex, 0, W * H * 3 / 2, timeline.presentationTimeUs(samplesFed), 0
                             )
-                            lastYuv = yuv
-                            imagesFed++
-                            stage?.set("in $imagesFed/$imageCount")
-                            onProgress(imagesFed * 100 / imageCount)
-                            current = loadNext()
+                            samplesFed++
+                            stage?.set("frame $samplesFed/${timeline.frameCount}")
+                            onProgress(samplesFed * 100 / timeline.frameCount)
                         }
                     }
                 }
@@ -213,7 +171,7 @@ object SlideshowEncoder {
                 when {
                     outIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
                         videoTrack = muxer.addTrack(encoder!!.outputFormat)
-                        audioFormat?.let { audioDstTrack = muxer.addTrack(it) }
+                        audioFormat?.let { audioDstTrack = muxer!!.addTrack(it) }
                         muxer.start()
                         muxerStarted = true
                         stage?.set("muxing")
@@ -232,15 +190,20 @@ object SlideshowEncoder {
                 }
             }
 
-            if (imagesFed == 0) return "$encoderName: no frames encoded"
+            if (samplesFed != timeline.frameCount) return "$encoderName: incomplete video frames"
 
-            // Last picture (the trailing hold frame) also gets a full turn.
-            val videoDurationUs = (imagesFed + 1).toLong() * perImageUs
             val ex = audioExtractor
             if (muxerStarted && ex != null && audioDstTrack >= 0) {
                 stage?.set("audio")
-                writeAudioLooped(muxer, ex, audioSrcTrack, audioDstTrack, audioFormat, videoDurationUs)
+                writeAudioLooped(muxer, ex, audioSrcTrack, audioDstTrack, audioFormat, timeline.durationUs)
             }
+            check(muxerStarted && videoTrack >= 0) { "No video track was produced" }
+            stage?.set("finalizing")
+            // Finalizing MP4 can fail; report that failure instead of swallowing it.
+            muxer.stop()
+            muxer.release()
+            muxer = null
+            verifyOutput(output, audio != null, timeline.durationUs)
             stage?.set("done")
             return null
         } catch (e: Throwable) {
@@ -253,6 +216,27 @@ object SlideshowEncoder {
             runCatching { muxer?.release() }
             runCatching { audioExtractor?.release() }
         }
+    }
+
+    private fun verifyOutput(output: File, audioRequired: Boolean, expectedDurationUs: Long) {
+        val extractor = MediaExtractor()
+        try {
+            extractor.setDataSource(output.absolutePath)
+            var videoFound = false
+            var audioFound = false
+            for (i in 0 until extractor.trackCount) {
+                val format = extractor.getTrackFormat(i)
+                val mime = format.getString(MediaFormat.KEY_MIME).orEmpty()
+                if (mime.startsWith("video/")) {
+                    videoFound = true
+                    check(format.containsKey(MediaFormat.KEY_DURATION)) { "Missing video duration" }
+                    val duration = format.getLong(MediaFormat.KEY_DURATION)
+                    check(kotlin.math.abs(duration - expectedDurationUs) <= 250_000L) { "Incomplete video duration" }
+                }
+                if (mime == MediaFormat.MIMETYPE_AUDIO_AAC) audioFound = true
+            }
+            check(videoFound && (!audioRequired || audioFound)) { "Missing video or music track" }
+        } finally { extractor.release() }
     }
 
     /**

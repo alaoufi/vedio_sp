@@ -514,6 +514,7 @@ class DownloadWorker @AssistedInject constructor(
         val rawFiles = ArrayList<File>()
         val frameFiles = ArrayList<File>()
         var audioFile: File? = null
+        var preparedAudio: File? = null
         try {
             // Fetch every picture, then re-encode each to an identical JPEG canvas
             // so the encoder gets uniform frames (mixed sizes/WEBP break some
@@ -527,14 +528,22 @@ class DownloadWorker @AssistedInject constructor(
                     }
                     rawFiles.add(raw)
                     val frame = File(dir, "${destFile.name}.f$i.jpg")
-                    if (normalizeFrame(raw, frame)) frameFiles.add(frame)
+                    if (!normalizeFrame(raw, frame)) throw IllegalStateException("Couldn't read image ${i + 1}")
+                    frameFiles.add(frame)
                 }
             }
             if (frameFiles.isEmpty()) throw IllegalStateException("Couldn't read the images")
 
             download.audioUrl?.takeIf { it.isNotBlank() }?.let { a ->
                 val f = File(dir, "${destFile.name}.audio")
-                if (withContext(Dispatchers.IO) { fetchToFile(a, f) }) audioFile = f
+                audioFile = f
+                if (!withContext(Dispatchers.IO) { fetchToFile(a, f) }) {
+                    throw IllegalStateException("Couldn't fetch post audio")
+                }
+                val converted = File(dir, "${destFile.name}.audio.m4a")
+                preparedAudio = converted
+                withContext(Dispatchers.IO) { converted.delete() }
+                com.myvideolibrary.app.util.SlideshowAudio.prepare(applicationContext, f, converted)
             }
 
             val encodePercent = java.util.concurrent.atomic.AtomicInteger(0)
@@ -548,9 +557,9 @@ class DownloadWorker @AssistedInject constructor(
                         delay(700)
                     }
                 }
-                val e = runSlideshow(frameFiles, audioFile, destFile, encodePercent)
-                reporter.cancel()
-                e
+                try {
+                    runSlideshow(frameFiles, preparedAudio, destFile, encodePercent)
+                } finally { reporter.cancel() }
             }
             if (error != null) throw IllegalStateException("Video build failed — $error")
             return true
@@ -558,14 +567,10 @@ class DownloadWorker @AssistedInject constructor(
             rawFiles.forEach { runCatching { it.delete() } }
             frameFiles.forEach { runCatching { it.delete() } }
             audioFile?.let { runCatching { it.delete() } }
+            preparedAudio?.let { runCatching { it.delete() } }
         }
     }
 
-    /**
-     * Runs the on-device compose with the music; if that fails (some encoders
-     * choke on the TikTok audio track) retries once without it so the user still
-     * gets the moving video instead of nothing. Each attempt is time-bounded.
-     */
     /** @return null on success, else a short error describing the failure. */
     private suspend fun runSlideshow(
         frames: List<File>,
@@ -591,22 +596,8 @@ class DownloadWorker @AssistedInject constructor(
             }
         }
 
-        val withMusic = attempt(audio)
-        if (withMusic == null) return null
-        // A timeout means the video encode itself is too slow on this device —
-        // NOT the audio track. encode() is a blocking call that withTimeoutOrNull
-        // can't actually interrupt, so starting a second (silent) attempt here
-        // would run concurrently with the first still-running encode, and both
-        // would then time out. Only retry without audio for a real encoder error.
-        if (withMusic.startsWith("timed out")) return withMusic
-        if (audio != null) {
-            progress.set(0)
-            output.delete()
-            val silent = attempt(null)
-            if (silent == null) return null
-            return "music[$withMusic] silent[$silent]"
-        }
-        return withMusic
+        // A post with music must not silently become a successful muted video.
+        return attempt(audio)
     }
 
     /**

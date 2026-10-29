@@ -49,6 +49,21 @@ jobs:
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
 
+      - name: Verify slideshow audio and playback on Android before release
+        timeout-minutes: 15
+        run: bash scripts/test-slideshow-android.sh '${{ github.run_number }}'
+
+      - name: Upload Android media test diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-media-test-results
+          path: |
+            app/build/reports/androidTests/
+            app/build/outputs/androidTest-results/
+            emulator.log
+          if-no-files-found: ignore
+
       - name: Remove old APK assets (renamed to vedio_lb.apk)
         if: success()
         run: |
