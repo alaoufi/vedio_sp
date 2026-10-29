@@ -575,7 +575,10 @@ class DownloadWorker @AssistedInject constructor(
     ): String? {
         suspend fun attempt(withAudio: File?): String? {
             val stage = java.util.concurrent.atomic.AtomicReference("start")
-            return kotlinx.coroutines.withTimeoutOrNull(8 * 60 * 1000L) {
+            return com.myvideolibrary.app.util.SlideshowAttempt.run(
+                timeoutMs = 8 * 60 * 1000L,
+                stage = { stage.get() }
+            ) {
                 withContext(Dispatchers.IO) {
                     // Low-level MediaCodec/MediaMuxer encoder — no Media3, no GL.
                     com.myvideolibrary.app.util.SlideshowEncoder.encode(
@@ -585,8 +588,7 @@ class DownloadWorker @AssistedInject constructor(
                         stage = stage
                     ) { p -> progress.set(p) }
                 }
-                // Names the exact stage reached so a hang points to its cause.
-            } ?: "timed out @ ${stage.get()}"
+            }
         }
 
         val withMusic = attempt(audio)
