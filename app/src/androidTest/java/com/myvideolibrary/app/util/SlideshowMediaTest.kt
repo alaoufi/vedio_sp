@@ -19,7 +19,7 @@ import java.nio.ByteBuffer
 
 @RunWith(AndroidJUnit4::class)
 class SlideshowMediaTest {
-    @Test fun mp3PhotoExportsCompletePlayableVideoWithSound() = runBlocking {
+    @Test fun mp3PhotoExportsCompletePlayableVideoWithSound(): Unit = runBlocking {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val context = instrumentation.targetContext
         val dir = File(context.cacheDir, "slideshow-test-${System.nanoTime()}").apply { mkdirs() }
