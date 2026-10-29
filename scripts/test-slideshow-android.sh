@@ -13,13 +13,25 @@ ffmpeg -hide_banner -loglevel error -f lavfi -i 'sine=frequency=440:duration=164
 test -e /dev/kvm
 sudo chmod a+rw /dev/kvm
 sdkmanager 'emulator' 'system-images;android-35;google_apis;x86_64' >/dev/null
+export ANDROID_AVD_HOME="${RUNNER_TEMP:?}/slideshow-avds"
+export ANDROID_USER_HOME="$RUNNER_TEMP/slideshow-android"
+mkdir -p "$ANDROID_AVD_HOME" "$ANDROID_USER_HOME"
 printf 'no\n' | avdmanager create avd --force --name slideshow-test \
-  --package 'system-images;android-35;google_apis;x86_64' >/dev/null
+  --path "$ANDROID_AVD_HOME/slideshow-test.avd" \
+  --package 'system-images;android-35;google_apis;x86_64'
+# SDK tools and newer emulator versions can use different default user homes.
+# Point both explicitly at the same AVD, including its discovery entry.
+test -f "$ANDROID_AVD_HOME/slideshow-test.avd/config.ini"
+printf 'avd.ini.encoding=UTF-8\npath=%s\ntarget=android-35\n' \
+  "$ANDROID_AVD_HOME/slideshow-test.avd" > "$ANDROID_AVD_HOME/slideshow-test.ini"
+"$ANDROID_HOME/emulator/emulator" -list-avds | grep -Fx slideshow-test
 "$ANDROID_HOME/emulator/emulator" -avd slideshow-test -no-window -no-audio \
-  -no-snapshot -no-boot-anim -gpu swiftshader_indirect -memory 2048 -cores 2 \
+  -no-snapshot -no-boot-anim -no-metrics -gpu swiftshader_indirect -memory 2048 -cores 2 \
   > emulator.log 2>&1 &
 emulator_pid=$!
 trap 'adb emu kill >/dev/null 2>&1 || true; kill "$emulator_pid" 2>/dev/null || true' EXIT
+sleep 2
+if ! kill -0 "$emulator_pid" 2>/dev/null; then cat emulator.log; exit 1; fi
 timeout 180 adb wait-for-device
 booted=false
 for _ in $(seq 1 90); do
