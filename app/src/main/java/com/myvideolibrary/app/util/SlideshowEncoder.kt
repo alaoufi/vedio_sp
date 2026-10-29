@@ -269,22 +269,16 @@ object SlideshowEncoder {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) info.isSoftwareOnly
             else info.name.lowercase().let { it.startsWith("omx.google") || it.startsWith("c2.android") }
 
-        fun candidate(wantSoftware: Boolean): String? = infos.firstOrNull { info ->
+        fun candidates(wantSoftware: Boolean): List<String> = infos.filter { info ->
             info.isEncoder &&
                 info.supportedTypes.any { it.equals(MIME, ignoreCase = true) } &&
                 isSoftware(info) == wantSoftware &&
                 runCatching {
                     info.getCapabilitiesForType(MIME).colorFormats.any { it == flexible }
                 }.getOrDefault(false)
-        }?.name
+        }.map { it.name }
 
-        val hardware = candidate(wantSoftware = false)
-        val software = candidate(wantSoftware = true)
-        val ordered = ArrayList<String?>()
-        hardware?.let { ordered.add(it) }
-        software?.let { if (it != hardware) ordered.add(it) }
-        ordered.add(null) // platform default, last resort
-        return ordered
+        return SlideshowEncoderPolicy.order(candidates(false), candidates(true))
     }
 
     /** Converts an ARGB bitmap to packed I420 YUV once (BT.601), reused per frame. */

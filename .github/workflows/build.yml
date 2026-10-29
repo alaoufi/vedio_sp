@@ -34,7 +34,7 @@ jobs:
 
       - name: Build debug APK
         run: >-
-          ./gradlew assembleDebug --stacktrace
+          ./gradlew testDebugUnitTest assembleDebug --stacktrace
           -PversionCode=${{ github.run_number }}
           -PversionName=1.0.${{ github.run_number }}
 

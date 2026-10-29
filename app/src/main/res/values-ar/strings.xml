@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="download_wrong_payload">أعاد الخادم صورة أو صفحة خطأ بدل المقطع المطلوب. يرجى إعادة المحاولة.</string>
     <string name="app_name">مكتبة الوسائط</string>
 
     <!-- Tabs / YouTube -->
@@ -262,7 +263,7 @@
     <string name="wifi_only">التحميل عبر Wi-Fi فقط</string>
     <string name="wifi_only_desc">التحميل فقط على شبكة غير محدودة</string>
     <string name="social_browser_title">فتح انستقرام/سناب في المتصفح</string>
-    <string name="social_browser_desc">هذه المواقع تتطلب تسجيل الدخول؛ المتصفح داخل التطبيق يلتقط الفيديو وأنت مسجّل الدخول. أوقفه لتجربة فكّ الرابط أولاً.</string>
+    <string name="social_browser_desc">روابط إنستقرام العامة تجرب التنزيل مباشرة أولاً. استخدم المتصفح عند الحاجة لتسجيل الدخول في إنستقرام، ولفتح سنابشات مباشرة.</string>
     <string name="max_concurrent">أقصى عدد تحميلات متزامنة</string>
     <string name="app_lock">قفل التطبيق</string>
     <string name="app_lock_desc">طلب رمز PIN لفتح التطبيق</string>

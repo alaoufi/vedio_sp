@@ -47,7 +47,8 @@ class InstagramProvider @Inject constructor(
     /** Fetches the video via an embed relay that exposes og:video to bot clients. */
     private fun relayResolve(url: String): ResolvedVideo? {
         for (host in RELAY_HOSTS) {
-            val relay = url.replace(Regex("(?i)([a-z0-9-]+\\.)?instagram\\.com"), host)
+            val relay = url.substringBefore('?').substringBefore('#')
+                .replace(Regex("(?i)([a-z0-9-]+\\.)?instagram\\.com"), host)
             val result = runCatching { fetchOg(relay, url) }.getOrNull()
             if (result != null) return result
         }
@@ -61,9 +62,21 @@ class InstagramProvider @Inject constructor(
             .build()
         val body = client.newCall(request).execute().use { resp ->
             if (!resp.isSuccessful) return null
+            // Some relays redirect straight to the CDN's MP4 rather than HTML.
+            // Return that final URL without decoding binary video as page text.
+            if (resp.body?.contentType()?.type.equals("video", ignoreCase = true)) {
+                return ResolvedVideo(
+                    source = source,
+                    sourceUrl = originalUrl,
+                    title = "Instagram video",
+                    directUrl = resp.request.url.toString()
+                )
+            }
+            if (resp.body?.contentType()?.type.equals("image", ignoreCase = true)) return null
             resp.body?.string()
         } ?: return null
-        val video = meta(body, "og:video:secure_url") ?: meta(body, "og:video") ?: return null
+        val video = meta(body, "og:video:secure_url") ?: meta(body, "og:video:url")
+            ?: meta(body, "og:video") ?: return null
         return ResolvedVideo(
             source = source,
             sourceUrl = originalUrl,

@@ -115,23 +115,9 @@ class DownloadWorker @AssistedInject constructor(
         } catch (e: Exception) {
             coroutineContext.ensureActive()
             // A slideshow build can't be fixed by retrying the same device encoder.
-            // Rather than fail outright, fall back to saving the first picture so the
-            // post still downloads (as an image) on devices whose encoder can't build
-            // the video.
+            // Keep the requested video kind. An encoder failure must not silently
+            // save its first picture and report a successful video download.
             if (kind == com.myvideolibrary.app.data.model.DownloadKind.SLIDESHOW) {
-                val firstImage = download.imageUrls
-                    ?.split("\n")?.map { it.trim() }?.firstOrNull { it.isNotEmpty() }
-                val savedImage = firstImage != null &&
-                    withContext(Dispatchers.IO) { fetchToFile(firstImage, destFile) }
-                if (savedImage) {
-                    markProcessing(downloadId)
-                    finalize(
-                        downloadId, download.title, destFile,
-                        com.myvideolibrary.app.data.model.DownloadKind.IMAGE_ONLY
-                    )
-                    notifier.showComplete(notificationId, download.title, true)
-                    return Result.success(workDataOf(KEY_DOWNLOAD_ID to downloadId))
-                }
                 downloadRepository.setStatus(
                     downloadId, DownloadStatus.FAILED, e.message ?: "Slideshow build failed"
                 )
@@ -667,6 +653,17 @@ class DownloadWorker @AssistedInject constructor(
         destFile: File,
         kind: com.myvideolibrary.app.data.model.DownloadKind
     ) {
+        val prefix = destFile.inputStream().use { input ->
+            val bytes = ByteArray(32)
+            bytes.copyOf(input.read(bytes).coerceAtLeast(0))
+        }
+        if (!DownloadPayloadPolicy.accepts(kind, prefix)) {
+            // Only this uncommitted download is invalid. Discard its partial
+            // bytes so a refreshed URL starts clean instead of resuming a JPEG.
+            destFile.delete()
+            File(destFile.parentFile, destFile.name + PARTS_SUFFIX).delete()
+            throw IllegalStateException(applicationContext.getString(com.myvideolibrary.app.R.string.download_wrong_payload))
+        }
         val download = downloadRepository.get(downloadId)
 
         val mediaType = when (kind) {

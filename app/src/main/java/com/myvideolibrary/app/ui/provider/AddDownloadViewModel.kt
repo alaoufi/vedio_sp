@@ -53,11 +53,12 @@ class AddDownloadViewModel @Inject constructor(
 
         _state.value = AddDownloadUiState(resolving = true)
         viewModelScope.launch {
-            // Optional shortcut: for login-walled platforms (Instagram/Snapchat), skip
-            // the flaky resolver and let the in-app browser capture the video instead.
-            if (isSocialLink(trimmed) &&
+            val instagram = provider.source == com.myvideolibrary.app.data.model.VideoSource.INSTAGRAM
+            val preferBrowser = isSocialLink(trimmed) &&
                 runCatching { settingsRepository.getSettings().socialOpenInBrowser }.getOrDefault(true)
-            ) {
+            // Public Instagram reels can resolve directly. Keep the configured
+            // browser route for login-only failures and the existing Snapchat path.
+            if (preferBrowser && !instagram) {
                 _state.value = AddDownloadUiState(openInBrowserUrl = trimmed)
                 return@launch
             }
@@ -65,6 +66,10 @@ class AddDownloadViewModel @Inject constructor(
                 val resolved = provider.resolve(trimmed)
                 _state.value = AddDownloadUiState(resolved = resolved)
             } catch (e: ProviderException) {
+                if (instagram && preferBrowser) {
+                    _state.value = AddDownloadUiState(openInBrowserUrl = trimmed)
+                    return@launch
+                }
                 _state.value = AddDownloadUiState(
                     errorType = e.type,
                     errorMessage = e.message
